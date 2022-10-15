@@ -7,6 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
 import { ScheduleModule } from '@nestjs/schedule';
 import { UserModule } from './users/user.module';
+import { JwtModule } from './jwt/jwt.module';
 
 @Module({
   imports: [
@@ -42,6 +43,9 @@ import { UserModule } from './users/user.module';
       entities: [User],
     }),
     UserModule,
+    JwtModule.forRoot({
+      privateKey: process.env.PRIVATE_KEY,
+    }),
   ],
   controllers: [],
   providers: [],

@@ -1,3 +1,4 @@
+import { User } from './users/entities/user.entity';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
@@ -5,7 +6,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
 import { ScheduleModule } from '@nestjs/schedule';
-import { UserModule } from './user/user.module';
+import { UserModule } from './users/user.module';
 
 @Module({
   imports: [
@@ -38,7 +39,7 @@ import { UserModule } from './user/user.module';
       database: process.env.DB_NAME,
       synchronize: process.env.NODE_ENV !== 'prod',
       logging: false,
-      entities: [],
+      entities: [User],
     }),
     UserModule,
   ],

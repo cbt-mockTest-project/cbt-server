@@ -7,7 +7,7 @@ import { Column, Entity, OneToMany } from 'typeorm';
 @ObjectType()
 @Entity()
 export class MockExamCategory extends CoreEntity {
-  @Column()
+  @Column({ unique: true })
   @Field(() => String)
   name: string;
 

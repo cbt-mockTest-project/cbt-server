@@ -14,6 +14,7 @@ import {
   EditMockExamCategoryInput,
   EditMockExamCategoryOutput,
 } from './dtos/editCategory.dto';
+import { ReadAllMockExamCategoriesOutput } from './dtos/readAllCategories.dto';
 
 @Injectable()
 export class MockExamCategoryService {
@@ -102,5 +103,20 @@ export class MockExamCategoryService {
     return {
       ok: true,
     };
+  }
+
+  async readAllMockExamCategories(): Promise<ReadAllMockExamCategoriesOutput> {
+    try {
+      const categories = await this.mockExamCategories.find();
+      return {
+        ok: true,
+        categories,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '카테고리를 찾을 수 없습니다.',
+      };
+    }
   }
 }

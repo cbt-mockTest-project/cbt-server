@@ -1,10 +1,11 @@
+import { ReadAllMockExamCategoriesOutput } from './dtos/readAllCategories.dto';
 import {
   CreateMockExamCategoryInput,
   CreateMockExamCategoryOutput,
 } from './dtos/createCategory.dto';
 import { MockExamCategoryService } from './mock-exams-category.service';
 import { MockExamCategory } from './entities/mock-exam-category.entity';
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { Role } from 'src/auth/role.decorators';
 import {
   DeleteMockExamCategoryInput,
@@ -49,5 +50,10 @@ export class MockExamCategoryResolver {
     return this.mockExamCategoryService.editMockExamCategory(
       editMockExamCategoryInput,
     );
+  }
+
+  @Query(() => ReadAllMockExamCategoriesOutput)
+  readAllMockExamCategories(): Promise<ReadAllMockExamCategoriesOutput> {
+    return this.mockExamCategoryService.readAllMockExamCategories();
   }
 }

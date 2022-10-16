@@ -13,9 +13,9 @@ export class CoreEntity {
 
   @CreateDateColumn()
   @Field(() => Date)
-  createdAt: Date;
+  created_at: Date;
 
   @UpdateDateColumn()
   @Field(() => Date)
-  updatedAt: Date;
+  updated_at: Date;
 }

@@ -1,3 +1,6 @@
+import { MockExamQuestionFeedback } from './mock-exams/entities/mock-exam-question-feedback.entity';
+import { MockExamQuestion } from './mock-exams/entities/mock-exam-question.entity';
+import { MockExamCategory } from './mock-exams/entities/mock-exam-category.entity';
 import { User } from './users/entities/user.entity';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
@@ -9,6 +12,8 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { UserModule } from './users/user.module';
 import { JwtModule } from './jwt/jwt.module';
 import { AuthModule } from './auth/auth.module';
+import { MockExamsModule } from './mock-exams/mock-exams.module';
+import { MockExam } from './mock-exams/entities/mock-exam.entity';
 
 @Module({
   imports: [
@@ -41,13 +46,20 @@ import { AuthModule } from './auth/auth.module';
       database: process.env.DB_NAME,
       synchronize: process.env.NODE_ENV !== 'prod',
       logging: false,
-      entities: [User],
+      entities: [
+        User,
+        MockExam,
+        MockExamCategory,
+        MockExamQuestion,
+        MockExamQuestionFeedback,
+      ],
     }),
     UserModule,
     JwtModule.forRoot({
       privateKey: process.env.PRIVATE_KEY,
     }),
     AuthModule,
+    MockExamsModule,
   ],
   controllers: [],
   providers: [],

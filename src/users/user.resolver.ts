@@ -4,7 +4,6 @@ import { RegisterInput, RegisterOutput } from './dtos/register.dto';
 import { User } from './entities/user.entity';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UserService } from './user.service';
-import { JwtService } from 'src/jwt/jwt.service';
 import { Role } from 'src/auth/role.decorators';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 
@@ -12,7 +11,6 @@ import { AuthUser } from 'src/auth/auth-user.decorator';
 export class UserResolver {
   constructor(private readonly userService: UserService) {}
 
-  @Role(['ANY'])
   @Mutation(() => RegisterOutput)
   async register(
     @Args('input') registerInput: RegisterInput,
@@ -20,7 +18,6 @@ export class UserResolver {
     return this.userService.register(registerInput);
   }
 
-  @Role(['ANY'])
   @Query(() => UserProfileOutput)
   async userProfile(
     @Args('input') userProfileInput: UserProfileInput,

@@ -8,6 +8,10 @@ import { MockExamQuestion } from './mock-exam-question.entity';
 @ObjectType()
 @Entity()
 export class MockExam extends CoreEntity {
+  @Column({ unique: true })
+  @Field(() => String)
+  title: string;
+
   @Column()
   @Field(() => Boolean, { defaultValue: false })
   approved: boolean;

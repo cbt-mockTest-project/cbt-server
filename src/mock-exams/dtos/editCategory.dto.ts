@@ -1,6 +1,6 @@
-import { CoreOutput } from '../../common/dtos/output.dto';
-import { MockExamCategory } from '../entities/mock-exam-category.entity';
 import { InputType, ObjectType, PickType } from '@nestjs/graphql';
+import { CoreOutput } from 'src/common/dtos/output.dto';
+import { MockExamCategory } from '../entities/mock-exam-category.entity';
 
 @InputType()
 export class EditMockExamCategoryInput extends PickType(MockExamCategory, [

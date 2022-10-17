@@ -4,14 +4,17 @@ import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { MockExamQuestionFeedback } from './mock-exam-question-feedback.entity';
 
+@InputType('MockExamQuestionImageInputType', { isAbstract: true })
+@ObjectType()
+export class MockExamQuestionImage {
+  @Field(() => String)
+  url: string;
+}
+
 @InputType('MockExamQuestionInputType', { isAbstract: true })
 @ObjectType()
 @Entity()
 export class MockExamQuestion extends CoreEntity {
-  @Column()
-  @Field(() => Number)
-  number: number;
-
   @Column()
   @Field(() => String)
   question: string;
@@ -24,13 +27,13 @@ export class MockExamQuestion extends CoreEntity {
   @Field(() => Boolean)
   approved: boolean;
 
-  @Column('simple-array', { array: true })
-  @Field(() => [String], { nullable: true })
-  question_img: string[];
+  @Column({ type: 'json', nullable: true })
+  @Field(() => [MockExamQuestionImage], { nullable: true })
+  question_img: MockExamQuestionImage[];
 
-  @Column('simple-array', { array: true })
-  @Field(() => [String], { nullable: true })
-  solution_img: string[];
+  @Column({ type: 'json', nullable: true })
+  @Field(() => [MockExamQuestionImage], { nullable: true })
+  solution_img: MockExamQuestionImage[];
 
   @Field(() => MockExam)
   @ManyToOne(() => MockExam, (mockExam) => mockExam.mockExamQuestion)

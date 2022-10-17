@@ -30,7 +30,7 @@ https://dbdiagram.io/d/634a210ef0018a1c5f0afe8e
   - readAllCategories
 
 ## 진행예정
-- MockExamQuestion CRUD
-- MockExamQuestionFeedback CRUD
-- MockExam CRUD
-- FileUpload controller
+- [] MockExamQuestion CRUD
+- [] MockExamQuestionFeedback CRUD
+- [o] MockExam CRUD
+- [] FileUpload controller

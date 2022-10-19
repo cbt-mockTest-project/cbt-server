@@ -30,6 +30,7 @@
     "@nestjs/schedule": "^2.1.0",
     "@nestjs/typeorm": "^9.0.1",
     "apollo-server-express": "^3.10.3",
+    "aws-sdk": "^2.1235.0",
     "bcrypt": "^5.1.0",
     "class-validator": "^0.13.2",
     "cross-env": "^7.0.3",

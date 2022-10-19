@@ -14,6 +14,7 @@ import { JwtModule } from './jwt/jwt.module';
 import { AuthModule } from './auth/auth.module';
 import { MockExamsModule } from './mock-exams/mock-exams.module';
 import { MockExam } from './mock-exams/entities/mock-exam.entity';
+import { UploadsModule } from './uploads/uploads.module';
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { MockExam } from './mock-exams/entities/mock-exam.entity';
     }),
     AuthModule,
     MockExamsModule,
+    UploadsModule,
   ],
   controllers: [],
   providers: [],

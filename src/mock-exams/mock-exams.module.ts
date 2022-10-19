@@ -1,3 +1,6 @@
+import { MockExamQuestionFeedback } from './entities/mock-exam-question-feedback.entity';
+import { MockExamQuestionFeedbackSerivce } from './mock-exams-question-feedback.service';
+import { MockExamQuestionFeedbackResolver } from './mock-exams-question-feedback.resolver';
 import { MockExamQuestion } from './entities/mock-exam-question.entity';
 import { MockExamQuestionResolver } from './mock-exams-question.resolver';
 import { MockExam } from './entities/mock-exam.entity';
@@ -12,7 +15,12 @@ import { MockExamQuestionService } from './mock-exams-question.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([MockExamCategory, MockExam, MockExamQuestion]),
+    TypeOrmModule.forFeature([
+      MockExamCategory,
+      MockExam,
+      MockExamQuestion,
+      MockExamQuestionFeedback,
+    ]),
   ],
   providers: [
     MockExamCategoryResolver,
@@ -21,6 +29,8 @@ import { MockExamQuestionService } from './mock-exams-question.service';
     MockExamService,
     MockExamQuestionResolver,
     MockExamQuestionService,
+    MockExamQuestionFeedbackResolver,
+    MockExamQuestionFeedbackSerivce,
   ],
   exports: [],
 })

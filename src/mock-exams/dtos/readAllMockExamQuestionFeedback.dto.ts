@@ -1,5 +1,9 @@
+import { MockExamQuestionFeedback } from './../entities/mock-exam-question-feedback.entity';
 import { CoreOutput } from './../../common/dtos/output.dto';
-import { ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
-export class ReadAllMockExamQuestionFeedbackOutput extends CoreOutput {}
+export class ReadAllMockExamQuestionFeedbackOutput extends CoreOutput {
+  @Field(() => [MockExamQuestionFeedback])
+  feedbacks?: MockExamQuestionFeedback[];
+}

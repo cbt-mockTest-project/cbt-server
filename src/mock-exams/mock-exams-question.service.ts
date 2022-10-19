@@ -118,7 +118,9 @@ export class MockExamQuestionService {
 
   async readAllMockExamQuestion(): Promise<ReadAllMockExamQuestionOutput> {
     try {
-      const mockExamQuestions = await this.mockExamQuestion.find();
+      const mockExamQuestions = await this.mockExamQuestion.find({
+        relations: ['mockExamQuestionFeedback'],
+      });
       return {
         ok: true,
         mockExamQuestions,

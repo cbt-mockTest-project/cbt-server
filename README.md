@@ -33,4 +33,4 @@ https://dbdiagram.io/d/634a210ef0018a1c5f0afe8e
 - [o] MockExamQuestion CRUD
 - [] MockExamQuestionFeedback CRUD
 - [o] MockExam CRUD
-- [] FileUpload controller
+- [o] FileUpload controller

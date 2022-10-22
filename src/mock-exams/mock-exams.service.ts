@@ -2,7 +2,10 @@ import {
   SearchMockExamInput,
   SearchMockExamOutput,
 } from './dtos/searchMockExam.dto';
-import { ReadAllMockExamsOutput } from './dtos/readAllMockExam.dto';
+import {
+  ReadAllMockExamsOutput,
+  ReadAllMockExamsInput,
+} from './dtos/readAllMockExam.dto';
 import {
   DeleteMockExamInput,
   DeleteMockExamOutput,
@@ -98,9 +101,16 @@ export class MockExamService {
     return { ok: true };
   }
 
-  async readAllMockExam(): Promise<ReadAllMockExamsOutput> {
+  async readAllMockExam(
+    readAllMockExamsInput: ReadAllMockExamsInput,
+  ): Promise<ReadAllMockExamsOutput> {
     try {
-      const mockExams = await this.mockExam.find();
+      const { query } = readAllMockExamsInput;
+      const mockExams = await this.mockExam.find({
+        where: {
+          title: Raw((title) => `${title} ILIKE '%${query}%'`),
+        },
+      });
       return { ok: true, mockExams };
     } catch {
       return {

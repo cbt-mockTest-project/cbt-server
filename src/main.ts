@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  await app.listen(3000);
-  console.log('go to graphql : http://localhost:3000/graphql');
+  await app.listen(8070);
+  console.log('go to graphql : http://localhost:8070/graphql');
 }
 bootstrap();

@@ -12,6 +12,10 @@ import {
   DeleteMockExamInput,
   DeleteMockExamOutput,
 } from './dtos/deleteMockExam.dto';
+import {
+  SearchMockExamOutput,
+  SearchMockExamInput,
+} from './dtos/searchMockExam.dto';
 
 @Resolver(() => MockExam)
 export class MockExamResolver {
@@ -43,5 +47,12 @@ export class MockExamResolver {
   @Query(() => ReadAllMockExamsOutput)
   readAllMockExam(): Promise<ReadAllMockExamsOutput> {
     return this.mockExamService.readAllMockExam();
+  }
+
+  @Query(() => SearchMockExamOutput)
+  searchMockExam(
+    @Args('input') searchMockExamInput: SearchMockExamInput,
+  ): Promise<SearchMockExamOutput> {
+    return this.mockExamService.searchMockExam(searchMockExamInput);
   }
 }

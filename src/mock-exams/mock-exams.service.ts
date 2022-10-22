@@ -1,3 +1,7 @@
+import {
+  SearchMockExamInput,
+  SearchMockExamOutput,
+} from './dtos/searchMockExam.dto';
 import { ReadAllMockExamsOutput } from './dtos/readAllMockExam.dto';
 import {
   DeleteMockExamInput,
@@ -7,7 +11,7 @@ import { MockExamCategory } from './entities/mock-exam-category.entity';
 import { MockExam } from './entities/mock-exam.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Raw, Repository } from 'typeorm';
 import {
   CreateMockExamInput,
   CreateMockExamOutput,
@@ -102,6 +106,30 @@ export class MockExamService {
       return {
         ok: false,
         error: '시험을 찾을 수 없습니다.',
+      };
+    }
+  }
+
+  async searchMockExam(
+    searchMockExamInput: SearchMockExamInput,
+  ): Promise<SearchMockExamOutput> {
+    try {
+      const { query } = searchMockExamInput;
+      const [mockExams, totalResults] = await this.mockExam.findAndCount({
+        where: {
+          title: Raw((title) => `${title} ILIKE '%${query}%'`),
+        },
+        relations: ['mockExamQuestion'],
+      });
+      return {
+        ok: true,
+        totalResults,
+        mockExams,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '시험을 검색할 수  없습니다.',
       };
     }
   }

@@ -71,18 +71,17 @@ export class MockExamQuestionService {
           error: '존재하지 않는 문제입니다.',
         };
       }
-      const newMockExamQuestion = {
-        ...prevMockExamQuestion,
+      await this.mockExamQuestion.update(id, {
         question,
         question_img,
         solution,
         solution_img,
-      };
-      await this.mockExamQuestion.save([newMockExamQuestion]);
+      });
       return {
         ok: true,
       };
-    } catch {
+    } catch (e) {
+      console.log(e);
       return {
         ok: false,
         error: '문제를 수정할 수 없습니다.',

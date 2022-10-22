@@ -1,3 +1,4 @@
+import { ReadMockExamOutput, ReadMockExamInput } from './dtos/readMockExam.dto';
 import {
   ReadAllMockExamsOutput,
   ReadAllMockExamsInput,
@@ -59,5 +60,12 @@ export class MockExamResolver {
     @Args('input') searchMockExamInput: SearchMockExamInput,
   ): Promise<SearchMockExamOutput> {
     return this.mockExamService.searchMockExam(searchMockExamInput);
+  }
+
+  @Query(() => ReadMockExamOutput)
+  readMockExam(
+    @Args('input') readMockExamInput: ReadMockExamInput,
+  ): Promise<ReadMockExamOutput> {
+    return this.mockExamService.readMockExam(readMockExamInput);
   }
 }

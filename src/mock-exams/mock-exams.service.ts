@@ -1,3 +1,4 @@
+import { ReadMockExamInput, ReadMockExamOutput } from './dtos/readMockExam.dto';
 import {
   SearchMockExamInput,
   SearchMockExamOutput,
@@ -140,6 +141,30 @@ export class MockExamService {
       return {
         ok: false,
         error: '시험을 검색할 수  없습니다.',
+      };
+    }
+  }
+
+  async readMockExam(
+    readMockExamInput: ReadMockExamInput,
+  ): Promise<ReadMockExamOutput> {
+    try {
+      const { id } = readMockExamInput;
+      const mockExam = await this.mockExam.findOne({
+        where: { id },
+        relations: [
+          'mockExamQuestion',
+          'mockExamQuestion.mockExamQuestionFeedback',
+        ],
+      });
+      return {
+        ok: true,
+        mockExam,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '시험을 찾을 수 없습니다.',
       };
     }
   }

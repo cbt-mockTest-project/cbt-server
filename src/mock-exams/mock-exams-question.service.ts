@@ -157,6 +157,7 @@ export class MockExamQuestionService {
         state,
       },
       relations: ['mockExamQuestion'],
+      select: ['mockExamQuestion'],
     });
     const mockExamQuestionsByState = mockExamQuestionStates
       .map((data) => data.mockExamQuestion)

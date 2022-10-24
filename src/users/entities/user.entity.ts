@@ -5,10 +5,11 @@ import {
   ObjectType,
   registerEnumType,
 } from '@nestjs/graphql';
-import { BeforeInsert, BeforeUpdate, Column, Entity } from 'typeorm';
+import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { IsEmail, IsEnum, IsString } from 'class-validator';
 import { InternalServerErrorException } from '@nestjs/common';
+import { MockExamQuestionState } from 'src/mock-exams/entities/mock-exam-question-state.entity';
 
 export enum UserRole {
   CLIENT = 'CLIENT',
@@ -42,6 +43,13 @@ export class User extends CoreEntity {
   @Field(() => UserRole)
   @IsEnum(UserRole)
   role: UserRole;
+
+  @OneToMany(
+    () => MockExamQuestionState,
+    (mockExamQuestionState) => mockExamQuestionState.mockExamQuestion,
+  )
+  @Field(() => [MockExamQuestionState])
+  mockExamQuestionState: MockExamQuestionState[];
 
   @BeforeInsert()
   @BeforeUpdate()

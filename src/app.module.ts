@@ -15,6 +15,7 @@ import { AuthModule } from './auth/auth.module';
 import { MockExamsModule } from './mock-exams/mock-exams.module';
 import { MockExam } from './mock-exams/entities/mock-exam.entity';
 import { UploadsModule } from './uploads/uploads.module';
+import { MockExamQuestionState } from './mock-exams/entities/mock-exam-question-state.entity';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { UploadsModule } from './uploads/uploads.module';
         MockExamCategory,
         MockExamQuestion,
         MockExamQuestionFeedback,
+        MockExamQuestionState,
       ],
     }),
     UserModule,

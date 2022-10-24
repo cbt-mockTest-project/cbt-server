@@ -1,3 +1,4 @@
+import { User } from 'src/users/entities/user.entity';
 import { ReadAllMockExamQuestionOutput } from './dtos/readAllMockExamQuestion.dto';
 import {
   CreateMockExamQuestionInput,
@@ -15,6 +16,11 @@ import {
   DeleteMockExamQuestionInput,
   DeleteMockExamQuestionOutput,
 } from './dtos/deleteMockExamQuestion.dto';
+import {
+  CreateOrUpdateMockExamQuestionStateInput,
+  CreateOrUpdateMockExamQuestionStateOutput,
+} from './dtos/createOrUpdateMockExamQuestionState.dto';
+import { AuthUser } from 'src/auth/auth-user.decorator';
 
 @Resolver(() => MockExamQuestion)
 export class MockExamQuestionResolver {
@@ -55,5 +61,18 @@ export class MockExamQuestionResolver {
   @Query(() => ReadAllMockExamQuestionOutput)
   readAllMockExamQuestion(): Promise<ReadAllMockExamQuestionOutput> {
     return this.mockExamQuestionService.readAllMockExamQuestion();
+  }
+
+  @Mutation(() => CreateOrUpdateMockExamQuestionStateOutput)
+  @Role(['ANY'])
+  async createOrUpdateMockExamQuestionState(
+    @AuthUser() user: User,
+    @Args('input')
+    createOrUpdateMockExamQuestionStateInput: CreateOrUpdateMockExamQuestionStateInput,
+  ): Promise<CreateOrUpdateMockExamQuestionStateOutput> {
+    return this.mockExamQuestionService.createOrUpdateMockExamQuestionState(
+      user,
+      createOrUpdateMockExamQuestionStateInput,
+    );
   }
 }

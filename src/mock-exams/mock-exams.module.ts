@@ -12,6 +12,7 @@ import { MockExamCategoryResolver } from './mock-exams-category.resolver';
 import { Module } from '@nestjs/common';
 import { MockExamService } from './mock-exams.service';
 import { MockExamQuestionService } from './mock-exams-question.service';
+import { MockExamQuestionState } from './entities/mock-exam-question-state.entity';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { MockExamQuestionService } from './mock-exams-question.service';
       MockExam,
       MockExamQuestion,
       MockExamQuestionFeedback,
+      MockExamQuestionState,
     ]),
   ],
   providers: [

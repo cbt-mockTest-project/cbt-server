@@ -1,3 +1,4 @@
+import { MockExamQuestionState } from './entities/mock-exam-question-state.entity';
 import { ReadAllMockExamQuestionOutput } from './dtos/readAllMockExamQuestion.dto';
 import {
   EditMockExamQuestionInput,
@@ -16,6 +17,11 @@ import {
   DeleteMockExamQuestionInput,
   DeleteMockExamQuestionOutput,
 } from './dtos/deleteMockExamQuestion.dto';
+import {
+  CreateOrUpdateMockExamQuestionStateInput,
+  CreateOrUpdateMockExamQuestionStateOutput,
+} from './dtos/createOrUpdateMockExamQuestionState.dto';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class MockExamQuestionService {
@@ -24,6 +30,8 @@ export class MockExamQuestionService {
     private readonly mockExamQuestion: Repository<MockExamQuestion>,
     @InjectRepository(MockExam)
     private readonly mockExam: Repository<MockExam>,
+    @InjectRepository(MockExamQuestionState)
+    private readonly mockExamQuestionState: Repository<MockExamQuestionState>,
   ) {}
 
   async createMockExamQuestion(
@@ -130,5 +138,50 @@ export class MockExamQuestionService {
         error: '시험문제를 찾을 수 없습니다.',
       };
     }
+  }
+
+  async createOrUpdateMockExamQuestionState(
+    user: User,
+    createOrUpdateMockExamQuestionStateInput: CreateOrUpdateMockExamQuestionStateInput,
+  ): Promise<CreateOrUpdateMockExamQuestionStateOutput> {
+    const { questionId, state } = createOrUpdateMockExamQuestionStateInput;
+    const prevState = await this.mockExamQuestionState.findOne({
+      where: {
+        user: {
+          id: user.id,
+        },
+        mockExamQuestion: {
+          id: questionId,
+        },
+      },
+    });
+    if (prevState) {
+      if (prevState.state === state) {
+        return {
+          ok: false,
+          error: '이전과 값이 동일합니다.',
+        };
+      }
+      await this.mockExamQuestionState.update(prevState.id, { state });
+      return {
+        ok: true,
+        message: 'update success',
+      };
+    }
+    const mockExamQuestion = await this.mockExamQuestion.findOne({
+      where: {
+        id: questionId,
+      },
+    });
+    const newState = this.mockExamQuestionState.create({
+      mockExamQuestion,
+      state,
+      user,
+    });
+    await this.mockExamQuestionState.save(newState);
+    return {
+      ok: true,
+      message: 'create success',
+    };
   }
 }

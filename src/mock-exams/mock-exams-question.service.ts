@@ -22,6 +22,10 @@ import {
   CreateOrUpdateMockExamQuestionStateOutput,
 } from './dtos/createOrUpdateMockExamQuestionState.dto';
 import { User } from 'src/users/entities/user.entity';
+import {
+  ReadMockExamQuestionsByStateInput,
+  ReadMockExamQuestionsByStateOutput,
+} from './dtos/readMockExamQuestionsByState.dto';
 
 @Injectable()
 export class MockExamQuestionService {
@@ -140,6 +144,29 @@ export class MockExamQuestionService {
     }
   }
 
+  async readMockExamQuestionsByState(
+    user: User,
+    readMockExamQuestionsByStateInput: ReadMockExamQuestionsByStateInput,
+  ): Promise<ReadMockExamQuestionsByStateOutput> {
+    const { state, examId } = readMockExamQuestionsByStateInput;
+    const mockExamQuestionStates = await this.mockExamQuestionState.find({
+      where: {
+        user: {
+          id: user.id,
+        },
+        state,
+      },
+      relations: ['mockExamQuestion'],
+    });
+    const mockExamQuestionsByState = mockExamQuestionStates
+      .map((data) => data.mockExamQuestion)
+      .filter((mockExamQuestion) => mockExamQuestion.mockExamId === examId);
+    return {
+      ok: true,
+      mockExamQusetions: mockExamQuestionsByState,
+    };
+  }
+
   async createOrUpdateMockExamQuestionState(
     user: User,
     createOrUpdateMockExamQuestionStateInput: CreateOrUpdateMockExamQuestionStateInput,
@@ -173,6 +200,12 @@ export class MockExamQuestionService {
         id: questionId,
       },
     });
+    if (!mockExamQuestion) {
+      return {
+        ok: false,
+        error: '존재하지 않는 문제입니다.',
+      };
+    }
     const newState = this.mockExamQuestionState.create({
       mockExamQuestion,
       state,

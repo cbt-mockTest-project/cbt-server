@@ -21,6 +21,10 @@ import {
   CreateOrUpdateMockExamQuestionStateOutput,
 } from './dtos/createOrUpdateMockExamQuestionState.dto';
 import { AuthUser } from 'src/auth/auth-user.decorator';
+import {
+  ReadMockExamQuestionsByStateInput,
+  ReadMockExamQuestionsByStateOutput,
+} from './dtos/readMockExamQuestionsByState.dto';
 
 @Resolver(() => MockExamQuestion)
 export class MockExamQuestionResolver {
@@ -73,6 +77,19 @@ export class MockExamQuestionResolver {
     return this.mockExamQuestionService.createOrUpdateMockExamQuestionState(
       user,
       createOrUpdateMockExamQuestionStateInput,
+    );
+  }
+
+  @Mutation(() => ReadMockExamQuestionsByStateOutput)
+  @Role(['ANY'])
+  async readMockExamQuestionsByState(
+    @AuthUser() user: User,
+    @Args('input')
+    readMockExamQuestionsByStateInput: ReadMockExamQuestionsByStateInput,
+  ): Promise<ReadMockExamQuestionsByStateOutput> {
+    return this.mockExamQuestionService.readMockExamQuestionsByState(
+      user,
+      readMockExamQuestionsByStateInput,
     );
   }
 }

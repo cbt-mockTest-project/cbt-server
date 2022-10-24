@@ -1,7 +1,7 @@
 import { MockExam } from './mock-exam.entity';
 import { CoreEntity } from '../../common/entities/core.entity';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, RelationId } from 'typeorm';
 import { MockExamQuestionFeedback } from './mock-exam-question-feedback.entity';
 import { MockExamQuestionState } from './mock-exam-question-state.entity';
 
@@ -39,6 +39,9 @@ export class MockExamQuestion extends CoreEntity {
   @Field(() => MockExam)
   @ManyToOne(() => MockExam, (mockExam) => mockExam.mockExamQuestion)
   mockExam: MockExam;
+
+  @RelationId((mockExamQusetion: MockExamQuestion) => mockExamQusetion.mockExam)
+  mockExamId: number;
 
   @OneToMany(
     () => MockExamQuestionFeedback,

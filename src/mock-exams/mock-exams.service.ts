@@ -106,10 +106,13 @@ export class MockExamService {
     readAllMockExamsInput: ReadAllMockExamsInput,
   ): Promise<ReadAllMockExamsOutput> {
     try {
-      const { query } = readAllMockExamsInput;
+      const { query, category } = readAllMockExamsInput;
       const mockExams = await this.mockExam.find({
         where: {
           title: Raw((title) => `${title} ILIKE '%${query}%'`),
+          mockExamCategory: {
+            name: Raw((name) => `${name} ILIKE '%${category}%'`),
+          },
         },
       });
       return { ok: true, mockExams };

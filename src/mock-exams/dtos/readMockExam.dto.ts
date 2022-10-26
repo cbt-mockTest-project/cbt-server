@@ -12,4 +12,7 @@ export class ReadMockExamInput {
 export class ReadMockExamOutput extends CoreOutput {
   @Field(() => MockExam)
   mockExam?: MockExam;
+
+  @Field(() => [Number])
+  questionNumbers?: number[];
 }

@@ -8,9 +8,10 @@ export class CreateMockExamQuestionInput extends PickType(MockExamQuestion, [
   'question_img',
   'solution',
   'solution_img',
+  'number',
 ]) {
-  @Field(() => String)
-  mockExamTitle: string;
+  @Field(() => Number)
+  mockExamId: number;
 }
 
 @ObjectType()

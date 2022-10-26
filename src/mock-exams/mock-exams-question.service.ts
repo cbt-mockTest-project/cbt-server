@@ -42,11 +42,31 @@ export class MockExamQuestionService {
     createMockExamQuestionInput: CreateMockExamQuestionInput,
   ): Promise<CreateMockExamQuestionOutput> {
     try {
-      const { question, question_img, solution, solution_img, mockExamTitle } =
-        createMockExamQuestionInput;
+      const {
+        question,
+        question_img,
+        solution,
+        solution_img,
+        mockExamId,
+        number,
+      } = createMockExamQuestionInput;
       const mockExam = await this.mockExam.findOne({
-        where: { title: mockExamTitle },
+        where: { id: mockExamId },
       });
+      const questions = await this.mockExamQuestion.find({
+        where: {
+          mockExam: {
+            id: mockExamId,
+          },
+        },
+      });
+      const questionNumbers = questions.map((question) => question.number);
+      if (questionNumbers.includes(number)) {
+        return {
+          ok: false,
+          error: '이미 존재하는 문제 번호입니다',
+        };
+      }
       if (!mockExam) {
         return {
           ok: false,
@@ -60,6 +80,7 @@ export class MockExamQuestionService {
         solution_img,
         mockExam,
         approved: false,
+        number,
       });
       await this.mockExamQuestion.save(newExamQuestion);
       return { ok: true };

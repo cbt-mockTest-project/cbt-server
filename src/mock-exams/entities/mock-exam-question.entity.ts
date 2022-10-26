@@ -56,4 +56,8 @@ export class MockExamQuestion extends CoreEntity {
   )
   @Field(() => [MockExamQuestionState])
   state: MockExamQuestionState[];
+
+  @Column({ default: 0 })
+  @Field(() => Number)
+  number: number;
 }

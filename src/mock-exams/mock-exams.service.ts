@@ -160,9 +160,13 @@ export class MockExamService {
           'mockExamQuestion.mockExamQuestionFeedback',
         ],
       });
+      const questionNumbers = mockExam.mockExamQuestion.map(
+        (data) => data.number,
+      );
       return {
         ok: true,
         mockExam,
+        questionNumbers,
       };
     } catch {
       return {

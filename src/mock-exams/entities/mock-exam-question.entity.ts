@@ -28,11 +28,11 @@ export class MockExamQuestion extends CoreEntity {
   @Field(() => Boolean)
   approved: boolean;
 
-  @Column({ type: 'json', nullable: true })
+  @Column({ type: 'json', default: [] })
   @Field(() => [MockExamQuestionImage], { nullable: true })
   question_img: MockExamQuestionImage[];
 
-  @Column({ type: 'json', nullable: true })
+  @Column({ type: 'json', default: [] })
   @Field(() => [MockExamQuestionImage], { nullable: true })
   solution_img: MockExamQuestionImage[];
 

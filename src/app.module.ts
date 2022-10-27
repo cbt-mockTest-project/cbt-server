@@ -16,6 +16,7 @@ import { MockExamsModule } from './mock-exams/mock-exams.module';
 import { MockExam } from './mock-exams/entities/mock-exam.entity';
 import { UploadsModule } from './uploads/uploads.module';
 import { MockExamQuestionState } from './mock-exams/entities/mock-exam-question-state.entity';
+import { SchedulerModule } from './scheduler/scheduler.module';
 
 @Module({
   imports: [
@@ -64,6 +65,7 @@ import { MockExamQuestionState } from './mock-exams/entities/mock-exam-question-
     AuthModule,
     MockExamsModule,
     UploadsModule,
+    SchedulerModule,
   ],
   controllers: [],
   providers: [],

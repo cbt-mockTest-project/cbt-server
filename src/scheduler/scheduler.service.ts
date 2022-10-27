@@ -51,7 +51,6 @@ export class SchedulerService {
       })
       .promise();
     const imageListForDelete = findUniqElem(awsListKeys, examImageList);
-
     imageListForDelete.map(async (key) => {
       await s3Client
         .deleteObject(
@@ -60,10 +59,10 @@ export class SchedulerService {
             if (err) {
               throw err;
             }
-            console.log('s3 deleteObject', data);
           },
         )
         .promise();
     });
+    console.log('s3 clean up');
   }
 }

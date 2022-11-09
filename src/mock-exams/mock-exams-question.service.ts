@@ -185,6 +185,11 @@ export class MockExamQuestionService {
           number: true,
         },
       },
+      order: {
+        mockExamQuestion: {
+          number: 'ASC',
+        },
+      },
     });
     if (!mockExam) {
       return {

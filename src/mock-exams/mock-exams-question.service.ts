@@ -26,6 +26,10 @@ import {
   ReadMockExamQuestionsByStateInput,
   ReadMockExamQuestionsByStateOutput,
 } from './dtos/readMockExamQuestionsByState.dto';
+import {
+  ReadMockExamQuestionNumbersInput,
+  ReadMockExamQuestionNumbersOutput,
+} from './dtos/readMockExamQuestionNumbers.dto';
 
 @Injectable()
 export class MockExamQuestionService {
@@ -163,6 +167,38 @@ export class MockExamQuestionService {
         error: '시험문제를 찾을 수 없습니다.',
       };
     }
+  }
+
+  async readMockExamQuestionNumbers(
+    readMockExamQuestionNumbersInput: ReadMockExamQuestionNumbersInput,
+  ): Promise<ReadMockExamQuestionNumbersOutput> {
+    const { mockExamId } = readMockExamQuestionNumbersInput;
+    const mockExam = await this.mockExam.find({
+      where: {
+        id: mockExamId,
+      },
+      relations: {
+        mockExamQuestion: true,
+      },
+      select: {
+        mockExamQuestion: {
+          number: true,
+        },
+      },
+    });
+    if (!mockExam) {
+      return {
+        ok: false,
+        error: '존재하지 않는 시험입니다.',
+      };
+    }
+    const questionNumbers = mockExam[0].mockExamQuestion.map(
+      (data) => data.number,
+    );
+    return {
+      ok: true,
+      questionNumbers,
+    };
   }
 
   async readMockExamQuestionsByState(

@@ -1,3 +1,7 @@
+import {
+  ReadMockExamQuestionNumbersInput,
+  ReadMockExamQuestionNumbersOutput,
+} from './dtos/readMockExamQuestionNumbers.dto';
 import { User } from 'src/users/entities/user.entity';
 import { ReadAllMockExamQuestionOutput } from './dtos/readAllMockExamQuestion.dto';
 import {
@@ -90,6 +94,16 @@ export class MockExamQuestionResolver {
     return this.mockExamQuestionService.readMockExamQuestionsByState(
       user,
       readMockExamQuestionsByStateInput,
+    );
+  }
+
+  @Query(() => ReadMockExamQuestionNumbersOutput)
+  async readMockExamQuestionNumbers(
+    @Args('input')
+    readMockExamQuestionNumbersInput: ReadMockExamQuestionNumbersInput,
+  ): Promise<ReadMockExamQuestionNumbersOutput> {
+    return this.mockExamQuestionService.readMockExamQuestionNumbers(
+      readMockExamQuestionNumbersInput,
     );
   }
 }

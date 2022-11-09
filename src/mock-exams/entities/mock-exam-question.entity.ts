@@ -7,9 +7,13 @@ import { MockExamQuestionState } from './mock-exam-question-state.entity';
 
 @InputType('MockExamQuestionImageInputType', { isAbstract: true })
 @ObjectType()
-export class MockExamQuestionImage {
+export class MockExamImageType {
   @Field(() => String)
   url: string;
+  @Field(() => String)
+  name: string;
+  @Field(() => String)
+  uid: string;
 }
 
 @InputType('MockExamQuestionInputType', { isAbstract: true })
@@ -29,12 +33,12 @@ export class MockExamQuestion extends CoreEntity {
   approved: boolean;
 
   @Column({ type: 'json', default: [] })
-  @Field(() => [MockExamQuestionImage], { nullable: true })
-  question_img: MockExamQuestionImage[];
+  @Field(() => [MockExamImageType], { nullable: true })
+  question_img: MockExamImageType[];
 
   @Column({ type: 'json', default: [] })
-  @Field(() => [MockExamQuestionImage], { nullable: true })
-  solution_img: MockExamQuestionImage[];
+  @Field(() => [MockExamImageType], { nullable: true })
+  solution_img: MockExamImageType[];
 
   @Field(() => MockExam)
   @ManyToOne(() => MockExam, (mockExam) => mockExam.mockExamQuestion)

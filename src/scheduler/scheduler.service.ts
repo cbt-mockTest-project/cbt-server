@@ -1,6 +1,6 @@
 import {
   MockExamQuestion,
-  MockExamQuestionImage,
+  MockExamImageType,
 } from './../mock-exams/entities/mock-exam-question.entity';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -28,7 +28,7 @@ export class SchedulerService {
       },
     });
     let awsListKeys: string[];
-    let examImageList: (string | MockExamQuestionImage)[] = [];
+    let examImageList: (string | MockExamImageType)[] = [];
     (await this.mockExamQuestions.find()).map((question) => {
       examImageList = examImageList.concat(
         question.question_img,
@@ -37,7 +37,7 @@ export class SchedulerService {
       return;
     });
     examImageList = examImageList.map(
-      (image: MockExamQuestionImage) =>
+      (image: MockExamImageType) =>
         image.url.split('https://cbteungwangnestjs961203.s3.amazonaws.com/')[1],
     );
     const s3Client = new AWS.S3();

@@ -11,4 +11,6 @@ export class UpdateApprovedStateOfMockExamQuestionInput {
 export class UpdateApprovedStateOfMockExamQuestionOutput extends CoreOutput {
   @Field(() => Boolean)
   currentApprovedState?: boolean;
+  @Field(() => Number)
+  questionId?: number;
 }

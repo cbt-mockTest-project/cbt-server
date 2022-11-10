@@ -118,15 +118,13 @@ export class MockExamQuestionService {
     console.log(question.approved);
     if (question.approved) {
       await this.mockExamQuestion.update(questionId, { approved: false });
-      return {
-        ok: true,
-        currentApprovedState: false,
-      };
+    } else {
+      await this.mockExamQuestion.update(questionId, { approved: true });
     }
-    await this.mockExamQuestion.update(questionId, { approved: true });
     return {
       ok: true,
-      currentApprovedState: true,
+      currentApprovedState: false,
+      questionId,
     };
   }
 

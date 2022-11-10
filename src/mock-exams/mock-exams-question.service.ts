@@ -1,3 +1,7 @@
+import {
+  UpdateApprovedStateOfMockExamQuestionInput,
+  UpdateApprovedStateOfMockExamQuestionOutput,
+} from './dtos/updateApprovedStateOfMockExamQuestion.dto';
 import { MockExamQuestionState } from './entities/mock-exam-question-state.entity';
 import { ReadAllMockExamQuestionOutput } from './dtos/readAllMockExamQuestion.dto';
 import {
@@ -91,6 +95,39 @@ export class MockExamQuestionService {
     } catch {
       return { ok: false, error: '문제를 만들 수 없습니다' };
     }
+  }
+
+  /**
+   * toggle approved state
+   */
+  async updateApprovedStateOfMockExamQuestion(
+    updateApprovedStateOfMockExamQuestionInput: UpdateApprovedStateOfMockExamQuestionInput,
+  ): Promise<UpdateApprovedStateOfMockExamQuestionOutput> {
+    const { questionId } = updateApprovedStateOfMockExamQuestionInput;
+    const question = await this.mockExamQuestion.findOne({
+      where: {
+        id: questionId,
+      },
+    });
+    if (!question) {
+      return {
+        ok: false,
+        error: '존재하지 않는 문제입니다.',
+      };
+    }
+    console.log(question.approved);
+    if (question.approved) {
+      await this.mockExamQuestion.update(questionId, { approved: false });
+      return {
+        ok: true,
+        currentApprovedState: false,
+      };
+    }
+    await this.mockExamQuestion.update(questionId, { approved: true });
+    return {
+      ok: true,
+      currentApprovedState: true,
+    };
   }
 
   async editMockExamQuestion(

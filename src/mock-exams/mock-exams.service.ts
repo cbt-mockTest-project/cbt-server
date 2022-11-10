@@ -114,6 +114,9 @@ export class MockExamService {
             name: Raw((name) => `${name} ILIKE '%${category}%'`),
           },
         },
+        order: {
+          title: 'ASC',
+        },
       });
       return { ok: true, mockExams };
     } catch {

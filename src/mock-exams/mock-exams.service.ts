@@ -162,6 +162,11 @@ export class MockExamService {
           'mockExamQuestion',
           'mockExamQuestion.mockExamQuestionFeedback',
         ],
+        order: {
+          mockExamQuestion: {
+            number: 'ASC',
+          },
+        },
       });
       const questionNumbers = mockExam.mockExamQuestion.map(
         (data) => data.number,

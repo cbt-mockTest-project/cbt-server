@@ -29,6 +29,7 @@ export class UploadsController {
           Bucket: BUCKET_NAME,
           Key: objectName,
           ACL: 'public-read',
+          ContentType: file.mimetype,
         })
         .promise();
       const url = `https://${BUCKET_NAME}.s3.amazonaws.com/${objectName}`;

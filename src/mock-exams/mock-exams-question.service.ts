@@ -1,4 +1,8 @@
 import {
+  ReadMockExamQuestionInput,
+  ReadMockExamQuestionOutput,
+} from './dtos/readMockExamQuestion.dto';
+import {
   UpdateApprovedStateOfMockExamQuestionInput,
   UpdateApprovedStateOfMockExamQuestionOutput,
 } from './dtos/updateApprovedStateOfMockExamQuestion.dto';
@@ -125,6 +129,25 @@ export class MockExamQuestionService {
       ok: true,
       currentApprovedState: false,
       questionId,
+    };
+  }
+
+  async readMockExamQuestion(
+    readMockExamQuestionInput: ReadMockExamQuestionInput,
+  ): Promise<ReadMockExamQuestionOutput> {
+    const { questionId } = readMockExamQuestionInput;
+    const question = await this.mockExamQuestion.findOne({
+      where: { id: questionId },
+    });
+    if (!question) {
+      return {
+        ok: false,
+        error: '존재하지 않는 문제입니다.',
+      };
+    }
+    return {
+      ok: true,
+      mockExamQusetion: question,
     };
   }
 

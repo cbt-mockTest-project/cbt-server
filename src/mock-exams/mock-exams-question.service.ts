@@ -138,6 +138,7 @@ export class MockExamQuestionService {
     const { questionId } = readMockExamQuestionInput;
     const question = await this.mockExamQuestion.findOne({
       where: { id: questionId },
+      relations: ['mockExam'],
     });
     if (!question) {
       return {

@@ -78,13 +78,12 @@ export class UserService {
       await this.verification.save(newVerification);
       this.mailService.sendVerificationEmail(
         email,
-        `${process.env.CLIENT_URL}/confirm?code=${newVerification.code}`,
+        `${process.env.CLIENT_URL}/register?code=${newVerification.code}`,
       );
       return {
         ok: true,
       };
     } catch (e) {
-      console.log(e);
       return {
         ok: false,
         error: '메일을 보낼 수 없습니다.',

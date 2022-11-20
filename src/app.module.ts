@@ -1,3 +1,4 @@
+import { MailModule } from './mail/mail.module';
 import { MockExamQuestionFeedback } from './mock-exams/entities/mock-exam-question-feedback.entity';
 import { MockExamQuestion } from './mock-exams/entities/mock-exam-question.entity';
 import { MockExamCategory } from './mock-exams/entities/mock-exam-category.entity';
@@ -17,6 +18,10 @@ import { MockExam } from './mock-exams/entities/mock-exam.entity';
 import { UploadsModule } from './uploads/uploads.module';
 import { MockExamQuestionState } from './mock-exams/entities/mock-exam-question-state.entity';
 import { SchedulerModule } from './scheduler/scheduler.module';
+import { Verification } from './users/entities/verification.entity';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -51,6 +56,7 @@ import { SchedulerModule } from './scheduler/scheduler.module';
       logging: false,
       entities: [
         User,
+        Verification,
         MockExam,
         MockExamCategory,
         MockExamQuestion,
@@ -66,6 +72,21 @@ import { SchedulerModule } from './scheduler/scheduler.module';
     MockExamsModule,
     UploadsModule,
     SchedulerModule,
+    MailModule,
+    MailerModule.forRoot({
+      transport: `smtps://${process.env.EMAIL_AUTH_EMAIL}:${process.env.EMAIL_AUTH_PASSWORD}@${process.env.EMAIL_HOST}`,
+      defaults: {
+        from: `"${process.env.EMAIL_FROM_USER_NAME}" <${process.env.EMAIL_AUTH_EMAIL}>`,
+      },
+      preview: false,
+      template: {
+        dir: join(__dirname, 'templates'),
+        adapter: new HandlebarsAdapter(),
+        options: {
+          strict: true,
+        },
+      },
+    }),
   ],
   controllers: [],
   providers: [],

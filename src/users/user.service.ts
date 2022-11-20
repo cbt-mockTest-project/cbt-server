@@ -1,3 +1,8 @@
+import {
+  EmailVerificationInput,
+  EmailVerificationOutput,
+} from './dtos/EmailVerification.dto';
+import { v4 as uuidv4 } from 'uuid';
 import { JwtService } from 'src/jwt/jwt.service';
 import { UserProfileInput, UserProfileOutput } from './dtos/userProfile.dto';
 import { RegisterInput, RegisterOutput } from './dtos/register.dto';
@@ -6,17 +11,33 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User, UserRole } from './entities/user.entity';
 import { LoginInput, LoginOutput } from './dtos/login.dto';
+import { Verification } from './entities/verification.entity';
+import {
+  SendVerificationMailInput,
+  SendVerificationMailOutput,
+} from './dtos/sendVerificationMail.dto';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private readonly users: Repository<User>,
+    @InjectRepository(Verification)
+    private readonly verification: Repository<Verification>,
+    private readonly mailService: MailService,
     private readonly jwtService: JwtService,
   ) {}
 
   async register(registerInput: RegisterInput): Promise<RegisterOutput> {
     try {
-      const { email, password, nickname } = registerInput;
+      const { code, password, nickname } = registerInput;
+      const { email } = await this.verification.findOne({ where: { code } });
+      if (!email) {
+        return {
+          ok: false,
+          error: '인증되지 않은 이메일입니다.',
+        };
+      }
       const exists = await this.users.findOneBy({ email });
       if (exists) {
         return {
@@ -34,6 +55,67 @@ export class UserService {
       return {
         ok: false,
         error: '회원가입에 실패했습니다.',
+      };
+    }
+  }
+
+  async sendVerificationMail(
+    sendVerificationInput: SendVerificationMailInput,
+  ): Promise<SendVerificationMailOutput> {
+    try {
+      const code = uuidv4();
+      const { email } = sendVerificationInput;
+      const newVerification = this.verification.create({ email, code });
+      const prevVerification = await this.verification.findOne({
+        where: { email },
+      });
+      if (prevVerification) {
+        await this.verification.update(prevVerification.id, { code });
+        return {
+          ok: true,
+        };
+      }
+      await this.verification.save(newVerification);
+      this.mailService.sendVerificationEmail(
+        email,
+        `${process.env.CLIENT_URL}/confirm?code=${newVerification.code}`,
+      );
+      return {
+        ok: true,
+      };
+    } catch (e) {
+      console.log(e);
+      return {
+        ok: false,
+        error: '메일을 보낼 수 없습니다.',
+      };
+    }
+  }
+
+  async emailVerification(
+    emailVerificationInput: EmailVerificationInput,
+  ): Promise<EmailVerificationOutput> {
+    try {
+      const { code } = emailVerificationInput;
+      const verification = await this.verification.findOne({
+        where: {
+          code,
+        },
+      });
+      if (!verification) {
+        return {
+          ok: false,
+          error: '존재하지 않는 인증입니다.',
+        };
+      }
+      return {
+        ok: true,
+        email: verification.email,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '이메일 인증에 실패했습니다.',
       };
     }
   }

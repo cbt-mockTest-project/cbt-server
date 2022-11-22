@@ -20,6 +20,10 @@ import {
   SearchMockExamOutput,
   SearchMockExamInput,
 } from './dtos/searchMockExam.dto';
+import {
+  ReadMockExamTitlesByCateoryOutput,
+  ReadMockExamTitlesByCateoryInput,
+} from './dtos/readMockExamTitlesByCateory.dto';
 
 @Resolver(() => MockExam)
 export class MockExamResolver {
@@ -67,5 +71,15 @@ export class MockExamResolver {
     @Args('input') readMockExamInput: ReadMockExamInput,
   ): Promise<ReadMockExamOutput> {
     return this.mockExamService.readMockExam(readMockExamInput);
+  }
+
+  @Query(() => ReadMockExamTitlesByCateoryOutput)
+  async readMockExamTitlesByCateory(
+    @Args('input')
+    readMockExamTitlesByCateoryInput: ReadMockExamTitlesByCateoryInput,
+  ): Promise<ReadMockExamTitlesByCateoryOutput> {
+    return this.mockExamService.readMockExamTitlesByCateory(
+      readMockExamTitlesByCateoryInput,
+    );
   }
 }

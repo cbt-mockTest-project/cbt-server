@@ -1,3 +1,7 @@
+import {
+  ReadMockExamTitlesByCateoryInput,
+  ReadMockExamTitlesByCateoryOutput,
+} from './dtos/readMockExamTitlesByCateory.dto';
 import { ReadMockExamInput, ReadMockExamOutput } from './dtos/readMockExam.dto';
 import {
   SearchMockExamInput,
@@ -180,6 +184,34 @@ export class MockExamService {
       return {
         ok: false,
         error: '시험을 찾을 수 없습니다.',
+      };
+    }
+  }
+
+  async readMockExamTitlesByCateory(
+    readMockExamTitlesByCateoryInput: ReadMockExamTitlesByCateoryInput,
+  ): Promise<ReadMockExamTitlesByCateoryOutput> {
+    try {
+      const { name } = readMockExamTitlesByCateoryInput;
+      const mockExams = await this.mockExam.find({
+        where: { mockExamCategory: { name } },
+        select: ['title'],
+      });
+      if (!mockExams) {
+        return {
+          ok: false,
+          error: '해당 카테고리에 맞는 시험이 존재하지 않습니다.',
+        };
+      }
+      const titles = mockExams.map((exam) => exam.title);
+      return {
+        titles,
+        ok: true,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '타이틀을 찾을 수 없습니다.',
       };
     }
   }

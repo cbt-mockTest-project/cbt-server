@@ -1,4 +1,8 @@
 import {
+  ReadMockExamQuestionsByMockExamTitleOutput,
+  ReadMockExamQuestionsByMockExamTitleInput,
+} from './dtos/readMockExamQuestionsByMockExamTitle.dto';
+import {
   ReadMockExamQuestionOutput,
   ReadMockExamQuestionInput,
 } from './dtos/readMockExamQuestion.dto';
@@ -131,6 +135,16 @@ export class MockExamQuestionResolver {
   ): Promise<UpdateApprovedStateOfMockExamQuestionOutput> {
     return this.mockExamQuestionService.updateApprovedStateOfMockExamQuestion(
       updateApprovedStateOfMockExamQuestionInput,
+    );
+  }
+
+  @Query(() => ReadMockExamQuestionsByMockExamTitleOutput)
+  async readMockExamQuestionsByMockExamTitle(
+    @Args('input')
+    readMockExamQuestionsByMockExamTitleInput: ReadMockExamQuestionsByMockExamTitleInput,
+  ): Promise<ReadMockExamQuestionsByMockExamTitleOutput> {
+    return this.mockExamQuestionService.readMockExamQuestionsByMockExamTitle(
+      readMockExamQuestionsByMockExamTitleInput,
     );
   }
 }

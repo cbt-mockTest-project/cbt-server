@@ -1,4 +1,8 @@
 import {
+  ReadMockExamQuestionsByMockExamTitleInput,
+  ReadMockExamQuestionsByMockExamTitleOutput,
+} from './dtos/readMockExamQuestionsByMockExamTitle.dto';
+import {
   ReadMockExamQuestionInput,
   ReadMockExamQuestionOutput,
 } from './dtos/readMockExamQuestion.dto';
@@ -224,6 +228,28 @@ export class MockExamQuestionService {
       return {
         ok: false,
         error: '시험문제를 찾을 수 없습니다.',
+      };
+    }
+  }
+
+  async readMockExamQuestionsByMockExamTitle(
+    readMockExamQuestionsByMockExamTitleInput: ReadMockExamQuestionsByMockExamTitleInput,
+  ): Promise<ReadMockExamQuestionsByMockExamTitleOutput> {
+    try {
+      const { title } = readMockExamQuestionsByMockExamTitleInput;
+      const [questions, count] = await this.mockExamQuestion.findAndCount({
+        where: { mockExam: { title } },
+        order: { number: 'ASC' },
+      });
+      return {
+        ok: true,
+        questions,
+        count,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '문제를 찾을 수 없습니다.',
       };
     }
   }

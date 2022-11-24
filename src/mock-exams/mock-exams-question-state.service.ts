@@ -14,6 +14,7 @@ export class MockExamQuestionStateService {
   constructor(
     @InjectRepository(MockExamQuestionState)
     private readonly mockExamQuestionState: Repository<MockExamQuestionState>,
+    @InjectRepository(MockExamQuestion)
     private readonly mockExamQuestion: Repository<MockExamQuestion>,
   ) {}
 

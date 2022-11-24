@@ -1,3 +1,5 @@
+import { MockExamQuestionStateService } from './mock-exams-question-state.service';
+import { MockExamQuestionStateResolver } from './mock-exams-question-state.resolver';
 import { MockExamQuestionFeedback } from './entities/mock-exam-question-feedback.entity';
 import { MockExamQuestionFeedbackSerivce } from './mock-exams-question-feedback.service';
 import { MockExamQuestionFeedbackResolver } from './mock-exams-question-feedback.resolver';
@@ -33,6 +35,8 @@ import { MockExamQuestionState } from './entities/mock-exam-question-state.entit
     MockExamQuestionService,
     MockExamQuestionFeedbackResolver,
     MockExamQuestionFeedbackSerivce,
+    MockExamQuestionStateResolver,
+    MockExamQuestionStateService,
   ],
   exports: [],
 })

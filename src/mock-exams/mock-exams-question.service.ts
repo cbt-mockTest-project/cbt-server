@@ -29,10 +29,6 @@ import {
   DeleteMockExamQuestionInput,
   DeleteMockExamQuestionOutput,
 } from './dtos/deleteMockExamQuestion.dto';
-import {
-  CreateOrUpdateMockExamQuestionStateInput,
-  CreateOrUpdateMockExamQuestionStateOutput,
-} from './dtos/createOrUpdateMockExamQuestionState.dto';
 import { User } from 'src/users/entities/user.entity';
 import {
   ReadMockExamQuestionsByStateInput,
@@ -304,65 +300,14 @@ export class MockExamQuestionService {
         state,
       },
       relations: ['mockExamQuestion'],
-      select: ['mockExamQuestion'],
+      select: ['question'],
     });
     const mockExamQuestionsByState = mockExamQuestionStates
-      .map((data) => data.mockExamQuestion)
+      .map((data) => data.question)
       .filter((mockExamQuestion) => mockExamQuestion.mockExamId === examId);
     return {
       ok: true,
       mockExamQusetions: mockExamQuestionsByState,
-    };
-  }
-
-  async createOrUpdateMockExamQuestionState(
-    user: User,
-    createOrUpdateMockExamQuestionStateInput: CreateOrUpdateMockExamQuestionStateInput,
-  ): Promise<CreateOrUpdateMockExamQuestionStateOutput> {
-    const { questionId, state } = createOrUpdateMockExamQuestionStateInput;
-    const prevState = await this.mockExamQuestionState.findOne({
-      where: {
-        user: {
-          id: user.id,
-        },
-        mockExamQuestion: {
-          id: questionId,
-        },
-      },
-    });
-    if (prevState) {
-      if (prevState.state === state) {
-        return {
-          ok: false,
-          error: '이전과 값이 동일합니다.',
-        };
-      }
-      await this.mockExamQuestionState.update(prevState.id, { state });
-      return {
-        ok: true,
-        message: 'update success',
-      };
-    }
-    const mockExamQuestion = await this.mockExamQuestion.findOne({
-      where: {
-        id: questionId,
-      },
-    });
-    if (!mockExamQuestion) {
-      return {
-        ok: false,
-        error: '존재하지 않는 문제입니다.',
-      };
-    }
-    const newState = this.mockExamQuestionState.create({
-      mockExamQuestion,
-      state,
-      user,
-    });
-    await this.mockExamQuestionState.save(newState);
-    return {
-      ok: true,
-      message: 'create success',
     };
   }
 }

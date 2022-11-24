@@ -46,7 +46,7 @@ export class User extends CoreEntity {
 
   @OneToMany(
     () => MockExamQuestionState,
-    (mockExamQuestionState) => mockExamQuestionState.mockExamQuestion,
+    (mockExamQuestionState) => mockExamQuestionState.question,
   )
   @Field(() => [MockExamQuestionState])
   mockExamQuestionState: MockExamQuestionState[];

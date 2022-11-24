@@ -33,7 +33,7 @@ export class MockExamQuestionState extends CoreEntity {
     (mockExamQuestion) => mockExamQuestion.state,
   )
   @Field(() => MockExamQuestion)
-  mockExamQuestion: MockExamQuestion;
+  question: MockExamQuestion;
 
   @ManyToOne(() => User, (user) => user.mockExamQuestionState)
   @Field(() => User)

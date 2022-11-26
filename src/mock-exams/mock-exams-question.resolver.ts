@@ -79,7 +79,7 @@ export class MockExamQuestionResolver {
     return this.mockExamQuestionService.readAllMockExamQuestion();
   }
 
-  @Mutation(() => ReadMockExamQuestionsByStateOutput)
+  @Query(() => ReadMockExamQuestionsByStateOutput)
   @Role(['ANY'])
   async readMockExamQuestionsByState(
     @AuthUser() user: User,

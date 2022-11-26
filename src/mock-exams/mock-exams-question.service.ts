@@ -299,16 +299,19 @@ export class MockExamQuestionService {
           id: user.id,
         },
         state,
+        question: {
+          mockExam: { id: examId },
+        },
       },
-      relations: ['mockExamQuestion'],
+      relations: { question: true },
       select: ['question'],
     });
-    const mockExamQuestionsByState = mockExamQuestionStates
-      .map((data) => data.question)
-      .filter((mockExamQuestion) => mockExamQuestion.mockExamId === examId);
+    const mockExamQusetions = mockExamQuestionStates.map(
+      (state) => state.question,
+    );
     return {
       ok: true,
-      mockExamQusetions: mockExamQuestionsByState,
+      mockExamQusetions,
     };
   }
 }

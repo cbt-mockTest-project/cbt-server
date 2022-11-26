@@ -134,16 +134,34 @@ export class MockExamQuestionService {
 
   async readMockExamQuestion(
     readMockExamQuestionInput: ReadMockExamQuestionInput,
+    userId: number,
   ): Promise<ReadMockExamQuestionOutput> {
     const { questionId } = readMockExamQuestionInput;
     const question = await this.mockExamQuestion.findOne({
       where: { id: questionId },
-      relations: ['mockExam'],
+      relations: { mockExam: true },
     });
     if (!question) {
       return {
         ok: false,
         error: '존재하지 않는 문제입니다.',
+      };
+    }
+    let questionState: MockExamQuestionState;
+    if (userId) {
+      questionState = await this.mockExamQuestionState.findOne({
+        where: {
+          question: { id: questionId },
+          user: { id: userId },
+        },
+        relations: ['question', 'user'],
+      });
+    }
+    if (questionState) {
+      return {
+        ok: true,
+        mockExamQusetion: question,
+        state: questionState.state,
       };
     }
     return {

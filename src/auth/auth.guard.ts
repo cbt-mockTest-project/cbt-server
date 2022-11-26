@@ -24,10 +24,6 @@ export class AuthGuard implements CanActivate {
       'roles',
       context.getHandler(),
     );
-    // 비로그인 유저 통과
-    if (!roles) {
-      return true;
-    }
     const gqlContext = GqlExecutionContext.create(context).getContext();
     const token = gqlContext.req.headers['jwt-token'];
     if (token) {
@@ -41,11 +37,17 @@ export class AuthGuard implements CanActivate {
         if (user) {
           gqlContext['user'] = user;
         }
-        if (roles.includes('ANY')) {
-          return true;
+        if (roles) {
+          if (roles.includes('ANY')) {
+            return true;
+          }
+          return roles.includes(user.role);
         }
-        return roles.includes(user.role);
       }
+    }
+    // 비로그인 유저 통과
+    if (!roles) {
+      return true;
     }
     return false;
   }

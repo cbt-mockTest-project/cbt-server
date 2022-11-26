@@ -104,10 +104,12 @@ export class MockExamQuestionResolver {
 
   @Query(() => ReadMockExamQuestionOutput)
   async readMockExamQuestion(
+    @AuthUser() user: User,
     @Args('input') readMockExamQuestionInput: ReadMockExamQuestionInput,
   ): Promise<ReadMockExamQuestionOutput> {
     return this.mockExamQuestionService.readMockExamQuestion(
       readMockExamQuestionInput,
+      user.id,
     );
   }
 

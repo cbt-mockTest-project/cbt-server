@@ -236,6 +236,7 @@ export class MockExamQuestionService {
       const [questions, count] = await this.mockExamQuestion.findAndCount({
         where: { mockExam: { title } },
         order: { number: 'ASC' },
+        relations: { state: true },
       });
       return {
         ok: true,

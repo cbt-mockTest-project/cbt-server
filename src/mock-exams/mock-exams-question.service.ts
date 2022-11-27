@@ -119,7 +119,6 @@ export class MockExamQuestionService {
         error: '존재하지 않는 문제입니다.',
       };
     }
-    console.log(question.approved);
     if (question.approved) {
       await this.mockExamQuestion.update(questionId, { approved: false });
     } else {
@@ -325,7 +324,11 @@ export class MockExamQuestionService {
     const where = states.map((state) => ({ ...commonAndConditions, state }));
     const mockExamQuestionStates = await this.mockExamQuestionState.find({
       where,
-      relations: { question: true },
+      relations: {
+        question: {
+          state: true,
+        },
+      },
       select: ['question'],
     });
     const mockExamQusetions = mockExamQuestionStates.map(

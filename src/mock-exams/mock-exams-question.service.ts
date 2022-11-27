@@ -331,9 +331,9 @@ export class MockExamQuestionService {
       },
       select: ['question'],
     });
-    const mockExamQusetions = mockExamQuestionStates.map(
-      (state) => state.question,
-    );
+    const mockExamQusetions = mockExamQuestionStates
+      .map((state) => state.question)
+      .sort((a, b) => a.number - b.number);
     return {
       ok: true,
       mockExamQusetions,

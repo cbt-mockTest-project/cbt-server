@@ -1,7 +1,7 @@
 import {
   ReadMockExamQuestionsByMockExamTitleOutput,
   ReadMockExamQuestionsByMockExamTitleInput,
-} from './dtos/readMockExamQuestionsByMockExamTitle.dto';
+} from './dtos/readMockExamQuestionsByMockExamId.dto';
 import {
   ReadMockExamQuestionOutput,
   ReadMockExamQuestionInput,

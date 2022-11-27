@@ -193,19 +193,18 @@ export class MockExamService {
   ): Promise<ReadMockExamTitlesByCateoryOutput> {
     try {
       const { name } = readMockExamTitlesByCateoryInput;
-      const mockExams = await this.mockExam.find({
+      const mockExamTitles = await this.mockExam.find({
         where: { mockExamCategory: { name } },
-        select: ['title'],
+        select: ['title', 'id'],
       });
-      if (!mockExams) {
+      if (!mockExamTitles) {
         return {
           ok: false,
           error: '해당 카테고리에 맞는 시험이 존재하지 않습니다.',
         };
       }
-      const titles = mockExams.map((exam) => exam.title);
       return {
-        titles,
+        titles: mockExamTitles,
         ok: true,
       };
     } catch {

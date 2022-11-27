@@ -1,7 +1,7 @@
 import {
-  ReadMockExamQuestionsByMockExamTitleInput,
-  ReadMockExamQuestionsByMockExamTitleOutput,
-} from './dtos/readMockExamQuestionsByMockExamTitle.dto';
+  ReadMockExamQuestionsByMockExamIdInput,
+  ReadMockExamQuestionsByMockExamIdOutput,
+} from './dtos/readMockExamQuestionsByMockExamId.dto';
 import {
   ReadMockExamQuestionInput,
   ReadMockExamQuestionOutput,
@@ -19,7 +19,7 @@ import {
 import { MockExam } from './entities/mock-exam.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, FindOptionsWhere } from 'typeorm';
 import {
   CreateMockExamQuestionInput,
   CreateMockExamQuestionOutput,
@@ -136,9 +136,12 @@ export class MockExamQuestionService {
     readMockExamQuestionInput: ReadMockExamQuestionInput,
     userId: number,
   ): Promise<ReadMockExamQuestionOutput> {
-    const { questionId } = readMockExamQuestionInput;
+    const { questionId, examId } = readMockExamQuestionInput;
+    const where: FindOptionsWhere<MockExamQuestion> = examId
+      ? { id: questionId, mockExam: { id: examId } }
+      : { id: questionId };
     const question = await this.mockExamQuestion.findOne({
-      where: { id: questionId },
+      where,
       relations: { mockExam: true },
     });
     if (!question) {
@@ -246,13 +249,13 @@ export class MockExamQuestionService {
     }
   }
 
-  async readMockExamQuestionsByMockExamTitle(
-    readMockExamQuestionsByMockExamTitleInput: ReadMockExamQuestionsByMockExamTitleInput,
-  ): Promise<ReadMockExamQuestionsByMockExamTitleOutput> {
+  async readMockExamQuestionsByMockExamId(
+    readMockExamQuestionsByMockExamIdInput: ReadMockExamQuestionsByMockExamIdInput,
+  ): Promise<ReadMockExamQuestionsByMockExamIdOutput> {
     try {
-      const { title } = readMockExamQuestionsByMockExamTitleInput;
+      const { id } = readMockExamQuestionsByMockExamIdInput;
       const [questions, count] = await this.mockExamQuestion.findAndCount({
-        where: { mockExam: { title } },
+        where: { mockExam: { id } },
         order: { number: 'ASC' },
         relations: { state: true },
       });

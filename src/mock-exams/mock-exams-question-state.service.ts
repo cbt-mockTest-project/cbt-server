@@ -44,6 +44,7 @@ export class MockExamQuestionStateService {
       return {
         ok: true,
         message: 'update success',
+        currentState: state,
       };
     }
     const question = await this.mockExamQuestion.findOne({

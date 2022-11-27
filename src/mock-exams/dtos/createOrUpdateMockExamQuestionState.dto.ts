@@ -1,5 +1,8 @@
 import { CoreOutput } from './../../common/dtos/output.dto';
-import { MockExamQuestionState } from './../entities/mock-exam-question-state.entity';
+import {
+  MockExamQuestionState,
+  QuestionState,
+} from './../entities/mock-exam-question-state.entity';
 import { Field, InputType, ObjectType, PickType } from '@nestjs/graphql';
 
 @InputType()
@@ -15,4 +18,6 @@ export class CreateOrUpdateMockExamQuestionStateInput extends PickType(
 export class CreateOrUpdateMockExamQuestionStateOutput extends CoreOutput {
   @Field(() => String, { nullable: true })
   message?: string;
+  @Field(() => QuestionState, { nullable: true })
+  currentState?: QuestionState;
 }

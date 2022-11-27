@@ -128,7 +128,7 @@ export class MockExamQuestionResolver {
     @Args('input')
     readMockExamQuestionsByMockExamIdInput: ReadMockExamQuestionsByMockExamIdInput,
   ): Promise<ReadMockExamQuestionsByMockExamIdOutput> {
-    return this.mockExamQuestionService.readMockExamQuestionsByMockExamTitle(
+    return this.mockExamQuestionService.readMockExamQuestionsByMockExamId(
       readMockExamQuestionsByMockExamIdInput,
     );
   }

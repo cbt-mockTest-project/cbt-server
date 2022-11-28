@@ -1,3 +1,5 @@
+import { MeOutput } from './dtos/me.dto';
+import { CoreOutput } from 'src/common/dtos/output.dto';
 import {
   SendVerificationMailInput,
   SendVerificationMailOutput,
@@ -6,14 +8,14 @@ import { LoginInput, LoginOutput } from './dtos/login.dto';
 import { UserProfileOutput, UserProfileInput } from './dtos/userProfile.dto';
 import { RegisterInput, RegisterOutput } from './dtos/register.dto';
 import { User } from './entities/user.entity';
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UserService } from './user.service';
-import { Role } from 'src/auth/role.decorators';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import {
   EmailVerificationOutput,
   EmailVerificationInput,
 } from './dtos/EmailVerification.dto';
+import { Response } from 'express';
 
 @Resolver(() => User)
 export class UserResolver {
@@ -34,8 +36,18 @@ export class UserResolver {
   }
 
   @Mutation(() => LoginOutput)
-  async login(@Args('input') loginInput: LoginInput): Promise<LoginOutput> {
-    return this.userService.login(loginInput);
+  async login(
+    @Args('input') loginInput: LoginInput,
+    @Context() context,
+  ): Promise<LoginOutput> {
+    const res: Response = context.req.res;
+    return this.userService.login(loginInput, res);
+  }
+
+  @Mutation(() => CoreOutput)
+  async logout(@Context() context): Promise<CoreOutput> {
+    const res: Response = context.req.res;
+    return this.userService.logout(res);
   }
 
   @Mutation(() => SendVerificationMailOutput)
@@ -45,10 +57,9 @@ export class UserResolver {
     return this.userService.sendVerificationMail(sendVerificationMailInput);
   }
 
-  @Role(['ANY'])
-  @Query(() => User)
-  me(@AuthUser() me: User) {
-    return me;
+  @Query(() => MeOutput)
+  me(@AuthUser() user: User): Promise<MeOutput> {
+    return this.userService.me(user);
   }
 
   @Mutation(() => EmailVerificationOutput)

@@ -1,8 +1,8 @@
+import { getCookie } from './../utils/utils';
 import { UserService } from './../users/user.service';
 import { JwtService } from 'src/jwt/jwt.service';
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Observable } from 'rxjs';
 import { AllowedRoles } from './role.decorators';
 import { GqlExecutionContext } from '@nestjs/graphql';
 
@@ -25,7 +25,8 @@ export class AuthGuard implements CanActivate {
       context.getHandler(),
     );
     const gqlContext = GqlExecutionContext.create(context).getContext();
-    const token = gqlContext.req.headers['jwt-token'];
+    const cookie = gqlContext.req.headers.cookie;
+    const token = getCookie(String(cookie), 'jwt-token');
     if (token) {
       const decodedToken = this.jwtService.verify(token);
       if (

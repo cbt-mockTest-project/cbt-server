@@ -1,3 +1,4 @@
+import { CoreOutput } from 'src/common/dtos/output.dto';
 import {
   EmailVerificationInput,
   EmailVerificationOutput,
@@ -17,6 +18,8 @@ import {
   SendVerificationMailOutput,
 } from './dtos/sendVerificationMail.dto';
 import { MailService } from 'src/mail/mail.service';
+import { Response } from 'express';
+import { MeOutput } from './dtos/me.dto';
 
 @Injectable()
 export class UserService {
@@ -147,7 +150,7 @@ export class UserService {
     }
   }
 
-  async login(loginInput: LoginInput): Promise<LoginOutput> {
+  async login(loginInput: LoginInput, res: Response): Promise<LoginOutput> {
     try {
       const { email, password } = loginInput;
       const user = await this.users.findOne({
@@ -168,6 +171,11 @@ export class UserService {
         };
       }
       const token = this.jwtService.sign(user.id);
+      res.cookie('jwt-token', token, {
+        domain: process.env.DOMAIN,
+        path: '/',
+        httpOnly: true,
+      });
       return {
         ok: true,
         token,
@@ -178,5 +186,26 @@ export class UserService {
         error: '로그인을 할 수 없습니다.',
       };
     }
+  }
+
+  async logout(res: Response): Promise<CoreOutput> {
+    res.clearCookie('jwt-token');
+    return {
+      ok: true,
+    };
+  }
+
+  async me(user: User): Promise<MeOutput> {
+    if (user) {
+      return {
+        ok: true,
+        user,
+      };
+    }
+    return {
+      ok: false,
+      user: null,
+      error: '로그인 상태가 아닙니다.',
+    };
   }
 }

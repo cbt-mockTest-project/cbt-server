@@ -44,6 +44,10 @@ import { join } from 'path';
       driver: ApolloDriver,
       autoSchemaFile: true,
       sortSchema: true, // 스키마 사전순으로 정렬
+      cors: {
+        credentials: true,
+        origin: process.env.CLIENT_URL,
+      },
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',

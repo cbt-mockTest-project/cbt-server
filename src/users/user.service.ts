@@ -68,15 +68,19 @@ export class UserService {
     try {
       const code = uuidv4();
       const { email } = sendVerificationInput;
+      const user = await this.users.findOne({ where: { email } });
+      if (user) {
+        return {
+          ok: false,
+          error: '이미 가입된 이메일입니다.',
+        };
+      }
       const newVerification = this.verification.create({ email, code });
       const prevVerification = await this.verification.findOne({
         where: { email },
       });
       if (prevVerification) {
         await this.verification.update(prevVerification.id, { code });
-        return {
-          ok: true,
-        };
       }
       await this.verification.save(newVerification);
       this.mailService.sendVerificationEmail(

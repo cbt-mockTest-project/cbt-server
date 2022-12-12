@@ -250,13 +250,22 @@ export class MockExamQuestionService {
 
   async readMockExamQuestionsByMockExamId(
     readMockExamQuestionsByMockExamIdInput: ReadMockExamQuestionsByMockExamIdInput,
+    user: User,
   ): Promise<ReadMockExamQuestionsByMockExamIdOutput> {
     try {
       const { id } = readMockExamQuestionsByMockExamIdInput;
-      const [questions, count] = await this.mockExamQuestion.findAndCount({
+      // eslint-disable-next-line prefer-const
+      let [questions, count] = await this.mockExamQuestion.findAndCount({
         where: { mockExam: { id } },
         order: { number: 'ASC' },
-        relations: { state: true },
+        relations: { state: { user: true } },
+      });
+
+      questions = questions.map((question) => {
+        const filteredState = question.state.filter(
+          (state) => user && state.user.id === user.id,
+        );
+        return { ...question, state: filteredState };
       });
       return {
         ok: true,

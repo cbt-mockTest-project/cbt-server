@@ -67,6 +67,7 @@ export class MockExamQuestionStateService {
     return {
       ok: true,
       message: 'create success',
+      currentState: state,
     };
   }
 }

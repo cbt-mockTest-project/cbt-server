@@ -20,6 +20,8 @@ import {
   EmailVerificationInput,
 } from './dtos/EmailVerification.dto';
 import { Response } from 'express';
+import { Role } from 'src/auth/role.decorators';
+import { EditProfileOutput, EditProfileInput } from './dtos/editProfile.dto';
 
 @Resolver(() => User)
 export class UserResolver {
@@ -73,11 +75,21 @@ export class UserResolver {
     return this.userService.emailVerification(emailVerificationInput);
   }
 
+  @Role(['ANY'])
   @Mutation(() => CheckPasswordOutput)
   async checkPassword(
     @Args('input') checkPassWordInput: CheckPasswordInput,
     @AuthUser() user: User,
   ): Promise<CheckPasswordOutput> {
     return this.userService.checkPassword(checkPassWordInput, user);
+  }
+
+  @Role(['ANY'])
+  @Mutation(() => EditProfileOutput)
+  async editProfile(
+    @Args('input') editProfileInput: EditProfileInput,
+    @AuthUser() user: User,
+  ): Promise<EditProfileOutput> {
+    return this.userService.editProfile(editProfileInput, user);
   }
 }

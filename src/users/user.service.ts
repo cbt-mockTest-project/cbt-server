@@ -24,6 +24,7 @@ import {
 import { MailService } from 'src/mail/mail.service';
 import { Response } from 'express';
 import { MeOutput } from './dtos/me.dto';
+import { EditProfileInput, EditProfileOutput } from './dtos/editProfile.dto';
 
 @Injectable()
 export class UserService {
@@ -221,18 +222,46 @@ export class UserService {
     checkPassWordInput: CheckPasswordInput,
     user: User,
   ): Promise<CheckPasswordOutput> {
-    const currentUser = await this.users.findOne({
-      where: { id: user.id },
-      select: { password: true },
-    });
-    const { password } = checkPassWordInput;
-    const passwordCorrect = await currentUser.checkPassword(password);
-    if (!passwordCorrect) {
+    try {
+      const currentUser = await this.users.findOne({
+        where: { id: user.id },
+        select: { password: true },
+      });
+      const { password } = checkPassWordInput;
+      const passwordCorrect = await currentUser.checkPassword(password);
+      if (!passwordCorrect) {
+        return {
+          ok: false,
+          error: '비밀번호를 잘못 입력했습니다.',
+        };
+      }
+      return { ok: true };
+    } catch {
       return {
         ok: false,
-        error: '비밀번호를 잘못 입력했습니다.',
+        error: '비밀번호 체크에 실패했습니다.',
       };
     }
-    return { ok: true };
+  }
+
+  async editProfile(
+    editProfileInput: EditProfileInput,
+    user: User,
+  ): Promise<EditProfileOutput> {
+    const { nickname, password } = editProfileInput;
+    user.password = password;
+    user.nickname = nickname;
+    try {
+      await this.users.save(user);
+      return {
+        ok: true,
+      };
+    } catch (e) {
+      console.log(e);
+      return {
+        ok: false,
+        error: '프로필 수정에 실패했습니다.',
+      };
+    }
   }
 }

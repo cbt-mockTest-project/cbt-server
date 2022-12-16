@@ -5,7 +5,14 @@ import {
   ObjectType,
   registerEnumType,
 } from '@nestjs/graphql';
-import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany } from 'typeorm';
+import {
+  BeforeInsert,
+  BeforeUpdate,
+  Column,
+  DeleteDateColumn,
+  Entity,
+  OneToMany,
+} from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { IsEmail, IsEnum, IsString } from 'class-validator';
 import { InternalServerErrorException } from '@nestjs/common';
@@ -50,6 +57,10 @@ export class User extends CoreEntity {
   )
   @Field(() => [MockExamQuestionState])
   mockExamQuestionState: MockExamQuestionState[];
+
+  @DeleteDateColumn()
+  @Field(() => Date)
+  deletedAt?: Date;
 
   @BeforeInsert()
   @BeforeUpdate()

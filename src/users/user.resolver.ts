@@ -22,6 +22,7 @@ import {
 import { Response } from 'express';
 import { Role } from 'src/auth/role.decorators';
 import { EditProfileOutput, EditProfileInput } from './dtos/editProfile.dto';
+import { RestoreUserInput } from './dtos/restoreUser.dto';
 
 @Resolver(() => User)
 export class UserResolver {
@@ -91,5 +92,19 @@ export class UserResolver {
     @AuthUser() user: User,
   ): Promise<EditProfileOutput> {
     return this.userService.editProfile(editProfileInput, user);
+  }
+
+  @Role(['ANY'])
+  @Mutation(() => CoreOutput)
+  async deleteUser(@AuthUser() user: User): Promise<CoreOutput> {
+    return this.userService.deleteUser(user);
+  }
+
+  @Role(['ANY'])
+  @Mutation(() => CoreOutput)
+  async restoreUser(
+    @Args('input') restoreUserInput: RestoreUserInput,
+  ): Promise<CoreOutput> {
+    return this.userService.restoreUser(restoreUserInput);
   }
 }

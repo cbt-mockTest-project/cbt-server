@@ -1,3 +1,4 @@
+import { RestoreUserInput } from './dtos/restoreUser.dto';
 import {
   CheckPasswordInput,
   CheckPasswordOutput,
@@ -46,7 +47,16 @@ export class UserService {
           error: '인증되지 않은 이메일입니다.',
         };
       }
-      const exists = await this.users.findOneBy({ email });
+      const exists = await this.users.findOne({
+        where: { email },
+        withDeleted: true,
+      });
+      if (exists.deletedAt) {
+        return {
+          ok: false,
+          error: '탈퇴 처리된 회원입니다.',
+        };
+      }
       if (exists) {
         return {
           ok: false,
@@ -73,7 +83,16 @@ export class UserService {
     try {
       const code = uuidv4();
       const { email } = sendVerificationInput;
-      const user = await this.users.findOne({ where: { email } });
+      const user = await this.users.findOne({
+        where: { email },
+        withDeleted: true,
+      });
+      if (user.deletedAt) {
+        return {
+          ok: false,
+          error: '탈퇴 처리된 이메일입니다.',
+        };
+      }
       if (user) {
         return {
           ok: false,
@@ -261,6 +280,35 @@ export class UserService {
       return {
         ok: false,
         error: '프로필 수정에 실패했습니다.',
+      };
+    }
+  }
+
+  async deleteUser(user: User): Promise<CoreOutput> {
+    try {
+      this.users.softDelete({ id: user.id });
+      return {
+        ok: true,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '회원탈퇴에 실패했습니다.',
+      };
+    }
+  }
+
+  async restoreUser(restoreUserInput: RestoreUserInput): Promise<CoreOutput> {
+    try {
+      const { id } = restoreUserInput;
+      await this.users.restore({ id });
+      return {
+        ok: true,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '탈퇴 복구에 실패했습니다.',
       };
     }
   }

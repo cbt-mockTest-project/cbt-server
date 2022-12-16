@@ -1,3 +1,7 @@
+import {
+  CheckPasswordInput,
+  CheckPasswordOutput,
+} from './dtos/checkPassword.dto';
 import { MeOutput } from './dtos/me.dto';
 import { CoreOutput } from 'src/common/dtos/output.dto';
 import {
@@ -67,5 +71,13 @@ export class UserResolver {
     @Args('input') emailVerificationInput: EmailVerificationInput,
   ): Promise<EmailVerificationOutput> {
     return this.userService.emailVerification(emailVerificationInput);
+  }
+
+  @Mutation(() => CheckPasswordOutput)
+  async checkPassword(
+    @Args('input') checkPassWordInput: CheckPasswordInput,
+    @AuthUser() user: User,
+  ): Promise<CheckPasswordOutput> {
+    return this.userService.checkPassword(checkPassWordInput, user);
   }
 }

@@ -1,3 +1,7 @@
+import {
+  CheckPasswordInput,
+  CheckPasswordOutput,
+} from './dtos/checkPassword.dto';
 import { CoreOutput } from 'src/common/dtos/output.dto';
 import {
   EmailVerificationInput,
@@ -211,5 +215,24 @@ export class UserService {
       user: null,
       error: '로그인 상태가 아닙니다.',
     };
+  }
+
+  async checkPassword(
+    checkPassWordInput: CheckPasswordInput,
+    user: User,
+  ): Promise<CheckPasswordOutput> {
+    const currentUser = await this.users.findOne({
+      where: { id: user.id },
+      select: { password: true },
+    });
+    const { password } = checkPassWordInput;
+    const passwordCorrect = await currentUser.checkPassword(password);
+    if (!passwordCorrect) {
+      return {
+        ok: false,
+        error: '비밀번호를 잘못 입력했습니다.',
+      };
+    }
+    return { ok: true };
   }
 }

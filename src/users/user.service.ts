@@ -26,7 +26,7 @@ import { MailService } from 'src/mail/mail.service';
 import { Response } from 'express';
 import { MeOutput } from './dtos/me.dto';
 import { EditProfileInput, EditProfileOutput } from './dtos/editProfile.dto';
-
+import * as bcrypt from 'bcrypt';
 @Injectable()
 export class UserService {
   constructor(
@@ -275,9 +275,23 @@ export class UserService {
     user: User,
   ): Promise<EditProfileOutput> {
     const { nickname, password } = editProfileInput;
-    user.password = password;
-    user.nickname = nickname;
     try {
+      const currentUser = await this.users.findOne({
+        where: { id: user.id },
+        select: { password: true },
+      });
+      const isEqualToPrevPassword = await bcrypt.compare(
+        password,
+        currentUser.password,
+      );
+      if (isEqualToPrevPassword) {
+        return {
+          ok: false,
+          error: '이전과 비밀번호가 동일합니다.',
+        };
+      }
+      user.password = password;
+      user.nickname = nickname;
       await this.users.save(user);
       return {
         ok: true,

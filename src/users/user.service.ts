@@ -1,3 +1,7 @@
+import {
+  SendFindPasswordMailInput,
+  SendFindPasswordMailOutput,
+} from './dtos/sendFindPasswordMail.dto';
 import { RestoreUserInput } from './dtos/restoreUser.dto';
 import {
   CheckPasswordInput,
@@ -115,6 +119,36 @@ export class UserService {
         ok: true,
       };
     } catch (e) {
+      return {
+        ok: false,
+        error: '메일을 보낼 수 없습니다.',
+      };
+    }
+  }
+
+  async sendFindPasswordMail(
+    sendFindPasswordMailInput: SendFindPasswordMailInput,
+  ): Promise<SendFindPasswordMailOutput> {
+    try {
+      const { email } = sendFindPasswordMailInput;
+      const user = await this.users.findOne({
+        where: { email },
+        withDeleted: true,
+      });
+      if (!user) {
+        return {
+          ok: false,
+          error: '존재하지 않는 이메일입니다.',
+        };
+      }
+      this.mailService.sendFindPasswordEmail(
+        email,
+        `${process.env.CLIENT_URL}/register/changePassword`,
+      );
+      return {
+        ok: true,
+      };
+    } catch {
       return {
         ok: false,
         error: '메일을 보낼 수 없습니다.',

@@ -23,4 +23,24 @@ export class MailService {
       });
     return true;
   }
+
+  sendFindPasswordEmail(email: string, link: string) {
+    const path = `${__dirname.split('dist')[0]}src/mail/templates`;
+    this.mailerService
+      .sendMail({
+        to: email,
+        subject: '[실기CBT] 비밀번호 찾기',
+        template: path + '/findPassword', // The `.pug` or `.hbs` extension is appended automatically.
+        context: {
+          link,
+        },
+      })
+      .then((success) => {
+        console.log(success);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    return true;
+  }
 }

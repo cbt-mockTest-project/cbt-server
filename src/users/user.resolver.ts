@@ -1,4 +1,8 @@
 import {
+  SendFindPasswordMailInput,
+  SendFindPasswordMailOutput,
+} from './dtos/sendFindPasswordMail.dto';
+import {
   CheckPasswordInput,
   CheckPasswordOutput,
 } from './dtos/checkPassword.dto';
@@ -106,5 +110,12 @@ export class UserResolver {
     @Args('input') restoreUserInput: RestoreUserInput,
   ): Promise<CoreOutput> {
     return this.userService.restoreUser(restoreUserInput);
+  }
+
+  @Mutation(() => SendFindPasswordMailOutput)
+  async sendFindPasswordMail(
+    @Args('input') sendFindPasswordMailInput: SendFindPasswordMailInput,
+  ): Promise<SendFindPasswordMailOutput> {
+    return this.userService.sendFindPasswordMail(sendFindPasswordMailInput);
   }
 }

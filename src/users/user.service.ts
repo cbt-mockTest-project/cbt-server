@@ -183,8 +183,15 @@ export class UserService {
       const { email, password } = loginInput;
       const user = await this.users.findOne({
         where: { email },
-        select: ['id', 'password'],
+        select: ['id', 'password', 'deletedAt'],
+        withDeleted: true,
       });
+      if (user && user.deletedAt) {
+        return {
+          ok: false,
+          error: '탈퇴 처리된 이메일입니다.',
+        };
+      }
       if (!user) {
         return {
           ok: false,

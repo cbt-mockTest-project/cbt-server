@@ -31,6 +31,10 @@ import { Response } from 'express';
 import { MeOutput } from './dtos/me.dto';
 import { EditProfileInput, EditProfileOutput } from './dtos/editProfile.dto';
 import * as bcrypt from 'bcrypt';
+import {
+  ChangePasswordAfterVerifyingInput,
+  ChangePasswordAfterVerifyingOutput,
+} from './dtos/changePasswordAfterVerifying.dto';
 @Injectable()
 export class UserService {
   constructor(
@@ -55,7 +59,7 @@ export class UserService {
         where: { email },
         withDeleted: true,
       });
-      if (exists.deletedAt) {
+      if (exists && exists.deletedAt) {
         return {
           ok: false,
           error: '탈퇴 처리된 회원입니다.',
@@ -70,6 +74,7 @@ export class UserService {
       await this.users.save(
         this.users.create({ email, password, nickname, role: UserRole.CLIENT }),
       );
+      await this.verification.delete({ email });
       return {
         ok: true,
       };
@@ -91,7 +96,7 @@ export class UserService {
         where: { email },
         withDeleted: true,
       });
-      if (user.deletedAt) {
+      if (user && user.deletedAt) {
         return {
           ok: false,
           error: '탈퇴 처리된 이메일입니다.',
@@ -109,11 +114,12 @@ export class UserService {
       });
       if (prevVerification) {
         await this.verification.update(prevVerification.id, { code });
+      } else {
+        await this.verification.save(newVerification);
       }
-      await this.verification.save(newVerification);
       this.mailService.sendVerificationEmail(
         email,
-        `${process.env.CLIENT_URL}/register?code=${newVerification.code}`,
+        `${process.env.CLIENT_URL}/register?code=${code}`,
       );
       return {
         ok: true,
@@ -130,20 +136,36 @@ export class UserService {
     sendFindPasswordMailInput: SendFindPasswordMailInput,
   ): Promise<SendFindPasswordMailOutput> {
     try {
+      const code = uuidv4();
       const { email } = sendFindPasswordMailInput;
       const user = await this.users.findOne({
         where: { email },
         withDeleted: true,
       });
+      if (user && user.deletedAt) {
+        return {
+          ok: false,
+          error: '탈퇴 처리된 이메일입니다.',
+        };
+      }
       if (!user) {
         return {
           ok: false,
           error: '존재하지 않는 이메일입니다.',
         };
       }
+      const newVerification = this.verification.create({ email, code });
+      const prevVerification = await this.verification.findOne({
+        where: { email },
+      });
+      if (prevVerification) {
+        await this.verification.update(prevVerification.id, { code });
+      } else {
+        await this.verification.save(newVerification);
+      }
       this.mailService.sendFindPasswordEmail(
         email,
-        `${process.env.CLIENT_URL}/register/changePassword`,
+        `${process.env.CLIENT_URL}/register/password?key=${code}`,
       );
       return {
         ok: true,
@@ -364,6 +386,39 @@ export class UserService {
       return {
         ok: false,
         error: '탈퇴 복구에 실패했습니다.',
+      };
+    }
+  }
+
+  async changePasswordAfterVerifying(
+    changePasswordAfterVerifyingInput: ChangePasswordAfterVerifyingInput,
+  ): Promise<ChangePasswordAfterVerifyingOutput> {
+    try {
+      const { code, password } = changePasswordAfterVerifyingInput;
+      const { email } = await this.verification.findOne({ where: { code } });
+      if (!email) {
+        return {
+          ok: false,
+          error: '인증되지 않은 이메일입니다.',
+        };
+      }
+      const user = await this.users.findOne({
+        where: { email },
+      });
+      if (!user) {
+        return {
+          ok: false,
+          error: '존재하지 않는 이메일입니다.',
+        };
+      }
+      user.password = password;
+      await this.users.save(user);
+      return {
+        ok: true,
+      };
+    } catch {
+      return {
+        ok: false,
       };
     }
   }

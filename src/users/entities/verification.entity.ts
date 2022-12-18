@@ -11,7 +11,7 @@ export class Verification extends CoreEntity {
   @Field(() => String)
   code: string;
 
-  @Column()
+  @Column({ nullable: true })
   @Field(() => String)
   @IsEmail()
   email: string;

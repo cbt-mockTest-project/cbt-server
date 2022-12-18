@@ -27,6 +27,10 @@ import { Response } from 'express';
 import { Role } from 'src/auth/role.decorators';
 import { EditProfileOutput, EditProfileInput } from './dtos/editProfile.dto';
 import { RestoreUserInput } from './dtos/restoreUser.dto';
+import {
+  ChangePasswordAfterVerifyingOutput,
+  ChangePasswordAfterVerifyingInput,
+} from './dtos/changePasswordAfterVerifying.dto';
 
 @Resolver(() => User)
 export class UserResolver {
@@ -117,5 +121,15 @@ export class UserResolver {
     @Args('input') sendFindPasswordMailInput: SendFindPasswordMailInput,
   ): Promise<SendFindPasswordMailOutput> {
     return this.userService.sendFindPasswordMail(sendFindPasswordMailInput);
+  }
+
+  @Mutation(() => ChangePasswordAfterVerifyingOutput)
+  async changePasswordAfterVerifying(
+    @Args('input')
+    changePasswordAfterVerifyingInput: ChangePasswordAfterVerifyingInput,
+  ): Promise<ChangePasswordAfterVerifyingOutput> {
+    return this.userService.changePasswordAfterVerifying(
+      changePasswordAfterVerifyingInput,
+    );
   }
 }

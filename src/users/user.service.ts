@@ -413,6 +413,7 @@ export class UserService {
       }
       user.password = password;
       await this.users.save(user);
+      await this.verification.delete({ email });
       return {
         ok: true,
       };

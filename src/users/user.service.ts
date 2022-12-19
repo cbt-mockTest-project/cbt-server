@@ -336,10 +336,8 @@ export class UserService {
         where: { id: user.id },
         select: { password: true },
       });
-      const isEqualToPrevPassword = await bcrypt.compare(
-        password,
-        currentUser.password,
-      );
+      const isEqualToPrevPassword =
+        password && (await bcrypt.compare(password, currentUser.password));
       if (isEqualToPrevPassword) {
         return {
           ok: false,

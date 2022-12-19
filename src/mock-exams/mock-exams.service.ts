@@ -1,3 +1,6 @@
+import { deduplication } from './../utils/utils';
+import { User } from './../users/entities/user.entity';
+import { MockExamQuestionState } from 'src/mock-exams/entities/mock-exam-question-state.entity';
 import {
   ReadMockExamTitlesByCateoryInput,
   ReadMockExamTitlesByCateoryOutput,
@@ -25,6 +28,7 @@ import {
   CreateMockExamOutput,
 } from './dtos/createMockExam.dto';
 import { EditMockExamInput, EditMockExamOutput } from './dtos/editMockExam.dto';
+import { FindMyExamHistoryOutput } from './dtos/findMyExamHistory.dto';
 
 @Injectable()
 export class MockExamService {
@@ -33,6 +37,8 @@ export class MockExamService {
     private readonly mockExam: Repository<MockExam>,
     @InjectRepository(MockExamCategory)
     private readonly mockExamCategory: Repository<MockExamCategory>,
+    @InjectRepository(MockExamQuestionState)
+    private readonly mockExamQuestionState: Repository<MockExamQuestionState>,
   ) {}
 
   async createMockExam(
@@ -211,6 +217,38 @@ export class MockExamService {
       return {
         ok: false,
         error: '타이틀을 찾을 수 없습니다.',
+      };
+    }
+  }
+
+  async findMyExamHistory(user: User): Promise<FindMyExamHistoryOutput> {
+    try {
+      const res = await this.mockExamQuestionState.find({
+        where: {
+          user: { id: user.id },
+        },
+        select: ['exam'],
+        relations: {
+          exam: true,
+        },
+      });
+      if (!res) {
+        return {
+          ok: false,
+          error: '시험내역이 존재하지 않습니다.',
+        };
+      }
+      const examsTitleAndId = deduplication(
+        res.map((el) => ({ id: el.exam.id, title: el.exam.title })),
+      );
+      return {
+        ok: true,
+        titleAndId: examsTitleAndId,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '시험기록을 조회할 수 없습니다.',
       };
     }
   }

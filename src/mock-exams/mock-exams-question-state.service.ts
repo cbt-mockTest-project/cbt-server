@@ -51,6 +51,9 @@ export class MockExamQuestionStateService {
       where: {
         id: questionId,
       },
+      relations: {
+        mockExam: true,
+      },
     });
     if (!question) {
       return {
@@ -60,6 +63,7 @@ export class MockExamQuestionStateService {
     }
     const newState = this.mockExamQuestionState.create({
       question,
+      exam: question.mockExam,
       state,
       user,
     });

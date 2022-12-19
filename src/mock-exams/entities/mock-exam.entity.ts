@@ -3,6 +3,7 @@ import { CoreEntity } from './../../common/entities/core.entity';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { MockExamQuestion } from './mock-exam-question.entity';
+import { MockExamQuestionState } from './mock-exam-question-state.entity';
 
 @InputType('MockExamInputType', { isAbstract: true })
 @ObjectType()
@@ -31,8 +32,18 @@ export class MockExam extends CoreEntity {
     () => MockExamQuestion,
     (mockExamQuestion) => mockExamQuestion.mockExam,
     {
-      onDelete: 'SET NULL', // category 삭제될시  mockExam's categoryId가 null
+      onDelete: 'SET NULL',
     },
   )
   mockExamQuestion: MockExamQuestion[];
+
+  @Field(() => [MockExamQuestion])
+  @OneToMany(
+    () => MockExamQuestionState,
+    (mockExamQuestionState) => mockExamQuestionState.exam,
+    {
+      onDelete: 'SET NULL',
+    },
+  )
+  mockExamQuestionState: MockExamQuestionState[];
 }

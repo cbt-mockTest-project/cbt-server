@@ -9,6 +9,7 @@ import {
 import { Column, Entity, ManyToOne } from 'typeorm';
 import { IsEnum } from 'class-validator';
 import { User } from 'src/users/entities/user.entity';
+import { MockExam } from './mock-exam.entity';
 
 export enum QuestionState {
   ROW = 'ROW',
@@ -42,4 +43,8 @@ export class MockExamQuestionState extends CoreEntity {
   @ManyToOne(() => User, (user) => user.mockExamQuestionState)
   @Field(() => User)
   user: User;
+
+  @ManyToOne(() => MockExam, (exam) => exam.mockExamQuestionState)
+  @Field(() => MockExam)
+  exam: MockExam;
 }

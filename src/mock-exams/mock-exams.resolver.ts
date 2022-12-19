@@ -1,3 +1,5 @@
+import { FindMyExamHistoryOutput } from './dtos/findMyExamHistory.dto';
+import { User } from './../users/entities/user.entity';
 import { ReadMockExamOutput, ReadMockExamInput } from './dtos/readMockExam.dto';
 import {
   ReadAllMockExamsOutput,
@@ -24,6 +26,7 @@ import {
   ReadMockExamTitlesByCateoryOutput,
   ReadMockExamTitlesByCateoryInput,
 } from './dtos/readMockExamTitlesByCateory.dto';
+import { AuthUser } from 'src/auth/auth-user.decorator';
 
 @Resolver(() => MockExam)
 export class MockExamResolver {
@@ -81,5 +84,12 @@ export class MockExamResolver {
     return this.mockExamService.readMockExamTitlesByCateory(
       readMockExamTitlesByCateoryInput,
     );
+  }
+
+  @Query(() => FindMyExamHistoryOutput)
+  async findMyExamHistory(
+    @AuthUser() user: User,
+  ): Promise<FindMyExamHistoryOutput> {
+    return this.mockExamService.findMyExamHistory(user);
   }
 }

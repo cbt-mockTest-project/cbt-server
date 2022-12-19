@@ -6,7 +6,10 @@ import { MockExam } from '../entities/mock-exam.entity';
 @InputType()
 export class ReadMockExamQuestionsByMockExamIdInput extends PickType(MockExam, [
   'id',
-]) {}
+]) {
+  @Field(() => Boolean)
+  isRandom?: boolean;
+}
 
 @ObjectType()
 export class ReadMockExamQuestionsByMockExamIdOutput extends CoreOutput {

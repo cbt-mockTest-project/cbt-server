@@ -11,3 +11,7 @@ export const getCookie = (cookie: string, key: string) => {
   const result = cookie.substring(index + (key.length + 1));
   return result;
 };
+
+export const shuffleArray = <T = string | number>(array: Array<T>) => {
+  return array.sort(() => Math.random() - 0.5);
+};

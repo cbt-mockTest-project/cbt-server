@@ -38,6 +38,7 @@ import {
   ReadMockExamQuestionNumbersInput,
   ReadMockExamQuestionNumbersOutput,
 } from './dtos/readMockExamQuestionNumbers.dto';
+import { shuffleArray } from 'src/utils/utils';
 
 @Injectable()
 export class MockExamQuestionService {
@@ -253,7 +254,7 @@ export class MockExamQuestionService {
     user: User,
   ): Promise<ReadMockExamQuestionsByMockExamIdOutput> {
     try {
-      const { id } = readMockExamQuestionsByMockExamIdInput;
+      const { id, isRandom } = readMockExamQuestionsByMockExamIdInput;
       // eslint-disable-next-line prefer-const
       let [questions, count] = await this.mockExamQuestion.findAndCount({
         where: { mockExam: { id } },
@@ -267,6 +268,9 @@ export class MockExamQuestionService {
         );
         return { ...question, state: filteredState };
       });
+      if (isRandom) {
+        questions = shuffleArray(questions);
+      }
       return {
         ok: true,
         questions,
@@ -331,6 +335,7 @@ export class MockExamQuestionService {
       },
     };
     const where = states.map((state) => ({ ...commonAndConditions, state }));
+    console.log(where);
     const mockExamQuestionStates = await this.mockExamQuestionState.find({
       where,
       relations: {

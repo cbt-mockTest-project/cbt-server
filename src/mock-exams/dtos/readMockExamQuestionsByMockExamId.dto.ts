@@ -7,7 +7,7 @@ import { MockExam } from '../entities/mock-exam.entity';
 export class ReadMockExamQuestionsByMockExamIdInput extends PickType(MockExam, [
   'id',
 ]) {
-  @Field(() => Boolean)
+  @Field(() => Boolean, { nullable: true })
   isRandom?: boolean;
 }
 

@@ -1,3 +1,4 @@
+import { User } from 'src/users/entities/user.entity';
 import { ReadAllMockExamQuestionFeedbackOutput } from './dtos/readAllMockExamQuestionFeedback.dto';
 import {
   EditMockExamQuestionFeedbackInput,
@@ -24,13 +25,17 @@ export class MockExamQuestionFeedbackSerivce {
     private readonly mockExamQuestionFeedback: Repository<MockExamQuestionFeedback>,
     @InjectRepository(MockExamQuestion)
     private readonly mockExamQuestion: Repository<MockExamQuestion>,
+    @InjectRepository(User)
+    private readonly users: Repository<User>,
   ) {}
 
   async createMockExamQuestionFeedback(
     createMockExamQuestionFeedbackInput: CreateMockExamQuestionFeedbackInput,
+    user: User,
   ): Promise<CreateMockExamQuestionFeedbackOutput> {
     try {
       const { questionId, content } = createMockExamQuestionFeedbackInput;
+
       const question = await this.mockExamQuestion.findOne({
         where: { id: questionId },
       });
@@ -43,6 +48,7 @@ export class MockExamQuestionFeedbackSerivce {
       const feedback = this.mockExamQuestionFeedback.create({
         content,
         mockExamQuestion: question,
+        user,
       });
       await this.mockExamQuestionFeedback.save(feedback);
       return {

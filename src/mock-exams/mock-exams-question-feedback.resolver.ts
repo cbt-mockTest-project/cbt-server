@@ -1,3 +1,4 @@
+import { User } from 'src/users/entities/user.entity';
 import {
   DeleteMockExamQuestionFeedbackInput,
   DeleteMockExamQuestionFeedbackOutput,
@@ -15,6 +16,7 @@ import {
   EditMockExamQuestionFeedbackOutput,
 } from './dtos/editMockExamQuestionFeedback.dto';
 import { ReadAllMockExamQuestionFeedbackOutput } from './dtos/readAllMockExamQuestionFeedback.dto';
+import { AuthUser } from 'src/auth/auth-user.decorator';
 
 @Resolver(() => MockExamQuestionFeedback)
 export class MockExamQuestionFeedbackResolver {
@@ -27,9 +29,11 @@ export class MockExamQuestionFeedbackResolver {
   createMockExamQuestionFeedback(
     @Args('input')
     createMockExamQuestionFeedbackInput: CreateMockExamQuestionFeedbackInput,
+    @AuthUser() user: User,
   ): Promise<CreateMockExamQuestionFeedbackOutput> {
     return this.mockExamQuestionFeedbackSerivce.createMockExamQuestionFeedback(
       createMockExamQuestionFeedbackInput,
+      user,
     );
   }
 

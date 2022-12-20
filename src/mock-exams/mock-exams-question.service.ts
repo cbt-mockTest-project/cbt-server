@@ -259,7 +259,7 @@ export class MockExamQuestionService {
       let [questions, count] = await this.mockExamQuestion.findAndCount({
         where: { mockExam: { id } },
         order: { number: 'ASC' },
-        relations: { state: { user: true } },
+        relations: { state: { user: true, exam: true } },
       });
 
       questions = questions.map((question) => {

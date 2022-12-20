@@ -1,3 +1,7 @@
+import {
+  ResetMyExamQuestionStateInput,
+  ResetMyExamQuestionStateOutput,
+} from './dtos/resetMyExamQuestionState.dto';
 import { User } from 'src/users/entities/user.entity';
 import {
   CreateOrUpdateMockExamQuestionStateInput,
@@ -6,7 +10,10 @@ import {
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { MockExamQuestionState } from './entities/mock-exam-question-state.entity';
+import {
+  MockExamQuestionState,
+  QuestionState,
+} from './entities/mock-exam-question-state.entity';
 import { MockExamQuestion } from './entities/mock-exam-question.entity';
 
 @Injectable()
@@ -73,5 +80,47 @@ export class MockExamQuestionStateService {
       message: 'create success',
       currentState: state,
     };
+  }
+
+  async resetMyExamQuestionState(
+    resetMyExamQuestionStateInput: ResetMyExamQuestionStateInput,
+    user: User,
+  ): Promise<ResetMyExamQuestionStateOutput> {
+    try {
+      const { examId } = resetMyExamQuestionStateInput;
+      const states = await this.mockExamQuestionState.find({
+        where: {
+          user: { id: user.id },
+          exam: { id: examId },
+        },
+      });
+      if (!states) {
+        return {
+          ok: false,
+          error: '존재하지 않는 시험입니다.',
+        };
+      }
+      if (states.length === 0) {
+        return {
+          ok: false,
+          error: '체크된 성취도가 없습니다.',
+        };
+      }
+      const newStates = this.mockExamQuestionState.create(
+        states.map((el) => ({
+          ...el,
+          state: QuestionState.CORE,
+        })),
+      );
+      await this.mockExamQuestionState.save(newStates);
+      return {
+        ok: true,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '성취도를 초기화 할 수 없습니다.',
+      };
+    }
   }
 }

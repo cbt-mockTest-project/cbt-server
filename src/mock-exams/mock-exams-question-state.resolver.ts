@@ -1,3 +1,7 @@
+import {
+  ResetMyExamQuestionStateInput,
+  ResetMyExamQuestionStateOutput,
+} from './dtos/resetMyExamQuestionState.dto';
 import { User } from 'src/users/entities/user.entity';
 import {
   CreateOrUpdateMockExamQuestionStateOutput,
@@ -25,6 +29,18 @@ export class MockExamQuestionStateResolver {
     return this.mockExamQuestionStateService.createOrUpdateMockExamQuestionState(
       user,
       createOrUpdateMockExamQuestionStateInput,
+    );
+  }
+
+  @Mutation(() => ResetMyExamQuestionStateOutput)
+  @Role(['ANY'])
+  async resetMyExamQuestionState(
+    @Args('input') resetMyExamQuestionStateInput: ResetMyExamQuestionStateInput,
+    @AuthUser() user: User,
+  ): Promise<ResetMyExamQuestionStateOutput> {
+    return this.mockExamQuestionStateService.resetMyExamQuestionState(
+      resetMyExamQuestionStateInput,
+      user,
     );
   }
 }

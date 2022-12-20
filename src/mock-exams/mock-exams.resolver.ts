@@ -1,4 +1,7 @@
-import { FindMyExamHistoryOutput } from './dtos/findMyExamHistory.dto';
+import {
+  FindMyExamHistoryOutput,
+  FindMyExamHistoryInput,
+} from './dtos/findMyExamHistory.dto';
 import { User } from './../users/entities/user.entity';
 import { ReadMockExamOutput, ReadMockExamInput } from './dtos/readMockExam.dto';
 import {
@@ -89,7 +92,8 @@ export class MockExamResolver {
   @Query(() => FindMyExamHistoryOutput)
   async findMyExamHistory(
     @AuthUser() user: User,
+    @Args('input') findMyExamHistoryInput: FindMyExamHistoryInput,
   ): Promise<FindMyExamHistoryOutput> {
-    return this.mockExamService.findMyExamHistory(user);
+    return this.mockExamService.findMyExamHistory(user, findMyExamHistoryInput);
   }
 }

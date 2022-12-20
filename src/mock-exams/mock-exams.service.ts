@@ -22,13 +22,16 @@ import { MockExamCategory } from './entities/mock-exam-category.entity';
 import { MockExam } from './entities/mock-exam.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Raw, Repository } from 'typeorm';
+import { Raw, Repository, FindOptionsWhere } from 'typeorm';
 import {
   CreateMockExamInput,
   CreateMockExamOutput,
 } from './dtos/createMockExam.dto';
 import { EditMockExamInput, EditMockExamOutput } from './dtos/editMockExam.dto';
-import { FindMyExamHistoryOutput } from './dtos/findMyExamHistory.dto';
+import {
+  FindMyExamHistoryOutput,
+  FindMyExamHistoryInput,
+} from './dtos/findMyExamHistory.dto';
 
 @Injectable()
 export class MockExamService {
@@ -221,12 +224,24 @@ export class MockExamService {
     }
   }
 
-  async findMyExamHistory(user: User): Promise<FindMyExamHistoryOutput> {
+  async findMyExamHistory(
+    user: User,
+    findMyExamHistoryInput: FindMyExamHistoryInput,
+  ): Promise<FindMyExamHistoryOutput> {
     try {
+      const commonAndConditions = { user: { id: user.id } };
+      const { categoryIds } = findMyExamHistoryInput;
+      const where:
+        | FindOptionsWhere<MockExamQuestionState>[]
+        | FindOptionsWhere<MockExamQuestionState> =
+        categoryIds.length !== 0
+          ? categoryIds.map((id) => ({
+              ...commonAndConditions,
+              exam: { mockExamCategory: { id } },
+            }))
+          : commonAndConditions;
       const res = await this.mockExamQuestionState.find({
-        where: {
-          user: { id: user.id },
-        },
+        where,
         select: ['exam'],
         relations: {
           exam: true,

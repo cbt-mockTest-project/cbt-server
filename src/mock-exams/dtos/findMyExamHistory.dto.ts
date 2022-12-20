@@ -1,5 +1,5 @@
 import { CoreOutput } from './../../common/dtos/output.dto';
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType, InputType } from '@nestjs/graphql';
 
 @ObjectType()
 export class TitleAndId {
@@ -7,6 +7,12 @@ export class TitleAndId {
   id?: number;
   @Field(() => String, { nullable: true })
   title?: string;
+}
+
+@InputType()
+export class FindMyExamHistoryInput {
+  @Field(() => [Number])
+  categoryIds: number[];
 }
 
 @ObjectType()

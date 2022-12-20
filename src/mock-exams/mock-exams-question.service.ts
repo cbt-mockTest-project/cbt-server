@@ -335,7 +335,6 @@ export class MockExamQuestionService {
       },
     };
     const where = states.map((state) => ({ ...commonAndConditions, state }));
-    console.log(where);
     const mockExamQuestionStates = await this.mockExamQuestionState.find({
       where,
       relations: {

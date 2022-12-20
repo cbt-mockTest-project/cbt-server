@@ -1,3 +1,4 @@
+import { User } from 'src/users/entities/user.entity';
 import { MockExamQuestion } from './mock-exam-question.entity';
 import { CoreEntity } from './../../common/entities/core.entity';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
@@ -15,9 +16,15 @@ export class MockExamQuestionFeedback extends CoreEntity {
     () => MockExamQuestion,
     (mockExamQuestion) => mockExamQuestion.mockExamQuestionFeedback,
     {
-      onDelete: 'CASCADE', // category 삭제될시  mockExam's categoryId가 null
+      onDelete: 'CASCADE',
     },
   )
   @Field(() => MockExamQuestion)
   mockExamQuestion: MockExamQuestion;
+
+  @ManyToOne(() => User, (user) => user.questionFeedback, {
+    onDelete: 'CASCADE',
+  })
+  @Field(() => User)
+  user: User;
 }

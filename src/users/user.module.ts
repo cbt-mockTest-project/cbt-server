@@ -1,3 +1,4 @@
+import { Feedback } from './entities/feedback.entity';
 import { Verification } from './entities/verification.entity';
 import { UserService } from './user.service';
 import { UserResolver } from './user.resolver';
@@ -6,7 +7,7 @@ import { Module } from '@nestjs/common';
 import { User } from './entities/user.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Verification])],
+  imports: [TypeOrmModule.forFeature([User, Verification, Feedback])],
   providers: [UserResolver, UserService],
   exports: [UserService],
 })

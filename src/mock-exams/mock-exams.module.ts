@@ -1,3 +1,4 @@
+import { User } from 'src/users/entities/user.entity';
 import { MockExamQuestionStateService } from './mock-exams-question-state.service';
 import { MockExamQuestionStateResolver } from './mock-exams-question-state.resolver';
 import { MockExamQuestionFeedback } from './entities/mock-exam-question-feedback.entity';
@@ -24,6 +25,7 @@ import { MockExamQuestionState } from './entities/mock-exam-question-state.entit
       MockExamQuestion,
       MockExamQuestionFeedback,
       MockExamQuestionState,
+      User,
     ]),
   ],
   providers: [

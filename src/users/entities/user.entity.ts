@@ -17,6 +17,8 @@ import * as bcrypt from 'bcrypt';
 import { IsEmail, IsEnum, IsString } from 'class-validator';
 import { InternalServerErrorException } from '@nestjs/common';
 import { MockExamQuestionState } from 'src/mock-exams/entities/mock-exam-question-state.entity';
+import { MockExamQuestionFeedback } from 'src/mock-exams/entities/mock-exam-question-feedback.entity';
+import { Feedback } from './feedback.entity';
 
 export enum UserRole {
   CLIENT = 'CLIENT',
@@ -53,10 +55,21 @@ export class User extends CoreEntity {
 
   @OneToMany(
     () => MockExamQuestionState,
-    (mockExamQuestionState) => mockExamQuestionState.question,
+    (mockExamQuestionState) => mockExamQuestionState.user,
   )
   @Field(() => [MockExamQuestionState])
   mockExamQuestionState: MockExamQuestionState[];
+
+  @OneToMany(
+    () => MockExamQuestionFeedback,
+    (questionFeedback) => questionFeedback.user,
+  )
+  @Field(() => [MockExamQuestionFeedback])
+  questionFeedback: MockExamQuestionFeedback[];
+
+  @OneToMany(() => Feedback, (feedback) => feedback.user)
+  @Field(() => [Feedback])
+  feedback: Feedback[];
 
   @DeleteDateColumn()
   @Field(() => Date)

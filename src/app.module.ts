@@ -1,3 +1,4 @@
+import { Feedback } from './users/entities/feedback.entity';
 import { MailModule } from './mail/mail.module';
 import { MockExamQuestionFeedback } from './mock-exams/entities/mock-exam-question-feedback.entity';
 import { MockExamQuestion } from './mock-exams/entities/mock-exam-question.entity';
@@ -66,6 +67,7 @@ import { join } from 'path';
         MockExamQuestion,
         MockExamQuestionFeedback,
         MockExamQuestionState,
+        Feedback,
       ],
     }),
     UserModule,

@@ -1,0 +1,38 @@
+import { SendFindPasswordMailInput, SendFindPasswordMailOutput } from './dtos/sendFindPasswordMail.dto';
+import { RestoreUserInput } from './dtos/restoreUser.dto';
+import { CheckPasswordInput, CheckPasswordOutput } from './dtos/checkPassword.dto';
+import { CoreOutput } from 'src/common/dtos/output.dto';
+import { EmailVerificationInput, EmailVerificationOutput } from './dtos/EmailVerification.dto';
+import { JwtService } from 'src/jwt/jwt.service';
+import { UserProfileInput, UserProfileOutput } from './dtos/userProfile.dto';
+import { RegisterInput, RegisterOutput } from './dtos/register.dto';
+import { Repository } from 'typeorm';
+import { User } from './entities/user.entity';
+import { LoginInput, LoginOutput } from './dtos/login.dto';
+import { Verification } from './entities/verification.entity';
+import { SendVerificationMailInput, SendVerificationMailOutput } from './dtos/sendVerificationMail.dto';
+import { MailService } from 'src/mail/mail.service';
+import { Response } from 'express';
+import { MeOutput } from './dtos/me.dto';
+import { EditProfileInput, EditProfileOutput } from './dtos/editProfile.dto';
+import { ChangePasswordAfterVerifyingInput, ChangePasswordAfterVerifyingOutput } from './dtos/changePasswordAfterVerifying.dto';
+export declare class UserService {
+    private readonly users;
+    private readonly verification;
+    private readonly mailService;
+    private readonly jwtService;
+    constructor(users: Repository<User>, verification: Repository<Verification>, mailService: MailService, jwtService: JwtService);
+    register(registerInput: RegisterInput): Promise<RegisterOutput>;
+    sendVerificationMail(sendVerificationInput: SendVerificationMailInput): Promise<SendVerificationMailOutput>;
+    sendFindPasswordMail(sendFindPasswordMailInput: SendFindPasswordMailInput): Promise<SendFindPasswordMailOutput>;
+    emailVerification(emailVerificationInput: EmailVerificationInput): Promise<EmailVerificationOutput>;
+    userProfile(userProfileInput: UserProfileInput): Promise<UserProfileOutput>;
+    login(loginInput: LoginInput, res: Response): Promise<LoginOutput>;
+    logout(res: Response): Promise<CoreOutput>;
+    me(user: User): Promise<MeOutput>;
+    checkPassword(checkPassWordInput: CheckPasswordInput, user: User): Promise<CheckPasswordOutput>;
+    editProfile(editProfileInput: EditProfileInput, user: User): Promise<EditProfileOutput>;
+    deleteUser(user: User): Promise<CoreOutput>;
+    restoreUser(restoreUserInput: RestoreUserInput): Promise<CoreOutput>;
+    changePasswordAfterVerifying(changePasswordAfterVerifyingInput: ChangePasswordAfterVerifyingInput): Promise<ChangePasswordAfterVerifyingOutput>;
+}

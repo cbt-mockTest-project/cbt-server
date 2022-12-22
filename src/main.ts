@@ -1,11 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.use(cookieParser());
-  await app.listen(8070);
+  await app.listen(8080);
   console.log('go to graphql : http://localhost:8070/graphql');
 }
 bootstrap();

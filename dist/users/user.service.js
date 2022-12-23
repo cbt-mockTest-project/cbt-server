@@ -253,6 +253,7 @@ let UserService = class UserService {
     }
     async logout(res) {
         res.clearCookie('jwt-token', {
+            domain: process.env.DOMAIN,
             path: '/',
             sameSite: 'none',
             secure: true,

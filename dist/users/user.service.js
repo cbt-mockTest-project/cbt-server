@@ -252,7 +252,12 @@ let UserService = class UserService {
         }
     }
     async logout(res) {
-        res.clearCookie('jwt-token');
+        res.clearCookie('jwt-token', {
+            path: '/',
+            sameSite: 'none',
+            secure: true,
+            httpOnly: true,
+        });
         return {
             ok: true,
         };

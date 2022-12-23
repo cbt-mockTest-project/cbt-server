@@ -282,7 +282,12 @@ export class UserService {
   }
 
   async logout(res: Response): Promise<CoreOutput> {
-    res.clearCookie('jwt-token');
+    res.clearCookie('jwt-token', {
+      path: '/',
+      sameSite: 'none',
+      secure: true,
+      httpOnly: true,
+    });
     return {
       ok: true,
     };

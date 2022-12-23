@@ -235,7 +235,6 @@ let UserService = class UserService {
             res.cookie('jwt-token', token, {
                 domain: process.env.DOMAIN,
                 path: '/',
-                httpOnly: true,
             });
             return {
                 ok: true,

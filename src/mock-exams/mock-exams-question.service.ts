@@ -255,13 +255,19 @@ export class MockExamQuestionService {
   ): Promise<ReadMockExamQuestionsByMockExamIdOutput> {
     try {
       const { id, isRandom } = readMockExamQuestionsByMockExamIdInput;
+      const mockExam = await this.mockExam.findOne({ where: { id } });
+      if (!mockExam) {
+        return {
+          ok: false,
+          error: '문제가 존재하지 않습니다.',
+        };
+      }
       // eslint-disable-next-line prefer-const
       let [questions, count] = await this.mockExamQuestion.findAndCount({
         where: { mockExam: { id } },
         order: { number: 'ASC' },
         relations: { state: { user: true, exam: true } },
       });
-
       questions = questions.map((question) => {
         const filteredState = question.state.filter(
           (state) => user && state.user.id === user.id,
@@ -273,6 +279,7 @@ export class MockExamQuestionService {
       }
       return {
         ok: true,
+        title: mockExam.title,
         questions,
         count,
       };

@@ -204,6 +204,13 @@ let MockExamQuestionService = class MockExamQuestionService {
     async readMockExamQuestionsByMockExamId(readMockExamQuestionsByMockExamIdInput, user) {
         try {
             const { id, isRandom } = readMockExamQuestionsByMockExamIdInput;
+            const mockExam = await this.mockExam.findOne({ where: { id } });
+            if (!mockExam) {
+                return {
+                    ok: false,
+                    error: '문제가 존재하지 않습니다.',
+                };
+            }
             let [questions, count] = await this.mockExamQuestion.findAndCount({
                 where: { mockExam: { id } },
                 order: { number: 'ASC' },
@@ -218,6 +225,7 @@ let MockExamQuestionService = class MockExamQuestionService {
             }
             return {
                 ok: true,
+                title: mockExam.title,
                 questions,
                 count,
             };

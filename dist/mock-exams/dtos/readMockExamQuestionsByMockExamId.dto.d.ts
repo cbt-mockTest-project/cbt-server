@@ -8,5 +8,6 @@ export declare class ReadMockExamQuestionsByMockExamIdInput extends ReadMockExam
 export declare class ReadMockExamQuestionsByMockExamIdOutput extends CoreOutput {
     questions?: MockExamQuestion[];
     count?: number;
+    title?: string;
 }
 export {};

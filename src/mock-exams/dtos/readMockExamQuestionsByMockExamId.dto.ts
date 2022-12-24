@@ -17,4 +17,6 @@ export class ReadMockExamQuestionsByMockExamIdOutput extends CoreOutput {
   questions?: MockExamQuestion[];
   @Field(() => Number)
   count?: number;
+  @Field(() => String)
+  title?: string;
 }

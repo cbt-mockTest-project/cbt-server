@@ -36,6 +36,10 @@ __decorate([
     (0, graphql_1.Field)(() => Number),
     __metadata("design:type", Number)
 ], ReadMockExamQuestionsByMockExamIdOutput.prototype, "count", void 0);
+__decorate([
+    (0, graphql_1.Field)(() => String),
+    __metadata("design:type", String)
+], ReadMockExamQuestionsByMockExamIdOutput.prototype, "title", void 0);
 ReadMockExamQuestionsByMockExamIdOutput = __decorate([
     (0, graphql_1.ObjectType)()
 ], ReadMockExamQuestionsByMockExamIdOutput);

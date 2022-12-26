@@ -202,8 +202,11 @@ export class MockExamService {
   ): Promise<ReadMockExamTitlesByCateoryOutput> {
     try {
       const { name } = readMockExamTitlesByCateoryInput;
-      const mockExamTitles = await this.mockExam.find({
+      let mockExamTitles = await this.mockExam.find({
         where: { mockExamCategory: { name } },
+        relations: {
+          mockExamQuestion: true,
+        },
         select: ['title', 'id'],
       });
       if (!mockExamTitles) {
@@ -212,6 +215,9 @@ export class MockExamService {
           error: '해당 카테고리에 맞는 시험이 존재하지 않습니다.',
         };
       }
+      mockExamTitles = mockExamTitles.filter(
+        (exam) => exam.mockExamQuestion.length,
+      );
       return {
         titles: mockExamTitles,
         ok: true,

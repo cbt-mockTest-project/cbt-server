@@ -31,6 +31,7 @@ import { EditMockExamInput, EditMockExamOutput } from './dtos/editMockExam.dto';
 import {
   FindMyExamHistoryOutput,
   FindMyExamHistoryInput,
+  TitleAndId,
 } from './dtos/findMyExamHistory.dto';
 
 @Injectable()
@@ -215,9 +216,13 @@ export class MockExamService {
           error: '해당 카테고리에 맞는 시험이 존재하지 않습니다.',
         };
       }
-      mockExamTitles = mockExamTitles.filter(
-        (exam) => exam.mockExamQuestion.length,
-      );
+      mockExamTitles = mockExamTitles
+        .filter((exam) => exam.mockExamQuestion.length)
+        .sort((a, b) => {
+          return (
+            Number(a.title.split('년')[0]) - Number(b.title.split('년')[0])
+          );
+        });
       return {
         titles: mockExamTitles,
         ok: true,
@@ -259,9 +264,11 @@ export class MockExamService {
           error: '시험내역이 존재하지 않습니다.',
         };
       }
-      const examsTitleAndId = deduplication(
+      const examsTitleAndId: TitleAndId[] = deduplication(
         res.map((el) => ({ id: el.exam.id, title: el.exam.title })),
-      );
+      ).sort((a, b) => {
+        return Number(a.title.split('년')[0]) - Number(b.title.split('년')[0]);
+      });
       return {
         ok: true,
         titleAndId: examsTitleAndId,

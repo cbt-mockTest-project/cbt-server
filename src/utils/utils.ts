@@ -9,6 +9,10 @@ export const getCookie = (cookie: string, key: string) => {
   if (match) {
     return match[0].split('=')[1];
   }
+  const keyIndex = cookie.indexOf(key);
+  if (keyIndex !== -1) {
+    return cookie.substring(keyIndex + key.length + 1);
+  }
   return null;
 };
 

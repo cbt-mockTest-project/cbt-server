@@ -121,17 +121,19 @@ export class MockExamService {
   ): Promise<ReadAllMockExamsOutput> {
     try {
       const { query, category } = readAllMockExamsInput;
-      const mockExams = await this.mockExam.find({
+      let mockExams = await this.mockExam.find({
         where: {
           title: Raw((title) => `${title} ILIKE '%${query}%'`),
           mockExamCategory: {
             name: Raw((name) => `${name} ILIKE '%${category}%'`),
           },
         },
+        relations: { mockExamQuestion: true },
         order: {
           title: 'ASC',
         },
       });
+      mockExams = mockExams.filter((exam) => exam.mockExamQuestion.length >= 1);
       return { ok: true, mockExams };
     } catch {
       return {
@@ -220,7 +222,9 @@ export class MockExamService {
         .filter((exam) => exam.mockExamQuestion.length)
         .sort((a, b) => {
           return (
-            Number(a.title.split('년')[0]) - Number(b.title.split('년')[0])
+            Number(a.title.split('년')[0]) - Number(b.title.split('년')[0]) ||
+            Number(a.title.split('-').at(-1).split('회차')[0]) -
+              Number(b.title.split('-').at(-1).split('회차')[0])
           );
         });
       return {

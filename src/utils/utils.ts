@@ -4,12 +4,12 @@ export const findUniqElem = <T>(arr1: T[], arr2: T[]) =>
     .filter((item) => !arr1.includes(item) || !arr2.includes(item));
 
 export const getCookie = (cookie: string, key: string) => {
-  const index = cookie.indexOf(key);
-  if (index === -1) {
-    return null;
+  const reg = new RegExp(`(?=${key}).*(?=;)`, 'g');
+  const match = cookie.match(reg);
+  if (match) {
+    return match[0].split('=')[1];
   }
-  const result = cookie.substring(index + (key.length + 1));
-  return result;
+  return null;
 };
 
 export const shuffleArray = <T = string | number>(array: Array<T>) => {

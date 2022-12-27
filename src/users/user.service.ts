@@ -1,4 +1,8 @@
 import {
+  CreateFeedbackInput,
+  CreateFeedbackOutput,
+} from './dtos/createFeedback.dto';
+import {
   SendFindPasswordMailInput,
   SendFindPasswordMailOutput,
 } from './dtos/sendFindPasswordMail.dto';
@@ -35,12 +39,15 @@ import {
   ChangePasswordAfterVerifyingInput,
   ChangePasswordAfterVerifyingOutput,
 } from './dtos/changePasswordAfterVerifying.dto';
+import { Feedback } from './entities/feedback.entity';
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private readonly users: Repository<User>,
     @InjectRepository(Verification)
     private readonly verification: Repository<Verification>,
+    @InjectRepository(Feedback)
+    private readonly feedback: Repository<Feedback>,
     private readonly mailService: MailService,
     private readonly jwtService: JwtService,
   ) {}
@@ -427,6 +434,31 @@ export class UserService {
       return {
         ok: false,
         error: '비밀번호 변경에 실패했습니다.',
+      };
+    }
+  }
+
+  async createFeedback(
+    createFeedback: CreateFeedbackInput,
+    user: User,
+  ): Promise<CreateFeedbackOutput> {
+    try {
+      const { content } = createFeedback;
+      if (!content) {
+        return {
+          ok: false,
+          error: '한글자 이상 입력해주세요.',
+        };
+      }
+      const newFeedback = this.feedback.create({ content, user });
+      this.feedback.save(newFeedback);
+      return {
+        ok: true,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '피드백을 보낼 수 없습니다.',
       };
     }
   }

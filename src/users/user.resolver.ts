@@ -1,4 +1,8 @@
 import {
+  CreateFeedbackInput,
+  CreateFeedbackOutput,
+} from './dtos/createFeedback.dto';
+import {
   SendFindPasswordMailInput,
   SendFindPasswordMailOutput,
 } from './dtos/sendFindPasswordMail.dto';
@@ -131,5 +135,14 @@ export class UserResolver {
     return this.userService.changePasswordAfterVerifying(
       changePasswordAfterVerifyingInput,
     );
+  }
+
+  @Role(['ANY'])
+  @Mutation(() => CreateFeedbackOutput)
+  async createFeedback(
+    @Args('input') createFeedback: CreateFeedbackInput,
+    @AuthUser() user: User,
+  ): Promise<CreateFeedbackOutput> {
+    return this.userService.createFeedback(createFeedback, user);
   }
 }

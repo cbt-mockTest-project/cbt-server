@@ -268,14 +268,16 @@ export class MockExamQuestionService {
         order: { number: 'ASC' },
         relations: { state: { user: true, exam: true } },
       });
-      questions = questions.map((question) => {
-        const filteredState = question.state.filter(
-          (state) => user && state.user.id === user.id,
-        );
-        return { ...question, state: filteredState };
-      });
-      if (isRandom) {
-        questions = shuffleArray(questions);
+      if (user) {
+        questions = questions.map((question) => {
+          const filteredState = question.state.filter(
+            (state) => user && state.user.id === user.id,
+          );
+          return { ...question, state: filteredState };
+        });
+        if (isRandom) {
+          questions = shuffleArray(questions);
+        }
       }
       return {
         ok: true,

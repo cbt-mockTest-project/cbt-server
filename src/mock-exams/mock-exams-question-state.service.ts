@@ -1,4 +1,8 @@
 import {
+  ReadMyExamQuestionStateInput,
+  ReadMyExamQuestionStateOutput,
+} from './dtos/readMyExamQuestionStates.dto';
+import {
   ResetMyExamQuestionStateInput,
   ResetMyExamQuestionStateOutput,
 } from './dtos/resetMyExamQuestionState.dto';
@@ -80,6 +84,45 @@ export class MockExamQuestionStateService {
       message: 'create success',
       currentState: state,
     };
+  }
+
+  async readMyExamQuestionState(
+    readMyExamQuestionState: ReadMyExamQuestionStateInput,
+    user: User,
+  ): Promise<ReadMyExamQuestionStateOutput> {
+    try {
+      const { questionId } = readMyExamQuestionState;
+      const coreState = this.mockExamQuestionState.create({
+        state: QuestionState.CORE,
+      });
+      if (!user) {
+        return {
+          ok: true,
+          state: coreState,
+        };
+      }
+      const state = await this.mockExamQuestionState.findOne({
+        where: {
+          question: { id: questionId },
+          user: { id: user.id },
+        },
+      });
+      if (!state) {
+        return {
+          ok: true,
+          state: coreState,
+        };
+      }
+      return {
+        ok: true,
+        state: state,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '상태를 읽어올 수 없습니다.',
+      };
+    }
   }
 
   async resetMyExamQuestionState(

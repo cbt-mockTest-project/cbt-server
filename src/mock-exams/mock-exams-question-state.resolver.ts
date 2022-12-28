@@ -9,9 +9,13 @@ import {
 } from './dtos/createOrUpdateMockExamQuestionState.dto';
 import { MockExamQuestionStateService } from './mock-exams-question-state.service';
 import { MockExamQuestionState } from 'src/mock-exams/entities/mock-exam-question-state.entity';
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
 import { Role } from 'src/auth/role.decorators';
 import { AuthUser } from 'src/auth/auth-user.decorator';
+import {
+  ReadMyExamQuestionStateInput,
+  ReadMyExamQuestionStateOutput,
+} from './dtos/readMyExamQuestionStates.dto';
 
 @Resolver(() => MockExamQuestionState)
 export class MockExamQuestionStateResolver {
@@ -40,6 +44,17 @@ export class MockExamQuestionStateResolver {
   ): Promise<ResetMyExamQuestionStateOutput> {
     return this.mockExamQuestionStateService.resetMyExamQuestionState(
       resetMyExamQuestionStateInput,
+      user,
+    );
+  }
+
+  @Query(() => ReadMyExamQuestionStateOutput)
+  async readMyExamQuestionState(
+    @Args('input') readMyExamQuestionState: ReadMyExamQuestionStateInput,
+    @AuthUser() user: User,
+  ): Promise<ReadMyExamQuestionStateOutput> {
+    return this.mockExamQuestionStateService.readMyExamQuestionState(
+      readMyExamQuestionState,
       user,
     );
   }

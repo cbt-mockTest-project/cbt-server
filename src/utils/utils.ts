@@ -4,14 +4,15 @@ export const findUniqElem = <T>(arr1: T[], arr2: T[]) =>
     .filter((item) => !arr1.includes(item) || !arr2.includes(item));
 
 export const getCookie = (cookie: string, key: string) => {
-  const reg = new RegExp(`(?=${key}).*(?=;)`, 'g');
-  const match = cookie.match(reg);
-  if (match) {
-    return match[0].split('=')[1];
-  }
-  const keyIndex = cookie.indexOf(key);
-  if (keyIndex !== -1) {
-    return cookie.substring(keyIndex + key.length + 1);
+  const cookieObj = cookie
+    .split(';')
+    .map((v) => v.split('='))
+    .reduce((acc, v) => {
+      acc[decodeURIComponent(v[0].trim())] = decodeURIComponent(v[1].trim());
+      return acc;
+    }, {});
+  if (cookieObj[key]) {
+    return cookieObj[key];
   }
   return null;
 };

@@ -22,7 +22,7 @@ export class RevalidateService {
       return {
         ok: true,
       };
-    } catch {
+    } catch (e) {
       return {
         ok: false,
         error: 'revalidate failed',

@@ -8,6 +8,8 @@ export class ReadAllMockExamsInput {
   query?: string;
   @Field(() => String, { defaultValue: '' })
   category?: string;
+  @Field(() => Boolean, { defaultValue: false })
+  all?: boolean;
 }
 
 @ObjectType()

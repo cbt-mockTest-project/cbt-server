@@ -120,7 +120,7 @@ export class MockExamService {
     readAllMockExamsInput: ReadAllMockExamsInput,
   ): Promise<ReadAllMockExamsOutput> {
     try {
-      const { query, category } = readAllMockExamsInput;
+      const { query, category, all } = readAllMockExamsInput;
       let mockExams = await this.mockExam.find({
         where: {
           title: Raw((title) => `${title} ILIKE '%${query}%'`),
@@ -133,7 +133,11 @@ export class MockExamService {
           title: 'ASC',
         },
       });
-      mockExams = mockExams.filter((exam) => exam.mockExamQuestion.length >= 1);
+      if (!all) {
+        mockExams = mockExams.filter(
+          (exam) => exam.mockExamQuestion.length >= 1 && exam.approved,
+        );
+      }
       return { ok: true, mockExams };
     } catch {
       return {

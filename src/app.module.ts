@@ -23,6 +23,7 @@ import { Verification } from './users/entities/verification.entity';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { join } from 'path';
+import { RevalidateModule } from './revalidate/revalidate.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { join } from 'path';
         DB_PASSWORD: Joi.string().required(),
         DB_NAME: Joi.string().required(),
         PRIVATE_KEY: Joi.string().required(),
+        REVALIDATE_KEY: Joi.string().required(),
       }),
     }),
     ScheduleModule.forRoot(),
@@ -73,6 +75,10 @@ import { join } from 'path';
     JwtModule.forRoot({
       privateKey: process.env.PRIVATE_KEY,
     }),
+    RevalidateModule.forRoot({
+      revalidateKey: process.env.REVALIDATE_KEY,
+      clientUrl: process.env.CLIENT_URL,
+    }),
     AuthModule,
     MockExamsModule,
     UploadsModule,
@@ -92,6 +98,7 @@ import { join } from 'path';
         },
       },
     }),
+    RevalidateModule,
   ],
   controllers: [],
   providers: [],

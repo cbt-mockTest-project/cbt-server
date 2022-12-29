@@ -80,7 +80,7 @@ export class MockExamService {
   async editMockExam(
     editMockExamInput: EditMockExamInput,
   ): Promise<EditMockExamOutput> {
-    const { id, title } = editMockExamInput;
+    const { id, approved } = editMockExamInput;
     const prevMockExam = await this.mockExam.findOne({
       where: { id },
     });
@@ -90,13 +90,13 @@ export class MockExamService {
         error: '존재하지 않는 시험입니다.',
       };
     }
-    if (title === prevMockExam.title) {
+    if (approved === prevMockExam.approved) {
       return {
         ok: false,
         error: '변경 된 내용이 없습니다.',
       };
     }
-    prevMockExam.title = title;
+    prevMockExam.approved = approved;
     await this.mockExam.save([prevMockExam]);
     return { ok: true };
   }

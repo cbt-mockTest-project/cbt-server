@@ -24,6 +24,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { join } from 'path';
 import { RevalidateModule } from './revalidate/revalidate.module';
+import { TelegramModule } from './telegram/telegram.module';
 
 @Module({
   imports: [
@@ -39,6 +40,8 @@ import { RevalidateModule } from './revalidate/revalidate.module';
         DB_NAME: Joi.string().required(),
         PRIVATE_KEY: Joi.string().required(),
         REVALIDATE_KEY: Joi.string().required(),
+        TELEGRAM_BOT_TOKEN: Joi.string().required(),
+        TELEGRAM_ALRAM_CHANNEL: Joi.string().required(),
       }),
     }),
     ScheduleModule.forRoot(),
@@ -48,7 +51,10 @@ import { RevalidateModule } from './revalidate/revalidate.module';
       sortSchema: true, // 스키마 사전순으로 정렬
       cors: {
         credentials: true,
-        origin: process.env.CLIENT_URL,
+        origin:
+          process.env.NODE_ENV == 'dev'
+            ? [process.env.CLIENT_URL, process.env.ADMIN_URL]
+            : process.env.CLIENT_URL,
       },
     }),
     TypeOrmModule.forRoot({
@@ -75,9 +81,16 @@ import { RevalidateModule } from './revalidate/revalidate.module';
     JwtModule.forRoot({
       privateKey: process.env.PRIVATE_KEY,
     }),
+    TelegramModule.forRoot({
+      token: process.env.TELEGRAM_BOT_TOKEN,
+      alramChannelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
+    }),
     RevalidateModule.forRoot({
       revalidateKey: process.env.REVALIDATE_KEY,
-      clientUrl: process.env.CLIENT_URL,
+      clientUrl:
+        process.env.NODE_ENV === 'dev'
+          ? process.env.PRODUCT_CLIENT_URL
+          : process.env.CLIENT_URL,
     }),
     AuthModule,
     MockExamsModule,
@@ -99,6 +112,7 @@ import { RevalidateModule } from './revalidate/revalidate.module';
       },
     }),
     RevalidateModule,
+    TelegramModule,
   ],
   controllers: [],
   providers: [],

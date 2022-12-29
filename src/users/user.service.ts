@@ -1,3 +1,4 @@
+import { TelegramService } from './../telegram/telegram.service';
 import {
   CreateFeedbackInput,
   CreateFeedbackOutput,
@@ -50,6 +51,7 @@ export class UserService {
     private readonly feedback: Repository<Feedback>,
     private readonly mailService: MailService,
     private readonly jwtService: JwtService,
+    private readonly telegramService: TelegramService,
   ) {}
 
   async register(registerInput: RegisterInput): Promise<RegisterOutput> {
@@ -82,6 +84,9 @@ export class UserService {
         this.users.create({ email, password, nickname, role: UserRole.CLIENT }),
       );
       await this.verification.delete({ email });
+      this.telegramService.sendMessageToAlramChannelOfTelegram({
+        message: `${nickname} 님이 회원가입 하셨습니다. `,
+      });
       return {
         ok: true,
       };
@@ -308,6 +313,7 @@ export class UserService {
         user,
       };
     }
+
     return {
       ok: false,
       user: null,

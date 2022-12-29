@@ -210,7 +210,7 @@ export class MockExamService {
     try {
       const { name } = readMockExamTitlesByCateoryInput;
       let mockExamTitles = await this.mockExam.find({
-        where: { mockExamCategory: { name } },
+        where: { mockExamCategory: { name }, approved: true },
         relations: {
           mockExamQuestion: true,
         },

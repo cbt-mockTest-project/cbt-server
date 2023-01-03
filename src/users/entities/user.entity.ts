@@ -20,6 +20,7 @@ import { InternalServerErrorException } from '@nestjs/common';
 import { MockExamQuestionState } from 'src/mock-exams/entities/mock-exam-question-state.entity';
 import { MockExamQuestionFeedback } from 'src/mock-exams/entities/mock-exam-question-feedback.entity';
 import { Feedback } from './feedback.entity';
+import { MockExamQuestionCommentLike } from 'src/mock-exams/entities/mock-exam-question-comment-like.entity';
 
 export enum UserRole {
   CLIENT = 'CLIENT',
@@ -67,6 +68,13 @@ export class User extends CoreEntity {
   )
   @Field(() => [MockExamQuestionComment])
   mockExamQuestionComment: MockExamQuestionComment[];
+
+  @OneToMany(
+    () => MockExamQuestionCommentLike,
+    (mockExamQuestionCommentLike) => mockExamQuestionCommentLike.user,
+  )
+  @Field(() => [MockExamQuestionCommentLike])
+  mockExamQuestionCommentLike: MockExamQuestionCommentLike[];
 
   @OneToMany(
     () => MockExamQuestionFeedback,

@@ -1,3 +1,4 @@
+import { MockExamQuestionCommentLike } from './mock-exams/entities/mock-exam-question-comment-like.entity';
 import { MockExamQuestionComment } from './mock-exams/entities/mock-exam-question-comment.entity';
 import { Feedback } from './users/entities/feedback.entity';
 import { MailModule } from './mail/mail.module';
@@ -77,6 +78,7 @@ import { TelegramModule } from './telegram/telegram.module';
         MockExamQuestionState,
         Feedback,
         MockExamQuestionComment,
+        MockExamQuestionCommentLike,
       ],
     }),
     UserModule,

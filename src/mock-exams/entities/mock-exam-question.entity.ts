@@ -4,6 +4,7 @@ import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, ManyToOne, OneToMany, RelationId } from 'typeorm';
 import { MockExamQuestionFeedback } from './mock-exam-question-feedback.entity';
 import { MockExamQuestionState } from './mock-exam-question-state.entity';
+import { MockExamQuestionComment } from './mock-exam-question-comment.entity';
 
 @InputType('MockExamQuestionImageInputType', { isAbstract: true })
 @ObjectType()
@@ -53,6 +54,13 @@ export class MockExamQuestion extends CoreEntity {
   )
   @Field(() => [MockExamQuestionFeedback])
   mockExamQuestionFeedback: MockExamQuestionFeedback[];
+
+  @OneToMany(
+    () => MockExamQuestionComment,
+    (MockExamQuestionComment) => MockExamQuestionComment.question,
+  )
+  @Field(() => [MockExamQuestionComment])
+  mockExamQuestionComment: MockExamQuestionComment[];
 
   @OneToMany(
     () => MockExamQuestionState,

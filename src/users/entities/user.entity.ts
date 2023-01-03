@@ -1,3 +1,4 @@
+import { MockExamQuestionComment } from './../../mock-exams/entities/mock-exam-question-comment.entity';
 import { CoreEntity } from './../../common/entities/core.entity';
 import {
   Field,
@@ -59,6 +60,13 @@ export class User extends CoreEntity {
   )
   @Field(() => [MockExamQuestionState])
   mockExamQuestionState: MockExamQuestionState[];
+
+  @OneToMany(
+    () => MockExamQuestionComment,
+    (mockExamQuestionComment) => mockExamQuestionComment.user,
+  )
+  @Field(() => [MockExamQuestionComment])
+  mockExamQuestionComment: MockExamQuestionComment[];
 
   @OneToMany(
     () => MockExamQuestionFeedback,

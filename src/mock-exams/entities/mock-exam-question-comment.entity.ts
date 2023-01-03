@@ -31,4 +31,7 @@ export class MockExamQuestionComment extends CoreEntity {
   )
   @Field(() => [MockExamQuestionCommentLike])
   commentLike: MockExamQuestionCommentLike[];
+
+  @Field(() => Boolean, { defaultValue: false })
+  likeState: boolean;
 }

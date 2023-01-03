@@ -70,9 +70,11 @@ export class MockExamQuestionCommentResolver {
   async readMockExamQuestionCommentsByQuestinId(
     @Args('input')
     readMockExamQuestionCommentsByQuestinIdInput: ReadMockExamQuestionCommentsByQuestinIdInput,
+    @AuthUser() user: User,
   ): Promise<ReadMockExamQuestionCommentsByQuestinIdOutput> {
-    return this.mockExamQuestionCommentSerivce.readMockExamQuestionCommentsByQuestinId(
+    return this.mockExamQuestionCommentSerivce.readMockExamQuestionCommentsByQuestinoId(
       readMockExamQuestionCommentsByQuestinIdInput,
+      user,
     );
   }
 }

@@ -1,6 +1,7 @@
 import {
   ReadMockExamQuestionCommentsByQuestinIdOutput,
   ReadMockExamQuestionCommentsByQuestinIdInput,
+  MockExamQuestionCommentIncludingLikeState,
 } from './dtos/readMockExamQuestionCommentsByQuestinId.dto';
 import { User } from 'src/users/entities/user.entity';
 import {
@@ -20,10 +21,13 @@ import {
   DeleteMockExamQuestionCommentInput,
   DeleteMockExamQuestionCommentOutput,
 } from './dtos/deleteMockExamQuestionComment.dto';
+import { MockExamQuestionCommentLike } from './entities/mock-exam-question-comment-like.entity';
 
 @Injectable()
 export class MockExamQuestionCommentSerivce {
   constructor(
+    @InjectRepository(MockExamQuestionCommentLike)
+    private readonly mockExamQuestionCommentLike: Repository<MockExamQuestionCommentLike>,
     @InjectRepository(MockExamQuestionComment)
     private readonly mockExamQuestionComment: Repository<MockExamQuestionComment>,
     @InjectRepository(MockExamQuestion)
@@ -130,8 +134,9 @@ export class MockExamQuestionCommentSerivce {
     }
   }
 
-  async readMockExamQuestionCommentsByQuestinId(
+  async readMockExamQuestionCommentsByQuestinoId(
     readMockExamQuestionCommentsByQuestinIdInput: ReadMockExamQuestionCommentsByQuestinIdInput,
+    user: User,
   ): Promise<ReadMockExamQuestionCommentsByQuestinIdOutput> {
     try {
       const { questionId } = readMockExamQuestionCommentsByQuestinIdInput;
@@ -141,8 +146,28 @@ export class MockExamQuestionCommentSerivce {
         },
         relations: { user: true },
       });
+      let commentsIncludingLikeState: MockExamQuestionCommentIncludingLikeState[] =
+        [];
+      if (user && comments && comments.length >= 1) {
+        commentsIncludingLikeState = await Promise.all(
+          comments.map(async (comment) => {
+            const like = await this.mockExamQuestionCommentLike.findOne({
+              where: {
+                user: { id: user.id },
+                comment: {
+                  id: comment.id,
+                },
+              },
+            });
+            if (like) {
+              return { ...comment, likeState: true };
+            }
+            return { ...comment, likeState: false };
+          }),
+        );
+      }
       return {
-        comments,
+        comments: commentsIncludingLikeState,
         ok: true,
       };
     } catch {

@@ -1,7 +1,6 @@
 import {
   ReadMockExamQuestionCommentsByQuestinIdOutput,
   ReadMockExamQuestionCommentsByQuestinIdInput,
-  MockExamQuestionCommentIncludingLikeState,
 } from './dtos/readMockExamQuestionCommentsByQuestinId.dto';
 import { User } from 'src/users/entities/user.entity';
 import {
@@ -140,16 +139,15 @@ export class MockExamQuestionCommentSerivce {
   ): Promise<ReadMockExamQuestionCommentsByQuestinIdOutput> {
     try {
       const { questionId } = readMockExamQuestionCommentsByQuestinIdInput;
-      const comments = await this.mockExamQuestionComment.find({
+      let comments = await this.mockExamQuestionComment.find({
         where: {
           question: { id: questionId },
         },
         relations: { user: true },
       });
-      let commentsIncludingLikeState: MockExamQuestionCommentIncludingLikeState[] =
-        [];
+      [];
       if (user && comments && comments.length >= 1) {
-        commentsIncludingLikeState = await Promise.all(
+        comments = await Promise.all(
           comments.map(async (comment) => {
             const like = await this.mockExamQuestionCommentLike.findOne({
               where: {
@@ -167,7 +165,7 @@ export class MockExamQuestionCommentSerivce {
         );
       }
       return {
-        comments: commentsIncludingLikeState,
+        comments,
         ok: true,
       };
     } catch {

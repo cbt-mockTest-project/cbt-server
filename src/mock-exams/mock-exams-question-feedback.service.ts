@@ -1,3 +1,4 @@
+import { TelegramService } from './../telegram/telegram.service';
 import { User } from 'src/users/entities/user.entity';
 import { ReadAllMockExamQuestionFeedbackOutput } from './dtos/readAllMockExamQuestionFeedback.dto';
 import {
@@ -27,6 +28,7 @@ export class MockExamQuestionFeedbackSerivce {
     private readonly mockExamQuestion: Repository<MockExamQuestion>,
     @InjectRepository(User)
     private readonly users: Repository<User>,
+    private readonly telegramService: TelegramService,
   ) {}
 
   async createMockExamQuestionFeedback(
@@ -51,6 +53,13 @@ export class MockExamQuestionFeedbackSerivce {
         user,
       });
       await this.mockExamQuestionFeedback.save(feedback);
+      this.telegramService.sendMessageToAlramChannelOfTelegram({
+        message: `
+        user : ${user.nickname}\n
+        questionId : ${questionId}\n
+        feedback : ${content} 
+        `,
+      });
       return {
         ok: true,
       };

@@ -1,3 +1,5 @@
+import { MockExamQuestionCommentLike } from 'src/mock-exams/entities/mock-exam-question-comment-like.entity';
+import { MockExamQuestionCommentLikeResolver } from './mock-exams-question-comment-like.resolver';
 import { MockExamQuestionCommentSerivce } from './mock-exams-question-comment.service';
 import { User } from 'src/users/entities/user.entity';
 import { MockExamQuestionStateService } from './mock-exams-question-state.service';
@@ -19,6 +21,7 @@ import { MockExamQuestionService } from './mock-exams-question.service';
 import { MockExamQuestionState } from './entities/mock-exam-question-state.entity';
 import { MockExamQuestionComment } from './entities/mock-exam-question-comment.entity';
 import { MockExamQuestionCommentResolver } from './mock-exams-question-comment.resolver';
+import { MockExamQuestionCommentLikeSerivce } from './mock-exams-question-comment-like.service';
 
 @Module({
   imports: [
@@ -29,6 +32,7 @@ import { MockExamQuestionCommentResolver } from './mock-exams-question-comment.r
       MockExamQuestionFeedback,
       MockExamQuestionState,
       MockExamQuestionComment,
+      MockExamQuestionCommentLike,
       User,
     ]),
   ],
@@ -45,6 +49,8 @@ import { MockExamQuestionCommentResolver } from './mock-exams-question-comment.r
     MockExamQuestionStateService,
     MockExamQuestionCommentResolver,
     MockExamQuestionCommentSerivce,
+    MockExamQuestionCommentLikeResolver,
+    MockExamQuestionCommentLikeSerivce,
   ],
   exports: [],
 })

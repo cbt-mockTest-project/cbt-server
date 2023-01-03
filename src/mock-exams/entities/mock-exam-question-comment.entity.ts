@@ -1,7 +1,8 @@
+import { MockExamQuestionCommentLike } from 'src/mock-exams/entities/mock-exam-question-comment-like.entity';
 import { MockExamQuestion } from './mock-exam-question.entity';
 import { CoreEntity } from '../../common/entities/core.entity';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 
 @InputType('MockExamQuestionCommentInputType', { isAbstract: true })
@@ -23,4 +24,11 @@ export class MockExamQuestionComment extends CoreEntity {
   })
   @Field(() => User)
   user: User;
+
+  @OneToMany(
+    () => MockExamQuestionCommentLike,
+    (mockExamQuestionCommentLike) => mockExamQuestionCommentLike.comment,
+  )
+  @Field(() => [MockExamQuestionCommentLike])
+  commentLike: MockExamQuestionCommentLike[];
 }

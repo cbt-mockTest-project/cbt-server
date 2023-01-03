@@ -1,4 +1,4 @@
-import { MockExamQuestion } from './mock-exam-question.entity';
+import { MockExamQuestionComment } from './mock-exam-question-comment.entity';
 import { CoreEntity } from '../../common/entities/core.entity';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { Entity, ManyToOne } from 'typeorm';
@@ -9,11 +9,11 @@ import { User } from 'src/users/entities/user.entity';
 @Entity()
 export class MockExamQuestionCommentLike extends CoreEntity {
   @ManyToOne(
-    () => MockExamQuestion,
-    (mockExamQuestion) => mockExamQuestion.mockExamQuestionComment,
+    () => MockExamQuestionComment,
+    (mockExamQuestionComment) => mockExamQuestionComment.commentLike,
   )
-  @Field(() => MockExamQuestion)
-  question: MockExamQuestion;
+  @Field(() => MockExamQuestionComment)
+  comment: MockExamQuestionComment;
 
   @ManyToOne(() => User, (user) => user.mockExamQuestionComment, {
     onDelete: 'CASCADE',

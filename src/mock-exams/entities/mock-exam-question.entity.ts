@@ -70,13 +70,6 @@ export class MockExamQuestion extends CoreEntity {
   @Field(() => [MockExamQuestionState])
   state: MockExamQuestionState[];
 
-  @OneToMany(
-    () => MockExamQuestionCommentLike,
-    (mockExamQuestionCommentLike) => mockExamQuestionCommentLike.question,
-  )
-  @Field(() => [MockExamQuestionCommentLike])
-  mockExamQuestionCommentLike: MockExamQuestionCommentLike[];
-
   @Column({ default: 0 })
   @Field(() => Number)
   number: number;

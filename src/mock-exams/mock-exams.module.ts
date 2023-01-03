@@ -1,3 +1,4 @@
+import { MockExamQuestionCommentSerivce } from './mock-exams-question-comment.service';
 import { User } from 'src/users/entities/user.entity';
 import { MockExamQuestionStateService } from './mock-exams-question-state.service';
 import { MockExamQuestionStateResolver } from './mock-exams-question-state.resolver';
@@ -16,6 +17,8 @@ import { Module } from '@nestjs/common';
 import { MockExamService } from './mock-exams.service';
 import { MockExamQuestionService } from './mock-exams-question.service';
 import { MockExamQuestionState } from './entities/mock-exam-question-state.entity';
+import { MockExamQuestionComment } from './entities/mock-exam-question-comment.entity';
+import { MockExamQuestionCommentResolver } from './mock-exams-question-comment.resolver';
 
 @Module({
   imports: [
@@ -25,6 +28,7 @@ import { MockExamQuestionState } from './entities/mock-exam-question-state.entit
       MockExamQuestion,
       MockExamQuestionFeedback,
       MockExamQuestionState,
+      MockExamQuestionComment,
       User,
     ]),
   ],
@@ -39,6 +43,8 @@ import { MockExamQuestionState } from './entities/mock-exam-question-state.entit
     MockExamQuestionFeedbackSerivce,
     MockExamQuestionStateResolver,
     MockExamQuestionStateService,
+    MockExamQuestionCommentResolver,
+    MockExamQuestionCommentSerivce,
   ],
   exports: [],
 })

@@ -12,7 +12,7 @@ import {
   CreateMockExamQuestionCommentOutput,
 } from './dtos/createMockExamQuestionComment.dto';
 import { MockExamQuestion } from './entities/mock-exam-question.entity';
-import { MockExamQuestionComment } from './entities/mock-exam-question-Comment.entity';
+import { MockExamQuestionComment } from './entities/mock-exam-question-comment.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';

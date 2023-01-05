@@ -34,4 +34,7 @@ export class MockExamQuestionComment extends CoreEntity {
 
   @Field(() => Boolean, { defaultValue: false })
   likeState: boolean;
+
+  @Field(() => Number, { defaultValue: 0 })
+  likesCount?: number;
 }

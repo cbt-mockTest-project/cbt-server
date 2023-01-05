@@ -3,13 +3,13 @@ import { CoreOutput } from './../../common/dtos/output.dto';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 
 @InputType()
-export class ReadMockExamQuestionCommentsByQuestinIdInput {
+export class ReadMockExamQuestionCommentsByQuestionIdInput {
   @Field(() => Number)
   questionId: number;
 }
 
 @ObjectType()
-export class ReadMockExamQuestionCommentsByQuestinIdOutput extends CoreOutput {
+export class ReadMockExamQuestionCommentsByQuestionIdOutput extends CoreOutput {
   @Field(() => [MockExamQuestionComment], { nullable: true })
   comments?: MockExamQuestionComment[];
 }

@@ -1,6 +1,6 @@
 import {
-  ReadMockExamQuestionCommentsByQuestinIdOutput,
-  ReadMockExamQuestionCommentsByQuestinIdInput,
+  ReadMockExamQuestionCommentsByQuestionIdOutput,
+  ReadMockExamQuestionCommentsByQuestionIdInput,
 } from './dtos/readMockExamQuestionCommentsByQuestinId.dto';
 import { User } from 'src/users/entities/user.entity';
 import {
@@ -51,13 +51,14 @@ export class MockExamQuestionCommentSerivce {
           error: '존재하지 않는 문제입니다.',
         };
       }
-      const Comment = this.mockExamQuestionComment.create({
+      const comment = this.mockExamQuestionComment.create({
         content,
         question,
         user,
       });
-      await this.mockExamQuestionComment.save(Comment);
+      await this.mockExamQuestionComment.save(comment);
       return {
+        comment,
         ok: true,
       };
     } catch {
@@ -133,12 +134,12 @@ export class MockExamQuestionCommentSerivce {
     }
   }
 
-  async readMockExamQuestionCommentsByQuestinoId(
-    readMockExamQuestionCommentsByQuestinIdInput: ReadMockExamQuestionCommentsByQuestinIdInput,
+  async readMockExamQuestionCommentsByQuestionId(
+    readMockExamQuestionCommentsByQuestionIdInput: ReadMockExamQuestionCommentsByQuestionIdInput,
     user: User,
-  ): Promise<ReadMockExamQuestionCommentsByQuestinIdOutput> {
+  ): Promise<ReadMockExamQuestionCommentsByQuestionIdOutput> {
     try {
-      const { questionId } = readMockExamQuestionCommentsByQuestinIdInput;
+      const { questionId } = readMockExamQuestionCommentsByQuestionIdInput;
       let comments = await this.mockExamQuestionComment.find({
         where: {
           question: { id: questionId },
@@ -157,13 +158,22 @@ export class MockExamQuestionCommentSerivce {
                 },
               },
             });
+            const [likes, likesCount] =
+              await this.mockExamQuestionCommentLike.findAndCount({
+                where: {
+                  comment: {
+                    id: comment.id,
+                  },
+                },
+              });
             if (like) {
-              return { ...comment, likeState: true };
+              return { ...comment, likeState: true, likesCount };
             }
-            return { ...comment, likeState: false };
+            return { ...comment, likeState: false, likesCount };
           }),
         );
       }
+      comments = comments.sort((a, b) => a.likesCount - b.likesCount);
       return {
         comments,
         ok: true,

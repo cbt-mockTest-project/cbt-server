@@ -1,6 +1,6 @@
 import {
-  ReadMockExamQuestionCommentsByQuestinIdOutput,
-  ReadMockExamQuestionCommentsByQuestinIdInput,
+  ReadMockExamQuestionCommentsByQuestionIdOutput,
+  ReadMockExamQuestionCommentsByQuestionIdInput,
 } from './dtos/readMockExamQuestionCommentsByQuestinId.dto';
 import { User } from 'src/users/entities/user.entity';
 import {
@@ -66,14 +66,14 @@ export class MockExamQuestionCommentResolver {
     );
   }
 
-  @Query(() => ReadMockExamQuestionCommentsByQuestinIdOutput)
-  async readMockExamQuestionCommentsByQuestinId(
+  @Query(() => ReadMockExamQuestionCommentsByQuestionIdOutput)
+  async readMockExamQuestionCommentsByQuestionId(
     @Args('input')
-    readMockExamQuestionCommentsByQuestinIdInput: ReadMockExamQuestionCommentsByQuestinIdInput,
+    readMockExamQuestionCommentsByQuestionIdInput: ReadMockExamQuestionCommentsByQuestionIdInput,
     @AuthUser() user: User,
-  ): Promise<ReadMockExamQuestionCommentsByQuestinIdOutput> {
-    return this.mockExamQuestionCommentSerivce.readMockExamQuestionCommentsByQuestinoId(
-      readMockExamQuestionCommentsByQuestinIdInput,
+  ): Promise<ReadMockExamQuestionCommentsByQuestionIdOutput> {
+    return this.mockExamQuestionCommentSerivce.readMockExamQuestionCommentsByQuestionId(
+      readMockExamQuestionCommentsByQuestionIdInput,
       user,
     );
   }

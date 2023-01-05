@@ -173,7 +173,7 @@ export class MockExamQuestionCommentSerivce {
           }),
         );
       }
-      comments = comments.sort((a, b) => a.likesCount - b.likesCount);
+      comments = comments.sort((a, b) => b.likesCount - a.likesCount);
       return {
         comments,
         ok: true,

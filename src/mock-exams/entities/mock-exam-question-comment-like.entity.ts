@@ -11,6 +11,7 @@ export class MockExamQuestionCommentLike extends CoreEntity {
   @ManyToOne(
     () => MockExamQuestionComment,
     (mockExamQuestionComment) => mockExamQuestionComment.commentLike,
+    { onDelete: 'CASCADE' },
   )
   @Field(() => MockExamQuestionComment)
   comment: MockExamQuestionComment;

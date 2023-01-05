@@ -58,6 +58,7 @@ export class MockExamQuestionCommentLikeSerivce {
         await this.mockExamQuestionCommentLike.delete({ id: prevLike.id });
         return {
           ok: true,
+          currentState: false,
         };
       }
       const newLike = this.mockExamQuestionCommentLike.create({
@@ -67,6 +68,7 @@ export class MockExamQuestionCommentLikeSerivce {
       await this.mockExamQuestionCommentLike.save(newLike);
       return {
         ok: true,
+        currentState: true,
       };
     } catch {
       return {

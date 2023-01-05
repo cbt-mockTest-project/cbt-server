@@ -8,4 +8,7 @@ export class EditMockExamQuestionCommentLikeInput {
 }
 
 @ObjectType()
-export class EditMockExamQuestionCommentLikeOutput extends CoreOutput {}
+export class EditMockExamQuestionCommentLikeOutput extends CoreOutput {
+  @Field(() => Boolean, { defaultValue: false })
+  currentState?: boolean;
+}

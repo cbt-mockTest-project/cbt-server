@@ -80,6 +80,12 @@ export class UserService {
           error: '이미 가입된 이메일입니다.',
         };
       }
+      if (nickname.length >= 10) {
+        return {
+          ok: false,
+          error: '닉네임은 10글자를 초과할 수 없습니다.',
+        };
+      }
       await this.users.save(
         this.users.create({ email, password, nickname, role: UserRole.CLIENT }),
       );
@@ -363,6 +369,12 @@ export class UserService {
         return {
           ok: false,
           error: '이전과 비밀번호가 동일합니다.',
+        };
+      }
+      if (nickname.length >= 10) {
+        return {
+          ok: false,
+          error: '닉네임은 10글자를 초과할 수 없습니다.',
         };
       }
       user.password = password;

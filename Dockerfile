@@ -1,14 +1,24 @@
-FROM node:16.13.2-alpine3.15
-
-RUN apk update
-RUN apk upgrade
+# STEP 1
+# 1
+FROM node:16 AS builder
+# 2
 WORKDIR /CBT-SERVER
+# 3
 COPY . .
-RUN yarn global add pm2 
-ENV NODE_PATH .
+# 4
+RUN yarn
+# 5
+RUN yarn build
+
+# 6
+FROM node:16-alpine
+# 7
+WORKDIR /CBT-SERVER
+# 8
 ENV NODE_ENV production
-
-COPY package*.json .
-RUN yarn install --production
-
+# 9
+COPY --from=builder /CBT-SERVER ./
+# 10
+RUN yarn global add pm2 
+# 10
 CMD ["pm2-runtime", "start", "ecosystem.config.js"]

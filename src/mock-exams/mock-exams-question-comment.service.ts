@@ -147,17 +147,19 @@ export class MockExamQuestionCommentSerivce {
         relations: { user: true },
       });
       [];
-      if (user && comments && comments.length >= 1) {
+      if (comments && comments.length >= 1) {
         comments = await Promise.all(
           comments.map(async (comment) => {
-            const like = await this.mockExamQuestionCommentLike.findOne({
-              where: {
-                user: { id: user.id },
-                comment: {
-                  id: comment.id,
-                },
-              },
-            });
+            const like = user
+              ? await this.mockExamQuestionCommentLike.findOne({
+                  where: {
+                    user: { id: user.id },
+                    comment: {
+                      id: comment.id,
+                    },
+                  },
+                })
+              : false;
             const [likes, likesCount] =
               await this.mockExamQuestionCommentLike.findAndCount({
                 where: {

@@ -27,6 +27,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { join } from 'path';
 import { RevalidateModule } from './revalidate/revalidate.module';
 import { TelegramModule } from './telegram/telegram.module';
+import { Notice } from './users/entities/notice.entity';
 
 @Module({
   imports: [
@@ -79,6 +80,7 @@ import { TelegramModule } from './telegram/telegram.module';
         Feedback,
         MockExamQuestionComment,
         MockExamQuestionCommentLike,
+        Notice,
       ],
     }),
     UserModule,

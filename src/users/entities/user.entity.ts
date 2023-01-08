@@ -21,6 +21,7 @@ import { MockExamQuestionState } from 'src/mock-exams/entities/mock-exam-questio
 import { MockExamQuestionFeedback } from 'src/mock-exams/entities/mock-exam-question-feedback.entity';
 import { Feedback } from './feedback.entity';
 import { MockExamQuestionCommentLike } from 'src/mock-exams/entities/mock-exam-question-comment-like.entity';
+import { Notice } from './notice.entity';
 
 export enum UserRole {
   CLIENT = 'CLIENT',
@@ -86,6 +87,10 @@ export class User extends CoreEntity {
   @OneToMany(() => Feedback, (feedback) => feedback.user)
   @Field(() => [Feedback])
   feedback: Feedback[];
+
+  @OneToMany(() => Notice, (notice) => notice.user)
+  @Field(() => [Notice], { nullable: true })
+  notice: Notice[];
 
   @DeleteDateColumn()
   @Field(() => Date)

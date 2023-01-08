@@ -1,3 +1,4 @@
+import { NoticeService } from './notice.service';
 import { TelegramService } from './../telegram/telegram.service';
 import {
   CreateFeedbackInput,
@@ -52,6 +53,7 @@ export class UserService {
     private readonly mailService: MailService,
     private readonly jwtService: JwtService,
     private readonly telegramService: TelegramService,
+    private readonly noticeService: NoticeService,
   ) {}
 
   async register(registerInput: RegisterInput): Promise<RegisterOutput> {
@@ -313,10 +315,12 @@ export class UserService {
   }
 
   async me(user: User): Promise<MeOutput> {
-    if (user) {
+    const { notices } = await this.noticeService.readMyNotice(user);
+    if (user && notices) {
       return {
         ok: true,
         user,
+        notices,
       };
     }
 

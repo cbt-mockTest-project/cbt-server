@@ -6,6 +6,7 @@ import { MockExamQuestionFeedback } from './mock-exam-question-feedback.entity';
 import { MockExamQuestionState } from './mock-exam-question-state.entity';
 import { MockExamQuestionComment } from './mock-exam-question-comment.entity';
 import { MockExamQuestionCommentLike } from './mock-exam-question-comment-like.entity';
+import { MockExamQuestionBookmark } from './mock-exam-question-bookmark.entity';
 
 @InputType('MockExamQuestionImageInputType', { isAbstract: true })
 @ObjectType()
@@ -73,4 +74,14 @@ export class MockExamQuestion extends CoreEntity {
   @Column({ default: 0 })
   @Field(() => Number)
   number: number;
+
+  @Field(() => [MockExamQuestionBookmark])
+  @OneToMany(
+    () => MockExamQuestionBookmark,
+    (mockExamQuestionBookmark) => mockExamQuestionBookmark.question,
+    {
+      onDelete: 'SET NULL',
+    },
+  )
+  mockExamQuestionBookmark: MockExamQuestionBookmark[];
 }

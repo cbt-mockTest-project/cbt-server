@@ -28,6 +28,7 @@ import { join } from 'path';
 import { RevalidateModule } from './revalidate/revalidate.module';
 import { TelegramModule } from './telegram/telegram.module';
 import { Notice } from './users/entities/notice.entity';
+import { MockExamQuestionBookmark } from './mock-exams/entities/mock-exam-question-bookmark.entity';
 
 @Module({
   imports: [
@@ -80,6 +81,7 @@ import { Notice } from './users/entities/notice.entity';
         Feedback,
         MockExamQuestionComment,
         MockExamQuestionCommentLike,
+        MockExamQuestionBookmark,
         Notice,
       ],
     }),

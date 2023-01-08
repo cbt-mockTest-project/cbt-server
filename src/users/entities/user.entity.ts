@@ -22,6 +22,7 @@ import { MockExamQuestionFeedback } from 'src/mock-exams/entities/mock-exam-ques
 import { Feedback } from './feedback.entity';
 import { MockExamQuestionCommentLike } from 'src/mock-exams/entities/mock-exam-question-comment-like.entity';
 import { Notice } from './notice.entity';
+import { MockExamQuestionBookmark } from 'src/mock-exams/entities/mock-exam-question-bookmark.entity';
 
 export enum UserRole {
   CLIENT = 'CLIENT',
@@ -95,6 +96,16 @@ export class User extends CoreEntity {
   @DeleteDateColumn()
   @Field(() => Date)
   deletedAt?: Date;
+
+  @Field(() => [MockExamQuestionBookmark])
+  @OneToMany(
+    () => MockExamQuestionBookmark,
+    (mockExamQuestionBookmark) => mockExamQuestionBookmark.user,
+    {
+      onDelete: 'SET NULL',
+    },
+  )
+  mockExamQuestionBookmark: MockExamQuestionBookmark[];
 
   @BeforeInsert()
   @BeforeUpdate()

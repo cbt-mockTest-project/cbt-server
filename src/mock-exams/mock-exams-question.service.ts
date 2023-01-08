@@ -266,14 +266,24 @@ export class MockExamQuestionService {
       let [questions, count] = await this.mockExamQuestion.findAndCount({
         where: { mockExam: { id } },
         order: { number: 'ASC' },
-        relations: { state: { user: true, exam: true } },
+        relations: {
+          state: { user: true, exam: true },
+          mockExamQuestionBookmark: { user: true },
+        },
       });
       if (user) {
         questions = questions.map((question) => {
           const filteredState = question.state.filter(
             (state) => user && state.user.id === user.id,
           );
-          return { ...question, state: filteredState };
+          const filteredBookmark = question.mockExamQuestionBookmark.filter(
+            (bookmark) => user && bookmark.user.id === user.id,
+          );
+          return {
+            ...question,
+            state: filteredState,
+            mockExamQuestionBookmark: filteredBookmark,
+          };
         });
         if (isRandom) {
           questions = shuffleArray(questions);

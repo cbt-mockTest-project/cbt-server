@@ -1,3 +1,4 @@
+import { CoreOutput } from 'src/common/dtos/output.dto';
 import { User } from 'src/users/entities/user.entity';
 import { Notice } from './entities/notice.entity';
 import { Injectable } from '@nestjs/common';
@@ -6,6 +7,7 @@ import { Repository } from 'typeorm';
 import { CreateNoticeInput, CreateNoticeOutput } from './dtos/createNotice.dto';
 import { EditNoticeInput, EditNoticeOutput } from './dtos/editNotice.dto';
 import { ReadMyNoticeOutput } from './dtos/readMyNotice.dto';
+import { DeleteNoticeInput, DeleteNoticeOutput } from './dtos/deleteNotice.dto';
 
 @Injectable()
 export class NoticeService {
@@ -69,14 +71,30 @@ export class NoticeService {
     }
   }
 
+  async deleteNotice(
+    deleteNoticeInput: DeleteNoticeInput,
+  ): Promise<DeleteNoticeOutput> {
+    try {
+      const { noticeId } = deleteNoticeInput;
+      await this.notice.delete({ id: noticeId });
+      return {
+        ok: true,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '알림을 삭제할 수 없습니다.',
+      };
+    }
+  }
+
   async readMyNotice(user: User): Promise<ReadMyNoticeOutput> {
     try {
       const notices = await this.notice.find({
         where: {
           user: { id: user.id },
-          confirm: false,
         },
-        order: { created_at: 'DESC' },
+        order: { confirm: 'ASC', created_at: 'DESC' },
       });
       console.log(notices);
       return {
@@ -88,6 +106,15 @@ export class NoticeService {
         ok: false,
         error: '알림을 불러올 수 없습니다.',
       };
+    }
+  }
+
+  async deleteAllNoticesOfMe(user: User): Promise<CoreOutput> {
+    try {
+      await this.notice.delete({ user: { id: user.id } });
+      return { ok: true };
+    } catch {
+      return { ok: false, error: '알림을 삭제할 수 없습니다.' };
     }
   }
 }

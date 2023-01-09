@@ -9,6 +9,8 @@ export class ReadMockExamQuestionsByMockExamIdInput extends PickType(MockExam, [
 ]) {
   @Field(() => Boolean, { nullable: true })
   isRandom?: boolean;
+  @Field(() => Boolean, { nullable: true })
+  bookmarked?: boolean;
 }
 
 @ObjectType()

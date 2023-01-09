@@ -96,7 +96,6 @@ export class NoticeService {
         },
         order: { confirm: 'ASC', created_at: 'DESC' },
       });
-      console.log(notices);
       return {
         ok: true,
         notices,

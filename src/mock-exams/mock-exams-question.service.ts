@@ -197,8 +197,7 @@ export class MockExamQuestionService {
       return {
         ok: true,
       };
-    } catch (e) {
-      console.log(e);
+    } catch {
       return {
         ok: false,
         error: '문제를 수정할 수 없습니다.',
@@ -254,7 +253,8 @@ export class MockExamQuestionService {
     user: User,
   ): Promise<ReadMockExamQuestionsByMockExamIdOutput> {
     try {
-      const { id, isRandom } = readMockExamQuestionsByMockExamIdInput;
+      const { id, isRandom, bookmarked } =
+        readMockExamQuestionsByMockExamIdInput;
       const mockExam = await this.mockExam.findOne({ where: { id } });
       if (!mockExam) {
         return {
@@ -288,6 +288,16 @@ export class MockExamQuestionService {
         if (isRandom) {
           questions = shuffleArray(questions);
         }
+      }
+      if (user && bookmarked) {
+        questions = questions.filter((question) => {
+          if (question.mockExamQuestionBookmark.length === 0) return false;
+          const filteredQuestion = question.mockExamQuestionBookmark.filter(
+            (el) => el.user.id === user.id,
+          );
+          if (filteredQuestion.length >= 1) return true;
+          return false;
+        });
       }
       return {
         ok: true,

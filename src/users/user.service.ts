@@ -387,8 +387,7 @@ export class UserService {
       return {
         ok: true,
       };
-    } catch (e) {
-      console.log(e);
+    } catch {
       return {
         ok: false,
         error: '프로필 수정에 실패했습니다.',

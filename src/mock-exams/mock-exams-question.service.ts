@@ -271,6 +271,12 @@ export class MockExamQuestionService {
           mockExamQuestionBookmark: { user: true },
         },
       });
+      if (!user) {
+        questions = questions.map((question) => ({
+          ...question,
+          mockExamQuestionBookmark: [],
+        }));
+      }
       if (user) {
         questions = questions.map((question) => {
           const filteredState = question.state.filter(

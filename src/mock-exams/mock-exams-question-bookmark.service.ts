@@ -1,3 +1,4 @@
+import { deduplication } from './../utils/utils';
 import {
   EditMockExamQuestionBookmarkInput,
   EditMockExamQuestionBookmarkOutput,
@@ -12,7 +13,7 @@ import {
   ReadMockExamQuestionBookmarkInput,
   ReadMockExamQuestionBookmarkOutput,
 } from './dtos/readMockExamQuestionBookmark.dto';
-
+import { ReadExamTitleAndIdOfBookmarkedQuestionOutput } from './dtos/readExamTitleAndIdOfBookmarkedQuestion.dto';
 @Injectable()
 export class MockExamQuestionBookmarkSerivce {
   constructor(
@@ -100,6 +101,32 @@ export class MockExamQuestionBookmarkSerivce {
         ok: false,
         error: '북마크된 문제를 찾을 수 없습니다.',
       };
+    }
+  }
+
+  async readExamTitleAndIdOfBookmarkedQuestion(
+    user: User,
+  ): Promise<ReadExamTitleAndIdOfBookmarkedQuestionOutput> {
+    try {
+      const bookmarks = await this.mockExamQuestionBookmark.find({
+        where: {
+          user: {
+            id: user.id,
+          },
+        },
+        relations: {
+          question: { mockExam: true },
+        },
+      });
+      const titleAndId = deduplication(
+        bookmarks.map((bookmark) => {
+          const { title, id } = bookmark.question.mockExam;
+          return { title, id };
+        }),
+      );
+      return { ok: true, titleAndId };
+    } catch {
+      return { ok: false, error: '시험카테고리를 불러올 수 없습니다.' };
     }
   }
 }

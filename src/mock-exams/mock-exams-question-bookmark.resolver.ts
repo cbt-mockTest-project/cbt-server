@@ -12,6 +12,7 @@ import {
   ReadMockExamQuestionBookmarkOutput,
   ReadMockExamQuestionBookmarkInput,
 } from './dtos/readMockExamQuestionBookmark.dto';
+import { ReadExamTitleAndIdOfBookmarkedQuestionOutput } from './dtos/readExamTitleAndIdOfBookmarkedQuestion.dto';
 
 @Resolver(() => MockExamQuestionBookmark)
 export class MockExamQuestionBookmarkResolver {
@@ -42,6 +43,17 @@ export class MockExamQuestionBookmarkResolver {
   ): Promise<ReadMockExamQuestionBookmarkOutput> {
     return this.mockExamQuestionBookmarkSerivce.readMockExamQuestionBookmark(
       readMockExamQuestionBookmarkInput,
+      user,
+    );
+  }
+
+  @Query(() => ReadExamTitleAndIdOfBookmarkedQuestionOutput)
+  @Role(['ANY'])
+  async readExamTitleAndIdOfBookmarkedQuestion(
+    @AuthUser()
+    user: User,
+  ): Promise<ReadExamTitleAndIdOfBookmarkedQuestionOutput> {
+    return this.mockExamQuestionBookmarkSerivce.readExamTitleAndIdOfBookmarkedQuestion(
       user,
     );
   }

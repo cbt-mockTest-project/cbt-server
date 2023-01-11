@@ -29,6 +29,7 @@ import { RevalidateModule } from './revalidate/revalidate.module';
 import { TelegramModule } from './telegram/telegram.module';
 import { Notice } from './users/entities/notice.entity';
 import { MockExamQuestionBookmark } from './mock-exams/entities/mock-exam-question-bookmark.entity';
+import { CrawlerModule } from './crawler/crawler.module';
 
 @Module({
   imports: [
@@ -58,7 +59,7 @@ import { MockExamQuestionBookmark } from './mock-exams/entities/mock-exam-questi
         origin:
           process.env.NODE_ENV == 'dev'
             ? [process.env.CLIENT_URL, process.env.ADMIN_URL]
-            : process.env.CLIENT_URL,
+            : [process.env.CLIENT_URL, process.env.NAVER_CRAWLER_BOT_URL],
       },
     }),
     TypeOrmModule.forRoot({
@@ -121,6 +122,7 @@ import { MockExamQuestionBookmark } from './mock-exams/entities/mock-exam-questi
     }),
     RevalidateModule,
     TelegramModule,
+    CrawlerModule,
   ],
   controllers: [],
   providers: [],

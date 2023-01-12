@@ -14,7 +14,7 @@ export class CrawlerService {
     try {
       const { keyword, blogName } = naverViewTapCrawlerInput;
       const postBlogNameClass = '.sub_txt.sub_name';
-      const postTitleClass = '.api_txt_lines.total_tit._cross_trigger';
+      const postTitleClass = '.api_txt_lines.total_tit';
       const whereArray = ['view', 'blog'];
       const rank = { all: 0, blog: 0 };
       const postInfo = { title: '', link: '', content: '' };
@@ -41,7 +41,6 @@ export class CrawlerService {
                 if ($(postTitleArray[i]).attr()) {
                   postInfo.link = $(postTitleArray[i]).attr().href;
                 }
-
                 postInfo.content = $(postTitleArray[i]).next().text().trim();
                 return false;
               }
@@ -65,8 +64,7 @@ export class CrawlerService {
         searchCount: rank,
         postInfo,
       };
-    } catch (e) {
-      console.log(e);
+    } catch {
       return {
         ok: false,
       };

@@ -15,9 +15,10 @@ export class CrawlerService {
       const { keyword, blogName } = naverViewTapCrawlerInput;
       const postBlogNameClass = '.sub_txt.sub_name';
       const postTitleClass = '.api_txt_lines.total_tit';
+      const thumbClass = '.thumb.api_get'; //thumb api_get //flick_bx
       const whereArray = ['view', 'blog'];
       const rank = { all: 0, blog: 0 };
-      const postInfo = { title: '', link: '', content: '' };
+      const postInfo = { title: '', link: '', content: '', thumb: '' };
       await Promise.all(
         whereArray.map(async (where) => {
           const naverViewTabUrl = (startNum: number) =>
@@ -30,6 +31,7 @@ export class CrawlerService {
             const $ = load(res.data);
             const postBlogNameArray = $(postBlogNameClass);
             const postTitleArray = $(postTitleClass);
+            const thumbClassArray = $(thumbClass);
             if (!postBlogNameArray.text()) {
               break;
             }
@@ -40,6 +42,9 @@ export class CrawlerService {
                 postInfo.title = $(postTitleArray[i]).text();
                 if ($(postTitleArray[i]).attr()) {
                   postInfo.link = $(postTitleArray[i]).attr().href;
+                }
+                if ($(thumbClassArray[i]).children[0].attr()) {
+                  postInfo.thumb = $(thumbClassArray[i]).children[0].attr().src;
                 }
                 postInfo.content = $(postTitleArray[i]).next().text().trim();
                 return false;

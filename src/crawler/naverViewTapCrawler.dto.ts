@@ -17,6 +17,8 @@ class PostInfo {
   link: string;
   @Field(() => String)
   content: string;
+  @Field(() => String)
+  thumb: string;
 }
 
 @InputType()

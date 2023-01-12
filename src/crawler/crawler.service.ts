@@ -13,9 +13,11 @@ export class CrawlerService {
   ): Promise<NaverViewTapCrawlerOutput> {
     try {
       const { keyword, blogName } = naverViewTapCrawlerInput;
-      const titleClass = '.sub_txt.sub_name';
+      const postBlogNameClass = '.sub_txt.sub_name';
+      const postTitleClass = '.api_txt_lines.total_tit._cross_trigger';
       const whereArray = ['view', 'blog'];
       const rank = { all: 0, blog: 0 };
+      const postInfo = { title: '', link: '', content: '' };
       await Promise.all(
         whereArray.map(async (where) => {
           const naverViewTabUrl = (startNum: number) =>
@@ -26,14 +28,18 @@ export class CrawlerService {
           while (startNum < 100) {
             const res = await axios.get(naverViewTabUrl(startNum));
             const $ = load(res.data);
-            const titleData = $(titleClass);
-            if (!titleData.text()) {
+            const postBlogNameArray = $(postBlogNameClass);
+            const postTitleArray = $(postTitleClass);
+            if (!postBlogNameArray.text()) {
               break;
             }
-            titleData.each((i, el) => {
-              const title = $(el).text().replace(/ /g, '');
-              if (title.indexOf(blogName.replace(/ /g, '')) > -1) {
+            postBlogNameArray.each((i, el) => {
+              const postBlogName = $(el).text().replace(/ /g, '');
+              if (postBlogName.indexOf(blogName.replace(/ /g, '')) > -1) {
                 finished = true;
+                postInfo.title = $(postTitleArray[i]).text();
+                postInfo.link = $(postTitleArray[i]).attr().href;
+                postInfo.content = $(postTitleArray[i]).next().text().trim();
                 return false;
               }
               index++;
@@ -54,6 +60,7 @@ export class CrawlerService {
       return {
         ok: true,
         searchCount: rank,
+        postInfo,
       };
     } catch {
       return {

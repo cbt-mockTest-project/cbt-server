@@ -38,7 +38,10 @@ export class CrawlerService {
               if (postBlogName.indexOf(blogName.replace(/ /g, '')) > -1) {
                 finished = true;
                 postInfo.title = $(postTitleArray[i]).text();
-                postInfo.link = $(postTitleArray[i]).attr().href;
+                if ($(postTitleArray[i]).attr()) {
+                  postInfo.link = $(postTitleArray[i]).attr().href;
+                }
+
                 postInfo.content = $(postTitleArray[i]).next().text().trim();
                 return false;
               }
@@ -62,7 +65,8 @@ export class CrawlerService {
         searchCount: rank,
         postInfo,
       };
-    } catch {
+    } catch (e) {
+      console.log(e);
       return {
         ok: false,
       };

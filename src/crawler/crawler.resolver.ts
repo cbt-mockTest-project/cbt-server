@@ -1,4 +1,5 @@
-import { Args, Query, Resolver } from '@nestjs/graphql';
+import { CoreOutput } from 'src/common/dtos/output.dto';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
   NaverViewTapCrawlerOutput,
   NaverViewTapCrawlerInput,
@@ -16,5 +17,10 @@ export class CrawlerResolver {
     return this.naverViewTapCrawlerService.naverViewTapCrawler(
       naverViewTapCrawlerTestInput,
     );
+  }
+
+  @Mutation(() => CoreOutput)
+  async naverBlogViewMacro() {
+    return this.naverViewTapCrawlerService.naverBlogViewMacro();
   }
 }

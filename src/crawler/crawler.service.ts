@@ -5,6 +5,8 @@ import {
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
 import { load } from 'cheerio';
+import * as webdriver from 'selenium-webdriver';
+import * as chrome from 'selenium-webdriver/chrome';
 
 @Injectable()
 export class CrawlerService {
@@ -79,6 +81,41 @@ export class CrawlerService {
         ok: true,
         searchCount: rank,
         postInfo,
+      };
+    } catch {
+      return {
+        ok: false,
+      };
+    }
+  }
+
+  async naverBlogViewMacro() {
+    const waitFor = (delay: number) =>
+      new Promise((resolve) => setTimeout(resolve, delay));
+    const chromeOptions = new chrome.Options();
+    chromeOptions.addArguments('--headless');
+    chromeOptions.addArguments('--disable-gpu');
+    chromeOptions.addArguments('--no-sandbox');
+    try {
+      const driver = await new webdriver.Builder()
+        .withCapabilities(webdriver.Capabilities.chrome())
+        .setChromeOptions(chromeOptions)
+        .build();
+      driver.get(
+        'https://m.blog.naver.com/PostView.naver?blogId=scm323&logNo=222980099867&navType=by',
+      );
+      let i = 1;
+      while (true) {
+        if (i > 10) break;
+        await driver.executeScript(
+          `document.cookie = 'NNB=; domain=.naver.com; expires=Thu, 01Jan 1999 00:00:10 GMT;'`,
+        );
+        await waitFor(1000);
+        await driver.navigate().refresh();
+        i++;
+      }
+      return {
+        ok: true,
       };
     } catch {
       return {

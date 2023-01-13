@@ -13,9 +13,12 @@ export class CrawlerService {
   ): Promise<NaverViewTapCrawlerOutput> {
     try {
       const { keyword, blogName } = naverViewTapCrawlerInput;
+      const postBoxClass = '.total_wrap.api_ani_send';
       const postBlogNameClass = '.sub_txt.sub_name';
       const postTitleClass = '.api_txt_lines.total_tit';
-      const thumbClass = '.thumb.api_get'; //thumb api_get //flick_bx
+      const postContentClass = '.api_txt_lines.dsc_txt';
+      const postFlickerThumbClass = '.thumb._cross_trigger';
+      const postThumbClass = '.thumb.api_get';
       const whereArray = ['view', 'blog'];
       const rank = { all: 0, blog: 0 };
       const postInfo = { title: '', link: '', content: '', thumb: '' };
@@ -29,24 +32,32 @@ export class CrawlerService {
           while (startNum < 100) {
             const res = await axios.get(naverViewTabUrl(startNum));
             const $ = load(res.data);
-            const postBlogNameArray = $(postBlogNameClass);
-            const postTitleArray = $(postTitleClass);
-            const thumbClassArray = $(thumbClass);
-            if (!postBlogNameArray.text()) {
+            const postBoxArray = $(postBoxClass);
+            if (!postBoxArray.text()) {
               break;
             }
-            postBlogNameArray.each((i, el) => {
-              const postBlogName = $(el).text().replace(/ /g, '');
+            postBoxArray.each((i, post) => {
+              const postBlogName = $(post)
+                .find(postBlogNameClass)
+                .text()
+                .replace(/ /g, '');
               if (postBlogName.indexOf(blogName.replace(/ /g, '')) > -1) {
                 finished = true;
-                postInfo.title = $(postTitleArray[i]).text();
-                if ($(postTitleArray[i]).attr()) {
-                  postInfo.link = $(postTitleArray[i]).attr().href;
+                const postTitle = $(post).find(postTitleClass);
+                const postThumb = $(post).find(postThumbClass);
+                const postFlickerThumb = $(post).find(postFlickerThumbClass);
+                const postContent = $(post).find(postContentClass);
+                if (postFlickerThumb && postFlickerThumb.length >= 1) {
+                  postInfo.thumb = $(postFlickerThumb)
+                    .children('img')
+                    .attr('src');
                 }
-                if ($(thumbClassArray[i]).children[0].attr()) {
-                  postInfo.thumb = $(thumbClassArray[i]).children[0].attr().src;
+                postInfo.title = postTitle.text() || '';
+                postInfo.link = $(postTitle).attr('href') || '';
+                if (!postInfo.thumb) {
+                  postInfo.thumb = $(postThumb).attr('src') || '';
                 }
-                postInfo.content = $(postTitleArray[i]).next().text().trim();
+                postInfo.content = $(postContent).text().trim() || '';
                 return false;
               }
               index++;

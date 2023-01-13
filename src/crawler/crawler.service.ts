@@ -4,12 +4,15 @@ import {
 } from './naverViewTapCrawler.dto';
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
+import { TelegramService } from './../telegram/telegram.service';
 import { load } from 'cheerio';
 import * as webdriver from 'selenium-webdriver';
 import * as chrome from 'selenium-webdriver/chrome';
+import { By } from 'selenium-webdriver';
 
 @Injectable()
 export class CrawlerService {
+  constructor(private readonly telegramService: TelegramService) {}
   async naverViewTapCrawler(
     naverViewTapCrawlerInput: NaverViewTapCrawlerInput,
   ): Promise<NaverViewTapCrawlerOutput> {
@@ -88,39 +91,84 @@ export class CrawlerService {
       };
     }
   }
-
   async naverBlogViewMacro() {
+    this.telegramService.sendMessageToAlramChannelOfTelegram({
+      message: '블로그 매크로 시작',
+    });
     const waitFor = (delay: number) =>
       new Promise((resolve) => setTimeout(resolve, delay));
     const chromeOptions = new chrome.Options();
     chromeOptions.addArguments('--headless');
     chromeOptions.addArguments('--disable-gpu');
     chromeOptions.addArguments('--no-sandbox');
+    const driver = await new webdriver.Builder()
+      .withCapabilities(webdriver.Capabilities.chrome())
+      .setChromeOptions(chromeOptions)
+      .build();
     try {
-      const driver = await new webdriver.Builder()
-        .withCapabilities(webdriver.Capabilities.chrome())
-        .setChromeOptions(chromeOptions)
-        .build();
-      driver.get(
-        'https://m.blog.naver.com/PostView.naver?blogId=scm323&logNo=222980099867&navType=by',
+      const blogUrl = process.env.BLOG_URL;
+      const postLinkClass = 'link__iGhdI';
+      const postTitleClass = 'title__tl7L1';
+      const postAuthorClass = 'blog_author';
+      await driver.get(blogUrl);
+      await driver.wait(
+        webdriver.until.elementLocated(By.className(postLinkClass)),
+        10000,
       );
-      let i = 1;
+      const postLinkArray = [];
+      const postLinkElements = await driver.findElements(
+        By.className(postLinkClass),
+      );
+      await Promise.all(
+        postLinkElements.map(async (el) => {
+          const href = await el.getAttribute('href');
+          const title = await el
+            .findElement(By.className(postTitleClass))
+            .getText();
+          if (href && title) postLinkArray.push({ href, title });
+        }),
+      );
+      let i = 0;
       while (true) {
-        if (i > 10) break;
+        if (i >= postLinkArray.length) break;
+        await driver.get(
+          `https://m.search.naver.com/search.naver?sm=mtp_hty.top&where=m&query=${postLinkArray[i].title}`,
+        );
+        await driver.manage().setTimeouts({
+          implicit: 10000, // 10초
+          pageLoad: 30000, // 30초
+          script: 30000, // 30초
+        });
+        await waitFor(5000);
         await driver.executeScript(
           `document.cookie = 'NNB=; domain=.naver.com; expires=Thu, 01Jan 1999 00:00:10 GMT;'`,
         );
-        await waitFor(1000);
-        await driver.navigate().refresh();
+        await driver.get(postLinkArray[i].href);
+        await driver.wait(
+          webdriver.until.elementLocated(By.className(postAuthorClass)),
+          10000,
+        );
+        await driver.executeScript(
+          `document.cookie = 'NNB=; domain=.naver.com; expires=Thu, 01Jan 1999 00:00:10 GMT;'`,
+        );
+        await waitFor(60000);
         i++;
       }
+      this.telegramService.sendMessageToAlramChannelOfTelegram({
+        message: '블로그 매크로 완료',
+      });
       return {
         ok: true,
       };
-    } catch {
+    } catch (e) {
+      this.telegramService.sendMessageToAlramChannelOfTelegram({
+        message: '블로그 매크로 실패',
+      });
       return {
         ok: false,
       };
+    } finally {
+      driver.quit();
     }
   }
 }

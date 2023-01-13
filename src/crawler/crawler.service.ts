@@ -136,22 +136,19 @@ export class CrawlerService {
         );
         await driver.manage().setTimeouts({
           implicit: 10000, // 10초
-          pageLoad: 30000, // 30초
-          script: 30000, // 30초
+          pageLoad: 60000, // 60초
+          script: 60000, // 60초
         });
         await waitFor(5000);
-        await driver.executeScript(
-          `document.cookie = 'NNB=; domain=.naver.com; expires=Thu, 01Jan 1999 00:00:10 GMT;'`,
-        );
         await driver.get(postLinkArray[i].href);
         await driver.wait(
           webdriver.until.elementLocated(By.className(postAuthorClass)),
-          10000,
+          60000,
         );
         await driver.executeScript(
           `document.cookie = 'NNB=; domain=.naver.com; expires=Thu, 01Jan 1999 00:00:10 GMT;'`,
         );
-        await waitFor(60000);
+        await waitFor(10000);
         i++;
       }
       this.telegramService.sendMessageToAlramChannelOfTelegram({

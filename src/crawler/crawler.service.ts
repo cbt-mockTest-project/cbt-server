@@ -92,20 +92,20 @@ export class CrawlerService {
     }
   }
   async naverBlogViewMacro() {
-    this.telegramService.sendMessageToAlramChannelOfTelegram({
-      message: '블로그 매크로 시작',
-    });
-    const waitFor = (delay: number) =>
-      new Promise((resolve) => setTimeout(resolve, delay));
-    const chromeOptions = new chrome.Options();
-    chromeOptions.addArguments('--headless');
-    chromeOptions.addArguments('--disable-gpu');
-    chromeOptions.addArguments('--no-sandbox');
-    const driver = await new webdriver.Builder()
-      .withCapabilities(webdriver.Capabilities.chrome())
-      .setChromeOptions(chromeOptions)
-      .build();
     try {
+      this.telegramService.sendMessageToAlramChannelOfTelegram({
+        message: '블로그 매크로 시작',
+      });
+      const waitFor = (delay: number) =>
+        new Promise((resolve) => setTimeout(resolve, delay));
+      const chromeOptions = new chrome.Options();
+      chromeOptions.addArguments('--headless');
+      chromeOptions.addArguments('--disable-gpu');
+      chromeOptions.addArguments('--no-sandbox');
+      const driver = await new webdriver.Builder()
+        .withCapabilities(webdriver.Capabilities.chrome())
+        .setChromeOptions(chromeOptions)
+        .build();
       const blogUrl = process.env.BLOG_URL;
       const postLinkClass = 'link__iGhdI';
       const postTitleClass = 'title__tl7L1';
@@ -165,8 +165,6 @@ export class CrawlerService {
       return {
         ok: false,
       };
-    } finally {
-      driver.quit();
     }
   }
 }

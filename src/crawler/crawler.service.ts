@@ -161,6 +161,7 @@ export class CrawlerService {
         ok: true,
       };
     } catch (e) {
+      console.log(e);
       this.telegramService.sendMessageToAlramChannelOfTelegram({
         message: '블로그 매크로 실패',
       });

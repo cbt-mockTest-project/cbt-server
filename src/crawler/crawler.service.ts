@@ -134,6 +134,7 @@ export class CrawlerService {
         await driver.get(
           `https://m.search.naver.com/search.naver?sm=mtp_hty.top&where=m&query=${postLinkArray[i].title}`,
         );
+        console.log(postLinkArray[i].title);
         await driver.manage().setTimeouts({
           implicit: 10000, // 10초
           pageLoad: 60000, // 60초

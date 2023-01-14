@@ -7,7 +7,7 @@ import axios from 'axios';
 import { TelegramService } from './../telegram/telegram.service';
 import { load } from 'cheerio';
 import * as webdriver from 'selenium-webdriver';
-import * as chrome from 'selenium-webdriver/chrome';
+import * as firefox from 'selenium-webdriver/firefox';
 import { By } from 'selenium-webdriver';
 
 @Injectable()
@@ -92,20 +92,20 @@ export class CrawlerService {
     }
   }
   async naverBlogViewMacro() {
+    this.telegramService.sendMessageToAlramChannelOfTelegram({
+      message: '블로그 매크로 시작',
+    });
+    const waitFor = (delay: number) =>
+      new Promise((resolve) => setTimeout(resolve, delay));
+    const firefoxOptions = new firefox.Options();
+    firefoxOptions.addArguments('--headless');
+    firefoxOptions.addArguments('--disable-gpu');
+    firefoxOptions.addArguments('--no-sandbox');
+    const driver = await new webdriver.Builder()
+      .withCapabilities(webdriver.Capabilities.firefox())
+      .setFirefoxOptions(firefoxOptions)
+      .build();
     try {
-      this.telegramService.sendMessageToAlramChannelOfTelegram({
-        message: '블로그 매크로 시작',
-      });
-      const waitFor = (delay: number) =>
-        new Promise((resolve) => setTimeout(resolve, delay));
-      const chromeOptions = new chrome.Options();
-      chromeOptions.addArguments('--headless');
-      chromeOptions.addArguments('--disable-gpu');
-      chromeOptions.addArguments('--no-sandbox');
-      const driver = await new webdriver.Builder()
-        .withCapabilities(webdriver.Capabilities.chrome())
-        .setChromeOptions(chromeOptions)
-        .build();
       const blogUrl = process.env.BLOG_URL;
       const postLinkClass = 'link__iGhdI';
       const postTitleClass = 'title__tl7L1';
@@ -134,7 +134,6 @@ export class CrawlerService {
         await driver.get(
           `https://m.search.naver.com/search.naver?sm=mtp_hty.top&where=m&query=${postLinkArray[i].title}`,
         );
-        console.log(postLinkArray[i].title);
         await driver.manage().setTimeouts({
           implicit: 10000, // 10초
           pageLoad: 60000, // 60초
@@ -155,10 +154,12 @@ export class CrawlerService {
       this.telegramService.sendMessageToAlramChannelOfTelegram({
         message: '블로그 매크로 완료',
       });
+      await driver.quit();
       return {
         ok: true,
       };
     } catch (e) {
+      await driver.quit();
       console.log(e);
       this.telegramService.sendMessageToAlramChannelOfTelegram({
         message: '블로그 매크로 실패',

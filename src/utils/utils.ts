@@ -3,7 +3,8 @@ import { addYears, subYears } from 'date-fns';
 
 export const AfterDate = (date: Date) => Between(date, addYears(date, 100));
 export const BeforeDate = (date: Date) => Between(subYears(date, 100), date);
-
+export const waitFor = (delay: number) =>
+  new Promise((resolve) => setTimeout(resolve, delay));
 export const findUniqElem = <T>(arr1: T[], arr2: T[]) =>
   arr1
     .concat(arr2)

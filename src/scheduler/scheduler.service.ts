@@ -20,10 +20,10 @@ export class SchedulerService {
     private readonly crawlerService: CrawlerService,
   ) {}
   //6시간마다
-  // @Cron('0 */5 * * *')
-  // async naverViewMacro() {
-  //   await this.crawlerService.naverBlogViewMacro();
-  // }
+  @Cron('0 */5 * * *')
+  async naverViewMacro() {
+    await this.crawlerService.naverBlogViewMacro();
+  }
 
   // 월요일 02:30am
   // @Cron('0 30 2 * * 1')

@@ -1,6 +1,6 @@
 # STEP 1
 # 1
-FROM node:16 AS builder
+FROM --platform=linux/amd64 node:16 AS builder
 # 2
 WORKDIR /CBT-SERVER
 # 3
@@ -11,7 +11,7 @@ RUN yarn
 RUN yarn build
 
 # 6
-FROM node:16-alpine
+FROM --platform=linux/amd64 node:16-alpine
 # 7
 WORKDIR /CBT-SERVER
 # 8

@@ -7,7 +7,7 @@ import axios from 'axios';
 import { TelegramService } from './../telegram/telegram.service';
 import { load } from 'cheerio';
 import * as webdriver from 'selenium-webdriver';
-import * as firefox from 'selenium-webdriver/firefox';
+import * as chrome from 'selenium-webdriver/chrome';
 import { By } from 'selenium-webdriver';
 
 @Injectable()
@@ -97,13 +97,13 @@ export class CrawlerService {
     });
     const waitFor = (delay: number) =>
       new Promise((resolve) => setTimeout(resolve, delay));
-    const firefoxOptions = new firefox.Options();
-    firefoxOptions.addArguments('--headless');
-    firefoxOptions.addArguments('--disable-gpu');
-    firefoxOptions.addArguments('--no-sandbox');
+    const chromeOptions = new chrome.Options();
+    // chromeOptions.addArguments('--headless');
+    chromeOptions.addArguments('--disable-gpu');
+    chromeOptions.addArguments('--no-sandbox');
     const driver = await new webdriver.Builder()
-      .withCapabilities(webdriver.Capabilities.firefox())
-      .setFirefoxOptions(firefoxOptions)
+      .withCapabilities(webdriver.Capabilities.chrome())
+      .setChromeOptions(chromeOptions)
       .build();
     try {
       const blogUrl = process.env.BLOG_URL;
@@ -145,6 +145,8 @@ export class CrawlerService {
           webdriver.until.elementLocated(By.className(postAuthorClass)),
           60000,
         );
+
+        await waitFor(10000);
         await driver.executeScript(
           `document.cookie = 'NNB=; domain=.naver.com; expires=Thu, 01Jan 1999 00:00:10 GMT;'`,
         );

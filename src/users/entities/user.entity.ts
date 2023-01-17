@@ -1,3 +1,4 @@
+import { Post } from './../../post/entities/post.entity';
 import { MockExamQuestionComment } from './../../mock-exams/entities/mock-exam-question-comment.entity';
 import { CoreEntity } from './../../common/entities/core.entity';
 import {
@@ -92,6 +93,10 @@ export class User extends CoreEntity {
   @OneToMany(() => Notice, (notice) => notice.user)
   @Field(() => [Notice], { nullable: true })
   notice: Notice[];
+
+  @OneToMany(() => Post, (post) => post.user)
+  @Field(() => [Post], { nullable: true })
+  post: Post[];
 
   @DeleteDateColumn()
   @Field(() => Date)

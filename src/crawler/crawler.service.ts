@@ -1,7 +1,7 @@
 import {
   NaverViewTapCrawlerInput,
   NaverViewTapCrawlerOutput,
-} from './naverViewTapCrawler.dto';
+} from './dtos/naverViewTapCrawler.dto';
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
 import { TelegramService } from './../telegram/telegram.service';
@@ -9,6 +9,10 @@ import { load } from 'cheerio';
 import * as webdriver from 'selenium-webdriver';
 import * as chrome from 'selenium-webdriver/chrome';
 import { By } from 'selenium-webdriver';
+import {
+  NaverBlogViewMacroInput,
+  NaverBlogViewMacroOutput,
+} from './dtos/naverBlogViewMacro.dto';
 
 @Injectable()
 export class CrawlerService {
@@ -91,7 +95,10 @@ export class CrawlerService {
       };
     }
   }
-  async naverBlogViewMacro() {
+  async naverBlogViewMacro(
+    naverBlogViewMacroInput: NaverBlogViewMacroInput,
+  ): Promise<NaverBlogViewMacroOutput> {
+    const { blogUrl } = naverBlogViewMacroInput;
     this.telegramService.sendMessageToAlramChannelOfTelegram({
       message: '블로그 매크로 시작',
     });
@@ -106,11 +113,11 @@ export class CrawlerService {
       .setChromeOptions(chromeOptions)
       .build();
     try {
-      const blogUrl = process.env.BLOG_URL;
+      const url = blogUrl || process.env.BLOG_URL;
       const postLinkClass = 'link__iGhdI';
       const postTitleClass = 'title__tl7L1';
       const postAuthorClass = 'blog_author';
-      await driver.get(blogUrl);
+      await driver.get(url);
       await driver.wait(
         webdriver.until.elementLocated(By.className(postLinkClass)),
         10000,

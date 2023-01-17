@@ -1,10 +1,13 @@
-import { CoreOutput } from 'src/common/dtos/output.dto';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
   NaverViewTapCrawlerOutput,
   NaverViewTapCrawlerInput,
-} from './naverViewTapCrawler.dto';
+} from './dtos/naverViewTapCrawler.dto';
 import { CrawlerService } from './crawler.service';
+import {
+  NaverBlogViewMacroInput,
+  NaverBlogViewMacroOutput,
+} from './dtos/naverBlogViewMacro.dto';
 
 @Resolver()
 export class CrawlerResolver {
@@ -19,8 +22,13 @@ export class CrawlerResolver {
     );
   }
 
-  @Mutation(() => CoreOutput)
-  async naverBlogViewMacro() {
-    return this.naverViewTapCrawlerService.naverBlogViewMacro();
+  @Mutation(() => NaverBlogViewMacroOutput)
+  async naverBlogViewMacro(
+    @Args('input')
+    naverBlogViewMacroInput: NaverBlogViewMacroInput,
+  ): Promise<NaverBlogViewMacroOutput> {
+    return this.naverViewTapCrawlerService.naverBlogViewMacro(
+      naverBlogViewMacroInput,
+    );
   }
 }

@@ -1,3 +1,4 @@
+import { Post } from './post/entities/post.entity';
 import { MockExamQuestionCommentLike } from './mock-exams/entities/mock-exam-question-comment-like.entity';
 import { MockExamQuestionComment } from './mock-exams/entities/mock-exam-question-comment.entity';
 import { Feedback } from './users/entities/feedback.entity';
@@ -30,6 +31,7 @@ import { TelegramModule } from './telegram/telegram.module';
 import { Notice } from './users/entities/notice.entity';
 import { MockExamQuestionBookmark } from './mock-exams/entities/mock-exam-question-bookmark.entity';
 import { CrawlerModule } from './crawler/crawler.module';
+import { PostModule } from './post/post.module';
 
 @Module({
   imports: [
@@ -84,6 +86,7 @@ import { CrawlerModule } from './crawler/crawler.module';
         MockExamQuestionCommentLike,
         MockExamQuestionBookmark,
         Notice,
+        Post,
       ],
     }),
     UserModule,
@@ -123,6 +126,7 @@ import { CrawlerModule } from './crawler/crawler.module';
     RevalidateModule,
     TelegramModule,
     CrawlerModule,
+    PostModule,
   ],
   controllers: [],
   providers: [],

@@ -97,7 +97,10 @@ export class PostService {
   async readPost(readPostInput: ReadPostInput): Promise<ReadPostOutput> {
     try {
       const { id } = readPostInput;
-      const post = await this.post.findOne({ where: { id } });
+      const post = await this.post.findOne({
+        where: { id },
+        relations: { user: true },
+      });
       if (!post) {
         return {
           ok: false,
@@ -123,6 +126,7 @@ export class PostService {
       const [posts, count] = await this.post.findAndCount({
         skip,
         take: limit,
+        relations: { user: true },
       });
       return {
         posts,

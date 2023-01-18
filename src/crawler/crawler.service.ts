@@ -105,7 +105,7 @@ export class CrawlerService {
     const waitFor = (delay: number) =>
       new Promise((resolve) => setTimeout(resolve, delay));
     const chromeOptions = new chrome.Options();
-    // chromeOptions.addArguments('--headless');
+    chromeOptions.addArguments('--headless');
     chromeOptions.addArguments('--disable-gpu');
     chromeOptions.addArguments('--no-sandbox');
     const driver = await new webdriver.Builder()

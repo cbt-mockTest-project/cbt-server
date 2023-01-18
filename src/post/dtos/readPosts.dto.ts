@@ -6,10 +6,12 @@ import { Field, InputType, ObjectType } from '@nestjs/graphql';
 export class ReadPostsInput {
   @Field(() => Number)
   page: number;
-  @Field(() => Number)
+  @Field(() => Number, { nullable: true })
   limit: number;
-  @Field(() => PostCategory)
+  @Field(() => PostCategory, { nullable: true })
   category: PostCategory;
+  @Field(() => Boolean, { defaultValue: false })
+  all: boolean;
 }
 
 @ObjectType()

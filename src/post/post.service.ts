@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 import { ReadPostsInput, ReadPostsOutput } from './dtos/readPosts.dto';
 import { ReadPostInput, ReadPostOutput } from './dtos/readPost.dto';
 import { DeletePostInput, DeletePostOutput } from './dtos/deletePost.dto';
@@ -6,7 +7,7 @@ import { User } from 'src/users/entities/user.entity';
 import { Post } from './entities/post.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindManyOptions, Repository } from 'typeorm';
 import { CreatePostInput, CreatePostOutput } from './dtos/createPost.dto';
 
 @Injectable()
@@ -97,9 +98,9 @@ export class PostService {
   async readPost(readPostInput: ReadPostInput): Promise<ReadPostOutput> {
     try {
       const { id } = readPostInput;
-      const post = await this.post.findOne({
+      let post = await this.post.findOne({
         where: { id },
-        relations: { user: true, like: true },
+        relations: { user: true, like: true, comment: true },
       });
       if (!post) {
         return {
@@ -107,6 +108,8 @@ export class PostService {
           error: '존재하지 않는 게시글 입니다.',
         };
       }
+      post.commentsCount = post.comment.length;
+      post.likesCount = post.like.length;
       return {
         ok: true,
         post,
@@ -121,16 +124,29 @@ export class PostService {
 
   async readPosts(readPostsInput: ReadPostsInput): Promise<ReadPostsOutput> {
     try {
-      const { page, limit, category } = readPostsInput;
+      const { page, limit, category, all } = readPostsInput;
       const skip = (page - 1) * limit;
-      const [posts, count] = await this.post.findAndCount({
-        skip,
-        take: limit,
-        relations: { user: true, like: true },
-        where: {
-          category,
-        },
-      });
+      let options: FindManyOptions<Post> = {};
+      if (!all) {
+        options = {
+          skip,
+          take: limit,
+          relations: { user: true, like: true, comment: true },
+          where: {
+            category,
+          },
+        };
+      }
+      let [posts, count] = await this.post.findAndCount(options);
+      if (!all) {
+        posts = posts.map((post) => {
+          return {
+            ...post,
+            likesCount: post.like.length,
+            commentsCount: post.comment.length,
+          };
+        });
+      }
       return {
         posts,
         count,

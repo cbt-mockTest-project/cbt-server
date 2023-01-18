@@ -9,6 +9,7 @@ import {
 import { CoreEntity } from 'src/common/entities/core.entity';
 import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { IsEnum } from 'class-validator';
+import { PostLike } from './postLike.entity';
 
 export enum PostCategory {
   FREE = 'FREE',
@@ -39,6 +40,10 @@ export class Post extends CoreEntity {
   @OneToMany(() => PostComment, (postComment) => postComment.post)
   @Field(() => [PostComment])
   comment: PostComment[];
+
+  @OneToMany(() => PostLike, (postLike) => postLike.post)
+  @Field(() => [PostLike])
+  like: PostLike[];
 
   @ManyToOne(() => User, (user) => user.post, {
     onDelete: 'CASCADE',

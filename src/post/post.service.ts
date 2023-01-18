@@ -99,7 +99,7 @@ export class PostService {
       const { id } = readPostInput;
       const post = await this.post.findOne({
         where: { id },
-        relations: { user: true },
+        relations: { user: true, like: true },
       });
       if (!post) {
         return {
@@ -126,7 +126,7 @@ export class PostService {
       const [posts, count] = await this.post.findAndCount({
         skip,
         take: limit,
-        relations: { user: true },
+        relations: { user: true, like: true },
         where: {
           category,
         },

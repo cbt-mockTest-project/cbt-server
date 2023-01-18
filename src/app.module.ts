@@ -34,6 +34,7 @@ import { Notice } from './users/entities/notice.entity';
 import { MockExamQuestionBookmark } from './mock-exams/entities/mock-exam-question-bookmark.entity';
 import { CrawlerModule } from './crawler/crawler.module';
 import { PostModule } from './post/post.module';
+import { PostLike } from './post/entities/postLike.entity';
 
 @Module({
   imports: [
@@ -91,6 +92,7 @@ import { PostModule } from './post/post.module';
         Post,
         PostComment,
         PostCommentLike,
+        PostLike,
       ],
     }),
     UserModule,

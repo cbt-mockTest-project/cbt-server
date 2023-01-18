@@ -1,3 +1,6 @@
+import { PostLikeService } from './postLike.service';
+import { PostLikeResolver } from './postLike.resolver';
+import { PostLike } from './entities/postLike.entity';
 import { PostComment } from './entities/postComment.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
@@ -7,7 +10,9 @@ import { PostResolver } from './post.resolver';
 import { PostCommentLike } from './entities/postCommentLike.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Post, PostComment, PostCommentLike])],
-  providers: [PostService, PostResolver],
+  imports: [
+    TypeOrmModule.forFeature([Post, PostComment, PostCommentLike, PostLike]),
+  ],
+  providers: [PostService, PostResolver, PostLikeResolver, PostLikeService],
 })
 export class PostModule {}

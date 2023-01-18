@@ -73,7 +73,7 @@ export class MockExamQuestionCommentLikeSerivce {
     } catch {
       return {
         ok: false,
-        error: '댓글을 수정할 수 없습니다.',
+        error: '좋아요 요청에 실패했습니다.',
       };
     }
   }

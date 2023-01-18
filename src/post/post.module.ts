@@ -1,3 +1,5 @@
+import { PostCommentResolver } from './postComment.resolver';
+import { PostCommentSerivce } from './postComment.service';
 import { PostLikeService } from './postLike.service';
 import { PostLikeResolver } from './postLike.resolver';
 import { PostLike } from './entities/postLike.entity';
@@ -13,6 +15,13 @@ import { PostCommentLike } from './entities/postCommentLike.entity';
   imports: [
     TypeOrmModule.forFeature([Post, PostComment, PostCommentLike, PostLike]),
   ],
-  providers: [PostService, PostResolver, PostLikeResolver, PostLikeService],
+  providers: [
+    PostService,
+    PostResolver,
+    PostLikeResolver,
+    PostLikeService,
+    PostCommentSerivce,
+    PostCommentResolver,
+  ],
 })
 export class PostModule {}

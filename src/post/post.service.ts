@@ -9,7 +9,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindManyOptions, Repository } from 'typeorm';
 import { CreatePostInput, CreatePostOutput } from './dtos/createPost.dto';
-import { CoreOutput } from 'src/common/dtos/output.dto';
 import { ViewPostInput, ViewPostOutput } from './dtos/viewPost.dto';
 
 @Injectable()
@@ -119,7 +118,6 @@ export class PostService {
         post.likeState =
           post.like.filter((el) => el.user.id === user.id).length >= 1;
       }
-
       return {
         ok: true,
         post,

@@ -121,12 +121,15 @@ export class PostService {
 
   async readPosts(readPostsInput: ReadPostsInput): Promise<ReadPostsOutput> {
     try {
-      const { page, limit } = readPostsInput;
+      const { page, limit, category } = readPostsInput;
       const skip = (page - 1) * limit;
       const [posts, count] = await this.post.findAndCount({
         skip,
         take: limit,
         relations: { user: true },
+        where: {
+          category,
+        },
       });
       return {
         posts,

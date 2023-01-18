@@ -1,6 +1,6 @@
 import { CoreOutput } from './../../common/dtos/output.dto';
-import { Post } from './../entities/post.entity';
-import { Field, InputType, ObjectType, PickType } from '@nestjs/graphql';
+import { Post, PostCategory } from './../entities/post.entity';
+import { Field, InputType, ObjectType } from '@nestjs/graphql';
 
 @InputType()
 export class ReadPostsInput {
@@ -8,6 +8,8 @@ export class ReadPostsInput {
   page: number;
   @Field(() => Number)
   limit: number;
+  @Field(() => PostCategory)
+  category: PostCategory;
 }
 
 @ObjectType()

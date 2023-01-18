@@ -104,7 +104,11 @@ export class PostService {
       const { id } = readPostInput;
       let post = await this.post.findOne({
         where: { id },
-        relations: { user: true, like: { user: true }, comment: true },
+        relations: {
+          user: true,
+          like: { user: true },
+          comment: { user: true },
+        },
       });
       if (!post) {
         return {

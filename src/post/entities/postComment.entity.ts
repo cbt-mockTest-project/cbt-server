@@ -1,5 +1,4 @@
 import { Post } from './post.entity';
-import { MockExamQuestionCommentLike } from 'src/mock-exams/entities/mock-exam-question-comment-like.entity';
 import { CoreEntity } from '../../common/entities/core.entity';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
@@ -25,8 +24,8 @@ export class PostComment extends CoreEntity {
   user: User;
 
   @OneToMany(
-    () => MockExamQuestionCommentLike,
-    (mockExamQuestionCommentLike) => mockExamQuestionCommentLike.comment,
+    () => PostCommentLike,
+    (postCommentLike) => postCommentLike.comment,
   )
   @Field(() => [PostCommentLike])
   commentLike: PostCommentLike[];

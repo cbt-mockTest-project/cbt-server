@@ -1,5 +1,4 @@
 import { User } from 'src/users/entities/user.entity';
-import { EditPostInput } from './dtos/editPost.dto';
 import { Post } from './entities/post.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';

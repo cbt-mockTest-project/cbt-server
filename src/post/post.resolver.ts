@@ -58,8 +58,9 @@ export class PostResolver {
   @Query(() => ReadPostOutput)
   async readPost(
     @Args('input') readPostInput: ReadPostInput,
+    @AuthUser() user: User,
   ): Promise<ReadPostOutput> {
-    return this.postService.readPost(readPostInput);
+    return this.postService.readPost(readPostInput, user);
   }
 
   @Query(() => ReadPostsOutput)

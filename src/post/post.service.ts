@@ -97,12 +97,15 @@ export class PostService {
     }
   }
 
-  async readPost(readPostInput: ReadPostInput): Promise<ReadPostOutput> {
+  async readPost(
+    readPostInput: ReadPostInput,
+    user: User,
+  ): Promise<ReadPostOutput> {
     try {
       const { id } = readPostInput;
       let post = await this.post.findOne({
         where: { id },
-        relations: { user: true, like: true, comment: true },
+        relations: { user: true, like: { user: true }, comment: true },
       });
       if (!post) {
         return {
@@ -112,6 +115,11 @@ export class PostService {
       }
       post.commentsCount = post.comment.length;
       post.likesCount = post.like.length;
+      if (user) {
+        post.likeState =
+          post.like.filter((el) => el.user.id === user.id).length >= 1;
+      }
+
       return {
         ok: true,
         post,

@@ -1,3 +1,4 @@
+import { PostComment } from './postComment.entity';
 import { User } from './../../users/entities/user.entity';
 import {
   Field,
@@ -6,7 +7,7 @@ import {
   registerEnumType,
 } from '@nestjs/graphql';
 import { CoreEntity } from 'src/common/entities/core.entity';
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { IsEnum } from 'class-validator';
 
 export enum PostCategory {
@@ -34,6 +35,10 @@ export class Post extends CoreEntity {
   @Field(() => PostCategory)
   @IsEnum(PostCategory)
   category: PostCategory;
+
+  @OneToMany(() => PostComment, (postComment) => postComment.post)
+  @Field(() => [PostComment])
+  comment: PostComment[];
 
   @ManyToOne(() => User, (user) => user.post, {
     onDelete: 'CASCADE',

@@ -1,3 +1,5 @@
+import { PostComment } from './post/entities/postComment.entity';
+import { PostCommentLike } from './post/entities/postCommentLike.entity';
 import { Post } from './post/entities/post.entity';
 import { MockExamQuestionCommentLike } from './mock-exams/entities/mock-exam-question-comment-like.entity';
 import { MockExamQuestionComment } from './mock-exams/entities/mock-exam-question-comment.entity';
@@ -87,6 +89,8 @@ import { PostModule } from './post/post.module';
         MockExamQuestionBookmark,
         Notice,
         Post,
+        PostComment,
+        PostCommentLike,
       ],
     }),
     UserModule,

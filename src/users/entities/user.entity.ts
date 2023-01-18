@@ -1,3 +1,4 @@
+import { PostComment } from './../../post/entities/postComment.entity';
 import { Post } from './../../post/entities/post.entity';
 import { MockExamQuestionComment } from './../../mock-exams/entities/mock-exam-question-comment.entity';
 import { CoreEntity } from './../../common/entities/core.entity';
@@ -71,6 +72,10 @@ export class User extends CoreEntity {
   )
   @Field(() => [MockExamQuestionComment])
   mockExamQuestionComment: MockExamQuestionComment[];
+
+  @OneToMany(() => PostComment, (postComment) => postComment.user)
+  @Field(() => [PostComment])
+  postComment: PostComment[];
 
   @OneToMany(
     () => MockExamQuestionCommentLike,

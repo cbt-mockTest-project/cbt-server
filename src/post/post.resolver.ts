@@ -1,3 +1,4 @@
+import { ViewPostOutput, ViewPostInput } from './dtos/viewPost.dto';
 import { ReadPostInput, ReadPostOutput } from './dtos/readPost.dto';
 import { Role } from './../auth/role.decorators';
 import { User } from 'src/users/entities/user.entity';
@@ -45,6 +46,13 @@ export class PostResolver {
     user: User,
   ): Promise<DeletePostOutput> {
     return this.postService.deletePost(deletePostInput, user);
+  }
+
+  @Mutation(() => ViewPostOutput)
+  async viewPost(
+    @Args('input') viewPostInput: ViewPostInput,
+  ): Promise<ViewPostOutput> {
+    return this.postService.viewPost(viewPostInput);
   }
 
   @Query(() => ReadPostOutput)

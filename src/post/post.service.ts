@@ -9,6 +9,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindManyOptions, Repository } from 'typeorm';
 import { CreatePostInput, CreatePostOutput } from './dtos/createPost.dto';
+import { CoreOutput } from 'src/common/dtos/output.dto';
+import { ViewPostInput, ViewPostOutput } from './dtos/viewPost.dto';
 
 @Injectable()
 export class PostService {
@@ -156,6 +158,29 @@ export class PostService {
       return {
         ok: false,
         error: '게시글들을 불러오지 못했습니다.',
+      };
+    }
+  }
+
+  async viewPost(viewPostInput: ViewPostInput): Promise<ViewPostOutput> {
+    try {
+      const { postId } = viewPostInput;
+      const post = await this.post.findOne({ where: { id: postId } });
+      if (!post) {
+        return {
+          ok: false,
+          error: '존재하지 않는 게시글입니다.',
+        };
+      }
+      const updatedPost = this.post.create({ ...post, view: post.view + 1 });
+      this.post.save(updatedPost);
+      return {
+        ok: true,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '죄회수를 올릴 수 없습니다.',
       };
     }
   }

@@ -1,3 +1,4 @@
+import { RevalidateService } from './../revalidate/revalidate.service';
 import { PostComment } from './entities/postComment.entity';
 /* eslint-disable prefer-const */
 import { ReadPostsInput, ReadPostsOutput } from './dtos/readPosts.dto';
@@ -17,6 +18,7 @@ export class PostService {
   constructor(
     @InjectRepository(Post)
     private readonly post: Repository<Post>,
+    private readonly revalidateService: RevalidateService,
   ) {}
 
   async createPost(
@@ -28,6 +30,9 @@ export class PostService {
       if (content && title && user) {
         const post = this.post.create({ content, title, user });
         await this.post.save(post);
+        await this.revalidateService.revalidate({
+          path: `/post/${post.id}`,
+        });
       }
       return {
         ok: true,
@@ -59,6 +64,9 @@ export class PostService {
         title: title,
         content: content,
         id,
+      });
+      await this.revalidateService.revalidate({
+        path: `/post/${savedPost.id}`,
       });
       return { ok: true, title: savedPost.title, content: savedPost.content };
     } catch (e) {
@@ -134,6 +142,9 @@ export class PostService {
         post.likeState =
           post.like.filter((el) => el.user.id === user.id).length >= 1;
       }
+      post.comment = post.comment.sort(
+        (a, b) => Number(b.created_at) - Number(a.created_at),
+      );
       return {
         ok: true,
         post,
@@ -156,6 +167,7 @@ export class PostService {
         options = {
           skip,
           take: limit,
+          order: { created_at: 'DESC' },
           relations: { user: true, like: true, comment: true },
           where: {
             category,

@@ -1,3 +1,4 @@
+import { RevalidateService } from './../revalidate/revalidate.service';
 import { PostCommentLikeService } from './postCommentLike.service';
 import { PostCommentResolver } from './postComment.resolver';
 import { PostCommentSerivce } from './postComment.service';

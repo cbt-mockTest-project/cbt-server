@@ -1,3 +1,4 @@
+import { PostComment } from './entities/postComment.entity';
 /* eslint-disable prefer-const */
 import { ReadPostsInput, ReadPostsOutput } from './dtos/readPosts.dto';
 import { ReadPostInput, ReadPostOutput } from './dtos/readPost.dto';
@@ -107,7 +108,7 @@ export class PostService {
         relations: {
           user: true,
           like: { user: true },
-          comment: { user: true },
+          comment: { user: true, commentLike: { user: true } },
         },
       });
       if (!post) {
@@ -119,6 +120,17 @@ export class PostService {
       post.commentsCount = post.comment.length;
       post.likesCount = post.like.length;
       if (user) {
+        post.comment = post.comment.map((el) => {
+          const likeState =
+            el.commentLike.filter((el) => el.user.id === user.id).length >= 1;
+          const newComment: PostComment = {
+            ...el,
+            likesCount: el.commentLike.length,
+            likeState,
+          };
+
+          return newComment;
+        });
         post.likeState =
           post.like.filter((el) => el.user.id === user.id).length >= 1;
       }
@@ -126,7 +138,8 @@ export class PostService {
         ok: true,
         post,
       };
-    } catch {
+    } catch (e) {
+      console.log(e);
       return {
         ok: false,
         error: '게시글을 불러오지 못했습니다.',

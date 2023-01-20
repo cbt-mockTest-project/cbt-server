@@ -63,4 +63,10 @@ export class Post extends CoreEntity {
 
   @Field(() => Number, { defaultValue: 0 })
   commentsCount?: number;
+
+  @Field(() => Boolean, { defaultValue: false })
+  commentLikeState: boolean;
+
+  @Field(() => Number, { defaultValue: 0 })
+  commentLikesCount?: number;
 }

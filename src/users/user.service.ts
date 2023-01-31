@@ -1,3 +1,4 @@
+import { KakaoLoginInput, KakaoLoginOutput } from './dtos/kakaoLogin.dto';
 import { NoticeService } from './notice.service';
 import { TelegramService } from './../telegram/telegram.service';
 import {
@@ -42,6 +43,7 @@ import {
   ChangePasswordAfterVerifyingOutput,
 } from './dtos/changePasswordAfterVerifying.dto';
 import { Feedback } from './entities/feedback.entity';
+import axios from 'axios';
 @Injectable()
 export class UserService {
   constructor(
@@ -375,7 +377,7 @@ export class UserService {
           error: '이전과 비밀번호가 동일합니다.',
         };
       }
-      if (nickname.length >= 10) {
+      if (nickname && nickname.length >= 10) {
         return {
           ok: false,
           error: '닉네임은 10글자를 초과할 수 없습니다.',
@@ -387,7 +389,8 @@ export class UserService {
       return {
         ok: true,
       };
-    } catch {
+    } catch (e) {
+      console.log(e);
       return {
         ok: false,
         error: '프로필 수정에 실패했습니다.',
@@ -482,5 +485,54 @@ export class UserService {
         error: '피드백을 보낼 수 없습니다.',
       };
     }
+  }
+
+  async kakaoLogin(
+    kakaoLoginInput: KakaoLoginInput,
+  ): Promise<KakaoLoginOutput> {
+    const { code } = kakaoLoginInput;
+
+    const resToToken = await axios.post(
+      'https://kauth.kakao.com/oauth/token',
+      {
+        grant_type: 'authorization_code',
+        client_id: process.env.KAKAO_REST_API_KEY,
+        redirect_uri: process.env.KAKAO_REDIRECT_URI,
+        code,
+      },
+      {
+        headers: {
+          'Content-type': 'application/x-www-form-urlencoded;charset=utf-8',
+        },
+      },
+    );
+    if (!resToToken.data) {
+      return {
+        ok: false,
+        error: '로그인 에러',
+      };
+    }
+    const resToUserInfo = await axios.get('https://kapi.kakao.com/v2/user/me', {
+      headers: {
+        Authorization: `Bearer ${resToToken.data.access_token}`,
+        'Content-type': 'application/x-www-form-urlencoded;charset=utf-8',
+      },
+    });
+    if (!resToUserInfo.data) {
+      return {
+        ok: false,
+        error: '유저정보를 가져올 수 없습니다.',
+      };
+    }
+    const {
+      kakao_account: { email, profile },
+    } = resToUserInfo.data;
+
+    console.log(email, profile);
+    const user = await this.users.findOne({ where: { email } });
+
+    return {
+      ok: true,
+    };
   }
 }

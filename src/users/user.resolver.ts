@@ -1,3 +1,4 @@
+import { KakaoLoginOutput, KakaoLoginInput } from './dtos/kakaoLogin.dto';
 import {
   CreateFeedbackInput,
   CreateFeedbackOutput,
@@ -144,5 +145,12 @@ export class UserResolver {
     @AuthUser() user: User,
   ): Promise<CreateFeedbackOutput> {
     return this.userService.createFeedback(createFeedback, user);
+  }
+
+  @Mutation(() => KakaoLoginOutput)
+  async kakaoLogin(
+    @Args('input') kakaoLoginInput: KakaoLoginInput,
+  ): Promise<KakaoLoginOutput> {
+    return this.userService.kakaoLogin(kakaoLoginInput);
   }
 }

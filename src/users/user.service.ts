@@ -549,7 +549,16 @@ export class UserService {
       kakao_account: { email, profile },
     } = resToUserInfo.data;
 
-    const user = await this.users.findOne({ where: { email } });
+    const user = await this.users.findOne({
+      where: { email },
+      withDeleted: true,
+    });
+    if (user.deletedAt) {
+      return {
+        ok: false,
+        error: '탈퇴 처리된 계정입니다.',
+      };
+    }
     let newUser: User;
     let token: string;
     if (!user) {

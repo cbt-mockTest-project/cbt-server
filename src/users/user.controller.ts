@@ -8,8 +8,15 @@ export class UserController {
   async kakaoLogin(@Req() req: Request, @Res() res: Response) {
     try {
       const code = req.url.split('code=').at(-1);
-      await this.userService.kakaoLogin({ code }, res);
-      res.redirect(process.env.CLIENT_REDIRECT_URI);
+      const result = await this.userService.kakaoLogin({ code }, res);
+      if (result.error) {
+        res.redirect(
+          `${process.env.CLIENT_REDIRECT_URI}/mobile/login?message=${result.error}`,
+        );
+      } else {
+        res.redirect(process.env.CLIENT_REDIRECT_URI);
+      }
+
       return {
         ok: true,
       };

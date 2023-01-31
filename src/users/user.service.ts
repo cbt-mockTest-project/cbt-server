@@ -560,6 +560,9 @@ export class UserService {
         LoginType: LoginType.KAKAO,
       });
       newUser = await this.users.save(newUser);
+      this.telegramService.sendMessageToAlramChannelOfTelegram({
+        message: `${newUser.nickname} 님이 회원가입 하셨습니다. `,
+      });
       token = this.jwtService.sign(newUser.id);
     } else {
       token = this.jwtService.sign(user.id);
@@ -570,6 +573,7 @@ export class UserService {
         error: '이미 가입된 이메일입니다.',
       };
     }
+
     res.cookie('jwt-token', token, {
       domain: process.env.DOMAIN,
       path: '/',

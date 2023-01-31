@@ -107,8 +107,8 @@ import { PostLike } from './post/entities/postLike.entity';
       revalidateKey: process.env.REVALIDATE_KEY,
       clientUrl:
         process.env.NODE_ENV === 'dev'
-          ? process.env.PRODUCT_CLIENT_URL
-          : process.env.CLIENT_URL,
+          ? process.env.CLIENT_URL
+          : process.env.PRODUCT_CLIENT_URL,
     }),
     AuthModule,
     MockExamsModule,

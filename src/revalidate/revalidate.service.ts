@@ -13,8 +13,8 @@ export class RevalidateService {
   async revalidate(
     revalidateInput: RevalidateInput,
   ): Promise<RevalidateOutput> {
+    const { path } = revalidateInput;
     try {
-      const { path } = revalidateInput;
       await axios.post(
         `${this.options.clientUrl}/api/revalidate?secret=${this.options.revalidateKey}`,
         { path },
@@ -23,6 +23,7 @@ export class RevalidateService {
         ok: true,
       };
     } catch (e) {
+      console.log(`${path} revalidate failure`);
       return {
         ok: false,
         error: 'revalidate failed',

@@ -1,9 +1,10 @@
 import { RevalidateResolver } from './revalidate.resolver';
 import { CONFIG_OPTIONS } from 'src/common/common.constants';
-import { Module, DynamicModule } from '@nestjs/common';
+import { Module, DynamicModule, Global } from '@nestjs/common';
 import { RevalidateModuleOptions } from './revalidate.interface';
 import { RevalidateService } from './revalidate.service';
 
+@Global()
 @Module({})
 export class RevalidateModule {
   static forRoot(options: RevalidateModuleOptions): DynamicModule {

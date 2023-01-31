@@ -82,12 +82,22 @@ export class UserService {
           error: '이미 가입된 이메일입니다.',
         };
       }
-      if (nickname && nickname.length >= 10) {
+      if (nickname.length >= 10) {
         return {
           ok: false,
           error: '닉네임은 10글자를 초과할 수 없습니다.',
         };
       }
+      await this.users.save(
+        this.users.create({ email, password, nickname, role: UserRole.CLIENT }),
+      );
+      await this.verification.delete({ email });
+      this.telegramService.sendMessageToAlramChannelOfTelegram({
+        message: `${nickname} 님이 회원가입 하셨습니다. `,
+      });
+      return {
+        ok: true,
+      };
     } catch {
       return {
         ok: false,

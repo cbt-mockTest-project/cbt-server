@@ -21,6 +21,7 @@ export class UserController {
         ok: true,
       };
     } catch (e) {
+      console.log(e);
       res.redirect(process.env.CLIENT_REDIRECT_URI);
       return { ok: false, error: '카카오 로그인 실패' };
     }

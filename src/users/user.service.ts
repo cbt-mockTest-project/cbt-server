@@ -553,7 +553,7 @@ export class UserService {
       where: { email },
       withDeleted: true,
     });
-    if (user.deletedAt) {
+    if (user && user.deletedAt) {
       return {
         ok: false,
         error: '탈퇴 처리된 계정입니다.',

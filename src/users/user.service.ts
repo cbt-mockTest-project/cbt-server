@@ -82,7 +82,13 @@ export class UserService {
           error: '이미 가입된 이메일입니다.',
         };
       }
-      if (nickname.length >= 10) {
+      if (password && password.length < 4) {
+        return {
+          ok: false,
+          error: '비밀번호를 4글자 이상 입력해주세요.',
+        };
+      }
+      if (nickname && nickname.length >= 10) {
         return {
           ok: false,
           error: '닉네임은 10글자를 초과할 수 없습니다.',
@@ -369,13 +375,22 @@ export class UserService {
       });
       const isEqualToPrevPassword =
         password && (await bcrypt.compare(password, currentUser.password));
+      if (password && password.length < 4) {
+        return {
+          ok: false,
+          error: '비밀번호를 4글자 이상 입력해주세요.',
+        };
+      }
       if (isEqualToPrevPassword) {
         return {
           ok: false,
           error: '이전과 비밀번호가 동일합니다.',
         };
       }
-      if (nickname.length >= 10) {
+      if (nickname && nickname.length < 3) {
+        return { ok: false, error: '닉네임을 2글자 이상 입력해주세요.' };
+      }
+      if (nickname && nickname.length >= 10) {
         return {
           ok: false,
           error: '닉네임은 10글자를 초과할 수 없습니다.',
@@ -434,6 +449,12 @@ export class UserService {
         return {
           ok: false,
           error: '인증되지 않은 이메일입니다.',
+        };
+      }
+      if (password && password.length < 4) {
+        return {
+          ok: false,
+          error: '비밀번호를 4글자 이상 입력해주세요.',
         };
       }
       const user = await this.users.findOne({

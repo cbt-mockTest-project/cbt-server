@@ -31,7 +31,15 @@ export enum UserRole {
   ADMIN = 'ADMIN',
 }
 
+export enum LoginType {
+  NAVER = 'NAVER',
+  KAKAO = 'KAKAO',
+  GOOGLE = 'GOOGLE',
+  EMAIL = 'EMAIL',
+}
+
 registerEnumType(UserRole, { name: 'UserRole' });
+registerEnumType(LoginType, { name: 'LoginType' });
 
 @InputType('UserInputType', { isAbstract: true })
 @ObjectType()
@@ -46,7 +54,7 @@ export class User extends CoreEntity {
   @Field(() => String)
   nickname: string;
 
-  @Column({ select: false })
+  @Column({ select: false, nullable: true })
   @Field(() => String)
   @IsString()
   password: string;
@@ -54,10 +62,21 @@ export class User extends CoreEntity {
   @Column({
     type: 'enum',
     enum: UserRole,
+    nullable: true,
+    default: null,
   })
   @Field(() => UserRole)
   @IsEnum(UserRole)
   role: UserRole;
+
+  @Column({
+    type: 'enum',
+    enum: LoginType,
+    default: LoginType.EMAIL,
+  })
+  @Field(() => LoginType)
+  @IsEnum(LoginType)
+  LoginType: LoginType;
 
   @OneToMany(
     () => MockExamQuestionState,

@@ -8,10 +8,12 @@ import { Module } from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { Notice } from './entities/notice.entity';
 import { NoticeService } from './notice.service';
+import { UserController } from './user.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, Verification, Feedback, Notice])],
   providers: [UserResolver, UserService, NoticeResolver, NoticeService],
   exports: [UserService, NoticeService],
+  controllers: [UserController],
 })
 export class UserModule {}

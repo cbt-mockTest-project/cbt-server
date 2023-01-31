@@ -150,7 +150,9 @@ export class UserResolver {
   @Mutation(() => KakaoLoginOutput)
   async kakaoLogin(
     @Args('input') kakaoLoginInput: KakaoLoginInput,
+    @Context() context,
   ): Promise<KakaoLoginOutput> {
-    return this.userService.kakaoLogin(kakaoLoginInput);
+    const res: Response = context.req.res;
+    return this.userService.kakaoLogin(kakaoLoginInput, res);
   }
 }

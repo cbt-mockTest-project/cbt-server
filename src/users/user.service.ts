@@ -26,7 +26,7 @@ import { RegisterInput, RegisterOutput } from './dtos/register.dto';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User, UserRole } from './entities/user.entity';
+import { LoginType, User, UserRole } from './entities/user.entity';
 import { LoginInput, LoginOutput } from './dtos/login.dto';
 import { Verification } from './entities/verification.entity';
 import {
@@ -510,9 +510,9 @@ export class UserService {
 
   async kakaoLogin(
     kakaoLoginInput: KakaoLoginInput,
+    res: Response,
   ): Promise<KakaoLoginOutput> {
     const { code } = kakaoLoginInput;
-
     const resToToken = await axios.post(
       'https://kauth.kakao.com/oauth/token',
       {
@@ -549,11 +549,37 @@ export class UserService {
       kakao_account: { email, profile },
     } = resToUserInfo.data;
 
-    console.log(email, profile);
     const user = await this.users.findOne({ where: { email } });
-
+    let newUser: User;
+    let token: string;
+    if (!user) {
+      newUser = this.users.create({
+        email,
+        nickname: profile.nickname,
+        role: UserRole.CLIENT,
+        LoginType: LoginType.KAKAO,
+      });
+      newUser = await this.users.save(newUser);
+      token = this.jwtService.sign(newUser.id);
+    } else {
+      token = this.jwtService.sign(user.id);
+    }
+    if (user && user.LoginType !== LoginType.KAKAO) {
+      return {
+        ok: false,
+        error: '이미 가입된 이메일입니다.',
+      };
+    }
+    res.cookie('jwt-token', token, {
+      domain: process.env.DOMAIN,
+      path: '/',
+      sameSite: 'none',
+      secure: true,
+      httpOnly: true,
+    });
     return {
       ok: true,
+      token,
     };
   }
 }

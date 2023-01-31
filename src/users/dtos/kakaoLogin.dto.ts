@@ -8,4 +8,7 @@ export class KakaoLoginInput {
 }
 
 @ObjectType()
-export class KakaoLoginOutput extends CoreOutput {}
+export class KakaoLoginOutput extends CoreOutput {
+  @Field(() => String, { nullable: true })
+  token?: string;
+}

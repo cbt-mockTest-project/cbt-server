@@ -405,7 +405,6 @@ export class UserService {
         ok: true,
       };
     } catch (e) {
-      console.log(e);
       return {
         ok: false,
         error: '프로필 수정에 실패했습니다.',
@@ -518,7 +517,7 @@ export class UserService {
       {
         grant_type: 'authorization_code',
         client_id: process.env.KAKAO_REST_API_KEY,
-        redirect_uri: process.env.KAKAO_REDIRECT_URI,
+        redirect_uri: process.env.REDIRECT_URI + '/kakao',
         code,
       },
       {
@@ -577,6 +576,91 @@ export class UserService {
       token = this.jwtService.sign(user.id);
     }
     if (user && user.LoginType !== LoginType.KAKAO) {
+      return {
+        ok: false,
+        error: '이미 가입된 이메일입니다.',
+      };
+    }
+
+    res.cookie('jwt-token', token, {
+      domain: process.env.DOMAIN,
+      path: '/',
+      sameSite: 'none',
+      secure: true,
+      httpOnly: true,
+    });
+    return {
+      ok: true,
+      token,
+    };
+  }
+
+  async googleLogin(
+    kakaoLoginInput: KakaoLoginInput,
+    res: Response,
+  ): Promise<KakaoLoginOutput> {
+    const { code } = kakaoLoginInput;
+    const resToToken = await axios.post(
+      `https://oauth2.googleapis.com/token?code=${code}&client_id=${process.env.GOOGLE_CLIENT_ID}&client_secret=${process.env.GOOGLE_SECRET_KEY}&redirect_uri=${process.env.REDIRECT_URI}/google&grant_type=authorization_code`,
+      {},
+      {
+        headers: {
+          'content-type': 'x-www-form-urlencoded',
+        },
+      },
+    );
+    if (!resToToken.data) {
+      return {
+        ok: false,
+        error: '로그인 에러',
+      };
+    }
+
+    const resToUserInfo = await axios.get(
+      'https://www.googleapis.com/oauth2/v2/userinfo',
+      {
+        headers: {
+          Authorization: `Bearer ${resToToken.data.access_token}`,
+          'Content-type': 'application/x-www-form-urlencoded;charset=utf-8',
+        },
+      },
+    );
+    if (!resToUserInfo.data) {
+      return {
+        ok: false,
+        error: '유저정보를 가져올 수 없습니다.',
+      };
+    }
+    const { email, name } = resToUserInfo.data;
+
+    const user = await this.users.findOne({
+      where: { email },
+      withDeleted: true,
+    });
+    if (user && user.deletedAt) {
+      return {
+        ok: false,
+        error: '탈퇴 처리된 계정입니다.',
+      };
+    }
+    let newUser: User;
+    let token: string;
+    if (!user) {
+      newUser = this.users.create({
+        email,
+        nickname: name,
+        role: UserRole.CLIENT,
+        LoginType: LoginType.GOOGLE,
+      });
+      newUser = await this.users.save(newUser);
+      this.telegramService.sendMessageToAlramChannelOfTelegram({
+        message: `${newUser.nickname} 님이 회원가입 하셨습니다. `,
+      });
+      token = this.jwtService.sign(newUser.id);
+    } else {
+      token = this.jwtService.sign(user.id);
+    }
+    if (user && user.LoginType !== LoginType.GOOGLE) {
       return {
         ok: false,
         error: '이미 가입된 이메일입니다.',

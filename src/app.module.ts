@@ -63,8 +63,8 @@ import { CommonModule } from './common/common.module';
       sortSchema: true, // 스키마 사전순으로 정렬
       subscriptions: {
         'subscriptions-transport-ws': {
-          onConnect: (connectionParams) => {
-            return { headers: connectionParams };
+          onConnect: (connectionParams, websocket, context) => {
+            return { headers: websocket.upgradeReq.headers };
           },
         },
       },

@@ -35,6 +35,7 @@ import { MockExamQuestionBookmark } from './mock-exams/entities/mock-exam-questi
 import { CrawlerModule } from './crawler/crawler.module';
 import { PostModule } from './post/post.module';
 import { PostLike } from './post/entities/postLike.entity';
+import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
@@ -57,8 +58,21 @@ import { PostLike } from './post/entities/postLike.entity';
     ScheduleModule.forRoot(),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
+      installSubscriptionHandlers: true,
       autoSchemaFile: true,
       sortSchema: true, // 스키마 사전순으로 정렬
+      subscriptions: {
+        'subscriptions-transport-ws': {
+          onConnect: (connectionParams) => {
+            return { headers: connectionParams };
+          },
+        },
+      },
+      context: ({ req }) => {
+        if (req) {
+          return { headers: req.headers };
+        }
+      },
       cors: {
         credentials: true,
         origin:
@@ -133,6 +147,7 @@ import { PostLike } from './post/entities/postLike.entity';
     TelegramModule,
     CrawlerModule,
     PostModule,
+    CommonModule,
   ],
   controllers: [],
   providers: [],

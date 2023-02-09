@@ -6,6 +6,7 @@ import { Notice } from '../entities/notice.entity';
 export class CreateNoticeInput extends PickType(Notice, [
   'content',
   'reservationTime',
+  'link',
 ]) {
   @Field(() => Number)
   userId: number;

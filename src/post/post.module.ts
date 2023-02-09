@@ -1,4 +1,5 @@
-import { RevalidateService } from './../revalidate/revalidate.service';
+import { UserModule } from 'src/users/user.module';
+import { NoticeService } from './../users/notice.service';
 import { PostCommentLikeService } from './postCommentLike.service';
 import { PostCommentResolver } from './postComment.resolver';
 import { PostCommentSerivce } from './postComment.service';
@@ -13,10 +14,18 @@ import { PostService } from './post.service';
 import { PostResolver } from './post.resolver';
 import { PostCommentLike } from './entities/postCommentLike.entity';
 import { PostCommentLikeResolver } from './postCommentLike.resolver';
+import { Notice } from 'src/users/entities/notice.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Post, PostComment, PostCommentLike, PostLike]),
+    TypeOrmModule.forFeature([
+      Post,
+      PostComment,
+      PostCommentLike,
+      PostLike,
+      Notice,
+    ]),
+    UserModule,
   ],
   providers: [
     PostService,

@@ -19,6 +19,10 @@ export class Notice extends CoreEntity {
   @Field(() => Date, { nullable: true, defaultValue: null })
   reservationTime?: Date;
 
+  @Column({ nullable: true })
+  @Field(() => String, { nullable: true, defaultValue: null })
+  link?: string;
+
   @ManyToOne(() => User, (user) => user.notice, {
     onDelete: 'CASCADE',
   })

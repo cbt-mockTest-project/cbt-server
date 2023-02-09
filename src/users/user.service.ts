@@ -96,12 +96,16 @@ export class UserService {
           error: '닉네임은 10글자를 초과할 수 없습니다.',
         };
       }
-      await this.users.save(
+      const user = await this.users.save(
         this.users.create({ email, password, nickname, role: UserRole.CLIENT }),
       );
       await this.verification.delete({ email });
       this.telegramService.sendMessageToAlramChannelOfTelegram({
         message: `${nickname} 님이 회원가입 하셨습니다. `,
+      });
+      await this.noticeService.createNotice({
+        userId: user.id,
+        content: '모두CBT 가입을 환영합니다 !',
       });
       return {
         ok: true,

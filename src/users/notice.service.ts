@@ -22,10 +22,11 @@ export class NoticeService {
     createNoticeInput: CreateNoticeInput,
   ): Promise<CreateNoticeOutput> {
     try {
-      const { content, reservationTime, userId } = createNoticeInput;
+      const { content, reservationTime, userId, link } = createNoticeInput;
       const newNotice = this.notice.create({
         content,
         reservationTime: reservationTime || null,
+        link: link || null,
         confirm: false,
         user: { id: userId },
       });

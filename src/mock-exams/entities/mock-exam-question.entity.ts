@@ -5,8 +5,8 @@ import { Column, Entity, ManyToOne, OneToMany, RelationId } from 'typeorm';
 import { MockExamQuestionFeedback } from './mock-exam-question-feedback.entity';
 import { MockExamQuestionState } from './mock-exam-question-state.entity';
 import { MockExamQuestionComment } from './mock-exam-question-comment.entity';
-import { MockExamQuestionCommentLike } from './mock-exam-question-comment-like.entity';
 import { MockExamQuestionBookmark } from './mock-exam-question-bookmark.entity';
+import { MockExamQuestionMultipleChoice } from './mock-exam-question-multiple-choice.entity';
 
 @InputType('MockExamQuestionImageInputType', { isAbstract: true })
 @ObjectType()
@@ -27,9 +27,9 @@ export class MockExamQuestion extends CoreEntity {
   @Field(() => String)
   question: string;
 
-  @Column()
-  @Field(() => String)
-  solution: string;
+  @Column({ nullable: true })
+  @Field(() => String, { nullable: true })
+  solution?: string;
 
   @Column()
   @Field(() => Boolean)
@@ -70,6 +70,13 @@ export class MockExamQuestion extends CoreEntity {
   )
   @Field(() => [MockExamQuestionState])
   state: MockExamQuestionState[];
+
+  @OneToMany(
+    () => MockExamQuestionMultipleChoice,
+    (multipleChoice) => multipleChoice.question,
+  )
+  @Field(() => [MockExamQuestionMultipleChoice])
+  multipleChoice: MockExamQuestionMultipleChoice[];
 
   @Column({ default: 0 })
   @Field(() => Number)

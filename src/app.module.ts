@@ -1,3 +1,4 @@
+import { MockExamQuestionMultipleChoice } from './mock-exams/entities/mock-exam-question-multiple-choice.entity';
 import { PostComment } from './post/entities/postComment.entity';
 import { PostCommentLike } from './post/entities/postCommentLike.entity';
 import { Post } from './post/entities/post.entity';
@@ -102,6 +103,7 @@ import { CommonModule } from './common/common.module';
         MockExamQuestionComment,
         MockExamQuestionCommentLike,
         MockExamQuestionBookmark,
+        MockExamQuestionMultipleChoice,
         Notice,
         Post,
         PostComment,

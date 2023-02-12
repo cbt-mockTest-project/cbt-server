@@ -22,7 +22,7 @@ export class NoticeResolver {
     return this.noticeService.createNotice(createNoticeInput);
   }
 
-  @Role(['ADMIN'])
+  @Role(['ANY'])
   @Mutation(() => EditNoticeOutput)
   async editNotice(
     @Args('input')

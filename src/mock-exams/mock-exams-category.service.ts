@@ -2,7 +2,10 @@ import {
   CreateMockExamCategoryInput,
   CreateMockExamCategoryOutput,
 } from './dtos/createCategory.dto';
-import { MockExamCategory } from './entities/mock-exam-category.entity';
+import {
+  MockExamCategory,
+  MockExamCategoryTypes,
+} from './entities/mock-exam-category.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -14,7 +17,10 @@ import {
   EditMockExamCategoryInput,
   EditMockExamCategoryOutput,
 } from './dtos/editCategory.dto';
-import { ReadAllMockExamCategoriesOutput } from './dtos/readAllCategories.dto';
+import {
+  ReadAllMockExamCategoriesInput,
+  ReadAllMockExamCategoriesOutput,
+} from './dtos/readAllCategories.dto';
 
 @Injectable()
 export class MockExamCategoryService {
@@ -105,9 +111,20 @@ export class MockExamCategoryService {
     };
   }
 
-  async readAllMockExamCategories(): Promise<ReadAllMockExamCategoriesOutput> {
+  async readAllMockExamCategories(
+    readAllMockExamCategoriesInput: ReadAllMockExamCategoriesInput,
+  ): Promise<ReadAllMockExamCategoriesOutput> {
+    // default는 실기값
+    let type = MockExamCategoryTypes.practical;
+    if (readAllMockExamCategoriesInput) {
+      type = readAllMockExamCategoriesInput.type;
+    }
     try {
-      const categories = await this.mockExamCategories.find();
+      const categories = await this.mockExamCategories.find({
+        where: {
+          type,
+        },
+      });
       return {
         ok: true,
         categories,

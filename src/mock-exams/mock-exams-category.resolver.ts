@@ -1,4 +1,7 @@
-import { ReadAllMockExamCategoriesOutput } from './dtos/readAllCategories.dto';
+import {
+  ReadAllMockExamCategoriesInput,
+  ReadAllMockExamCategoriesOutput,
+} from './dtos/readAllCategories.dto';
 import {
   CreateMockExamCategoryInput,
   CreateMockExamCategoryOutput,
@@ -53,7 +56,12 @@ export class MockExamCategoryResolver {
   }
 
   @Query(() => ReadAllMockExamCategoriesOutput)
-  readAllMockExamCategories(): Promise<ReadAllMockExamCategoriesOutput> {
-    return this.mockExamCategoryService.readAllMockExamCategories();
+  readAllMockExamCategories(
+    @Args('input', { nullable: true })
+    readAllMockExamCategoriesInput?: ReadAllMockExamCategoriesInput,
+  ): Promise<ReadAllMockExamCategoriesOutput> {
+    return this.mockExamCategoryService.readAllMockExamCategories(
+      readAllMockExamCategoriesInput,
+    );
   }
 }

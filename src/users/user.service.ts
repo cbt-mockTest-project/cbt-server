@@ -377,7 +377,7 @@ export class UserService {
     try {
       const currentUser = await this.users.findOne({
         where: { id: user.id },
-        select: { password: true },
+        select: { password: true, nickname: true },
       });
       const isEqualToPrevPassword =
         password && (await bcrypt.compare(password, currentUser.password));
@@ -393,15 +393,34 @@ export class UserService {
           error: '이전과 비밀번호가 동일합니다.',
         };
       }
-      if (nickname && nickname.length < 2) {
-        return { ok: false, error: '닉네임을 2글자 이상 입력해주세요.' };
+      if (nickname) {
+        if (nickname.length < 2) {
+          return { ok: false, error: '닉네임을 2글자 이상 입력해주세요.' };
+        }
+        if (nickname.length >= 10) {
+          return {
+            ok: false,
+            error: '닉네임은 10글자를 초과할 수 없습니다.',
+          };
+        }
+        console.log(currentUser.nickname);
+        if (currentUser.nickname === nickname) {
+          return {
+            ok: false,
+            error: '이전과 닉네임이 동일합니다.',
+          };
+        }
+        const existed = await this.users.findOne({
+          where: { nickname },
+        });
+        if (existed) {
+          return {
+            ok: false,
+            error: '중복된 닉네임이 존재합니다.',
+          };
+        }
       }
-      if (nickname && nickname.length >= 10) {
-        return {
-          ok: false,
-          error: '닉네임은 10글자를 초과할 수 없습니다.',
-        };
-      }
+
       user.password = password;
       user.nickname = nickname;
       await this.users.save(user);

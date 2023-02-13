@@ -15,4 +15,7 @@ export class CreateMockExamQuestionInput extends PickType(MockExamQuestion, [
 }
 
 @ObjectType()
-export class CreateMockExamQuestionOutput extends CoreOutput {}
+export class CreateMockExamQuestionOutput extends CoreOutput {
+  @Field(() => Number, { nullable: true })
+  questionId?: number;
+}

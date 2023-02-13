@@ -95,8 +95,8 @@ export class MockExamQuestionService {
         approved: false,
         number,
       });
-      await this.mockExamQuestion.save(newExamQuestion);
-      return { ok: true };
+      const savedQestion = await this.mockExamQuestion.save(newExamQuestion);
+      return { ok: true, questionId: savedQestion.id };
     } catch {
       return { ok: false, error: '문제를 만들 수 없습니다' };
     }

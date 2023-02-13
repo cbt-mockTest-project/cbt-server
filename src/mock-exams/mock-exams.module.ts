@@ -25,6 +25,9 @@ import { MockExamQuestionComment } from './entities/mock-exam-question-comment.e
 import { MockExamQuestionCommentResolver } from './mock-exams-question-comment.resolver';
 import { MockExamQuestionCommentLikeSerivce } from './mock-exams-question-comment-like.service';
 import { MockExamQuestionBookmark } from './entities/mock-exam-question-bookmark.entity';
+import { MockExamQuestionMultipleChoiceResolver } from './mock-exams-question-multiple-choice.resolver';
+import { MockExamQuestionMultipleChoiceService } from './mock-exams-question-multiple-choice.service';
+import { MockExamQuestionMultipleChoice } from './entities/mock-exam-question-multiple-choice.entity';
 
 @Module({
   imports: [
@@ -37,6 +40,7 @@ import { MockExamQuestionBookmark } from './entities/mock-exam-question-bookmark
       MockExamQuestionComment,
       MockExamQuestionCommentLike,
       MockExamQuestionBookmark,
+      MockExamQuestionMultipleChoice,
       User,
     ]),
   ],
@@ -57,6 +61,8 @@ import { MockExamQuestionBookmark } from './entities/mock-exam-question-bookmark
     MockExamQuestionCommentLikeSerivce,
     MockExamQuestionBookmarkResolver,
     MockExamQuestionBookmarkSerivce,
+    MockExamQuestionMultipleChoiceResolver,
+    MockExamQuestionMultipleChoiceService,
   ],
   exports: [],
 })

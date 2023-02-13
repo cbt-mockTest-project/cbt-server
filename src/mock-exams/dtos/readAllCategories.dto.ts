@@ -11,7 +11,10 @@ import { CoreOutput } from 'src/common/dtos/output.dto';
 @InputType()
 export class ReadAllMockExamCategoriesInput extends PartialType(
   PickType(MockExamCategory, ['type']),
-) {}
+) {
+  @Field(() => Boolean, { defaultValue: false })
+  all?: boolean;
+}
 
 @ObjectType()
 export class ReadAllMockExamCategoriesOutput extends CoreOutput {

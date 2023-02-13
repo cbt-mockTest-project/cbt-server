@@ -115,11 +115,22 @@ export class MockExamCategoryService {
     readAllMockExamCategoriesInput: ReadAllMockExamCategoriesInput,
   ): Promise<ReadAllMockExamCategoriesOutput> {
     // default는 실기값
-    let type = MockExamCategoryTypes.practical;
-    if (readAllMockExamCategoriesInput) {
-      type = readAllMockExamCategoriesInput.type;
-    }
+
     try {
+      let type = MockExamCategoryTypes.practical;
+      if (readAllMockExamCategoriesInput) {
+        type = readAllMockExamCategoriesInput.type;
+      }
+      if (
+        readAllMockExamCategoriesInput &&
+        readAllMockExamCategoriesInput.all
+      ) {
+        const categories = await this.mockExamCategories.find();
+        return {
+          ok: true,
+          categories,
+        };
+      }
       const categories = await this.mockExamCategories.find({
         where: {
           type,

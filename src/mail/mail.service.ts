@@ -9,7 +9,7 @@ export class MailService {
     this.mailerService
       .sendMail({
         to: email,
-        subject: '[실기CBT] 이메일 인증',
+        subject: '[모두CBT] 이메일 인증',
         template: path + '/verification', // The `.pug` or `.hbs` extension is appended automatically.
         context: {
           link,
@@ -29,7 +29,7 @@ export class MailService {
     this.mailerService
       .sendMail({
         to: email,
-        subject: '[실기CBT] 비밀번호 찾기',
+        subject: '[모두CBT] 비밀번호 찾기',
         template: path + '/findPassword', // The `.pug` or `.hbs` extension is appended automatically.
         context: {
           link,

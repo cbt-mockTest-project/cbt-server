@@ -1,7 +1,7 @@
 import { MockExamQuestion } from './mock-exam-question.entity';
 import { CoreEntity } from './../../common/entities/core.entity';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToOne } from 'typeorm';
 
 @InputType('MockExamQuestionMultipleChoiceOption', { isAbstract: true })
 @ObjectType()
@@ -26,7 +26,7 @@ export class MockExamQuestionMultipleChoice extends CoreEntity {
   @Field(() => Number)
   answer: number;
 
-  @ManyToOne(() => MockExamQuestion, (question) => question.multipleChoice, {
+  @OneToOne(() => MockExamQuestion, (question) => question.multipleChoice, {
     onDelete: 'CASCADE',
   })
   @Field(() => MockExamQuestion)

@@ -83,6 +83,9 @@ export class MockExamQuestion extends CoreEntity {
   @OneToOne(
     () => MockExamQuestionMultipleChoice,
     (multipleChoice) => multipleChoice.question,
+    {
+      onDelete: 'SET NULL',
+    },
   )
   @Field(() => [MockExamQuestionMultipleChoice])
   multipleChoice: MockExamQuestionMultipleChoice[];

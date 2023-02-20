@@ -1,7 +1,7 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { CoreOutput } from 'src/common/dtos/output.dto';
 
-InputType();
+@InputType()
 export class SendMessageToAlramChannelOfTelegramInput {
   @Field(() => String)
   message: string;

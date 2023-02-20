@@ -1,3 +1,4 @@
+import { TelegramResolver } from './telegram.resolver';
 import { CONFIG_OPTIONS } from 'src/common/common.constants';
 import { Module, Global, DynamicModule } from '@nestjs/common';
 import { TelegramService } from './telegram.service';
@@ -16,6 +17,7 @@ export class TelegramModule {
           useValue: options,
         },
         TelegramService,
+        TelegramResolver,
       ],
     };
   }

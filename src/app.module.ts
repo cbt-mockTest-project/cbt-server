@@ -37,6 +37,8 @@ import { CrawlerModule } from './crawler/crawler.module';
 import { PostModule } from './post/post.module';
 import { PostLike } from './post/entities/postLike.entity';
 import { CommonModule } from './common/common.module';
+import { Visit } from './visit/entities/visit.entity';
+import { VisitModule } from './visit/visit.module';
 
 @Module({
   imports: [
@@ -109,6 +111,7 @@ import { CommonModule } from './common/common.module';
         PostComment,
         PostCommentLike,
         PostLike,
+        Visit,
       ],
     }),
     UserModule,
@@ -131,6 +134,7 @@ import { CommonModule } from './common/common.module';
     UploadsModule,
     SchedulerModule,
     MailModule,
+    VisitModule,
     MailerModule.forRoot({
       transport: `smtps://${process.env.EMAIL_AUTH_EMAIL}:${process.env.EMAIL_AUTH_PASSWORD}@${process.env.EMAIL_HOST}`,
       defaults: {

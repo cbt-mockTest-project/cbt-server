@@ -25,6 +25,7 @@ import { Feedback } from './feedback.entity';
 import { MockExamQuestionCommentLike } from 'src/mock-exams/entities/mock-exam-question-comment-like.entity';
 import { Notice } from './notice.entity';
 import { MockExamQuestionBookmark } from 'src/mock-exams/entities/mock-exam-question-bookmark.entity';
+import { Visit } from 'src/visit/entities/visit.entity';
 
 export enum UserRole {
   CLIENT = 'CLIENT',
@@ -113,6 +114,10 @@ export class User extends CoreEntity {
   @OneToMany(() => Feedback, (feedback) => feedback.user)
   @Field(() => [Feedback])
   feedback: Feedback[];
+
+  @OneToMany(() => Visit, (visit) => visit.user)
+  @Field(() => Visit)
+  visit: Visit[];
 
   @OneToMany(() => Notice, (notice) => notice.user)
   @Field(() => [Notice], { nullable: true })

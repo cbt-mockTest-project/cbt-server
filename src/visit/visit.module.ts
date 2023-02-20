@@ -7,5 +7,6 @@ import { VisitService } from './visit.service';
 @Module({
   providers: [VisitResolver, VisitService],
   imports: [TypeOrmModule.forFeature([Visit])],
+  exports: [VisitService],
 })
 export class VisitModule {}

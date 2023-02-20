@@ -1,9 +1,10 @@
 import { User } from './../users/entities/user.entity';
 import { AuthUser } from './../auth/auth-user.decorator';
-import { Mutation, Resolver } from '@nestjs/graphql';
+import { Mutation, Resolver, Query } from '@nestjs/graphql';
 import { CoreOutput } from 'src/common/dtos/output.dto';
 import { Visit } from './entities/visit.entity';
 import { VisitService } from './visit.service';
+import { ReadVisitCountOutput } from './dtos/readVisitCount.dto';
 
 @Resolver(() => Visit)
 export class VisitResolver {
@@ -11,6 +12,11 @@ export class VisitResolver {
 
   @Mutation(() => CoreOutput)
   async createVisit(@AuthUser() user: User): Promise<CoreOutput> {
-    return await this.visitService.createVisit(user);
+    return this.visitService.createVisit(user);
+  }
+
+  @Query(() => ReadVisitCountOutput)
+  async readVisitCount(): Promise<ReadVisitCountOutput> {
+    return this.visitService.readVisitCount();
   }
 }

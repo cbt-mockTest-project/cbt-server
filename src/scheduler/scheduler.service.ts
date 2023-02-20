@@ -1,3 +1,4 @@
+import { TelegramService } from './../telegram/telegram.service';
 import {
   MockExamQuestion,
   MockExamImageType,
@@ -10,6 +11,7 @@ import * as AWS from 'aws-sdk';
 import { findUniqElem } from 'src/utils/utils';
 import { Repository } from 'typeorm';
 import { CrawlerService } from 'src/crawler/crawler.service';
+import { VisitService } from 'src/visit/visit.service';
 
 @Injectable()
 export class SchedulerService {
@@ -18,7 +20,27 @@ export class SchedulerService {
     private readonly mockExamQuestions: Repository<MockExamQuestion>,
     private readonly configService: ConfigService,
     private readonly crawlerService: CrawlerService,
+    private readonly visitService: VisitService,
+    private readonly telegramService: TelegramService,
   ) {}
+  // 매일 밤 12시
+  @Cron('0 0 0 * * *', { timeZone: 'Asia/Seoul' })
+  async clearVisit() {
+    try {
+      const { count } = await this.visitService.readVisitCount();
+      await this.visitService.clearVisit();
+      await this.telegramService.sendMessageToAlramChannelOfTelegram({
+        message: `오늘의 방문자수는 ${count}명입니다.`,
+      });
+      console.log('visit clear');
+    } catch {
+      console.log('fail visit clear');
+      await this.telegramService.sendMessageToAlramChannelOfTelegram({
+        message: `방문자수 초기화 실패`,
+      });
+    }
+  }
+
   //6시간마다
   // @Cron('0 */5 * * *')
   // async naverViewMacro() {

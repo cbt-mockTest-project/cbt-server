@@ -269,6 +269,7 @@ export class MockExamQuestionService {
         relations: {
           state: { user: true, exam: true },
           mockExamQuestionBookmark: { user: true },
+          mockExamQuestionComment: { user: true },
         },
       });
       if (!user) {

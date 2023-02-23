@@ -1,3 +1,7 @@
+import {
+  CreateNoticeForAllUsersOutput,
+  CreateNoticeForAllUsersInput,
+} from './dtos/createNoticeForAllUsers.dto';
 import { CoreOutput } from 'src/common/dtos/output.dto';
 import { User } from 'src/users/entities/user.entity';
 import { DeleteNoticeInput, DeleteNoticeOutput } from './dtos/deleteNotice.dto';
@@ -44,5 +48,16 @@ export class NoticeResolver {
   @Mutation(() => CoreOutput)
   async deleteAllNoticesOfMe(@AuthUser() user: User): Promise<CoreOutput> {
     return this.noticeService.deleteAllNoticesOfMe(user);
+  }
+
+  @Role(['ADMIN'])
+  @Mutation(() => CreateNoticeForAllUsersOutput)
+  async createNoticeForAllUsers(
+    @Args('input')
+    createNoticeForAllUsersInput: CreateNoticeForAllUsersInput,
+  ): Promise<CreateNoticeForAllUsersOutput> {
+    return this.noticeService.createNoticeForAllUsers(
+      createNoticeForAllUsersInput,
+    );
   }
 }

@@ -1,3 +1,7 @@
+import {
+  CreateNoticeForAllUsersInput,
+  CreateNoticeForAllUsersOutput,
+} from './dtos/createNoticeForAllUsers.dto';
 import { CoreOutput } from 'src/common/dtos/output.dto';
 import { User } from 'src/users/entities/user.entity';
 import { Notice } from './entities/notice.entity';
@@ -116,5 +120,20 @@ export class NoticeService {
     } catch {
       return { ok: false, error: '알림을 삭제할 수 없습니다.' };
     }
+  }
+
+  async createNoticeForAllUsers(
+    createNoticeForAllUsersInput: CreateNoticeForAllUsersInput,
+  ): Promise<CreateNoticeForAllUsersOutput> {
+    const { content, link } = createNoticeForAllUsersInput;
+    const users = await this.user.find();
+    await Promise.all(
+      users.map((user) => {
+        this.createNotice({ userId: user.id, content });
+      }),
+    );
+    return {
+      ok: true,
+    };
   }
 }

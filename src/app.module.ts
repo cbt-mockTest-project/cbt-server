@@ -39,6 +39,7 @@ import { PostLike } from './post/entities/postLike.entity';
 import { CommonModule } from './common/common.module';
 import { Visit } from './visit/entities/visit.entity';
 import { VisitModule } from './visit/visit.module';
+import { VisitHistory } from './visit/entities/visitHistory.entity';
 
 @Module({
   imports: [
@@ -112,6 +113,7 @@ import { VisitModule } from './visit/visit.module';
         PostCommentLike,
         PostLike,
         Visit,
+        VisitHistory,
       ],
     }),
     UserModule,

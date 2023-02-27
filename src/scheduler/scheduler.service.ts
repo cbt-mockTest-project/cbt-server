@@ -24,19 +24,21 @@ export class SchedulerService {
     private readonly telegramService: TelegramService,
   ) {}
   // 매일 밤 12시
-  @Cron('0 0 0 * * *', { timeZone: 'Asia/Seoul' })
+  @Cron('0 55 23 * * *', { timeZone: 'Asia/Seoul' })
   async clearVisit() {
+    if (process.env.NODE_ENV === 'dev') {
+      return;
+    }
     try {
-      const { count } = await this.visitService.readVisitCount();
+      const { totalViewCount, todayViewCount } =
+        await this.visitService.createVisitHistory();
       await this.visitService.clearVisit();
       await this.telegramService.sendMessageToAlramChannelOfTelegram({
-        message: `오늘의 방문자수는 ${count}명입니다.`,
+        message: `오늘의 방문자수는 ${todayViewCount}명입니다.\n지금까지 총 방문자수는 ${totalViewCount}명입니다.`,
       });
-      console.log('visit clear');
     } catch {
-      console.log('fail visit clear');
       await this.telegramService.sendMessageToAlramChannelOfTelegram({
-        message: `방문자수 초기화 실패`,
+        message: `방문자수 기록 실패`,
       });
     }
   }

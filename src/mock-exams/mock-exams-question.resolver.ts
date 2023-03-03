@@ -75,8 +75,10 @@ export class MockExamQuestionResolver {
   }
 
   @Query(() => ReadAllMockExamQuestionOutput)
-  readAllMockExamQuestion(): Promise<ReadAllMockExamQuestionOutput> {
-    return this.mockExamQuestionService.readAllMockExamQuestion();
+  readAllMockExamQuestion(
+    @AuthUser() user: User,
+  ): Promise<ReadAllMockExamQuestionOutput> {
+    return this.mockExamQuestionService.readAllMockExamQuestion(user);
   }
 
   @Query(() => ReadMockExamQuestionsByStateOutput)

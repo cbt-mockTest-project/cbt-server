@@ -231,10 +231,22 @@ export class MockExamQuestionService {
     }
   }
 
-  async readAllMockExamQuestion(): Promise<ReadAllMockExamQuestionOutput> {
+  async readAllMockExamQuestion(
+    user: User,
+  ): Promise<ReadAllMockExamQuestionOutput> {
     try {
       const mockExamQuestions = await this.mockExamQuestion.find({
-        relations: ['mockExamQuestionFeedback'],
+        relations: {
+          mockExamQuestionFeedback: true,
+          mockExamQuestionBookmark: { user: true },
+        },
+        where: {
+          mockExamQuestionBookmark: {
+            user: {
+              id: user && user.id,
+            },
+          },
+        },
       });
       return {
         ok: true,
@@ -255,6 +267,28 @@ export class MockExamQuestionService {
     try {
       const { id, isRandom, bookmarked } =
         readMockExamQuestionsByMockExamIdInput;
+
+      // 북마크된 게시물 전체
+      if (!id && bookmarked && user) {
+        const [questions, count] = await this.mockExamQuestion.findAndCount({
+          order: { number: 'ASC' },
+          relations: {
+            state: { user: true, exam: true },
+            mockExamQuestionBookmark: { user: true },
+            mockExamQuestionComment: { user: true },
+          },
+          where: {
+            mockExamQuestionBookmark: { user: { id: user.id } },
+          },
+        });
+        return {
+          ok: true,
+          title: '전체',
+          questions,
+          count,
+        };
+      }
+
       const mockExam = await this.mockExam.findOne({ where: { id } });
       if (!mockExam) {
         return {
@@ -262,15 +296,23 @@ export class MockExamQuestionService {
           error: '문제가 존재하지 않습니다.',
         };
       }
+      let where: FindOptionsWhere<MockExamQuestion>;
+      where = { mockExam: { id } };
+      if (bookmarked && user) {
+        where = {
+          ...where,
+          mockExamQuestionBookmark: { user: { id: user.id } },
+        };
+      }
       // eslint-disable-next-line prefer-const
       let [questions, count] = await this.mockExamQuestion.findAndCount({
-        where: { mockExam: { id } },
         order: { number: 'ASC' },
         relations: {
           state: { user: true, exam: true },
           mockExamQuestionBookmark: { user: true },
           mockExamQuestionComment: { user: true },
         },
+        where,
       });
       if (!user) {
         questions = questions.map((question) => ({

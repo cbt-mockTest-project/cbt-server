@@ -7,7 +7,7 @@ import { Field, InputType, ObjectType } from '@nestjs/graphql';
 export class ReadMockExamQuestionInput {
   @Field(() => Number)
   questionId: number;
-  @Field(() => Number)
+  @Field(() => Number, { nullable: true })
   examId?: number;
 }
 

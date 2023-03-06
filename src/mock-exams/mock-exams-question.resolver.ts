@@ -37,6 +37,7 @@ import {
   ReadMockExamQuestionsByStateInput,
   ReadMockExamQuestionsByStateOutput,
 } from './dtos/readMockExamQuestionsByState.dto';
+import { ReadAllQuestionsOutput } from './dtos/readAllQuestions.dto';
 
 @Resolver(() => MockExamQuestion)
 export class MockExamQuestionResolver {
@@ -111,7 +112,7 @@ export class MockExamQuestionResolver {
   ): Promise<ReadMockExamQuestionOutput> {
     return this.mockExamQuestionService.readMockExamQuestion(
       readMockExamQuestionInput,
-      user.id,
+      user,
     );
   }
 
@@ -135,5 +136,10 @@ export class MockExamQuestionResolver {
       readMockExamQuestionsByMockExamIdInput,
       user,
     );
+  }
+
+  @Query(() => ReadAllQuestionsOutput)
+  async readAllQuestions(): Promise<ReadAllQuestionsOutput> {
+    return this.mockExamQuestionService.readAllQuestions();
   }
 }

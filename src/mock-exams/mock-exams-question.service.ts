@@ -39,6 +39,7 @@ import {
   ReadMockExamQuestionNumbersOutput,
 } from './dtos/readMockExamQuestionNumbers.dto';
 import { shuffleArray } from 'src/utils/utils';
+import { ReadAllQuestionsOutput } from './dtos/readAllQuestions.dto';
 
 @Injectable()
 export class MockExamQuestionService {
@@ -134,43 +135,47 @@ export class MockExamQuestionService {
 
   async readMockExamQuestion(
     readMockExamQuestionInput: ReadMockExamQuestionInput,
-    userId: number,
+    user: User,
   ): Promise<ReadMockExamQuestionOutput> {
-    const { questionId, examId } = readMockExamQuestionInput;
-    const where: FindOptionsWhere<MockExamQuestion> = examId
-      ? { id: questionId, mockExam: { id: examId } }
-      : { id: questionId };
-    const question = await this.mockExamQuestion.findOne({
-      where,
-      relations: { mockExam: true },
-    });
-    if (!question) {
-      return {
-        ok: false,
-        error: '존재하지 않는 문제입니다.',
-      };
-    }
-    let questionState: MockExamQuestionState;
-    if (userId) {
-      questionState = await this.mockExamQuestionState.findOne({
-        where: {
-          question: { id: questionId },
-          user: { id: userId },
+    try {
+      const { questionId, examId } = readMockExamQuestionInput;
+      const where: FindOptionsWhere<MockExamQuestion> = examId
+        ? {
+            id: questionId,
+            mockExam: { id: examId },
+            mockExamQuestionBookmark: { user: { id: user && user.id } },
+          }
+        : {
+            id: questionId,
+            mockExamQuestionBookmark: { user: { id: user && user.id } },
+          };
+      let question = await this.mockExamQuestion.findOne({
+        where,
+        relations: {
+          mockExam: true,
+          mockExamQuestionComment: { user: true },
+          mockExamQuestionBookmark: user ? { user: true } : false,
         },
-        relations: ['question', 'user'],
       });
-    }
-    if (questionState) {
+      if (!question) {
+        return {
+          ok: false,
+          error: '존재하지 않는 문제입니다.',
+        };
+      }
+      if (!user) {
+        question = { ...question, mockExamQuestionBookmark: [] };
+      }
       return {
         ok: true,
         mockExamQusetion: question,
-        state: questionState.state,
+      };
+    } catch (e) {
+      return {
+        ok: false,
+        error: '문제를 가져오는데 실패했습니다.',
       };
     }
-    return {
-      ok: true,
-      mockExamQusetion: question,
-    };
   }
 
   async editMockExamQuestion(
@@ -230,7 +235,26 @@ export class MockExamQuestionService {
       };
     }
   }
+  async readAllQuestions(): Promise<ReadAllQuestionsOutput> {
+    try {
+      const questions = await this.mockExamQuestion.find({
+        relations: {
+          mockExamQuestionComment: true,
+        },
+      });
+      return {
+        questions,
+        ok: true,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '문제를 불러오지 못했습니다.',
+      };
+    }
+  }
 
+  // bookmarkedQuestions - 추후 네이밍 변경 예정
   async readAllMockExamQuestion(
     user: User,
   ): Promise<ReadAllMockExamQuestionOutput> {

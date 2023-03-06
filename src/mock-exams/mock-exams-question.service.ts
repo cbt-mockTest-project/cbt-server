@@ -143,11 +143,9 @@ export class MockExamQuestionService {
         ? {
             id: questionId,
             mockExam: { id: examId },
-            mockExamQuestionBookmark: { user: { id: user && user.id } },
           }
         : {
             id: questionId,
-            mockExamQuestionBookmark: { user: { id: user && user.id } },
           };
       let question = await this.mockExamQuestion.findOne({
         where,
@@ -163,7 +161,13 @@ export class MockExamQuestionService {
           error: '존재하지 않는 문제입니다.',
         };
       }
-      if (!user) {
+      if (user) {
+        const mockExamQuestionBookmark =
+          question.mockExamQuestionBookmark.filter(
+            (bookmark) => user.id === bookmark.user.id,
+          );
+        question = { ...question, mockExamQuestionBookmark };
+      } else {
         question = { ...question, mockExamQuestionBookmark: [] };
       }
       return {
@@ -171,6 +175,7 @@ export class MockExamQuestionService {
         mockExamQusetion: question,
       };
     } catch (e) {
+      console.log(e);
       return {
         ok: false,
         error: '문제를 가져오는데 실패했습니다.',

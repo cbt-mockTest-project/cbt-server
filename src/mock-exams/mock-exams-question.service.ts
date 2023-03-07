@@ -153,6 +153,7 @@ export class MockExamQuestionService {
           mockExam: true,
           mockExamQuestionComment: { user: true },
           mockExamQuestionBookmark: user ? { user: true } : false,
+          mockExamQuestionFeedback: { user: true },
         },
       });
       if (!question) {
@@ -305,6 +306,7 @@ export class MockExamQuestionService {
             state: { user: true, exam: true },
             mockExamQuestionBookmark: { user: true },
             mockExamQuestionComment: { user: true },
+            mockExamQuestionFeedback: { user: true },
           },
           where: {
             mockExamQuestionBookmark: { user: { id: user.id } },
@@ -340,6 +342,7 @@ export class MockExamQuestionService {
           state: { user: true, exam: true },
           mockExamQuestionBookmark: { user: true },
           mockExamQuestionComment: { user: true },
+          mockExamQuestionFeedback: { user: true },
         },
         where,
       });

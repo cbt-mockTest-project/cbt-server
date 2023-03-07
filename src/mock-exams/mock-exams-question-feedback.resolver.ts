@@ -49,12 +49,14 @@ export class MockExamQuestionFeedbackResolver {
   }
 
   @Mutation(() => DeleteMockExamQuestionFeedbackOutput)
-  @Role(['ADMIN'])
+  @Role(['ANY'])
   async deleteMockExamQuestionFeedback(
+    @AuthUser() user: User,
     @Args('input')
     deleteMockExamQuestionFeedbackInput: DeleteMockExamQuestionFeedbackInput,
   ): Promise<DeleteMockExamQuestionFeedbackOutput> {
     return this.mockExamQuestionFeedbackSerivce.deleteMockExamQuestionFeedback(
+      user,
       deleteMockExamQuestionFeedbackInput,
     );
   }

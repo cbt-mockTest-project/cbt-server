@@ -1,4 +1,4 @@
-import { User } from 'src/users/entities/user.entity';
+import { User, UserRole } from 'src/users/entities/user.entity';
 import { ReadAllMockExamQuestionFeedbackOutput } from './dtos/readAllMockExamQuestionFeedback.dto';
 import {
   EditMockExamQuestionFeedbackInput,
@@ -90,13 +90,19 @@ export class MockExamQuestionFeedbackSerivce {
   }
 
   async deleteMockExamQuestionFeedback(
+    user: User,
     deleteMockExamQuestionFeedbackInput: DeleteMockExamQuestionFeedbackInput,
   ): Promise<DeleteMockExamQuestionFeedbackOutput> {
     try {
       const { id } = deleteMockExamQuestionFeedbackInput;
       const feedback = await this.mockExamQuestionFeedback.findOne({
         where: { id },
+        relations: { user: true },
       });
+      // 자신의 글이 아니면 삭제불가, 롤이 어드민이면 무조건 삭제가능
+      if (feedback.user.id !== user.id || user.role !== UserRole.ADMIN) {
+        return { ok: false, error: '권한이 없습니다.' };
+      }
       if (!feedback) {
         return {
           ok: false,

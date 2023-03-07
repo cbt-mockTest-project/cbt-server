@@ -433,7 +433,7 @@ export class MockExamQuestionService {
     readMockExamQuestionsByStateInput: ReadMockExamQuestionsByStateInput,
   ): Promise<ReadMockExamQuestionsByStateOutput> {
     const { states, examId } = readMockExamQuestionsByStateInput;
-    const commonAndConditions = {
+    const commonAndConditions: FindOptionsWhere<MockExamQuestionState> = {
       user: {
         id: user.id,
       },
@@ -445,15 +445,14 @@ export class MockExamQuestionService {
     const mockExamQuestionStates = await this.mockExamQuestionState.find({
       where,
       relations: {
-        question: {
-          state: true,
-        },
+        question: { state: true },
       },
-      select: ['question'],
     });
-    const mockExamQusetions = mockExamQuestionStates
-      .map((state) => state.question)
-      .sort((a, b) => a.number - b.number);
+
+    const mockExamQusetions = mockExamQuestionStates.sort(
+      (a, b) => a.question.number - b.question.number,
+    );
+    console.log(mockExamQusetions);
     return {
       ok: true,
       mockExamQusetions,

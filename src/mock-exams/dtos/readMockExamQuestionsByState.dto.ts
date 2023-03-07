@@ -1,5 +1,7 @@
-import { QuestionState } from './../entities/mock-exam-question-state.entity';
-import { MockExamQuestion } from './../entities/mock-exam-question.entity';
+import {
+  MockExamQuestionState,
+  QuestionState,
+} from './../entities/mock-exam-question-state.entity';
 import { CoreOutput } from './../../common/dtos/output.dto';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 
@@ -14,6 +16,6 @@ export class ReadMockExamQuestionsByStateInput {
 
 @ObjectType()
 export class ReadMockExamQuestionsByStateOutput extends CoreOutput {
-  @Field(() => [MockExamQuestion])
-  mockExamQusetions?: MockExamQuestion[];
+  @Field(() => [MockExamQuestionState])
+  mockExamQusetions?: MockExamQuestionState[];
 }

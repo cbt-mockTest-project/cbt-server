@@ -100,7 +100,7 @@ export class MockExamQuestionFeedbackSerivce {
         relations: { user: true },
       });
       // 자신의 글이 아니면 삭제불가, 롤이 어드민이면 무조건 삭제가능
-      if (feedback.user.id !== user.id || user.role !== UserRole.ADMIN) {
+      if (feedback.user.id !== user.id && user.role !== UserRole.ADMIN) {
         return { ok: false, error: '권한이 없습니다.' };
       }
       if (!feedback) {

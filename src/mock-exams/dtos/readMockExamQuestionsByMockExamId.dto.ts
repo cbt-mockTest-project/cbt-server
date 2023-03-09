@@ -1,16 +1,17 @@
 import { MockExamQuestion } from '../entities/mock-exam-question.entity';
 import { CoreOutput } from '../../common/dtos/output.dto';
-import { Field, InputType, ObjectType, PickType } from '@nestjs/graphql';
-import { MockExam } from '../entities/mock-exam.entity';
+import { Field, InputType, ObjectType } from '@nestjs/graphql';
 
 @InputType()
-export class ReadMockExamQuestionsByMockExamIdInput extends PickType(MockExam, [
-  'id',
-]) {
+export class ReadMockExamQuestionsByMockExamIdInput {
   @Field(() => Boolean, { nullable: true })
   isRandom?: boolean;
   @Field(() => Boolean, { nullable: true })
   bookmarked?: boolean;
+  @Field(() => Number, { nullable: true })
+  id?: number;
+  @Field(() => [Number], { nullable: true })
+  ids?: number[];
 }
 
 @ObjectType()

@@ -295,9 +295,7 @@ export class MockExamQuestionService {
     user: User,
   ): Promise<ReadMockExamQuestionsByMockExamIdOutput> {
     try {
-      const { id, isRandom, bookmarked } =
-        readMockExamQuestionsByMockExamIdInput;
-
+      const { id, bookmarked, ids } = readMockExamQuestionsByMockExamIdInput;
       // 북마크된 게시물 전체
       if (!id && bookmarked && user) {
         const [questions, count] = await this.mockExamQuestion.findAndCount({
@@ -307,6 +305,7 @@ export class MockExamQuestionService {
             mockExamQuestionBookmark: { user: true },
             mockExamQuestionComment: { user: true },
             mockExamQuestionFeedback: { user: true },
+            mockExam: true,
           },
           where: {
             mockExamQuestionBookmark: { user: { id: user.id } },
@@ -316,6 +315,64 @@ export class MockExamQuestionService {
           ok: true,
           title: '전체',
           questions,
+          count,
+        };
+      }
+
+      if (ids) {
+        const where:
+          | FindOptionsWhere<MockExamQuestion>
+          | FindOptionsWhere<MockExamQuestion>[] = ids.map((id) => ({
+          mockExam: { id },
+        }));
+
+        let questions = await this.mockExamQuestion.find({
+          order: { number: 'ASC' },
+          where,
+          relations: {
+            state: { user: true, exam: true },
+            mockExamQuestionBookmark: { user: true },
+            mockExamQuestionComment: { user: true },
+            mockExamQuestionFeedback: { user: true },
+            mockExam: true,
+          },
+        });
+        if (!questions) {
+          return {
+            ok: false,
+            error: '문제가 존재하지 않습니다.',
+          };
+        }
+
+        if (!user) {
+          questions = questions.map((question) => ({
+            ...question,
+            mockExamQuestionBookmark: [],
+          }));
+        }
+
+        if (user) {
+          questions = questions.map((question) => {
+            const filteredState = question.state.filter(
+              (state) => user && state.user.id === user.id,
+            );
+            const filteredBookmark = question.mockExamQuestionBookmark.filter(
+              (bookmark) => user && bookmark.user.id === user.id,
+            );
+            return {
+              ...question,
+              state: filteredState,
+              mockExamQuestionBookmark: filteredBookmark,
+            };
+          });
+        }
+        const count = 14;
+        questions = shuffleArray(questions).slice(0, count);
+
+        return {
+          ok: true,
+          questions,
+          title: '랜덤모의고사',
           count,
         };
       }
@@ -343,6 +400,7 @@ export class MockExamQuestionService {
           mockExamQuestionBookmark: { user: true },
           mockExamQuestionComment: { user: true },
           mockExamQuestionFeedback: { user: true },
+          mockExam: true,
         },
         where,
       });
@@ -366,9 +424,6 @@ export class MockExamQuestionService {
             mockExamQuestionBookmark: filteredBookmark,
           };
         });
-        if (isRandom) {
-          questions = shuffleArray(questions);
-        }
       }
       if (user && bookmarked) {
         questions = questions.filter((question) => {

@@ -7,8 +7,11 @@ import { Field, InputType, ObjectType } from '@nestjs/graphql';
 
 @InputType()
 export class ReadMockExamQuestionsByStateInput {
-  @Field(() => Number)
-  examId: number;
+  @Field(() => Number, { nullable: true })
+  examId?: number;
+
+  @Field(() => [Number], { nullable: true })
+  questionIds?: number[];
 
   @Field(() => [QuestionState])
   states: QuestionState[];

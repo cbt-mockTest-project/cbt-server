@@ -13,7 +13,7 @@ import {
 } from './dtos/createOrUpdateMockExamQuestionState.dto';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, FindOptionsWhere } from 'typeorm';
 import {
   MockExamQuestionState,
   QuestionState,
@@ -130,13 +130,26 @@ export class MockExamQuestionStateService {
     user: User,
   ): Promise<ResetMyExamQuestionStateOutput> {
     try {
-      const { examId } = resetMyExamQuestionStateInput;
-      const states = await this.mockExamQuestionState.find({
-        where: {
-          user: { id: user.id },
-          exam: { id: examId },
-        },
-      });
+      const { examId, questionIds } = resetMyExamQuestionStateInput;
+      let states: MockExamQuestionState[];
+      if (questionIds) {
+        const where:
+          | FindOptionsWhere<MockExamQuestionState>
+          | FindOptionsWhere<MockExamQuestionState>[] = questionIds.map(
+          (id) => ({ question: { id }, user: { id: user.id } }),
+        );
+        states = await this.mockExamQuestionState.find({
+          where,
+        });
+      } else if (examId) {
+        states = await this.mockExamQuestionState.find({
+          where: {
+            user: { id: user.id },
+            exam: { id: examId },
+          },
+        });
+      }
+
       if (!states) {
         return {
           ok: false,

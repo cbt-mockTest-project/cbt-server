@@ -10,7 +10,10 @@ import {
   UpdateApprovedStateOfMockExamQuestionInput,
   UpdateApprovedStateOfMockExamQuestionOutput,
 } from './dtos/updateApprovedStateOfMockExamQuestion.dto';
-import { MockExamQuestionState } from './entities/mock-exam-question-state.entity';
+import {
+  MockExamQuestionState,
+  QuestionState,
+} from './entities/mock-exam-question-state.entity';
 import { ReadAllMockExamQuestionOutput } from './dtos/readAllMockExamQuestion.dto';
 import {
   EditMockExamQuestionInput,
@@ -359,9 +362,18 @@ export class MockExamQuestionService {
             const filteredBookmark = question.mockExamQuestionBookmark.filter(
               (bookmark) => user && bookmark.user.id === user.id,
             );
+            const coreState = this.mockExamQuestionState.create({
+              exam: question.mockExam,
+              user,
+              state: QuestionState.CORE,
+              created_at: new Date(),
+              updated_at: new Date(),
+              id: 0,
+              answer: '',
+            });
             return {
               ...question,
-              state: filteredState,
+              state: filteredState.length >= 1 ? filteredState : [coreState],
               mockExamQuestionBookmark: filteredBookmark,
             };
           });
@@ -418,9 +430,18 @@ export class MockExamQuestionService {
           const filteredBookmark = question.mockExamQuestionBookmark.filter(
             (bookmark) => user && bookmark.user.id === user.id,
           );
+          const coreState = this.mockExamQuestionState.create({
+            exam: question.mockExam,
+            user,
+            state: QuestionState.CORE,
+            created_at: new Date(),
+            updated_at: new Date(),
+            id: 0,
+            answer: '',
+          });
           return {
             ...question,
-            state: filteredState,
+            state: filteredState.length >= 1 ? filteredState : [coreState],
             mockExamQuestionBookmark: filteredBookmark,
           };
         });
@@ -490,27 +511,28 @@ export class MockExamQuestionService {
     user: User,
     readMockExamQuestionsByStateInput: ReadMockExamQuestionsByStateInput,
   ): Promise<ReadMockExamQuestionsByStateOutput> {
-    const { states, examId } = readMockExamQuestionsByStateInput;
-    const commonAndConditions: FindOptionsWhere<MockExamQuestionState> = {
+    const { states, questionIds } = readMockExamQuestionsByStateInput;
+    const where:
+      | FindOptionsWhere<MockExamQuestionState>
+      | FindOptionsWhere<MockExamQuestionState>[] = questionIds.map((id) => ({
+      question: { id },
       user: {
         id: user.id,
       },
-      question: {
-        mockExam: { id: examId },
-      },
-    };
-    const where = states.map((state) => ({ ...commonAndConditions, state }));
-    const mockExamQuestionStates = await this.mockExamQuestionState.find({
+    }));
+    const mockExamQusetionStates = await this.mockExamQuestionState.find({
       where,
       relations: {
         question: { state: true },
+        exam: true,
       },
     });
 
-    const mockExamQusetions = mockExamQuestionStates.sort(
-      (a, b) => a.question.number - b.question.number,
-    );
-    console.log(mockExamQusetions);
+    const mockExamQusetions = mockExamQusetionStates.filter((state) => {
+      return states.includes(state.state);
+    });
+
+    mockExamQusetions.sort((a, b) => a.question.number - b.question.number);
     return {
       ok: true,
       mockExamQusetions,

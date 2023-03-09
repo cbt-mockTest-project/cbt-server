@@ -226,9 +226,9 @@ export class MockExamService {
         .filter((exam) => exam.mockExamQuestion.length)
         .sort((a, b) => {
           return (
-            Number(a.title.split('년')[0]) - Number(b.title.split('년')[0]) ||
-            Number(a.title.split('-').at(-1).split('회차')[0]) -
-              Number(b.title.split('-').at(-1).split('회차')[0])
+            Number(b.title.split('년')[0]) - Number(a.title.split('년')[0]) ||
+            Number(b.title.split('-').at(-1).split('회차')[0]) -
+              Number(a.title.split('-').at(-1).split('회차')[0])
           );
         });
       return {

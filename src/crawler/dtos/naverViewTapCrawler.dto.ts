@@ -10,6 +10,14 @@ class SearchCount {
 }
 
 @ObjectType()
+export class SearchCounts {
+  @Field(() => SearchCount)
+  naver: SearchCount;
+  @Field(() => SearchCount)
+  daum: SearchCount;
+}
+
+@ObjectType()
 class PostInfo {
   @Field(() => String)
   title: string;
@@ -34,8 +42,8 @@ export class NaverViewTapCrawlerInput {
 export class NaverViewTapCrawlerOutput extends CoreOutput {
   @Field(() => String, { nullable: true })
   message?: string;
-  @Field(() => SearchCount, { nullable: true })
-  searchCount?: SearchCount;
+  @Field(() => SearchCounts, { nullable: true })
+  searchCounts?: SearchCounts;
   @Field(() => PostInfo, { nullable: true })
   postInfo?: PostInfo;
 }

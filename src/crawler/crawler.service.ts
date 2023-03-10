@@ -1,6 +1,7 @@
 import {
   NaverViewTapCrawlerInput,
   NaverViewTapCrawlerOutput,
+  SearchCounts,
 } from './dtos/naverViewTapCrawler.dto';
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
@@ -22,74 +23,121 @@ export class CrawlerService {
   ): Promise<NaverViewTapCrawlerOutput> {
     try {
       const { keyword, blogName } = naverViewTapCrawlerInput;
-      const postBoxClass = '.total_wrap.api_ani_send';
-      const postBlogNameClass = '.sub_txt.sub_name';
-      const postTitleClass = '.api_txt_lines.total_tit';
-      const postContentClass = '.api_txt_lines.dsc_txt';
-      const postFlickerThumbClass = '.thumb._cross_trigger';
-      const postThumbClass = '.thumb.api_get';
-      const whereArray = ['view', 'blog'];
-      const rank = { all: 0, blog: 0 };
+      const naverPostBoxClass = '.total_wrap.api_ani_send';
+      const naverPostBlogNameClass = '.sub_txt.sub_name';
+      const naverPostTitleClass = '.api_txt_lines.total_tit';
+      const naberPostContentClass = '.api_txt_lines.dsc_txt';
+      const naverPostFlickerThumbClass = '.thumb._cross_trigger';
+      const naverPostThumbClass = '.thumb.api_get';
+      const daumPostBoxClass = '.info_item';
+      const daumPostBlogNameClass = '.fc_mid';
+      const naverwhereArray = ['view', 'blog'];
+      const daumwhereArray = ['view', 'blog'];
+      const rank: SearchCounts = {
+        naver: { all: 0, blog: 0 },
+        daum: { all: 0, blog: 0 },
+      };
       const postInfo = { title: '', link: '', content: '', thumb: '' };
-      await Promise.all(
-        whereArray.map(async (where) => {
-          const naverViewTabUrl = (startNum: number) =>
-            `https://search.naver.com/search.naver?&query=${keyword}&start=${startNum}&where=${where}`;
-          let startNum = 1;
-          let index = 1;
-          let finished = false;
-          while (startNum < 100) {
-            const res = await axios.get(naverViewTabUrl(startNum));
-            const $ = load(res.data);
-            const postBoxArray = $(postBoxClass);
-            if (!postBoxArray.text()) {
-              break;
-            }
-            postBoxArray.each((i, post) => {
-              const postBlogName = $(post)
-                .find(postBlogNameClass)
-                .text()
-                .replace(/ /g, '');
-              if (postBlogName.indexOf(blogName.replace(/ /g, '')) > -1) {
-                finished = true;
-                const postTitle = $(post).find(postTitleClass);
-                const postThumb = $(post).find(postThumbClass);
-                const postFlickerThumb = $(post).find(postFlickerThumbClass);
-                const postContent = $(post).find(postContentClass);
-                if (postFlickerThumb && postFlickerThumb.length >= 1) {
-                  postInfo.thumb = $(postFlickerThumb)
-                    .children('img')
-                    .attr('src');
-                }
-                postInfo.title = postTitle.text() || '';
-                postInfo.link = $(postTitle).attr('href') || '';
-                if (!postInfo.thumb) {
-                  postInfo.thumb = $(postThumb).attr('src') || '';
-                }
-                postInfo.content = $(postContent).text().trim() || '';
-                return false;
-              }
-              index++;
-            });
-            if (finished) {
-              if (where === 'view') {
-                rank.all = index;
-              }
-              if (where === 'blog') {
-                rank.blog = index;
-              }
-              break;
-            }
-            startNum += 30;
+      const exploreNaver = naverwhereArray.map(async (where) => {
+        const naverViewTabUrl = (startNum: number) =>
+          `https://search.naver.com/search.naver?&query=${keyword}&start=${startNum}&where=${where}`;
+        let startNum = 1;
+        let index = 1;
+        let finished = false;
+        while (startNum < 100) {
+          const res = await axios.get(naverViewTabUrl(startNum));
+          const $ = load(res.data);
+          const postBoxArray = $(naverPostBoxClass);
+          if (!postBoxArray.text()) {
+            break;
           }
-        }),
-      );
+          postBoxArray.each((i, post) => {
+            const postBlogName = $(post)
+              .find(naverPostBlogNameClass)
+              .text()
+              .replace(/ /g, '');
+            if (postBlogName.indexOf(blogName.replace(/ /g, '')) > -1) {
+              finished = true;
+              const postTitle = $(post).find(naverPostTitleClass);
+              const postThumb = $(post).find(naverPostThumbClass);
+              const postFlickerThumb = $(post).find(naverPostFlickerThumbClass);
+              const postContent = $(post).find(naberPostContentClass);
+              if (postFlickerThumb && postFlickerThumb.length >= 1) {
+                postInfo.thumb = $(postFlickerThumb)
+                  .children('img')
+                  .attr('src');
+              }
+              postInfo.title = postTitle.text() || '';
+              postInfo.link = $(postTitle).attr('href') || '';
+              if (!postInfo.thumb) {
+                postInfo.thumb = $(postThumb).attr('src') || '';
+              }
+              postInfo.content = $(postContent).text().trim() || '';
+              return false;
+            }
+            index++;
+          });
+          if (finished) {
+            if (where === 'view') {
+              rank.naver.all = index;
+            }
+            if (where === 'blog') {
+              rank.naver.blog = index;
+            }
+            break;
+          }
+          startNum += 30;
+        }
+      });
+      const exploreDaum = daumwhereArray.map(async (where) => {
+        const daumUrl = (page: number) =>
+          `https://m.search.daum.net/search?p=${page}&q=${encodeURIComponent(
+            keyword,
+          )}&col=${where}&w=fusion&DA=TWC`;
+        let page = 0;
+        let index = 1;
+        let finished = false;
+        while (page < 1) {
+          page++;
+          const res = await axios.get(daumUrl(page), {
+            headers: { 'Accept-Encoding': 'gzip,deflate,compress' },
+          });
+          const $ = load(res.data);
+          const postBoxArray = $(daumPostBoxClass);
+          if (!postBoxArray.text()) {
+            break;
+          }
+          postBoxArray.each((i, post) => {
+            const postBlogName = $(post)
+              .find(daumPostBlogNameClass)
+              .text()
+              .replace(/ /g, '');
+            if (postBlogName.indexOf(blogName.replace(/ /g, '')) > -1) {
+              finished = true;
+              return false;
+            }
+            index++;
+          });
+          if (finished) {
+            if (where === 'view') {
+              rank.daum.all = index;
+            }
+            if (where === 'blog') {
+              rank.daum.blog = index;
+            }
+            break;
+          }
+        }
+      });
+      await Promise.all([...exploreNaver, ...exploreDaum]);
+      console.log(rank);
       return {
         ok: true,
-        searchCount: rank,
+        searchCounts: rank,
         postInfo,
       };
-    } catch {
+    } catch (e) {
+      console.log(e);
       return {
         ok: false,
       };
@@ -115,7 +163,7 @@ export class CrawlerService {
     try {
       const url = blogUrl || process.env.BLOG_URL;
       const postLinkClass = 'link__iGhdI';
-      const postTitleClass = 'title__tl7L1';
+      const naverPostTitleClass = 'title__tl7L1';
       const postAuthorClass = 'blog_author';
       await driver.get(url);
       await driver.wait(
@@ -130,7 +178,7 @@ export class CrawlerService {
         postLinkElements.map(async (el) => {
           const href = await el.getAttribute('href');
           const title = await el
-            .findElement(By.className(postTitleClass))
+            .findElement(By.className(naverPostTitleClass))
             .getText();
           if (href && title) postLinkArray.push({ href, title });
         }),

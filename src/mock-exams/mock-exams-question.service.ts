@@ -356,11 +356,11 @@ export class MockExamQuestionService {
 
         if (user) {
           questions = questions.map((question) => {
-            const filteredState = question.state.filter(
-              (state) => user && state.user.id === user.id,
-            );
-            const filteredBookmark = question.mockExamQuestionBookmark.filter(
-              (bookmark) => user && bookmark.user.id === user.id,
+            const filteredState = question.state?.filter((state) => {
+              return user && state.user?.id === user.id;
+            });
+            const filteredBookmark = question.mockExamQuestionBookmark?.filter(
+              (bookmark) => user && bookmark.user?.id === user.id,
             );
             const coreState = this.mockExamQuestionState.create({
               exam: question.mockExam,
@@ -424,11 +424,11 @@ export class MockExamQuestionService {
       }
       if (user) {
         questions = questions.map((question) => {
-          const filteredState = question.state.filter(
-            (state) => user && state.user.id === user.id,
+          const filteredState = question.state?.filter(
+            (state) => user && state.user?.id === user.id,
           );
-          const filteredBookmark = question.mockExamQuestionBookmark.filter(
-            (bookmark) => user && bookmark.user.id === user.id,
+          const filteredBookmark = question.mockExamQuestionBookmark?.filter(
+            (bookmark) => user && bookmark.user?.id === user.id,
           );
           const coreState = this.mockExamQuestionState.create({
             exam: question.mockExam,
@@ -462,7 +462,8 @@ export class MockExamQuestionService {
         questions,
         count,
       };
-    } catch {
+    } catch (e) {
+      console.log(e);
       return {
         ok: false,
         error: '문제를 찾을 수 없습니다.',

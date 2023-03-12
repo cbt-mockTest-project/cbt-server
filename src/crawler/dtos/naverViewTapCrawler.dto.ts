@@ -7,6 +7,8 @@ class SearchCount {
   all: number;
   @Field(() => Number)
   blog: number;
+  @Field(() => String)
+  url: string;
 }
 
 @ObjectType()

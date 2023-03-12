@@ -34,8 +34,8 @@ export class CrawlerService {
       const naverwhereArray = ['view', 'blog'];
       const daumwhereArray = ['view', 'blog'];
       const rank: SearchCounts = {
-        naver: { all: 0, blog: 0 },
-        daum: { all: 0, blog: 0 },
+        naver: { all: 0, blog: 0, url: '' },
+        daum: { all: 0, blog: 0, url: '' },
       };
       const postInfo = { title: '', link: '', content: '', thumb: '' };
       const exploreNaver = naverwhereArray.map(async (where) => {
@@ -78,6 +78,7 @@ export class CrawlerService {
             index++;
           });
           if (finished) {
+            rank.naver.url = naverViewTabUrl(startNum);
             if (where === 'view') {
               rank.naver.all = index;
             }
@@ -119,6 +120,8 @@ export class CrawlerService {
             index++;
           });
           if (finished) {
+            rank.daum.url = daumUrl(page);
+            console.log(daumUrl(page));
             if (where === 'view') {
               rank.daum.all = index;
             }
@@ -130,7 +133,7 @@ export class CrawlerService {
         }
       });
       await Promise.all([...exploreNaver, ...exploreDaum]);
-      console.log(rank);
+
       return {
         ok: true,
         searchCounts: rank,

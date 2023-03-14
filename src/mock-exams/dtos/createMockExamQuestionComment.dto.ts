@@ -5,7 +5,7 @@ import { MockExamQuestionComment } from '../entities/mock-exam-question-comment.
 @InputType()
 export class CreateMockExamQuestionCommentInput extends PickType(
   MockExamQuestionComment,
-  ['content'],
+  ['content', 'img'],
 ) {
   @Field(() => Number)
   questionId: number;

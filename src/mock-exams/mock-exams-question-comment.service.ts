@@ -40,7 +40,7 @@ export class MockExamQuestionCommentSerivce {
     user: User,
   ): Promise<CreateMockExamQuestionCommentOutput> {
     try {
-      const { questionId, content } = createMockExamQuestionCommentInput;
+      const { questionId, content, img } = createMockExamQuestionCommentInput;
 
       const question = await this.mockExamQuestion.findOne({
         where: { id: questionId },
@@ -55,6 +55,7 @@ export class MockExamQuestionCommentSerivce {
         content,
         question,
         user,
+        img,
       });
       await this.mockExamQuestionComment.save(comment);
       return {

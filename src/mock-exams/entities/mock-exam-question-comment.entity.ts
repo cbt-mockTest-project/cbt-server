@@ -1,5 +1,8 @@
 import { MockExamQuestionCommentLike } from 'src/mock-exams/entities/mock-exam-question-comment-like.entity';
-import { MockExamQuestion } from './mock-exam-question.entity';
+import {
+  MockExamImageType,
+  MockExamQuestion,
+} from './mock-exam-question.entity';
 import { CoreEntity } from '../../common/entities/core.entity';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
@@ -37,4 +40,8 @@ export class MockExamQuestionComment extends CoreEntity {
 
   @Field(() => Number, { defaultValue: 0 })
   likesCount?: number;
+
+  @Column({ type: 'json', default: [] })
+  @Field(() => [MockExamImageType], { nullable: true })
+  img: MockExamImageType[];
 }

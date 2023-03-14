@@ -1,3 +1,5 @@
+import { MockExamQuestionComment } from './entities/mock-exam-question-comment.entity';
+import { MockExamQuestionFeedback } from './entities/mock-exam-question-feedback.entity';
 import {
   ReadMockExamQuestionsByMockExamIdInput,
   ReadMockExamQuestionsByMockExamIdOutput,
@@ -22,7 +24,7 @@ import {
 import { MockExam } from './entities/mock-exam.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, FindOptionsWhere } from 'typeorm';
+import { Repository, FindOptionsWhere, Brackets } from 'typeorm';
 import {
   CreateMockExamQuestionInput,
   CreateMockExamQuestionOutput,
@@ -43,6 +45,7 @@ import {
 } from './dtos/readMockExamQuestionNumbers.dto';
 import { shuffleArray } from 'src/utils/utils';
 import { ReadAllQuestionsOutput } from './dtos/readAllQuestions.dto';
+import { MockExamQuestionBookmark } from './entities/mock-exam-question-bookmark.entity';
 
 @Injectable()
 export class MockExamQuestionService {
@@ -323,23 +326,51 @@ export class MockExamQuestionService {
       }
 
       if (ids) {
-        const where:
-          | FindOptionsWhere<MockExamQuestion>
-          | FindOptionsWhere<MockExamQuestion>[] = ids.map((id) => ({
-          mockExam: { id },
-        }));
+        let questions: MockExamQuestion[] = await this.mockExamQuestion
+          .createQueryBuilder('mockExamQuestion')
+          .select(['mockExamQuestion'])
+          .leftJoinAndSelect('mockExamQuestion.mockExam', 'mockExam')
+          .leftJoinAndSelect(
+            'mockExamQuestion.mockExamQuestionBookmark',
+            'mockExamQuestionBookmark',
+          )
+          .leftJoinAndSelect(
+            'mockExamQuestion.mockExamQuestionFeedback',
+            'mockExamQuestionFeedback',
+          )
+          .leftJoinAndSelect(
+            'mockExamQuestion.mockExamQuestionComment',
+            'mockExamQuestionComment',
+          )
+          .leftJoinAndSelect('mockExamQuestion.state', 'state')
+          .leftJoinAndSelect('mockExamQuestionComment.user', 'comment_user')
+          .leftJoinAndSelect('mockExamQuestionFeedback.user', 'feedback_user')
+          .leftJoinAndSelect('mockExamQuestionBookmark.user', 'bookmark_user')
+          .leftJoinAndSelect('state.user', 'state_user')
+          .leftJoinAndSelect('state.exam', 'state_exam')
+          .orWhere('mockExamQuestion.mockExam.id IN (:...ids)', { ids })
+          .orderBy('RANDOM()')
+          .getMany();
 
-        let questions = await this.mockExamQuestion.find({
-          order: { number: 'ASC' },
-          where,
-          relations: {
-            state: { user: true, exam: true },
-            mockExamQuestionBookmark: { user: true },
-            mockExamQuestionComment: { user: true },
-            mockExamQuestionFeedback: { user: true },
-            mockExam: true,
-          },
-        });
+        questions = questions.slice(0, 14);
+        // const where:
+        //   | FindOptionsWhere<MockExamQuestion>
+        //   | FindOptionsWhere<MockExamQuestion>[] = ids.map((id) => ({
+        //   mockExam: { id },
+        // }));
+        // const questionss = await this.mockExamQuestion.find({
+        //   order: { number: 'ASC' },
+        //   where,
+        //   relations: {
+        //     state: { user: true, exam: true },
+        //     mockExamQuestionBookmark: { user: true },
+        //     mockExamQuestionComment: { user: true },
+        //     mockExamQuestionFeedback: { user: true },
+        //     mockExam: true,
+        //   },
+        // });
+        // console.log('next', questions[0]);
+        // console.log('prev', questionss[0]);
         if (!questions) {
           return {
             ok: false,
@@ -353,7 +384,6 @@ export class MockExamQuestionService {
             mockExamQuestionBookmark: [],
           }));
         }
-
         if (user) {
           questions = questions.map((question) => {
             const filteredState = question.state?.filter((state) => {
@@ -378,14 +408,12 @@ export class MockExamQuestionService {
             };
           });
         }
-        const count = 14;
-        questions = shuffleArray(questions).slice(0, count);
 
         return {
           ok: true,
           questions,
           title: '랜덤모의고사',
-          count,
+          count: questions.length,
         };
       }
 

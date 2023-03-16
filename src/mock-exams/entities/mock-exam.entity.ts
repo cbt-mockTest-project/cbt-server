@@ -1,3 +1,4 @@
+import { User } from 'src/users/entities/user.entity';
 import { MockExamCategory } from './mock-exam-category.entity';
 import { CoreEntity } from './../../common/entities/core.entity';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
@@ -45,5 +46,10 @@ export class MockExam extends CoreEntity {
       onDelete: 'SET NULL',
     },
   )
+  @ManyToOne(() => User, (user) => user.mockExam, {
+    onDelete: 'SET NULL',
+  })
+  @Field(() => User)
+  user: User;
   mockExamQuestionState: MockExamQuestionState[];
 }

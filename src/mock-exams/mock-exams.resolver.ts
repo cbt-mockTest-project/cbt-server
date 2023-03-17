@@ -35,7 +35,7 @@ import { AuthUser } from 'src/auth/auth-user.decorator';
 export class MockExamResolver {
   constructor(private readonly mockExamService: MockExamService) {}
   @Mutation(() => CreateMockExamOutput)
-  @Role(['ADMIN'])
+  @Role(['ANY'])
   createMockExam(
     @Args('input') createMockExamInput: CreateMockExamInput,
   ): Promise<CreateMockExamOutput> {

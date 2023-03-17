@@ -1,3 +1,4 @@
+import { User } from 'src/users/entities/user.entity';
 import { MockExam } from './mock-exam.entity';
 import { CoreEntity } from '../../common/entities/core.entity';
 import {
@@ -6,7 +7,7 @@ import {
   ObjectType,
   registerEnumType,
 } from '@nestjs/graphql';
-import { Column, Entity, OneToMany } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { IsEnum } from 'class-validator';
 
 export enum MockExamCategoryTypes {
@@ -35,4 +36,17 @@ export class MockExamCategory extends CoreEntity {
   @Field(() => MockExamCategoryTypes)
   @IsEnum(MockExamCategoryTypes)
   type: MockExamCategoryTypes;
+
+  @Column({
+    type: 'boolean',
+    default: true,
+  })
+  @Field(() => Boolean, { defaultValue: true })
+  approved: boolean;
+
+  @ManyToOne(() => User, (user) => user.mockExamCategory, {
+    onDelete: 'SET NULL',
+  })
+  @Field(() => User)
+  user: User;
 }

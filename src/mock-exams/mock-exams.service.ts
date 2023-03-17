@@ -71,9 +71,10 @@ export class MockExamService {
       mockExamCategory,
       approved: false,
     });
-    this.mockExam.save(newMockExam);
+    const mockExam = await this.mockExam.save(newMockExam);
     return {
       ok: true,
+      mockExam,
     };
   }
 
@@ -208,9 +209,9 @@ export class MockExamService {
     readMockExamTitlesByCateoryInput: ReadMockExamTitlesByCateoryInput,
   ): Promise<ReadMockExamTitlesByCateoryOutput> {
     try {
-      const { name } = readMockExamTitlesByCateoryInput;
+      const { name, all } = readMockExamTitlesByCateoryInput;
       let mockExamTitles = await this.mockExam.find({
-        where: { mockExamCategory: { name }, approved: true },
+        where: { mockExamCategory: { name }, approved: !all && true },
         relations: {
           mockExamQuestion: true,
         },
@@ -222,15 +223,17 @@ export class MockExamService {
           error: '해당 카테고리에 맞는 시험이 존재하지 않습니다.',
         };
       }
-      mockExamTitles = mockExamTitles
-        .filter((exam) => exam.mockExamQuestion.length)
-        .sort((a, b) => {
-          return (
-            Number(b.title.split('년')[0]) - Number(a.title.split('년')[0]) ||
-            Number(b.title.split('-').at(-1).split('회차')[0]) -
-              Number(a.title.split('-').at(-1).split('회차')[0])
-          );
-        });
+      if (!all) {
+        mockExamTitles = mockExamTitles
+          .filter((exam) => exam.mockExamQuestion.length)
+          .sort((a, b) => {
+            return (
+              Number(b.title.split('년')[0]) - Number(a.title.split('년')[0]) ||
+              Number(b.title.split('-').at(-1).split('회차')[0]) -
+                Number(a.title.split('-').at(-1).split('회차')[0])
+            );
+          });
+      }
       return {
         titles: mockExamTitles,
         ok: true,

@@ -1,3 +1,5 @@
+import { ReadMyMockExamCategoriesOutput } from './dtos/readMyMockExamCategories.dto';
+import { User } from 'src/users/entities/user.entity';
 import {
   ReadAllMockExamCategoriesInput,
   ReadAllMockExamCategoriesOutput,
@@ -18,6 +20,7 @@ import {
   EditMockExamCategoryInput,
   EditMockExamCategoryOutput,
 } from './dtos/editCategory.dto';
+import { AuthUser } from 'src/auth/auth-user.decorator';
 
 @Resolver(() => MockExamCategory)
 export class MockExamCategoryResolver {
@@ -26,11 +29,13 @@ export class MockExamCategoryResolver {
   ) {}
 
   @Mutation(() => CreateMockExamCategoryOutput)
-  @Role(['ADMIN'])
+  @Role(['ANY'])
   createMockExamCategory(
+    @AuthUser() user: User,
     @Args('input') createMockExamCategoryInput: CreateMockExamCategoryInput,
   ): Promise<CreateMockExamCategoryOutput> {
     return this.mockExamCategoryService.createMockExamCategory(
+      user,
       createMockExamCategoryInput,
     );
   }
@@ -63,5 +68,13 @@ export class MockExamCategoryResolver {
     return this.mockExamCategoryService.readAllMockExamCategories(
       readAllMockExamCategoriesInput,
     );
+  }
+
+  @Role(['ANY'])
+  @Query(() => ReadMyMockExamCategoriesOutput)
+  readMyMockExamCategories(
+    @AuthUser() user: User,
+  ): Promise<ReadMyMockExamCategoriesOutput> {
+    return this.mockExamCategoryService.readMyMockExamCategories(user);
   }
 }

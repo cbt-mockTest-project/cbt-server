@@ -13,7 +13,10 @@ class ExamTitleAndId {
 export class ReadMockExamTitlesByCateoryInput extends PickType(
   MockExamCategory,
   ['name'],
-) {}
+) {
+  @Field(() => Boolean, { defaultValue: false, nullable: true })
+  all?: boolean;
+}
 
 @ObjectType()
 export class ReadMockExamTitlesByCateoryOutput extends CoreOutput {

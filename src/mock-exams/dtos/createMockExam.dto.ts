@@ -9,4 +9,7 @@ export class CreateMockExamInput extends PickType(MockExam, ['title']) {
 }
 
 @ObjectType()
-export class CreateMockExamOutput extends CoreOutput {}
+export class CreateMockExamOutput extends CoreOutput {
+  @Field(() => MockExam, { nullable: true })
+  mockExam?: MockExam;
+}

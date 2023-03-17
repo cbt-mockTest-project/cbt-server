@@ -1,3 +1,4 @@
+import { MockExamCategory } from './../../mock-exams/entities/mock-exam-category.entity';
 import { PostComment } from './../../post/entities/postComment.entity';
 import { Post } from './../../post/entities/post.entity';
 import { MockExamQuestionComment } from './../../mock-exams/entities/mock-exam-question-comment.entity';
@@ -90,6 +91,13 @@ export class User extends CoreEntity {
   @OneToMany(() => MockExam, (mockExam) => mockExam.user)
   @Field(() => [MockExam])
   mockExam: MockExam[];
+
+  @OneToMany(
+    () => MockExamCategory,
+    (mockExamCategory) => mockExamCategory.user,
+  )
+  @Field(() => [MockExamCategory])
+  mockExamCategory: MockExamCategory[];
 
   @OneToMany(
     () => MockExamQuestionComment,

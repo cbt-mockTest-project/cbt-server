@@ -1,3 +1,4 @@
+import { User, UserRole } from 'src/users/entities/user.entity';
 import {
   CreateMockExamCategoryInput,
   CreateMockExamCategoryOutput,
@@ -30,10 +31,12 @@ export class MockExamCategoryService {
   ) {}
 
   async createMockExamCategory(
+    user: User,
     createMockExamCategoryInput: CreateMockExamCategoryInput,
   ): Promise<CreateMockExamCategoryOutput> {
     try {
       const { name } = createMockExamCategoryInput;
+      const approved = user.role === UserRole.ADMIN ? true : false;
       const exists = await this.mockExamCategories.findOne({
         where: { name },
       });
@@ -43,12 +46,15 @@ export class MockExamCategoryService {
           error: '이미 존재하는 카테고리 입니다.',
         };
       }
-      const newCategory = this.mockExamCategories.create(
-        createMockExamCategoryInput,
-      );
-      await this.mockExamCategories.save(newCategory);
+      const newCategory = this.mockExamCategories.create({
+        name: createMockExamCategoryInput.name,
+        user,
+        approved,
+      });
+      const category = await this.mockExamCategories.save(newCategory);
       return {
         ok: true,
+        category,
       };
     } catch {
       return {
@@ -115,7 +121,6 @@ export class MockExamCategoryService {
     readAllMockExamCategoriesInput: ReadAllMockExamCategoriesInput,
   ): Promise<ReadAllMockExamCategoriesOutput> {
     // default는 실기값
-
     try {
       let type = MockExamCategoryTypes.practical;
       if (readAllMockExamCategoriesInput) {
@@ -134,6 +139,26 @@ export class MockExamCategoryService {
       const categories = await this.mockExamCategories.find({
         where: {
           type,
+          approved: true,
+        },
+      });
+      return {
+        ok: true,
+        categories,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '카테고리를 찾을 수 없습니다.',
+      };
+    }
+  }
+
+  async readMyMockExamCategories(user: User) {
+    try {
+      const categories = await this.mockExamCategories.find({
+        where: {
+          user: { id: user.id },
         },
       });
       return {

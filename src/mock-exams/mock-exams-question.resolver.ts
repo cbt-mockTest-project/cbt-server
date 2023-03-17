@@ -46,7 +46,7 @@ export class MockExamQuestionResolver {
   ) {}
 
   @Mutation(() => CreateMockExamQuestionOutput)
-  @Role(['ADMIN'])
+  @Role(['ANY'])
   createMockExamQuestion(
     @Args('input') createMockExamQuestionInput: CreateMockExamQuestionInput,
   ) {
@@ -56,7 +56,7 @@ export class MockExamQuestionResolver {
   }
 
   @Mutation(() => EditMockExamQuestionOutput)
-  @Role(['ADMIN'])
+  @Role(['ANY'])
   editMockExamQuestion(
     @Args('input') editMockExamQuestionInput: EditMockExamQuestionInput,
   ): Promise<EditMockExamQuestionOutput> {
@@ -66,7 +66,7 @@ export class MockExamQuestionResolver {
   }
 
   @Mutation(() => DeleteMockExamQuestionOutput)
-  @Role(['ADMIN'])
+  @Role(['ANY'])
   deleteMockExamQuestion(
     @Args('input') deleteMockExamQuestionInput: DeleteMockExamQuestionInput,
   ): Promise<DeleteMockExamQuestionOutput> {

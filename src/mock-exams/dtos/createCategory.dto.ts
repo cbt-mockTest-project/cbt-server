@@ -1,6 +1,6 @@
 import { CoreOutput } from './../../common/dtos/output.dto';
 import { MockExamCategory } from './../entities/mock-exam-category.entity';
-import { InputType, ObjectType, PickType } from '@nestjs/graphql';
+import { Field, InputType, ObjectType, PickType } from '@nestjs/graphql';
 
 @InputType()
 export class CreateMockExamCategoryInput extends PickType(MockExamCategory, [
@@ -8,4 +8,7 @@ export class CreateMockExamCategoryInput extends PickType(MockExamCategory, [
 ]) {}
 
 @ObjectType()
-export class CreateMockExamCategoryOutput extends CoreOutput {}
+export class CreateMockExamCategoryOutput extends CoreOutput {
+  @Field(() => MockExamCategory, { nullable: true })
+  category?: MockExamCategory;
+}

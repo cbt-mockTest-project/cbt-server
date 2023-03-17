@@ -26,9 +26,9 @@ export class PostService {
     user: User,
   ): Promise<CreatePostOutput> {
     try {
-      const { content, title } = createPostInput;
+      const { content, title, category } = createPostInput;
       if (content && title && user) {
-        const post = this.post.create({ content, title, user });
+        const post = this.post.create({ content, title, user, category });
         await this.post.save(post);
         await this.revalidateService.revalidate({
           path: `/post/${post.id}`,

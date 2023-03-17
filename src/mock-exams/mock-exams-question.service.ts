@@ -38,12 +38,11 @@ import {
   ReadMockExamQuestionsByStateOutput,
 } from './dtos/readMockExamQuestionsByState.dto';
 import {
+  QuestionNumber,
   ReadMockExamQuestionNumbersInput,
   ReadMockExamQuestionNumbersOutput,
 } from './dtos/readMockExamQuestionNumbers.dto';
-import { shuffleArray } from 'src/utils/utils';
 import { ReadAllQuestionsOutput } from './dtos/readAllQuestions.dto';
-import { MockExamQuestionBookmark } from './entities/mock-exam-question-bookmark.entity';
 
 @Injectable()
 export class MockExamQuestionService {
@@ -369,24 +368,7 @@ export class MockExamQuestionService {
           .getMany();
 
         questions = questions.slice(0, 14);
-        // const where:
-        //   | FindOptionsWhere<MockExamQuestion>
-        //   | FindOptionsWhere<MockExamQuestion>[] = ids.map((id) => ({
-        //   mockExam: { id },
-        // }));
-        // const questionss = await this.mockExamQuestion.find({
-        //   order: { number: 'ASC' },
-        //   where,
-        //   relations: {
-        //     state: { user: true, exam: true },
-        //     mockExamQuestionBookmark: { user: true },
-        //     mockExamQuestionComment: { user: true },
-        //     mockExamQuestionFeedback: { user: true },
-        //     mockExam: true,
-        //   },
-        // });
-        // console.log('next', questions[0]);
-        // console.log('prev', questionss[0]);
+
         if (!questions) {
           return {
             ok: false,
@@ -529,6 +511,7 @@ export class MockExamQuestionService {
       select: {
         mockExamQuestion: {
           number: true,
+          id: true,
         },
       },
       order: {
@@ -543,9 +526,13 @@ export class MockExamQuestionService {
         error: '존재하지 않는 시험입니다.',
       };
     }
-    const questionNumbers = mockExam[0].mockExamQuestion.map(
-      (data) => data.number,
+    const questionNumbers: QuestionNumber[] = mockExam[0].mockExamQuestion.map(
+      (data) => ({
+        questionNumber: data.number,
+        questionId: data.id,
+      }),
     );
+    console.log(questionNumbers);
     return {
       ok: true,
       questionNumbers,

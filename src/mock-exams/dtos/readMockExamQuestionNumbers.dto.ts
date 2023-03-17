@@ -1,6 +1,14 @@
 import { CoreOutput } from './../../common/dtos/output.dto';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 
+@ObjectType()
+export class QuestionNumber {
+  @Field(() => Number)
+  questionNumber: number;
+
+  @Field(() => Number)
+  questionId: number;
+}
 @InputType()
 export class ReadMockExamQuestionNumbersInput {
   @Field(() => Number)
@@ -9,6 +17,6 @@ export class ReadMockExamQuestionNumbersInput {
 
 @ObjectType()
 export class ReadMockExamQuestionNumbersOutput extends CoreOutput {
-  @Field(() => [Number])
-  questionNumbers?: number[];
+  @Field(() => [QuestionNumber])
+  questionNumbers?: QuestionNumber[];
 }

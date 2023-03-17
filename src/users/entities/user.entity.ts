@@ -28,6 +28,7 @@ import { Notice } from './notice.entity';
 import { MockExamQuestionBookmark } from 'src/mock-exams/entities/mock-exam-question-bookmark.entity';
 import { Visit } from 'src/visit/entities/visit.entity';
 import { MockExam } from 'src/mock-exams/entities/mock-exam.entity';
+import { MockExamQuestion } from 'src/mock-exams/entities/mock-exam-question.entity';
 
 export enum UserRole {
   CLIENT = 'CLIENT',
@@ -153,6 +154,13 @@ export class User extends CoreEntity {
     },
   )
   mockExamQuestionBookmark: MockExamQuestionBookmark[];
+
+  @Field(() => [MockExamQuestion])
+  @OneToMany(
+    () => MockExamQuestion,
+    (mockExamQuestionMockExamQuestion) => mockExamQuestionMockExamQuestion.user,
+  )
+  mockExamQuestion: MockExamQuestionBookmark[];
 
   @BeforeInsert()
   @BeforeUpdate()

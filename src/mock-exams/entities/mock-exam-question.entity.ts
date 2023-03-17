@@ -15,6 +15,7 @@ import { MockExamQuestionState } from './mock-exam-question-state.entity';
 import { MockExamQuestionComment } from './mock-exam-question-comment.entity';
 import { MockExamQuestionBookmark } from './mock-exam-question-bookmark.entity';
 import { MockExamQuestionMultipleChoice } from './mock-exam-question-multiple-choice.entity';
+import { User } from 'src/users/entities/user.entity';
 
 @InputType('MockExamQuestionImageInputType', { isAbstract: true })
 @ObjectType()
@@ -103,4 +104,10 @@ export class MockExamQuestion extends CoreEntity {
     },
   )
   mockExamQuestionBookmark: MockExamQuestionBookmark[];
+
+  @ManyToOne(() => User, (user) => user.mockExamQuestion, {
+    onDelete: 'SET NULL', // user 삭제될시  mockExam's userId가 null
+  })
+  @Field(() => User)
+  user: User;
 }

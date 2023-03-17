@@ -1,5 +1,3 @@
-import { MockExamQuestionComment } from './entities/mock-exam-question-comment.entity';
-import { MockExamQuestionFeedback } from './entities/mock-exam-question-feedback.entity';
 import {
   ReadMockExamQuestionsByMockExamIdInput,
   ReadMockExamQuestionsByMockExamIdOutput,
@@ -59,6 +57,7 @@ export class MockExamQuestionService {
   ) {}
 
   async createMockExamQuestion(
+    user: User,
     createMockExamQuestionInput: CreateMockExamQuestionInput,
   ): Promise<CreateMockExamQuestionOutput> {
     try {
@@ -101,6 +100,7 @@ export class MockExamQuestionService {
         mockExam,
         approved: false,
         number,
+        user,
       });
       const savedQestion = await this.mockExamQuestion.save(newExamQuestion);
       return { ok: true, questionId: savedQestion.id };
@@ -191,6 +191,7 @@ export class MockExamQuestionService {
   }
 
   async editMockExamQuestion(
+    user: User,
     editMockExamQuestionInput: EditMockExamQuestionInput,
   ): Promise<EditMockExamQuestionOutput> {
     try {
@@ -198,11 +199,18 @@ export class MockExamQuestionService {
         editMockExamQuestionInput;
       const prevMockExamQuestion = await this.mockExamQuestion.findOne({
         where: { id },
+        relations: { user: true },
       });
       if (!prevMockExamQuestion) {
         return {
           ok: false,
           error: '존재하지 않는 문제입니다.',
+        };
+      }
+      if (prevMockExamQuestion.user.id !== user.id) {
+        return {
+          ok: false,
+          error: '권한이 없습니다.',
         };
       }
       await this.mockExamQuestion.update(id, {
@@ -223,17 +231,25 @@ export class MockExamQuestionService {
   }
 
   async deleteMockExamQuestion(
+    user: User,
     deleteMockExamQuestionInput: DeleteMockExamQuestionInput,
   ): Promise<DeleteMockExamQuestionOutput> {
     try {
       const { id } = deleteMockExamQuestionInput;
       const mockExamQuestion = await this.mockExamQuestion.findOne({
         where: { id },
+        relations: { user: true },
       });
       if (!mockExamQuestion) {
         return {
           ok: false,
           error: '존재하지 않는 문제입니다.',
+        };
+      }
+      if (user.id !== mockExamQuestion.user.id) {
+        return {
+          ok: false,
+          error: '권한이 없습니다.',
         };
       }
       await this.mockExamQuestion.delete({ id });
@@ -565,6 +581,18 @@ export class MockExamQuestionService {
     return {
       ok: true,
       mockExamQusetions,
+    };
+  }
+
+  async updateQuestionUserId() {
+    const questions = await this.mockExamQuestion.find();
+    await Promise.all(
+      questions.map(async (question) => {
+        await this.mockExamQuestion.save({ ...question, user: { id: 1 } });
+      }),
+    );
+    return {
+      ok: true,
     };
   }
 }

@@ -1,3 +1,4 @@
+import { CoreOutput } from 'src/common/dtos/output.dto';
 import {
   ReadMockExamQuestionsByMockExamIdOutput,
   ReadMockExamQuestionsByMockExamIdInput,
@@ -48,9 +49,11 @@ export class MockExamQuestionResolver {
   @Mutation(() => CreateMockExamQuestionOutput)
   @Role(['ANY'])
   createMockExamQuestion(
+    @AuthUser() user: User,
     @Args('input') createMockExamQuestionInput: CreateMockExamQuestionInput,
   ) {
     return this.mockExamQuestionService.createMockExamQuestion(
+      user,
       createMockExamQuestionInput,
     );
   }
@@ -58,9 +61,11 @@ export class MockExamQuestionResolver {
   @Mutation(() => EditMockExamQuestionOutput)
   @Role(['ANY'])
   editMockExamQuestion(
+    @AuthUser() user: User,
     @Args('input') editMockExamQuestionInput: EditMockExamQuestionInput,
   ): Promise<EditMockExamQuestionOutput> {
     return this.mockExamQuestionService.editMockExamQuestion(
+      user,
       editMockExamQuestionInput,
     );
   }
@@ -68,9 +73,11 @@ export class MockExamQuestionResolver {
   @Mutation(() => DeleteMockExamQuestionOutput)
   @Role(['ANY'])
   deleteMockExamQuestion(
+    @AuthUser() user: User,
     @Args('input') deleteMockExamQuestionInput: DeleteMockExamQuestionInput,
   ): Promise<DeleteMockExamQuestionOutput> {
     return this.mockExamQuestionService.deleteMockExamQuestion(
+      user,
       deleteMockExamQuestionInput,
     );
   }
@@ -141,5 +148,10 @@ export class MockExamQuestionResolver {
   @Query(() => ReadAllQuestionsOutput)
   async readAllQuestions(): Promise<ReadAllQuestionsOutput> {
     return this.mockExamQuestionService.readAllQuestions();
+  }
+
+  @Mutation(() => CoreOutput)
+  async updateQuestionUserId() {
+    return this.mockExamQuestionService.updateQuestionUserId();
   }
 }

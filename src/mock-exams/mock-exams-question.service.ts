@@ -159,6 +159,7 @@ export class MockExamQuestionService {
           mockExamQuestionComment: { user: true },
           mockExamQuestionBookmark: user ? { user: true } : false,
           mockExamQuestionFeedback: { user: true },
+          user: true,
         },
       });
       if (!question) {

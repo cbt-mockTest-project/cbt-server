@@ -37,9 +37,10 @@ export class MockExamResolver {
   @Mutation(() => CreateMockExamOutput)
   @Role(['ANY'])
   createMockExam(
+    @AuthUser() user: User,
     @Args('input') createMockExamInput: CreateMockExamInput,
   ): Promise<CreateMockExamOutput> {
-    return this.mockExamService.createMockExam(createMockExamInput);
+    return this.mockExamService.createMockExam(user, createMockExamInput);
   }
 
   @Mutation(() => EditMockExamOutput)

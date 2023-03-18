@@ -121,7 +121,6 @@ export class CrawlerService {
           });
           if (finished) {
             rank.daum.url = daumUrl(page);
-            console.log(daumUrl(page));
             if (where === 'view') {
               rank.daum.all = index;
             }

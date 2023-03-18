@@ -22,4 +22,6 @@ export class ReadMockExamQuestionsByMockExamIdOutput extends CoreOutput {
   count?: number;
   @Field(() => String)
   title?: string;
+  @Field(() => String, { defaultValue: '' })
+  author?: string;
 }

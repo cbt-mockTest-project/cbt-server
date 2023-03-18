@@ -404,7 +404,6 @@ export class UserService {
             error: '닉네임은 10글자를 초과할 수 없습니다.',
           };
         }
-        console.log(currentUser.nickname);
         if (currentUser.nickname === nickname) {
           return {
             ok: false,

@@ -1,5 +1,6 @@
 import { CoreOutput } from './../../common/dtos/output.dto';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
+import { ExamStatus } from '../entities/mock-exam.entity';
 
 @ObjectType()
 export class QuestionNumber {
@@ -19,4 +20,7 @@ export class ReadMockExamQuestionNumbersInput {
 export class ReadMockExamQuestionNumbersOutput extends CoreOutput {
   @Field(() => [QuestionNumber])
   questionNumbers?: QuestionNumber[];
+
+  @Field(() => ExamStatus, { nullable: true })
+  examStatus?: ExamStatus;
 }

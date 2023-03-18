@@ -22,7 +22,7 @@ import {
 import { MockExam } from './entities/mock-exam.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, FindOptionsWhere, Brackets } from 'typeorm';
+import { Repository, FindOptionsWhere } from 'typeorm';
 import {
   CreateMockExamQuestionInput,
   CreateMockExamQuestionOutput,
@@ -327,7 +327,6 @@ export class MockExamQuestionService {
             mockExamQuestionBookmark: { user: true },
             mockExamQuestionComment: { user: true },
             mockExamQuestionFeedback: { user: true },
-            mockExam: true,
           },
           where: {
             mockExamQuestionBookmark: { user: { id: user.id } },
@@ -345,7 +344,6 @@ export class MockExamQuestionService {
         let questions: MockExamQuestion[] = await this.mockExamQuestion
           .createQueryBuilder('mockExamQuestion')
           .select(['mockExamQuestion'])
-          .leftJoinAndSelect('mockExamQuestion.mockExam', 'mockExam')
           .leftJoinAndSelect(
             'mockExamQuestion.mockExamQuestionBookmark',
             'mockExamQuestionBookmark',
@@ -392,7 +390,7 @@ export class MockExamQuestionService {
               (bookmark) => user && bookmark.user?.id === user.id,
             );
             const coreState = this.mockExamQuestionState.create({
-              exam: question.mockExam,
+              exam: { id: 1 },
               user,
               state: QuestionState.CORE,
               created_at: new Date(),
@@ -416,7 +414,10 @@ export class MockExamQuestionService {
         };
       }
 
-      const mockExam = await this.mockExam.findOne({ where: { id } });
+      const mockExam = await this.mockExam.findOne({
+        where: { id },
+        relations: { user: true },
+      });
       if (!mockExam) {
         return {
           ok: false,
@@ -439,7 +440,6 @@ export class MockExamQuestionService {
           mockExamQuestionBookmark: { user: true },
           mockExamQuestionComment: { user: true },
           mockExamQuestionFeedback: { user: true },
-          mockExam: true,
         },
         where,
       });
@@ -458,7 +458,7 @@ export class MockExamQuestionService {
             (bookmark) => user && bookmark.user?.id === user.id,
           );
           const coreState = this.mockExamQuestionState.create({
-            exam: question.mockExam,
+            exam: mockExam,
             user,
             state: QuestionState.CORE,
             created_at: new Date(),
@@ -486,6 +486,7 @@ export class MockExamQuestionService {
       return {
         ok: true,
         title: mockExam.title,
+        author: mockExam.user.nickname,
         questions,
         count,
       };
@@ -510,6 +511,7 @@ export class MockExamQuestionService {
         mockExamQuestion: true,
       },
       select: {
+        status: true,
         mockExamQuestion: {
           number: true,
           id: true,
@@ -533,10 +535,10 @@ export class MockExamQuestionService {
         questionId: data.id,
       }),
     );
-    console.log(questionNumbers);
     return {
       ok: true,
       questionNumbers,
+      examStatus: mockExam[0].status,
     };
   }
 
@@ -572,15 +574,15 @@ export class MockExamQuestionService {
     };
   }
 
-  async updateQuestionUserId() {
-    const questions = await this.mockExamQuestion.find();
-    await Promise.all(
-      questions.map(async (question) => {
-        await this.mockExamQuestion.save({ ...question, user: { id: 1 } });
-      }),
-    );
-    return {
-      ok: true,
-    };
-  }
+  // async updateQuestionUserId() {
+  //   const questions = await this.mockExamQuestion.find();
+  //   await Promise.all(
+  //     questions.map(async (question) => {
+  //       await this.mockExamQuestion.save({ ...question, user: { id: 1 } });
+  //     }),
+  //   );
+  //   return {
+  //     ok: true,
+  //   };
+  // }
 }

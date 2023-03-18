@@ -46,6 +46,7 @@ export class MockExamService {
   ) {}
 
   async createMockExam(
+    user: User,
     createMockExamInput: CreateMockExamInput,
   ): Promise<CreateMockExamOutput> {
     const { title, categoryName } = createMockExamInput;
@@ -70,6 +71,7 @@ export class MockExamService {
       title,
       mockExamCategory,
       approved: false,
+      user,
     });
     const mockExam = await this.mockExam.save(newMockExam);
     return {
@@ -210,8 +212,11 @@ export class MockExamService {
   ): Promise<ReadMockExamTitlesByCateoryOutput> {
     try {
       const { name, all } = readMockExamTitlesByCateoryInput;
+      const where: FindOptionsWhere<MockExam> = all
+        ? { mockExamCategory: { name } }
+        : { mockExamCategory: { name }, approved: true };
       let mockExamTitles = await this.mockExam.find({
-        where: { mockExamCategory: { name }, approved: !all && true },
+        where,
         relations: {
           mockExamQuestion: true,
         },

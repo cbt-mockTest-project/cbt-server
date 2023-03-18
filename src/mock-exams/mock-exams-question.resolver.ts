@@ -150,8 +150,8 @@ export class MockExamQuestionResolver {
     return this.mockExamQuestionService.readAllQuestions();
   }
 
-  @Mutation(() => CoreOutput)
-  async updateQuestionUserId() {
-    return this.mockExamQuestionService.updateQuestionUserId();
-  }
+  // @Mutation(() => CoreOutput)
+  // async updateQuestionUserId() {
+  //   return this.mockExamQuestionService.updateQuestionUserId();
+  // }
 }

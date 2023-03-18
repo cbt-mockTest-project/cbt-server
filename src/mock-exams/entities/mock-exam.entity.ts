@@ -1,10 +1,25 @@
 import { User } from 'src/users/entities/user.entity';
 import { MockExamCategory } from './mock-exam-category.entity';
 import { CoreEntity } from './../../common/entities/core.entity';
-import { Field, InputType, ObjectType } from '@nestjs/graphql';
+import {
+  Field,
+  InputType,
+  ObjectType,
+  registerEnumType,
+} from '@nestjs/graphql';
 import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { MockExamQuestion } from './mock-exam-question.entity';
 import { MockExamQuestionState } from './mock-exam-question-state.entity';
+import { IsEnum } from 'class-validator';
+
+export enum ExamStatus {
+  UNSET = 'UNSET',
+  REQUEST = 'REQUEST',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED',
+}
+
+registerEnumType(ExamStatus, { name: 'ExamStatus' });
 
 @InputType('MockExamInputType', { isAbstract: true })
 @ObjectType()
@@ -53,4 +68,9 @@ export class MockExam extends CoreEntity {
   })
   @Field(() => User)
   user: User;
+
+  @Column({ type: 'enum', enum: ExamStatus, default: ExamStatus.UNSET })
+  @Field(() => ExamStatus)
+  @IsEnum(ExamStatus)
+  status: ExamStatus;
 }

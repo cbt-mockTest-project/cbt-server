@@ -81,11 +81,13 @@ export class MockExamService {
   }
 
   async editMockExam(
+    user: User,
     editMockExamInput: EditMockExamInput,
   ): Promise<EditMockExamOutput> {
-    const { id, approved } = editMockExamInput;
+    const { id } = editMockExamInput;
     const prevMockExam = await this.mockExam.findOne({
       where: { id },
+      relations: { user: true },
     });
     if (!prevMockExam) {
       return {
@@ -93,30 +95,47 @@ export class MockExamService {
         error: '존재하지 않는 시험입니다.',
       };
     }
-    if (approved === prevMockExam.approved) {
+    if (prevMockExam.user.id !== user.id) {
       return {
         ok: false,
-        error: '변경 된 내용이 없습니다.',
+        error: '권한이 없습니다.',
       };
     }
-    prevMockExam.approved = approved;
-    await this.mockExam.save([prevMockExam]);
+
+    await this.mockExam.save([editMockExamInput]);
     return { ok: true };
   }
 
   async deleteMockExam(
+    user: User,
     deleteMockExamInput: DeleteMockExamInput,
   ): Promise<DeleteMockExamOutput> {
-    const { id } = deleteMockExamInput;
-    const prevMockExam = await this.mockExam.findOne({ where: { id } });
-    if (!prevMockExam) {
+    try {
+      const { id } = deleteMockExamInput;
+      const prevMockExam = await this.mockExam.findOne({
+        where: { id },
+        relations: { user: true },
+      });
+      if (!prevMockExam) {
+        return {
+          ok: false,
+          error: '존재하지 않는 시험입니다.',
+        };
+      }
+      if (prevMockExam.user.id !== user.id) {
+        return {
+          ok: false,
+          error: '권한이 없습니다.',
+        };
+      }
+      await this.mockExam.delete({ id });
+      return { ok: true };
+    } catch (e) {
       return {
         ok: false,
-        error: '존재하지 않는 시험입니다.',
+        error: '시험지 삭제에 실패했습니다.',
       };
     }
-    await this.mockExam.delete({ id });
-    return { ok: true };
   }
 
   async readAllMockExam(
@@ -217,10 +236,7 @@ export class MockExamService {
         : { mockExamCategory: { name }, approved: true };
       let mockExamTitles = await this.mockExam.find({
         where,
-        relations: {
-          mockExamQuestion: true,
-        },
-        select: ['title', 'id'],
+        select: ['title', 'id', 'status'],
       });
       if (!mockExamTitles) {
         return {
@@ -230,7 +246,7 @@ export class MockExamService {
       }
       if (!all) {
         mockExamTitles = mockExamTitles
-          .filter((exam) => exam.mockExamQuestion.length)
+          // .filter((exam) => exam.mockExamQuestion.length)
           .sort((a, b) => {
             return (
               Number(b.title.split('년')[0]) - Number(a.title.split('년')[0]) ||

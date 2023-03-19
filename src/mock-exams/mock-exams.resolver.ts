@@ -44,19 +44,21 @@ export class MockExamResolver {
   }
 
   @Mutation(() => EditMockExamOutput)
-  @Role(['ADMIN'])
+  @Role(['ANY'])
   editMockExam(
+    @AuthUser() user: User,
     @Args('input') editMockExamInput: EditMockExamInput,
   ): Promise<EditMockExamOutput> {
-    return this.mockExamService.editMockExam(editMockExamInput);
+    return this.mockExamService.editMockExam(user, editMockExamInput);
   }
 
   @Mutation(() => DeleteMockExamOutput)
-  @Role(['ADMIN'])
+  @Role(['ANY'])
   deleteMockExam(
+    @AuthUser() user,
     @Args('input') deleteMockExamInput: DeleteMockExamInput,
   ): Promise<DeleteMockExamOutput> {
-    return this.mockExamService.deleteMockExam(deleteMockExamInput);
+    return this.mockExamService.deleteMockExam(user, deleteMockExamInput);
   }
 
   @Query(() => ReadAllMockExamsOutput)

@@ -41,21 +41,25 @@ export class MockExamCategoryResolver {
   }
 
   @Mutation(() => DeleteMockExamCategoryOutput)
-  @Role(['ADMIN'])
+  @Role(['ANY'])
   deleteMockExamCategory(
+    @AuthUser() user,
     @Args('input') deleteMockExamCategoryInput: DeleteMockExamCategoryInput,
   ): Promise<DeleteMockExamCategoryOutput> {
     return this.mockExamCategoryService.deleteMockExamCategory(
+      user,
       deleteMockExamCategoryInput,
     );
   }
 
   @Mutation(() => DeleteMockExamCategoryOutput)
-  @Role(['ADMIN'])
+  @Role(['ANY'])
   editMockExamCategory(
+    @AuthUser() user,
     @Args('input') editMockExamCategoryInput: EditMockExamCategoryInput,
   ): Promise<EditMockExamCategoryOutput> {
     return this.mockExamCategoryService.editMockExamCategory(
+      user,
       editMockExamCategoryInput,
     );
   }

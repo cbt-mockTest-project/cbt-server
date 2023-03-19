@@ -36,7 +36,6 @@ export class MockExamCategoryService {
   ): Promise<CreateMockExamCategoryOutput> {
     try {
       const { name } = createMockExamCategoryInput;
-      const approved = user.role === UserRole.ADMIN ? true : false;
       const exists = await this.mockExamCategories.findOne({
         where: { name },
       });
@@ -49,7 +48,7 @@ export class MockExamCategoryService {
       const newCategory = this.mockExamCategories.create({
         name: createMockExamCategoryInput.name,
         user,
-        approved,
+        approved: false,
       });
       const category = await this.mockExamCategories.save(newCategory);
       return {
@@ -65,17 +64,25 @@ export class MockExamCategoryService {
   }
 
   async deleteMockExamCategory(
+    user: User,
     deleteMockExamCategoryInput: DeleteMockExamCategoryInput,
   ): Promise<DeleteMockExamCategoryOutput> {
     try {
       const { id } = deleteMockExamCategoryInput;
       const category = await this.mockExamCategories.findOne({
         where: { id },
+        relations: { user: true },
       });
       if (!category) {
         return {
           ok: false,
           error: '카테고리가 존재하지 않습니다.',
+        };
+      }
+      if (user.id !== category.user.id) {
+        return {
+          ok: false,
+          error: '권한이 없습니다.',
         };
       }
       await this.mockExamCategories.delete({
@@ -93,16 +100,24 @@ export class MockExamCategoryService {
   }
 
   async editMockExamCategory(
+    user: User,
     editMockExamCategoryInput: EditMockExamCategoryInput,
   ): Promise<EditMockExamCategoryOutput> {
     const { id, name } = editMockExamCategoryInput;
     const prevCategory = await this.mockExamCategories.findOne({
       where: { id },
+      relations: { user: true },
     });
     if (!prevCategory) {
       return {
         ok: false,
         error: '존재하지 않는 카테고리입니다.',
+      };
+    }
+    if (user.id !== prevCategory.user.id) {
+      return {
+        ok: false,
+        error: '권한이 없습니다.',
       };
     }
     if (prevCategory.name === name) {
@@ -130,7 +145,9 @@ export class MockExamCategoryService {
         readAllMockExamCategoriesInput &&
         readAllMockExamCategoriesInput.all
       ) {
-        const categories = await this.mockExamCategories.find();
+        const categories = await this.mockExamCategories.find({
+          relations: { user: true },
+        });
         return {
           ok: true,
           categories,
@@ -140,6 +157,9 @@ export class MockExamCategoryService {
         where: {
           type,
           approved: true,
+        },
+        relations: {
+          user: true,
         },
       });
       return {

@@ -53,7 +53,9 @@ export class MockExamQuestion extends CoreEntity {
   solution_img: MockExamImageType[];
 
   @Field(() => MockExam)
-  @ManyToOne(() => MockExam, (mockExam) => mockExam.mockExamQuestion)
+  @ManyToOne(() => MockExam, (mockExam) => mockExam.mockExamQuestion, {
+    onDelete: 'CASCADE',
+  })
   mockExam: MockExam;
 
   @RelationId((mockExamQusetion: MockExamQuestion) => mockExamQusetion.mockExam)

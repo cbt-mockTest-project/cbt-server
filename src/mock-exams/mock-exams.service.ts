@@ -2,6 +2,7 @@ import { deduplication } from './../utils/utils';
 import { User } from './../users/entities/user.entity';
 import { MockExamQuestionState } from 'src/mock-exams/entities/mock-exam-question-state.entity';
 import {
+  ExamTitleAndId,
   ReadMockExamTitlesByCateoryInput,
   ReadMockExamTitlesByCateoryOutput,
 } from './dtos/readMockExamTitlesByCateory.dto';
@@ -84,7 +85,7 @@ export class MockExamService {
     user: User,
     editMockExamInput: EditMockExamInput,
   ): Promise<EditMockExamOutput> {
-    const { id } = editMockExamInput;
+    const { id, title } = editMockExamInput;
     const prevMockExam = await this.mockExam.findOne({
       where: { id },
       relations: { user: true },
@@ -93,6 +94,13 @@ export class MockExamService {
       return {
         ok: false,
         error: '존재하지 않는 시험입니다.',
+      };
+    }
+
+    if (prevMockExam.approved && title) {
+      return {
+        ok: false,
+        error: '승인된 시험지는 수정할 수 없습니다.',
       };
     }
     if (prevMockExam.user.id !== user.id) {
@@ -120,6 +128,12 @@ export class MockExamService {
         return {
           ok: false,
           error: '존재하지 않는 시험입니다.',
+        };
+      }
+      if (prevMockExam.approved) {
+        return {
+          ok: false,
+          error: '승인된 시험지는 삭제할 수 없습니다.',
         };
       }
       if (prevMockExam.user.id !== user.id) {
@@ -234,9 +248,10 @@ export class MockExamService {
       const where: FindOptionsWhere<MockExam> = all
         ? { mockExamCategory: { name } }
         : { mockExamCategory: { name }, approved: true };
-      let mockExamTitles = await this.mockExam.find({
+      const mockExamTitles = await this.mockExam.find({
         where,
-        select: ['title', 'id', 'status'],
+        select: { id: true, title: true, status: true, user: { role: true } },
+        relations: { user: true },
       });
       if (!mockExamTitles) {
         return {
@@ -244,19 +259,17 @@ export class MockExamService {
           error: '해당 카테고리에 맞는 시험이 존재하지 않습니다.',
         };
       }
-      if (!all) {
-        mockExamTitles = mockExamTitles
-          // .filter((exam) => exam.mockExamQuestion.length)
-          .sort((a, b) => {
-            return (
-              Number(b.title.split('년')[0]) - Number(a.title.split('년')[0]) ||
-              Number(b.title.split('-').at(-1).split('회차')[0]) -
-                Number(a.title.split('-').at(-1).split('회차')[0])
-            );
-          });
-      }
+      const titles: ExamTitleAndId[] = mockExamTitles
+        .sort((a, b) => {
+          return (
+            Number(b.title.split('년')[0]) - Number(a.title.split('년')[0]) ||
+            Number(b.title.split('-').at(-1).split('회차')[0]) -
+              Number(a.title.split('-').at(-1).split('회차')[0])
+          );
+        })
+        .map((el) => ({ ...el, role: el.user.role }));
       return {
-        titles: mockExamTitles,
+        titles,
         ok: true,
       };
     } catch {

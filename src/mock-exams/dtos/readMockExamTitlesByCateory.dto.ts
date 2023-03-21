@@ -1,16 +1,19 @@
+import { UserRole } from './../../users/entities/user.entity';
 import { CoreOutput } from 'src/common/dtos/output.dto';
 import { MockExamCategory } from '../entities/mock-exam-category.entity';
 import { Field, InputType, ObjectType, PickType } from '@nestjs/graphql';
 import { ExamStatus } from '../entities/mock-exam.entity';
 
 @ObjectType()
-class ExamTitleAndId {
+export class ExamTitleAndId {
   @Field(() => Number)
   id: number;
   @Field(() => String)
   title: string;
   @Field(() => ExamStatus)
   status: ExamStatus;
+  @Field(() => UserRole)
+  role: UserRole;
 }
 @InputType()
 export class ReadMockExamTitlesByCateoryInput extends PickType(

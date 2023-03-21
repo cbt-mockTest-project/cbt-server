@@ -79,6 +79,12 @@ export class MockExamCategoryService {
           error: '카테고리가 존재하지 않습니다.',
         };
       }
+      if (category.approved) {
+        return {
+          ok: false,
+          error: '승인된 카테고리는 삭제할 수 없습니다.',
+        };
+      }
       if (user.id !== category.user.id) {
         return {
           ok: false,
@@ -112,6 +118,12 @@ export class MockExamCategoryService {
       return {
         ok: false,
         error: '존재하지 않는 카테고리입니다.',
+      };
+    }
+    if (prevCategory.approved) {
+      return {
+        ok: false,
+        error: '승인된 카테고리는 수정할 수 없습니다.',
       };
     }
     if (user.id !== prevCategory.user.id) {

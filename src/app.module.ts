@@ -1,3 +1,4 @@
+import { RootModule } from './root/root.module';
 import { MockExamQuestionMultipleChoice } from './mock-exams/entities/mock-exam-question-multiple-choice.entity';
 import { PostComment } from './post/entities/postComment.entity';
 import { PostCommentLike } from './post/entities/postCommentLike.entity';
@@ -136,6 +137,7 @@ import { VisitHistory } from './visit/entities/visitHistory.entity';
     UploadsModule,
     SchedulerModule,
     MailModule,
+    RootModule,
     VisitModule,
     MailerModule.forRoot({
       transport: `smtps://${process.env.EMAIL_AUTH_EMAIL}:${process.env.EMAIL_AUTH_PASSWORD}@${process.env.EMAIL_HOST}`,

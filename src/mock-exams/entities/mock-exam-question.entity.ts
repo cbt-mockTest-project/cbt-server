@@ -52,7 +52,7 @@ export class MockExamQuestion extends CoreEntity {
   @Field(() => [MockExamImageType], { nullable: true })
   solution_img: MockExamImageType[];
 
-  @Field(() => MockExam)
+  @Field(() => MockExam, { nullable: true })
   @ManyToOne(() => MockExam, (mockExam) => mockExam.mockExamQuestion, {
     onDelete: 'SET NULL',
   })

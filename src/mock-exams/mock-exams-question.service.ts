@@ -343,11 +343,12 @@ export class MockExamQuestionService {
       if (ids) {
         let questions: MockExamQuestion[] = await this.mockExamQuestion
           .createQueryBuilder('mockExamQuestion')
-          .select(['mockExamQuestion'])
+          .select(['mockExamQuestion', `"mockExam".title`])
           .leftJoinAndSelect(
             'mockExamQuestion.mockExamQuestionBookmark',
             'mockExamQuestionBookmark',
           )
+          .leftJoinAndSelect('mockExamQuestion.mockExam', 'mockExam')
           .leftJoinAndSelect(
             'mockExamQuestion.mockExamQuestionFeedback',
             'mockExamQuestionFeedback',

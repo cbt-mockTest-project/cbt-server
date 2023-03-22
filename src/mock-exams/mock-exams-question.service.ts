@@ -1,3 +1,6 @@
+import { MockExamQuestionComment } from './entities/mock-exam-question-comment.entity';
+import { MockExamQuestionFeedback } from './entities/mock-exam-question-feedback.entity';
+import { MockExamQuestionBookmark } from 'src/mock-exams/entities/mock-exam-question-bookmark.entity';
 import {
   ReadMockExamQuestionsByMockExamIdInput,
   ReadMockExamQuestionsByMockExamIdOutput,
@@ -22,7 +25,7 @@ import {
 import { MockExam } from './entities/mock-exam.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, FindOptionsWhere } from 'typeorm';
+import { Repository, FindOptionsWhere, In } from 'typeorm';
 import {
   CreateMockExamQuestionInput,
   CreateMockExamQuestionOutput,
@@ -53,6 +56,12 @@ export class MockExamQuestionService {
     private readonly mockExam: Repository<MockExam>,
     @InjectRepository(MockExamQuestionState)
     private readonly mockExamQuestionState: Repository<MockExamQuestionState>,
+    @InjectRepository(MockExamQuestionBookmark)
+    private readonly mockExamQuestionBookmark: Repository<MockExamQuestionBookmark>,
+    @InjectRepository(MockExamQuestionFeedback)
+    private readonly mockExamQuestionFeedback: Repository<MockExamQuestionFeedback>,
+    @InjectRepository(MockExamQuestionComment)
+    private readonly mockExamQuestionComment: Repository<MockExamQuestionComment>,
   ) {}
 
   async createMockExamQuestion(
@@ -318,20 +327,94 @@ export class MockExamQuestionService {
   ): Promise<ReadMockExamQuestionsByMockExamIdOutput> {
     try {
       const { id, bookmarked, ids } = readMockExamQuestionsByMockExamIdInput;
+      let questionStates: MockExamQuestionState[] = [];
+      let questionBookmarks: MockExamQuestionBookmark[] = [];
+      let questionFeedbacks: MockExamQuestionFeedback[] = [];
+      let questionComments: MockExamQuestionComment[] = [];
+
+      const makeQuestionJoins = async (questions: MockExamQuestion[]) => {
+        const questionIds = questions.map((question) => question.id);
+        await Promise.all([
+          (questionStates = await this.mockExamQuestionState.find({
+            relations: { question: true, user: true, exam: true },
+            where: {
+              question: In(questionIds),
+            },
+          })),
+          (questionBookmarks = await this.mockExamQuestionBookmark.find({
+            relations: { question: true, user: true },
+            where: {
+              question: In(questionIds),
+            },
+          })),
+          (questionFeedbacks = await this.mockExamQuestionFeedback.find({
+            relations: { mockExamQuestion: true, user: true },
+            where: {
+              mockExamQuestion: In(questionIds),
+            },
+          })),
+          (questionComments = await this.mockExamQuestionComment.find({
+            relations: { question: true, user: true },
+            where: {
+              question: In(questionIds),
+            },
+          })),
+        ]);
+        const result: MockExamQuestion[] = questions.map((question) => {
+          return {
+            ...question,
+            state: questionStates.filter(
+              (state) => state.question.id === question.id,
+            ),
+            mockExamQuestionFeedback: questionFeedbacks.filter(
+              (feedback) => feedback.mockExamQuestion.id === question.id,
+            ),
+            mockExamQuestionBookmark: questionBookmarks.filter(
+              (bookmark) => bookmark.question.id === question.id,
+            ),
+            mockExamQuestionComment: questionComments.filter(
+              (comment) => comment.question.id === question.id,
+            ),
+          };
+        });
+        return result;
+      };
+      const filterQuestionStates = (questions: MockExamQuestion[]) => {
+        const result = questions.map((question) => {
+          const filteredState = question.state?.filter(
+            (state) => user && state.user?.id === user.id,
+          );
+          const filteredBookmark = question.mockExamQuestionBookmark?.filter(
+            (bookmark) => user && bookmark.user?.id === user.id,
+          );
+          const coreState = this.mockExamQuestionState.create({
+            exam: mockExam,
+            user,
+            state: QuestionState.CORE,
+            created_at: new Date(),
+            updated_at: new Date(),
+            id: 0,
+            answer: '',
+          });
+          return {
+            ...question,
+            state: filteredState.length >= 1 ? filteredState : [coreState],
+            mockExamQuestionBookmark: filteredBookmark,
+          };
+        });
+        return result;
+      };
+
       // 북마크된 게시물 전체
       if (!id && bookmarked && user) {
-        const [questions, count] = await this.mockExamQuestion.findAndCount({
+        // eslint-disable-next-line prefer-const
+        let [questions, count] = await this.mockExamQuestion.findAndCount({
           order: { number: 'ASC' },
-          relations: {
-            state: { user: true, exam: true },
-            mockExamQuestionBookmark: { user: true },
-            mockExamQuestionComment: { user: true },
-            mockExamQuestionFeedback: { user: true },
-          },
           where: {
             mockExamQuestionBookmark: { user: { id: user.id } },
           },
         });
+        questions = await makeQuestionJoins(questions);
         return {
           ok: true,
           title: '전체',
@@ -344,38 +427,19 @@ export class MockExamQuestionService {
         let questions: MockExamQuestion[] = await this.mockExamQuestion
           .createQueryBuilder('mockExamQuestion')
           .select(['mockExamQuestion', `"mockExam".title`])
-          .leftJoinAndSelect(
-            'mockExamQuestion.mockExamQuestionBookmark',
-            'mockExamQuestionBookmark',
-          )
           .leftJoinAndSelect('mockExamQuestion.mockExam', 'mockExam')
-          .leftJoinAndSelect(
-            'mockExamQuestion.mockExamQuestionFeedback',
-            'mockExamQuestionFeedback',
-          )
-          .leftJoinAndSelect(
-            'mockExamQuestion.mockExamQuestionComment',
-            'mockExamQuestionComment',
-          )
-          .leftJoinAndSelect('mockExamQuestion.state', 'state')
-          .leftJoinAndSelect('mockExamQuestionComment.user', 'comment_user')
-          .leftJoinAndSelect('mockExamQuestionFeedback.user', 'feedback_user')
-          .leftJoinAndSelect('mockExamQuestionBookmark.user', 'bookmark_user')
-          .leftJoinAndSelect('state.user', 'state_user')
-          .leftJoinAndSelect('state.exam', 'state_exam')
+          .limit(14)
           .orWhere('mockExamQuestion.mockExam.id IN (:...ids)', { ids })
           .orderBy('RANDOM()')
           .getMany();
-
         questions = questions.slice(0, 14);
-
         if (!questions) {
           return {
             ok: false,
             error: '문제가 존재하지 않습니다.',
           };
         }
-
+        questions = await makeQuestionJoins(questions);
         if (!user) {
           questions = questions.map((question) => ({
             ...question,
@@ -383,28 +447,7 @@ export class MockExamQuestionService {
           }));
         }
         if (user) {
-          questions = questions.map((question) => {
-            const filteredState = question.state?.filter((state) => {
-              return user && state.user?.id === user.id;
-            });
-            const filteredBookmark = question.mockExamQuestionBookmark?.filter(
-              (bookmark) => user && bookmark.user?.id === user.id,
-            );
-            const coreState = this.mockExamQuestionState.create({
-              exam: { id: 1 },
-              user,
-              state: QuestionState.CORE,
-              created_at: new Date(),
-              updated_at: new Date(),
-              id: 0,
-              answer: '',
-            });
-            return {
-              ...question,
-              state: filteredState.length >= 1 ? filteredState : [coreState],
-              mockExamQuestionBookmark: filteredBookmark,
-            };
-          });
+          questions = filterQuestionStates(questions);
         }
 
         return {
@@ -436,14 +479,9 @@ export class MockExamQuestionService {
       // eslint-disable-next-line prefer-const
       let [questions, count] = await this.mockExamQuestion.findAndCount({
         order: { number: 'ASC' },
-        relations: {
-          state: { user: true, exam: true },
-          mockExamQuestionBookmark: { user: true },
-          mockExamQuestionComment: { user: true },
-          mockExamQuestionFeedback: { user: true },
-        },
         where,
       });
+      questions = await makeQuestionJoins(questions);
       if (!user) {
         questions = questions.map((question) => ({
           ...question,
@@ -451,28 +489,7 @@ export class MockExamQuestionService {
         }));
       }
       if (user) {
-        questions = questions.map((question) => {
-          const filteredState = question.state?.filter(
-            (state) => user && state.user?.id === user.id,
-          );
-          const filteredBookmark = question.mockExamQuestionBookmark?.filter(
-            (bookmark) => user && bookmark.user?.id === user.id,
-          );
-          const coreState = this.mockExamQuestionState.create({
-            exam: mockExam,
-            user,
-            state: QuestionState.CORE,
-            created_at: new Date(),
-            updated_at: new Date(),
-            id: 0,
-            answer: '',
-          });
-          return {
-            ...question,
-            state: filteredState.length >= 1 ? filteredState : [coreState],
-            mockExamQuestionBookmark: filteredBookmark,
-          };
-        });
+        questions = filterQuestionStates(questions);
       }
       if (user && bookmarked) {
         questions = questions.filter((question) => {

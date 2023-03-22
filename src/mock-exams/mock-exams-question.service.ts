@@ -384,11 +384,13 @@ export class MockExamQuestionService {
           const filteredState = question.state?.filter(
             (state) => user && state.user?.id === user.id,
           );
+
           const filteredBookmark = question.mockExamQuestionBookmark?.filter(
             (bookmark) => user && bookmark.user?.id === user.id,
           );
+
           const coreState = this.mockExamQuestionState.create({
-            exam: mockExam,
+            exam: { id: 1 },
             user,
             state: QuestionState.CORE,
             created_at: new Date(),
@@ -426,7 +428,7 @@ export class MockExamQuestionService {
       if (ids) {
         let questions: MockExamQuestion[] = await this.mockExamQuestion
           .createQueryBuilder('mockExamQuestion')
-          .select(['mockExamQuestion', `"mockExam".title`])
+          // .select(['mockExamQuestion', `"mockExam".title`])
           .leftJoinAndSelect('mockExamQuestion.mockExam', 'mockExam')
           .limit(14)
           .orWhere('mockExamQuestion.mockExam.id IN (:...ids)', { ids })
@@ -449,7 +451,6 @@ export class MockExamQuestionService {
         if (user) {
           questions = filterQuestionStates(questions);
         }
-
         return {
           ok: true,
           questions,

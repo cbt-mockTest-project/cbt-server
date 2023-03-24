@@ -19,6 +19,7 @@ export class TelegramService {
     try {
       const { message } = sendMessageToAlramChannelOfTelegramInput;
       const bot = new TelegramBot(this.options.token);
+
       bot.sendMessage(this.options.alramChannelId, message);
       return {
         ok: true,

@@ -1,3 +1,4 @@
+import { QuestionCardCategory } from './question-card/entities/question-card-category';
 import { RootModule } from './root/root.module';
 import { MockExamQuestionMultipleChoice } from './mock-exams/entities/mock-exam-question-multiple-choice.entity';
 import { PostComment } from './post/entities/postComment.entity';
@@ -41,6 +42,8 @@ import { CommonModule } from './common/common.module';
 import { Visit } from './visit/entities/visit.entity';
 import { VisitModule } from './visit/visit.module';
 import { VisitHistory } from './visit/entities/visitHistory.entity';
+import { QuestionCardModule } from './question-card/question-card.module';
+import { QuestionCard } from './question-card/entities/question-card.entity';
 
 @Module({
   imports: [
@@ -96,6 +99,8 @@ import { VisitHistory } from './visit/entities/visitHistory.entity';
       synchronize: process.env.NODE_ENV !== 'prod',
       logging: false,
       entities: [
+        QuestionCard,
+        QuestionCardCategory,
         User,
         Verification,
         MockExam,
@@ -158,6 +163,7 @@ import { VisitHistory } from './visit/entities/visitHistory.entity';
     CrawlerModule,
     PostModule,
     CommonModule,
+    QuestionCardModule,
   ],
   controllers: [],
   providers: [],

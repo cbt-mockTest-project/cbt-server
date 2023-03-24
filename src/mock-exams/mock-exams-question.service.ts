@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 import { MockExamQuestionComment } from './entities/mock-exam-question-comment.entity';
 import { MockExamQuestionFeedback } from './entities/mock-exam-question-feedback.entity';
 import { MockExamQuestionBookmark } from 'src/mock-exams/entities/mock-exam-question-bookmark.entity';
@@ -25,7 +26,7 @@ import {
 import { MockExam } from './entities/mock-exam.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, FindOptionsWhere, In } from 'typeorm';
+import { Repository, FindOptionsWhere, In, Not } from 'typeorm';
 import {
   CreateMockExamQuestionInput,
   CreateMockExamQuestionOutput,
@@ -326,7 +327,8 @@ export class MockExamQuestionService {
     user: User,
   ): Promise<ReadMockExamQuestionsByMockExamIdOutput> {
     try {
-      const { id, bookmarked, ids } = readMockExamQuestionsByMockExamIdInput;
+      const { id, bookmarked, ids, states } =
+        readMockExamQuestionsByMockExamIdInput;
       let questionStates: MockExamQuestionState[] = [];
       let questionBookmarks: MockExamQuestionBookmark[] = [];
       let questionFeedbacks: MockExamQuestionFeedback[] = [];
@@ -408,8 +410,13 @@ export class MockExamQuestionService {
       };
 
       // 북마크된 게시물 전체
-      if (!id && bookmarked && user) {
-        // eslint-disable-next-line prefer-const
+      if (!id && bookmarked) {
+        if (!user) {
+          return {
+            ok: false,
+            error: '로그인이 필요합니다.',
+          };
+        }
         let [questions, count] = await this.mockExamQuestion.findAndCount({
           order: { number: 'ASC' },
           where: {
@@ -425,10 +432,10 @@ export class MockExamQuestionService {
         };
       }
 
+      // 랜덤모의고사
       if (ids) {
         let questions: MockExamQuestion[] = await this.mockExamQuestion
           .createQueryBuilder('mockExamQuestion')
-          // .select(['mockExamQuestion', `"mockExam".title`])
           .leftJoinAndSelect('mockExamQuestion.mockExam', 'mockExam')
           .limit(14)
           .orWhere('mockExamQuestion.mockExam.id IN (:...ids)', { ids })
@@ -459,6 +466,7 @@ export class MockExamQuestionService {
         };
       }
 
+      // 모의고사 문제, 북마크된 문제
       const mockExam = await this.mockExam.findOne({
         where: { id },
         relations: { user: true },
@@ -477,7 +485,15 @@ export class MockExamQuestionService {
           mockExamQuestionBookmark: { user: { id: user.id } },
         };
       }
-      // eslint-disable-next-line prefer-const
+      if (Array.isArray(states) && user) {
+        where = {
+          ...where,
+          state: {
+            user: { id: user.id },
+            state: states.length >= 1 ? In(states) : Not(QuestionState.CORE),
+          },
+        };
+      }
       let [questions, count] = await this.mockExamQuestion.findAndCount({
         order: { number: 'ASC' },
         where,

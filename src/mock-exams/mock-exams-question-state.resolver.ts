@@ -16,6 +16,7 @@ import {
   ReadMyExamQuestionStateInput,
   ReadMyExamQuestionStateOutput,
 } from './dtos/readMyExamQuestionStates.dto';
+import { ReadExamTitleAndIdByQuestionStateOutput } from './dtos/readExamTitleAndIdByQuestionState.dto';
 
 @Resolver(() => MockExamQuestionState)
 export class MockExamQuestionStateResolver {
@@ -55,6 +56,16 @@ export class MockExamQuestionStateResolver {
   ): Promise<ReadMyExamQuestionStateOutput> {
     return this.mockExamQuestionStateService.readMyExamQuestionState(
       readMyExamQuestionState,
+      user,
+    );
+  }
+
+  @Query(() => ReadExamTitleAndIdByQuestionStateOutput)
+  @Role(['ANY'])
+  async readExamTitleAndIdByQuestionState(
+    @AuthUser() user: User,
+  ): Promise<ReadExamTitleAndIdByQuestionStateOutput> {
+    return this.mockExamQuestionStateService.readExamTitleAndIdByQuestionState(
       user,
     );
   }

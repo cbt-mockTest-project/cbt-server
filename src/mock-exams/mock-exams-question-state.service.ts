@@ -13,12 +13,14 @@ import {
 } from './dtos/createOrUpdateMockExamQuestionState.dto';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, FindOptionsWhere } from 'typeorm';
+import { Repository, FindOptionsWhere, Not } from 'typeorm';
 import {
   MockExamQuestionState,
   QuestionState,
 } from './entities/mock-exam-question-state.entity';
 import { MockExamQuestion } from './entities/mock-exam-question.entity';
+import { ReadExamTitleAndIdByQuestionStateOutput } from './dtos/readExamTitleAndIdByQuestionState.dto';
+import { deduplication } from 'src/utils/utils';
 
 @Injectable()
 export class MockExamQuestionStateService {
@@ -177,6 +179,33 @@ export class MockExamQuestionStateService {
         ok: false,
         error: '성취도를 초기화 할 수 없습니다.',
       };
+    }
+  }
+
+  async readExamTitleAndIdByQuestionState(
+    user: User,
+  ): Promise<ReadExamTitleAndIdByQuestionStateOutput> {
+    try {
+      const questionStates = await this.mockExamQuestionState.find({
+        where: {
+          state: Not(QuestionState.CORE),
+          user: {
+            id: user.id,
+          },
+        },
+        relations: {
+          exam: true,
+        },
+      });
+      const titleAndId = deduplication(
+        questionStates.map((state) => {
+          const { title, id } = state.exam;
+          return { title, id };
+        }),
+      );
+      return { ok: true, titleAndId };
+    } catch (e) {
+      return { ok: false, error: '시험카테고리를 불러올 수 없습니다.' };
     }
   }
 }

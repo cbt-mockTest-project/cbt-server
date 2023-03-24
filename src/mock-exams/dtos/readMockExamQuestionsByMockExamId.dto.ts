@@ -1,6 +1,7 @@
 import { MockExamQuestion } from '../entities/mock-exam-question.entity';
 import { CoreOutput } from '../../common/dtos/output.dto';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
+import { QuestionState } from '../entities/mock-exam-question-state.entity';
 
 @InputType()
 export class ReadMockExamQuestionsByMockExamIdInput {
@@ -8,6 +9,8 @@ export class ReadMockExamQuestionsByMockExamIdInput {
   isRandom?: boolean;
   @Field(() => Boolean, { nullable: true })
   bookmarked?: boolean;
+  @Field(() => [QuestionState], { nullable: true })
+  states?: QuestionState[];
   @Field(() => Number, { nullable: true })
   id?: number;
   @Field(() => [Number], { nullable: true })

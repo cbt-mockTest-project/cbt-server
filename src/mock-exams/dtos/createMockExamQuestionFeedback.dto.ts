@@ -12,4 +12,7 @@ export class CreateMockExamQuestionFeedbackInput extends PickType(
 }
 
 @ObjectType()
-export class CreateMockExamQuestionFeedbackOutput extends CoreOutput {}
+export class CreateMockExamQuestionFeedbackOutput extends CoreOutput {
+  @Field(() => MockExamQuestionFeedback, { nullable: true })
+  feedback?: MockExamQuestionFeedback;
+}

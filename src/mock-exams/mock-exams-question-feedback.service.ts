@@ -45,14 +45,15 @@ export class MockExamQuestionFeedbackSerivce {
           error: '존재하지 않는 문제입니다.',
         };
       }
-      const feedback = this.mockExamQuestionFeedback.create({
+      let feedback = this.mockExamQuestionFeedback.create({
         content,
         mockExamQuestion: question,
         user,
       });
-      await this.mockExamQuestionFeedback.save(feedback);
+      feedback = await this.mockExamQuestionFeedback.save(feedback);
       return {
         ok: true,
+        feedback,
       };
     } catch {
       return {

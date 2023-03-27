@@ -583,6 +583,12 @@ export class UserService {
     }
     let newUser: User;
     let token: string;
+    const existedNickname = await this.users.findOne({
+      where: { nickname: profile.nickname },
+    });
+    if (existedNickname) {
+      profile.nickname = profile.nickname + '#' + uuidv4().substring(0, 4);
+    }
     if (!user) {
       newUser = this.users.create({
         email,
@@ -655,7 +661,8 @@ export class UserService {
         error: '유저정보를 가져올 수 없습니다.',
       };
     }
-    const { email, name } = resToUserInfo.data;
+    // eslint-disable-next-line prefer-const
+    let { email, name } = resToUserInfo.data;
 
     const user = await this.users.findOne({
       where: { email },
@@ -666,6 +673,12 @@ export class UserService {
         ok: false,
         error: '탈퇴 처리된 계정입니다.',
       };
+    }
+    const existedNickname = await this.users.findOne({
+      where: { nickname: name },
+    });
+    if (existedNickname) {
+      name = name + '#' + uuidv4().substring(0, 4);
     }
     let newUser: User;
     let token: string;

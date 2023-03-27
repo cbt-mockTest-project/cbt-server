@@ -1,4 +1,5 @@
 import { MockExamHistory } from './../../mock-exams/entities/mock-exam-history';
+import { QuestionCard } from './../../question-card/entities/question-card.entity';
 import { MockExamCategory } from './../../mock-exams/entities/mock-exam-category.entity';
 import { PostComment } from './../../post/entities/postComment.entity';
 import { Post } from './../../post/entities/post.entity';
@@ -30,6 +31,7 @@ import { MockExamQuestionBookmark } from 'src/mock-exams/entities/mock-exam-ques
 import { Visit } from 'src/visit/entities/visit.entity';
 import { MockExam } from 'src/mock-exams/entities/mock-exam.entity';
 import { MockExamQuestion } from 'src/mock-exams/entities/mock-exam-question.entity';
+import { QuestionCardCategory } from 'src/question-card/entities/question-card-category';
 
 export enum UserRole {
   CLIENT = 'CLIENT',
@@ -166,6 +168,17 @@ export class User extends CoreEntity {
   @Field(() => [MockExamHistory])
   @OneToMany(() => MockExamHistory, (mockExamHistory) => mockExamHistory.user)
   mockExamHistory: MockExamHistory[];
+
+  @Field(() => [QuestionCard])
+  @OneToMany(() => QuestionCard, (questionCard) => questionCard.user)
+  questionCards: QuestionCard[];
+
+  @Field(() => [QuestionCardCategory])
+  @OneToMany(
+    () => QuestionCardCategory,
+    (questionCardCategory) => questionCardCategory.user,
+  )
+  questionCardCategorys: QuestionCard[];
 
   @BeforeInsert()
   @BeforeUpdate()

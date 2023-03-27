@@ -29,6 +29,10 @@ export class MockExam extends CoreEntity {
   @Field(() => String)
   title: string;
 
+  @Column({ nullable: true })
+  @Field(() => String, { nullable: true })
+  slug: string;
+
   @Column()
   @Field(() => Boolean, { defaultValue: false })
   approved: boolean;

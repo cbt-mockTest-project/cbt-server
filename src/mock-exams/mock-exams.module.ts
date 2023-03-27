@@ -28,12 +28,16 @@ import { MockExamQuestionBookmark } from './entities/mock-exam-question-bookmark
 import { MockExamQuestionMultipleChoiceResolver } from './mock-exams-question-multiple-choice.resolver';
 import { MockExamQuestionMultipleChoiceService } from './mock-exams-question-multiple-choice.service';
 import { MockExamQuestionMultipleChoice } from './entities/mock-exam-question-multiple-choice.entity';
+import { MockExamHistory } from './entities/mock-exam-history';
+import { MockExamHistoryResolver } from './mock-exams-history.resolver';
+import { MockExamHistoryService } from './mock-exams-history.service';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       MockExamCategory,
       MockExam,
+      MockExamHistory,
       MockExamQuestion,
       MockExamQuestionFeedback,
       MockExamQuestionState,
@@ -63,6 +67,8 @@ import { MockExamQuestionMultipleChoice } from './entities/mock-exam-question-mu
     MockExamQuestionBookmarkSerivce,
     MockExamQuestionMultipleChoiceResolver,
     MockExamQuestionMultipleChoiceService,
+    MockExamHistoryResolver,
+    MockExamHistoryService,
   ],
   exports: [],
 })

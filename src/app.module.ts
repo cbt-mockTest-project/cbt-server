@@ -41,6 +41,7 @@ import { CommonModule } from './common/common.module';
 import { Visit } from './visit/entities/visit.entity';
 import { VisitModule } from './visit/visit.module';
 import { VisitHistory } from './visit/entities/visitHistory.entity';
+import { MockExamHistory } from './mock-exams/entities/mock-exam-history';
 
 @Module({
   imports: [
@@ -99,6 +100,7 @@ import { VisitHistory } from './visit/entities/visitHistory.entity';
         User,
         Verification,
         MockExam,
+        MockExamHistory,
         MockExamCategory,
         MockExamQuestion,
         MockExamQuestionFeedback,

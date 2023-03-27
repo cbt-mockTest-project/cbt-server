@@ -11,6 +11,7 @@ import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { MockExamQuestion } from './mock-exam-question.entity';
 import { MockExamQuestionState } from './mock-exam-question-state.entity';
 import { IsEnum } from 'class-validator';
+import { MockExamHistory } from './mock-exam-history';
 
 export enum ExamStatus {
   UNSET = 'UNSET',
@@ -66,6 +67,12 @@ export class MockExam extends CoreEntity {
     },
   )
   mockExamQuestionState: MockExamQuestionState[];
+
+  @Field(() => [MockExamHistory])
+  @OneToMany(() => MockExamHistory, (MockExamHistory) => MockExamHistory.exam, {
+    onDelete: 'SET NULL',
+  })
+  history: MockExamHistory[];
 
   @ManyToOne(() => User, (user) => user.mockExam, {
     onDelete: 'SET NULL',

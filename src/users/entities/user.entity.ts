@@ -1,3 +1,4 @@
+import { MockExamHistory } from './../../mock-exams/entities/mock-exam-history';
 import { MockExamCategory } from './../../mock-exams/entities/mock-exam-category.entity';
 import { PostComment } from './../../post/entities/postComment.entity';
 import { Post } from './../../post/entities/post.entity';
@@ -161,6 +162,10 @@ export class User extends CoreEntity {
     (mockExamQuestionMockExamQuestion) => mockExamQuestionMockExamQuestion.user,
   )
   mockExamQuestion: MockExamQuestionBookmark[];
+
+  @Field(() => [MockExamHistory])
+  @OneToMany(() => MockExamHistory, (mockExamHistory) => mockExamHistory.user)
+  mockExamHistory: MockExamHistory[];
 
   @BeforeInsert()
   @BeforeUpdate()

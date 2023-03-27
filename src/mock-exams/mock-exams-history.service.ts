@@ -57,11 +57,13 @@ export class MockExamHistoryService {
     try {
       const mockExamHistories = await this.mockExamHistory.find({
         where: { user: { id: user.id } },
+        order: { updated_at: 'DESC' },
         relations: ['exam'],
       });
-      const mockExams = mockExamHistories.map(
-        (mockExamHistory) => mockExamHistory.exam,
-      );
+      const mockExams = mockExamHistories.map((mockExamHistory) => ({
+        ...mockExamHistory.exam,
+        updated_at: mockExamHistory.updated_at,
+      }));
       return { ok: true, mockExams };
     } catch {
       return {

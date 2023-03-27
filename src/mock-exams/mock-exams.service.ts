@@ -250,7 +250,13 @@ export class MockExamService {
         : { mockExamCategory: { name }, approved: true };
       const mockExamTitles = await this.mockExam.find({
         where,
-        select: { id: true, title: true, status: true, user: { role: true } },
+        select: {
+          id: true,
+          title: true,
+          status: true,
+          slug: true,
+          user: { role: true },
+        },
         relations: { user: true },
       });
       if (!mockExamTitles) {
@@ -325,4 +331,18 @@ export class MockExamService {
       };
     }
   }
+  // async syncExamSlug() {
+  //   const slugify = (title: string) => {
+  //     const splited = title.split('-');
+  //     return splited[0] + '-' + splited.at(-1);
+  //   };
+  //   const mockExams = await this.mockExam.find();
+  //   for (const mockExam of mockExams) {
+  //     const slug = slugify(mockExam.title);
+  //     await this.mockExam.update(mockExam.id, { slug });
+  //   }
+  //   return {
+  //     ok: true,
+  //   };
+  // }
 }

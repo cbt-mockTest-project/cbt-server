@@ -30,6 +30,7 @@ import {
   ReadMockExamTitlesByCateoryInput,
 } from './dtos/readMockExamTitlesByCateory.dto';
 import { AuthUser } from 'src/auth/auth-user.decorator';
+import { CoreOutput } from 'src/common/dtos/output.dto';
 
 @Resolver(() => MockExam)
 export class MockExamResolver {
@@ -99,4 +100,9 @@ export class MockExamResolver {
   ): Promise<FindMyExamHistoryOutput> {
     return this.mockExamService.findMyExamHistory(user, findMyExamHistoryInput);
   }
+
+  // @Mutation(() => CoreOutput)
+  // async syncExamSlug() {
+  //   return this.mockExamService.syncExamSlug();
+  // }
 }

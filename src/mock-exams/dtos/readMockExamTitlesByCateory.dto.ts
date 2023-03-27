@@ -10,6 +10,8 @@ export class ExamTitleAndId {
   id: number;
   @Field(() => String)
   title: string;
+  @Field(() => String)
+  slug: string;
   @Field(() => ExamStatus)
   status: ExamStatus;
   @Field(() => UserRole)

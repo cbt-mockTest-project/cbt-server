@@ -67,6 +67,7 @@ export class QuestionCardService {
       const { categoryId } = readMyQuestionCardsInput;
       const questionCards = await this.questionCard.find({
         where: { category: { id: categoryId }, user: { id: user.id } },
+        order: { created_at: 'DESC' },
       });
       if (!questionCards) {
         return {

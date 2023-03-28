@@ -74,7 +74,7 @@ export class QuestionCardCategoryService {
     try {
       const { id } = deleteQuestionCardCategoryInput;
       const category = await this.questionCardCategory.findOne({
-        relations: { user: true },
+        relations: { user: true, questionCard: true },
         where: {
           id,
           user: {
@@ -86,6 +86,12 @@ export class QuestionCardCategoryService {
         return {
           ok: false,
           error: '카테고리가 존재하지 않습니다.',
+        };
+      }
+      if (category.questionCard.length > 0) {
+        return {
+          ok: false,
+          error: '카테고리에 속한 메모를 모두 삭제후 삭제해주세요.',
         };
       }
       await this.questionCardCategory.delete({ id });

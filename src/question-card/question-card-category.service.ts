@@ -32,7 +32,21 @@ export class QuestionCardCategoryService {
         where: {
           user: { id: user.id },
         },
+        order: {
+          created_at: 'DESC',
+        },
       });
+      if (categories.length === 0) {
+        const newCategory = this.questionCardCategory.create({
+          name: '기본',
+          user,
+        });
+        await this.questionCardCategory.save(newCategory);
+        return {
+          ok: true,
+          categories: [newCategory],
+        };
+      }
       return {
         ok: true,
         categories,

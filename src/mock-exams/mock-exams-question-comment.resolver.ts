@@ -1,4 +1,8 @@
 import {
+  ReadMyQuestionCommentsOutput,
+  ReadMyQuestionCommentsInput,
+} from './dtos/readMyQuestionComments.dto';
+import {
   ReadMockExamQuestionCommentsByQuestionIdOutput,
   ReadMockExamQuestionCommentsByQuestionIdInput,
 } from './dtos/readMockExamQuestionCommentsByQuestinId.dto';
@@ -20,6 +24,7 @@ import {
   EditMockExamQuestionCommentOutput,
 } from './dtos/editMockExamQuestionComment.dto';
 import { AuthUser } from 'src/auth/auth-user.decorator';
+import { ReadExamTitleAndIdByQuestionCommentOutput } from './dtos/readExamTitleAndIdByQuestionComment.dto';
 
 @Resolver(() => MockExamQuestionComment)
 export class MockExamQuestionCommentResolver {
@@ -74,6 +79,28 @@ export class MockExamQuestionCommentResolver {
   ): Promise<ReadMockExamQuestionCommentsByQuestionIdOutput> {
     return this.mockExamQuestionCommentSerivce.readMockExamQuestionCommentsByQuestionId(
       readMockExamQuestionCommentsByQuestionIdInput,
+      user,
+    );
+  }
+
+  @Query(() => ReadMyQuestionCommentsOutput)
+  @Role(['ANY'])
+  async readMyQuestionComments(
+    @Args('input') readMyQuestionCommentsInput: ReadMyQuestionCommentsInput,
+    @AuthUser() user: User,
+  ): Promise<ReadMyQuestionCommentsOutput> {
+    return this.mockExamQuestionCommentSerivce.readMyQuestionComments(
+      readMyQuestionCommentsInput,
+      user,
+    );
+  }
+
+  @Query(() => ReadExamTitleAndIdByQuestionCommentOutput)
+  @Role(['ANY'])
+  async readExamTitleAndIdByQuestionComment(
+    @AuthUser() user: User,
+  ): Promise<ReadExamTitleAndIdByQuestionCommentOutput> {
+    return this.mockExamQuestionCommentSerivce.readExamTitleAndIdByQuestionComment(
       user,
     );
   }

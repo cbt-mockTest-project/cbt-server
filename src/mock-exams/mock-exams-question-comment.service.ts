@@ -1,3 +1,4 @@
+import { deduplication, findUniqElem } from './../utils/utils';
 import {
   ReadMockExamQuestionCommentsByQuestionIdOutput,
   ReadMockExamQuestionCommentsByQuestionIdInput,
@@ -15,12 +16,18 @@ import { MockExamQuestion } from './entities/mock-exam-question.entity';
 import { MockExamQuestionComment } from './entities/mock-exam-question-comment.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import {
   DeleteMockExamQuestionCommentInput,
   DeleteMockExamQuestionCommentOutput,
 } from './dtos/deleteMockExamQuestionComment.dto';
 import { MockExamQuestionCommentLike } from './entities/mock-exam-question-comment-like.entity';
+import {
+  ReadMyQuestionCommentsInput,
+  ReadMyQuestionCommentsOutput,
+} from './dtos/readMyQuestionComments.dto';
+import { ReadExamTitleAndIdByQuestionCommentOutput } from './dtos/readExamTitleAndIdByQuestionComment.dto';
+import { MockExam } from './entities/mock-exam.entity';
 
 @Injectable()
 export class MockExamQuestionCommentSerivce {
@@ -31,6 +38,8 @@ export class MockExamQuestionCommentSerivce {
     private readonly mockExamQuestionComment: Repository<MockExamQuestionComment>,
     @InjectRepository(MockExamQuestion)
     private readonly mockExamQuestion: Repository<MockExamQuestion>,
+    @InjectRepository(MockExam)
+    private readonly mockExam: Repository<MockExam>,
     @InjectRepository(User)
     private readonly users: Repository<User>,
   ) {}
@@ -184,6 +193,69 @@ export class MockExamQuestionCommentSerivce {
       return {
         ok: false,
         error: '댓글을 불러올 수  없습니다.',
+      };
+    }
+  }
+
+  async readMyQuestionComments(
+    readMyQuestionCommentsInput: ReadMyQuestionCommentsInput,
+    user: User,
+  ): Promise<ReadMyQuestionCommentsOutput> {
+    try {
+      const { examId } = readMyQuestionCommentsInput;
+      const where: FindOptionsWhere<MockExamQuestion> = examId
+        ? {
+            mockExam: { id: examId },
+            mockExamQuestionComment: { user: { id: user.id } },
+          }
+        : {
+            mockExamQuestionComment: { user: { id: user.id } },
+          };
+      const questions = await this.mockExamQuestion.find({
+        relations: {
+          mockExam: true,
+          mockExamQuestionComment: true,
+        },
+        where,
+      });
+      return {
+        ok: true,
+        questions,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '댓글을 불러올 수  없습니다.',
+      };
+    }
+  }
+
+  async readExamTitleAndIdByQuestionComment(
+    user: User,
+  ): Promise<ReadExamTitleAndIdByQuestionCommentOutput> {
+    try {
+      const exams = await this.mockExam.find({
+        where: {
+          mockExamQuestion: {
+            mockExamQuestionComment: {
+              user: { id: user.id },
+            },
+          },
+        },
+      });
+      const examTitleAndId = exams.map((exam) => ({
+        id: exam.id,
+        title: exam.title,
+      }));
+
+      return {
+        ok: true,
+        examTitleAndId,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '카테고리를 불러올 수  없습니다.',
       };
     }
   }

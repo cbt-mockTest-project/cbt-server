@@ -327,7 +327,7 @@ export class MockExamQuestionService {
     user: User,
   ): Promise<ReadMockExamQuestionsByMockExamIdOutput> {
     try {
-      const { id, bookmarked, ids, states } =
+      const { id, bookmarked, ids, states, limit } =
         readMockExamQuestionsByMockExamIdInput;
       let questionStates: MockExamQuestionState[] = [];
       let questionBookmarks: MockExamQuestionBookmark[] = [];
@@ -434,14 +434,46 @@ export class MockExamQuestionService {
 
       // 랜덤모의고사
       if (ids) {
+        if (states) {
+          if (!user) {
+            return {
+              ok: false,
+              error: '로그인이 필요합니다.',
+            };
+          }
+          let questionStates = await this.mockExamQuestionState
+            .createQueryBuilder('mockExamQuestionState')
+            .leftJoinAndSelect('mockExamQuestionState.question', 'question')
+            .leftJoinAndSelect('question.mockExam', 'mockExam')
+            .where('mockExamQuestionState.user.id = :id', { id: user.id })
+            .andWhere('mockExam.id IN (:...ids)', {
+              ids,
+            })
+            .andWhere('mockExamQuestionState.state IN (:...states)', {
+              states,
+            })
+            .limit(limit || 14)
+            .orderBy('RANDOM()')
+            .getMany();
+
+          let questions = questionStates.map((state) => state.question);
+          questions = await makeQuestionJoins(questions);
+          questions = filterQuestionStates(questions);
+          return {
+            ok: true,
+            questions,
+            title: '랜덤모의고사',
+            count: questions.length,
+          };
+        }
+
         let questions: MockExamQuestion[] = await this.mockExamQuestion
           .createQueryBuilder('mockExamQuestion')
           .leftJoinAndSelect('mockExamQuestion.mockExam', 'mockExam')
-          .limit(14)
-          .orWhere('mockExamQuestion.mockExam.id IN (:...ids)', { ids })
+          .limit(limit || 14)
+          .where('mockExamQuestion.mockExam.id IN (:...ids)', { ids })
           .orderBy('RANDOM()')
           .getMany();
-        questions = questions.slice(0, 14);
         if (!questions) {
           return {
             ok: false,

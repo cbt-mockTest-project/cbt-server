@@ -15,6 +15,8 @@ export class ReadMockExamQuestionsByMockExamIdInput {
   id?: number;
   @Field(() => [Number], { nullable: true })
   ids?: number[];
+  @Field(() => Number, { nullable: true })
+  limit?: number;
 }
 
 @ObjectType()

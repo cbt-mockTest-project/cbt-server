@@ -1,4 +1,4 @@
-import { User, UserRole } from 'src/users/entities/user.entity';
+import { User } from 'src/users/entities/user.entity';
 import {
   CreateMockExamCategoryInput,
   CreateMockExamCategoryOutput,
@@ -188,16 +188,20 @@ export class MockExamCategoryService {
 
   async readMyMockExamCategories(user: User) {
     try {
-      const categories = await this.mockExamCategories.find({
-        where: {
-          user: { id: user.id },
-        },
-      });
+      const categories = await this.mockExamCategories
+        .createQueryBuilder('mockExamCategory')
+        .leftJoinAndSelect('mockExamCategory.examCoAuthor', 'examCoAuthor')
+        .orWhere('mockExamCategory.user.id = :userId', { userId: user.id })
+        .orWhere('examCoAuthor.user.id = :examCoAuthorId', {
+          examCoAuthorId: user.id,
+        })
+        .getMany();
       return {
         ok: true,
         categories,
       };
-    } catch {
+    } catch (e) {
+      console.log(e);
       return {
         ok: false,
         error: '카테고리를 찾을 수 없습니다.',

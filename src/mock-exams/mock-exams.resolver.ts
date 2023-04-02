@@ -87,8 +87,10 @@ export class MockExamResolver {
   async readMockExamTitlesByCateory(
     @Args('input')
     readMockExamTitlesByCateoryInput: ReadMockExamTitlesByCateoryInput,
+    @AuthUser() user: User,
   ): Promise<ReadMockExamTitlesByCateoryOutput> {
     return this.mockExamService.readMockExamTitlesByCateory(
+      user,
       readMockExamTitlesByCateoryInput,
     );
   }

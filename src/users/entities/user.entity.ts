@@ -1,3 +1,4 @@
+import { ExamCoAuthor } from './../../exam-co-author/entities/exam-co-author.entity';
 import { MockExamHistory } from './../../mock-exams/entities/mock-exam-history';
 import { QuestionCard } from './../../question-card/entities/question-card.entity';
 import { MockExamCategory } from './../../mock-exams/entities/mock-exam-category.entity';
@@ -143,6 +144,10 @@ export class User extends CoreEntity {
   @OneToMany(() => Post, (post) => post.user)
   @Field(() => [Post], { nullable: true })
   post: Post[];
+
+  @OneToMany(() => ExamCoAuthor, (examCoAuthor) => examCoAuthor.user)
+  @Field(() => [ExamCoAuthor], { nullable: true })
+  examCoAuthor: ExamCoAuthor[];
 
   @DeleteDateColumn()
   @Field(() => Date)

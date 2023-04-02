@@ -17,4 +17,6 @@ export class ReadMockExamQuestionOutput extends CoreOutput {
   mockExamQusetion?: MockExamQuestion;
   @Field(() => QuestionState, { nullable: true })
   state?: QuestionState;
+  @Field(() => Boolean, { defaultValue: false })
+  isCoAuthor?: boolean;
 }

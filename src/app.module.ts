@@ -45,6 +45,8 @@ import { VisitHistory } from './visit/entities/visitHistory.entity';
 import { MockExamHistory } from './mock-exams/entities/mock-exam-history';
 import { QuestionCardModule } from './question-card/question-card.module';
 import { QuestionCard } from './question-card/entities/question-card.entity';
+import { ExamCoAuthorModule } from './exam-co-author/exam-co-author.module';
+import { ExamCoAuthor } from './exam-co-author/entities/exam-co-author.entity';
 
 @Module({
   imports: [
@@ -100,6 +102,7 @@ import { QuestionCard } from './question-card/entities/question-card.entity';
       synchronize: process.env.NODE_ENV !== 'prod',
       logging: false,
       entities: [
+        ExamCoAuthor,
         QuestionCard,
         QuestionCardCategory,
         User,
@@ -140,6 +143,7 @@ import { QuestionCard } from './question-card/entities/question-card.entity';
           : process.env.PRODUCT_CLIENT_URL,
     }),
     AuthModule,
+    ExamCoAuthorModule,
     MockExamsModule,
     UploadsModule,
     SchedulerModule,
@@ -166,6 +170,7 @@ import { QuestionCard } from './question-card/entities/question-card.entity';
     PostModule,
     CommonModule,
     QuestionCardModule,
+    ExamCoAuthorModule,
   ],
   controllers: [],
   providers: [],

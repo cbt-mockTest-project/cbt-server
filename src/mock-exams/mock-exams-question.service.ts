@@ -1,3 +1,4 @@
+import { ExamCoAuthor } from './../exam-co-author/entities/exam-co-author.entity';
 /* eslint-disable prefer-const */
 import { MockExamQuestionComment } from './entities/mock-exam-question-comment.entity';
 import { MockExamQuestionFeedback } from './entities/mock-exam-question-feedback.entity';
@@ -63,6 +64,8 @@ export class MockExamQuestionService {
     private readonly mockExamQuestionFeedback: Repository<MockExamQuestionFeedback>,
     @InjectRepository(MockExamQuestionComment)
     private readonly mockExamQuestionComment: Repository<MockExamQuestionComment>,
+    @InjectRepository(ExamCoAuthor)
+    private readonly examCoAuthor: Repository<ExamCoAuthor>,
   ) {}
 
   async createMockExamQuestion(
@@ -79,6 +82,7 @@ export class MockExamQuestionService {
         number,
       } = createMockExamQuestionInput;
       const mockExam = await this.mockExam.findOne({
+        relations: { user: true },
         where: { id: mockExamId },
       });
       const questions = await this.mockExamQuestion.find({
@@ -99,6 +103,24 @@ export class MockExamQuestionService {
         return {
           ok: false,
           error: '존재하지 않는 시험입니다.',
+        };
+      }
+      const coAuthor = await this.examCoAuthor.findOne({
+        where: {
+          user: {
+            id: user.id,
+          },
+          exam: {
+            id: mockExamId,
+          },
+        },
+      });
+      const isCoAuthor = coAuthor ? true : false;
+      const isOwner = mockExam.user.id === user.id || isCoAuthor;
+      if (!isOwner) {
+        return {
+          ok: false,
+          error: '권한이 없습니다.',
         };
       }
       const newExamQuestion = this.mockExamQuestion.create({
@@ -162,6 +184,7 @@ export class MockExamQuestionService {
         : {
             id: questionId,
           };
+
       let question = await this.mockExamQuestion.findOne({
         where,
         relations: {
@@ -172,6 +195,22 @@ export class MockExamQuestionService {
           user: true,
         },
       });
+      let isCoAuthor = false;
+      if (user) {
+        const examCoAuthor = await this.examCoAuthor.findOne({
+          where: {
+            exam: {
+              id: question.mockExam.id,
+            },
+            user: {
+              id: user && user.id,
+            },
+          },
+        });
+        if (examCoAuthor) {
+          isCoAuthor = true;
+        }
+      }
       if (!question) {
         return {
           ok: false,
@@ -190,6 +229,7 @@ export class MockExamQuestionService {
       return {
         ok: true,
         mockExamQusetion: question,
+        isCoAuthor,
       };
     } catch (e) {
       console.log(e);
@@ -209,15 +249,28 @@ export class MockExamQuestionService {
         editMockExamQuestionInput;
       const prevMockExamQuestion = await this.mockExamQuestion.findOne({
         where: { id },
-        relations: { user: true },
+        relations: { user: true, mockExam: true },
       });
+
       if (!prevMockExamQuestion) {
         return {
           ok: false,
           error: '존재하지 않는 문제입니다.',
         };
       }
-      if (prevMockExamQuestion.user.id !== user.id) {
+      const coAuthor = await this.examCoAuthor.findOne({
+        where: {
+          user: {
+            id: user.id,
+          },
+          exam: {
+            id: prevMockExamQuestion.mockExam.id,
+          },
+        },
+      });
+      const isCoAuthor = coAuthor ? true : false;
+      const isOwner = prevMockExamQuestion.user.id === user.id || isCoAuthor;
+      if (!isOwner) {
         return {
           ok: false,
           error: '권한이 없습니다.',
@@ -248,7 +301,7 @@ export class MockExamQuestionService {
       const { id } = deleteMockExamQuestionInput;
       const mockExamQuestion = await this.mockExamQuestion.findOne({
         where: { id },
-        relations: { user: true },
+        relations: { user: true, mockExam: true },
       });
       if (!mockExamQuestion) {
         return {
@@ -256,7 +309,19 @@ export class MockExamQuestionService {
           error: '존재하지 않는 문제입니다.',
         };
       }
-      if (user.id !== mockExamQuestion.user.id) {
+      const coAuthor = await this.examCoAuthor.findOne({
+        where: {
+          user: {
+            id: user.id,
+          },
+          exam: {
+            id: mockExamQuestion.mockExam.id,
+          },
+        },
+      });
+      const isCoAuthor = coAuthor ? true : false;
+      const isOwner = mockExamQuestion.user.id === user.id || isCoAuthor;
+      if (!isOwner) {
         return {
           ok: false,
           error: '권한이 없습니다.',

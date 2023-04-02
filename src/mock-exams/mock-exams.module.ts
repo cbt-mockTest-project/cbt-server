@@ -1,3 +1,4 @@
+import { ExamCoAuthor } from './../exam-co-author/entities/exam-co-author.entity';
 import { MockExamQuestionBookmarkSerivce } from './mock-exams-question-bookmark.service';
 import { MockExamQuestionBookmarkResolver } from './mock-exams-question-bookmark.resolver';
 import { MockExamQuestionCommentLike } from 'src/mock-exams/entities/mock-exam-question-comment-like.entity';
@@ -45,6 +46,7 @@ import { MockExamHistoryService } from './mock-exams-history.service';
       MockExamQuestionCommentLike,
       MockExamQuestionBookmark,
       MockExamQuestionMultipleChoice,
+      ExamCoAuthor,
       User,
     ]),
   ],

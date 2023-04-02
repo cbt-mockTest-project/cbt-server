@@ -1,3 +1,4 @@
+import { ExamCoAuthor } from './../../exam-co-author/entities/exam-co-author.entity';
 import { User } from 'src/users/entities/user.entity';
 import { MockExamCategory } from './mock-exam-category.entity';
 import { CoreEntity } from './../../common/entities/core.entity';
@@ -73,6 +74,12 @@ export class MockExam extends CoreEntity {
     onDelete: 'SET NULL',
   })
   history: MockExamHistory[];
+
+  @Field(() => [ExamCoAuthor], { nullable: true })
+  @OneToMany(() => ExamCoAuthor, (examCoAuthor) => examCoAuthor.exam, {
+    onDelete: 'SET NULL',
+  })
+  examCoAuthor: ExamCoAuthor[];
 
   @ManyToOne(() => User, (user) => user.mockExam, {
     onDelete: 'SET NULL',

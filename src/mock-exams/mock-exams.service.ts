@@ -23,7 +23,7 @@ import { MockExamCategory } from './entities/mock-exam-category.entity';
 import { MockExam } from './entities/mock-exam.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Raw, Repository, FindOptionsWhere } from 'typeorm';
+import { Raw, Repository, FindOptionsWhere, Brackets } from 'typeorm';
 import {
   CreateMockExamInput,
   CreateMockExamOutput,
@@ -241,24 +241,57 @@ export class MockExamService {
   }
 
   async readMockExamTitlesByCateory(
+    user: User,
     readMockExamTitlesByCateoryInput: ReadMockExamTitlesByCateoryInput,
   ): Promise<ReadMockExamTitlesByCateoryOutput> {
     try {
       const { name, all } = readMockExamTitlesByCateoryInput;
-      const where: FindOptionsWhere<MockExam> = all
-        ? { mockExamCategory: { name } }
-        : { mockExamCategory: { name }, approved: true };
-      const mockExamTitles = await this.mockExam.find({
-        where,
-        select: {
-          id: true,
-          title: true,
-          status: true,
-          slug: true,
-          user: { role: true },
-        },
-        relations: { user: true },
-      });
+      let mockExamTitles: MockExam[] = [];
+      if (!all) {
+        mockExamTitles = await this.mockExam
+          .createQueryBuilder('mockExam')
+          .leftJoin('mockExam.user', 'user')
+          .leftJoin('mockExam.mockExamCategory', 'category')
+          .select([
+            'mockExam.id',
+            'mockExam.title',
+            'mockExam.status',
+            'mockExam.slug',
+            'user.role',
+          ])
+          .where('category.name = :name', { name })
+          .andWhere('mockExam.approved = true')
+          .getMany();
+      } else if (all && user) {
+        // 내 시험지에서 타이틀 불러오기 할 경우
+        if (!user) {
+          return {
+            ok: false,
+            error: '로그인이 필요합니다.',
+          };
+        }
+        mockExamTitles = await this.mockExam
+          .createQueryBuilder('mockExam')
+          .leftJoin('mockExam.user', 'user')
+          .leftJoin('mockExam.mockExamCategory', 'category')
+          .leftJoin('mockExam.examCoAuthor', 'examCoAuthor')
+          .select([
+            'mockExam.id',
+            'mockExam.title',
+            'mockExam.status',
+            'mockExam.slug',
+            'user.role',
+          ])
+          .where('category.name = :name', { name })
+          .andWhere(
+            new Brackets((qb) => {
+              qb.where('mockExam.user.id = :userId', {
+                userId: user.id,
+              }).orWhere('examCoAuthor.user.id = :userId', { userId: user.id });
+            }),
+          )
+          .getMany();
+      }
       if (!mockExamTitles) {
         return {
           ok: false,
@@ -278,7 +311,8 @@ export class MockExamService {
         titles,
         ok: true,
       };
-    } catch {
+    } catch (e) {
+      console.log(e);
       return {
         ok: false,
         error: '타이틀을 찾을 수 없습니다.',

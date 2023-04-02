@@ -1,6 +1,9 @@
 import { CoreOutput } from './../../common/dtos/output.dto';
 import { Field, InputType, ObjectType, PickType } from '@nestjs/graphql';
-import { MockExamQuestionFeedback } from '../entities/mock-exam-question-feedback.entity';
+import {
+  MockExamQuestionFeedback,
+  QuestionFeedbackType,
+} from '../entities/mock-exam-question-feedback.entity';
 
 @InputType()
 export class CreateMockExamQuestionFeedbackInput extends PickType(
@@ -9,6 +12,11 @@ export class CreateMockExamQuestionFeedbackInput extends PickType(
 ) {
   @Field(() => Number)
   questionId: number;
+
+  @Field(() => QuestionFeedbackType, {
+    defaultValue: QuestionFeedbackType.PUBLIC,
+  })
+  type?: QuestionFeedbackType;
 }
 
 @ObjectType()

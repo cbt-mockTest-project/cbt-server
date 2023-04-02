@@ -1,7 +1,10 @@
 import { ExamCoAuthor } from './../exam-co-author/entities/exam-co-author.entity';
 /* eslint-disable prefer-const */
 import { MockExamQuestionComment } from './entities/mock-exam-question-comment.entity';
-import { MockExamQuestionFeedback } from './entities/mock-exam-question-feedback.entity';
+import {
+  MockExamQuestionFeedback,
+  QuestionFeedbackType,
+} from './entities/mock-exam-question-feedback.entity';
 import { MockExamQuestionBookmark } from 'src/mock-exams/entities/mock-exam-question-bookmark.entity';
 import {
   ReadMockExamQuestionsByMockExamIdInput,
@@ -193,6 +196,11 @@ export class MockExamQuestionService {
           mockExamQuestionBookmark: user ? { user: true } : false,
           mockExamQuestionFeedback: { user: true },
           user: true,
+        },
+        order: {
+          mockExamQuestionFeedback: {
+            type: 'ASC',
+          },
         },
       });
       let isCoAuthor = false;
@@ -419,6 +427,9 @@ export class MockExamQuestionService {
             where: {
               mockExamQuestion: In(questionIds),
             },
+            order: {
+              type: 'ASC',
+            },
           })),
           (questionComments = await this.mockExamQuestionComment.find({
             relations: { question: true, user: true },
@@ -434,7 +445,11 @@ export class MockExamQuestionService {
               (state) => state.question.id === question.id,
             ),
             mockExamQuestionFeedback: questionFeedbacks.filter(
-              (feedback) => feedback.mockExamQuestion.id === question.id,
+              (feedback) =>
+                feedback.mockExamQuestion.id === question.id &&
+                (feedback.type !== QuestionFeedbackType.PRIVATE ||
+                  (feedback.type === QuestionFeedbackType.PRIVATE &&
+                    feedback.user.id === user?.id)),
             ),
             mockExamQuestionBookmark: questionBookmarks.filter(
               (bookmark) => bookmark.question.id === question.id,

@@ -1,9 +1,22 @@
 import { User } from 'src/users/entities/user.entity';
 import { MockExamQuestion } from './mock-exam-question.entity';
 import { CoreEntity } from './../../common/entities/core.entity';
-import { Field, InputType, ObjectType } from '@nestjs/graphql';
+import {
+  Field,
+  InputType,
+  ObjectType,
+  registerEnumType,
+} from '@nestjs/graphql';
 import { Column, Entity, ManyToOne } from 'typeorm';
+import { IsEnum } from 'class-validator';
 
+export enum QuestionFeedbackType {
+  PUBLIC = 'PUBLIC',
+  PRIVATE = 'PRIVATE',
+  REPORT = 'REPORT',
+}
+
+registerEnumType(QuestionFeedbackType, { name: 'QuestionFeedbackType' });
 @InputType('MockExamQuestionFeedbackInputType', { isAbstract: true })
 @ObjectType()
 @Entity()
@@ -27,4 +40,13 @@ export class MockExamQuestionFeedback extends CoreEntity {
   })
   @Field(() => User)
   user: User;
+
+  @Column({
+    type: 'enum',
+    enum: QuestionFeedbackType,
+    default: QuestionFeedbackType.PUBLIC,
+  })
+  @Field(() => QuestionFeedbackType)
+  @IsEnum(QuestionFeedbackType)
+  type: QuestionFeedbackType;
 }

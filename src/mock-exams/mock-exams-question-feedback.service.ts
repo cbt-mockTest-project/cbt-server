@@ -34,7 +34,7 @@ export class MockExamQuestionFeedbackSerivce {
     user: User,
   ): Promise<CreateMockExamQuestionFeedbackOutput> {
     try {
-      const { questionId, content } = createMockExamQuestionFeedbackInput;
+      const { questionId, content, type } = createMockExamQuestionFeedbackInput;
 
       const question = await this.mockExamQuestion.findOne({
         where: { id: questionId },
@@ -47,6 +47,7 @@ export class MockExamQuestionFeedbackSerivce {
       }
       let feedback = this.mockExamQuestionFeedback.create({
         content,
+        type,
         mockExamQuestion: question,
         user,
       });

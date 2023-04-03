@@ -33,6 +33,7 @@ import { Visit } from 'src/visit/entities/visit.entity';
 import { MockExam } from 'src/mock-exams/entities/mock-exam.entity';
 import { MockExamQuestion } from 'src/mock-exams/entities/mock-exam-question.entity';
 import { QuestionCardCategory } from 'src/question-card/entities/question-card-category';
+import { MockExamQuestionFeedbackRecommendation } from 'src/mock-exams/entities/mock-exam-question-feedback-recommendation.entity';
 
 export enum UserRole {
   CLIENT = 'CLIENT',
@@ -184,6 +185,13 @@ export class User extends CoreEntity {
     (questionCardCategory) => questionCardCategory.user,
   )
   questionCardCategorys: QuestionCard[];
+
+  @Field(() => [MockExamQuestionFeedbackRecommendation])
+  @OneToMany(
+    () => MockExamQuestionFeedbackRecommendation,
+    (feedbackRecommendation) => feedbackRecommendation.user,
+  )
+  feedbackRecommendation: MockExamQuestionFeedbackRecommendation[];
 
   @BeforeInsert()
   @BeforeUpdate()

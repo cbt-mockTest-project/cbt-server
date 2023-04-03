@@ -32,6 +32,9 @@ import { MockExamQuestionMultipleChoice } from './entities/mock-exam-question-mu
 import { MockExamHistory } from './entities/mock-exam-history';
 import { MockExamHistoryResolver } from './mock-exams-history.resolver';
 import { MockExamHistoryService } from './mock-exams-history.service';
+import { MockExamQuestionFeedbackRecommendation } from './entities/mock-exam-question-feedback-recommendation.entity';
+import { MockExamQuestionFeedbackRecommendationResolver } from './mock-exams-question-feedback-recommendation.resolver';
+import { MockExamQuestionFeedbackRecommendationService } from './mock-exams-question-feedback-recommendation.service';
 
 @Module({
   imports: [
@@ -46,6 +49,7 @@ import { MockExamHistoryService } from './mock-exams-history.service';
       MockExamQuestionCommentLike,
       MockExamQuestionBookmark,
       MockExamQuestionMultipleChoice,
+      MockExamQuestionFeedbackRecommendation,
       ExamCoAuthor,
       User,
     ]),
@@ -69,6 +73,8 @@ import { MockExamHistoryService } from './mock-exams-history.service';
     MockExamQuestionBookmarkSerivce,
     MockExamQuestionMultipleChoiceResolver,
     MockExamQuestionMultipleChoiceService,
+    MockExamQuestionFeedbackRecommendationResolver,
+    MockExamQuestionFeedbackRecommendationService,
     MockExamHistoryResolver,
     MockExamHistoryService,
   ],

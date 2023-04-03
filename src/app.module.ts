@@ -47,6 +47,7 @@ import { QuestionCardModule } from './question-card/question-card.module';
 import { QuestionCard } from './question-card/entities/question-card.entity';
 import { ExamCoAuthorModule } from './exam-co-author/exam-co-author.module';
 import { ExamCoAuthor } from './exam-co-author/entities/exam-co-author.entity';
+import { MockExamQuestionFeedbackRecommendation } from './mock-exams/entities/mock-exam-question-feedback-recommendation.entity';
 
 @Module({
   imports: [
@@ -118,6 +119,7 @@ import { ExamCoAuthor } from './exam-co-author/entities/exam-co-author.entity';
         MockExamQuestionCommentLike,
         MockExamQuestionBookmark,
         MockExamQuestionMultipleChoice,
+        MockExamQuestionFeedbackRecommendation,
         Notice,
         Post,
         PostComment,

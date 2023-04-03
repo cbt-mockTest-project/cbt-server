@@ -7,8 +7,9 @@ import {
   ObjectType,
   registerEnumType,
 } from '@nestjs/graphql';
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { IsEnum } from 'class-validator';
+import { MockExamQuestionFeedbackRecommendation } from './mock-exam-question-feedback-recommendation.entity';
 
 export enum QuestionFeedbackType {
   PUBLIC = 'PUBLIC',
@@ -40,6 +41,13 @@ export class MockExamQuestionFeedback extends CoreEntity {
   })
   @Field(() => User)
   user: User;
+
+  @OneToMany(
+    () => MockExamQuestionFeedbackRecommendation,
+    (feedbackRecommendation) => feedbackRecommendation.feedback,
+  )
+  @Field(() => [MockExamQuestionFeedbackRecommendation])
+  recommendation: MockExamQuestionFeedbackRecommendation[];
 
   @Column({
     type: 'enum',

@@ -16,6 +16,23 @@ export enum QuestionFeedbackType {
   PRIVATE = 'PRIVATE',
   REPORT = 'REPORT',
 }
+@ObjectType()
+export class RecommendationCount {
+  @Field(() => Number, { defaultValue: 0 })
+  good: number;
+
+  @Field(() => Number, { defaultValue: 0 })
+  bad: number;
+}
+
+@ObjectType()
+export class MyRecommedationStatus {
+  @Field(() => Boolean, { defaultValue: false })
+  isGood: boolean;
+
+  @Field(() => Boolean, { defaultValue: false })
+  isBad: boolean;
+}
 
 registerEnumType(QuestionFeedbackType, { name: 'QuestionFeedbackType' });
 @InputType('MockExamQuestionFeedbackInputType', { isAbstract: true })
@@ -57,4 +74,10 @@ export class MockExamQuestionFeedback extends CoreEntity {
   @Field(() => QuestionFeedbackType)
   @IsEnum(QuestionFeedbackType)
   type: QuestionFeedbackType;
+
+  @Field(() => RecommendationCount)
+  recommendationCount: RecommendationCount;
+
+  @Field(() => MyRecommedationStatus)
+  myRecommedationStatus: MyRecommedationStatus;
 }

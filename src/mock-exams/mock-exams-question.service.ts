@@ -710,6 +710,7 @@ export class MockExamQuestionService {
         where,
       });
       questions = await makeQuestionJoins(questions);
+
       if (!user) {
         questions = questions.map((question) => ({
           ...question,

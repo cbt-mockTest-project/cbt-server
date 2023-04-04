@@ -52,11 +52,14 @@ export class MockExamQuestionFeedbackSerivce {
         user,
       });
       feedback = await this.mockExamQuestionFeedback.save(feedback);
+      feedback.recommendationCount = { bad: 0, good: 0 };
+      feedback.myRecommedationStatus = { isBad: false, isGood: false };
       return {
         ok: true,
         feedback,
       };
-    } catch {
+    } catch (e) {
+      console.log(e);
       return {
         ok: false,
         error: '피드백을 보낼 수 없습니다.',

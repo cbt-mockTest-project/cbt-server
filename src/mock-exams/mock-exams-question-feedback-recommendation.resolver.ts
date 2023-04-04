@@ -7,6 +7,7 @@ import {
 } from './dtos/updateMockExamQuestionFeedbackRecommendation.dto';
 import { User } from 'src/users/entities/user.entity';
 import { AuthUser } from 'src/auth/auth-user.decorator';
+import { Role } from 'src/auth/role.decorators';
 
 @Resolver(() => MockExamQuestionFeedbackRecommendation)
 export class MockExamQuestionFeedbackRecommendationResolver {
@@ -14,6 +15,7 @@ export class MockExamQuestionFeedbackRecommendationResolver {
     private readonly mockExamQuestionFeedbackRecommendationService: MockExamQuestionFeedbackRecommendationService,
   ) {}
 
+  @Role(['ANY'])
   @Mutation(() => UpdateMockExamQuestionFeedbackRecommendationOutput)
   async updateMockExamQuestionFeedbackRecommendation(
     @Args('input')

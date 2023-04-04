@@ -28,6 +28,7 @@ export class MockExamQuestionFeedbackRecommendation extends CoreEntity {
   @ManyToOne(
     () => MockExamQuestionFeedback,
     (mockExamQuestionFeedback) => mockExamQuestionFeedback.recommendation,
+    { onDelete: 'CASCADE' },
   )
   @Field(() => MockExamQuestionFeedback)
   feedback: MockExamQuestionFeedback;

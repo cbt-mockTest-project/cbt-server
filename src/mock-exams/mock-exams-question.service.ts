@@ -276,7 +276,12 @@ export class MockExamQuestionService {
             recommendationCount,
             myRecommedationStatus,
           };
-        });
+        })
+        .sort(
+          (a, b) =>
+            b.recommendationCount.good - a.recommendationCount.good ||
+            a.recommendationCount.bad - b.recommendationCount.bad,
+        );
 
       if (user) {
         const mockExamQuestionBookmark =
@@ -549,7 +554,12 @@ export class MockExamQuestionService {
                   recommendationCount,
                   myRecommedationStatus,
                 };
-              }),
+              })
+              .sort(
+                (a, b) =>
+                  b.recommendationCount.good - a.recommendationCount.good ||
+                  a.recommendationCount.bad - b.recommendationCount.bad,
+              ),
             mockExamQuestionBookmark: questionBookmarks.filter(
               (bookmark) => bookmark.question.id === question.id,
             ),

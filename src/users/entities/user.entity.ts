@@ -63,6 +63,10 @@ export class User extends CoreEntity {
   @Field(() => String)
   nickname: string;
 
+  @Column({ default: false })
+  @Field(() => Boolean)
+  isAllowAdblock: boolean;
+
   @Column({ select: false, nullable: true })
   @Field(() => String)
   @IsString()

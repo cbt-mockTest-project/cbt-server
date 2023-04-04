@@ -49,6 +49,7 @@ export class MockExamQuestionCommentSerivce {
     user: User,
   ): Promise<CreateMockExamQuestionCommentOutput> {
     try {
+      if (!user) return { ok: false, error: '로그인이 필요합니다.' };
       const { questionId, content } = createMockExamQuestionCommentInput;
 
       const question = await this.mockExamQuestion.findOne({

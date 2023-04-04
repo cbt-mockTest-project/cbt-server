@@ -23,7 +23,7 @@ export class MockExamQuestionComment extends CoreEntity {
   @ManyToOne(() => User, (user) => user.mockExamQuestionComment, {
     onDelete: 'CASCADE',
   })
-  @Field(() => User, { nullable: true })
+  @Field(() => User)
   user: User;
 
   @OneToMany(

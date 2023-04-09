@@ -1,5 +1,5 @@
 import { deduplication } from './../utils/utils';
-import { User } from './../users/entities/user.entity';
+import { User, UserRole } from './../users/entities/user.entity';
 import { MockExamQuestionState } from 'src/mock-exams/entities/mock-exam-question-state.entity';
 import {
   ExamTitleAndId,
@@ -270,27 +270,46 @@ export class MockExamService {
             error: '로그인이 필요합니다.',
           };
         }
-        mockExamTitles = await this.mockExam
-          .createQueryBuilder('mockExam')
-          .leftJoin('mockExam.user', 'user')
-          .leftJoin('mockExam.mockExamCategory', 'category')
-          .leftJoin('mockExam.examCoAuthor', 'examCoAuthor')
-          .select([
-            'mockExam.id',
-            'mockExam.title',
-            'mockExam.status',
-            'mockExam.slug',
-            'user.role',
-          ])
-          .where('category.name = :name', { name })
-          .andWhere(
-            new Brackets((qb) => {
-              qb.where('mockExam.user.id = :userId', {
-                userId: user.id,
-              }).orWhere('examCoAuthor.user.id = :userId', { userId: user.id });
-            }),
-          )
-          .getMany();
+        if (user.role === UserRole.ADMIN) {
+          mockExamTitles = await this.mockExam
+            .createQueryBuilder('mockExam')
+            .leftJoin('mockExam.user', 'user')
+            .leftJoin('mockExam.mockExamCategory', 'category')
+            .leftJoin('mockExam.examCoAuthor', 'examCoAuthor')
+            .select([
+              'mockExam.id',
+              'mockExam.title',
+              'mockExam.status',
+              'mockExam.slug',
+              'user.role',
+            ])
+            .where('category.name = :name', { name })
+            .getMany();
+        } else {
+          mockExamTitles = await this.mockExam
+            .createQueryBuilder('mockExam')
+            .leftJoin('mockExam.user', 'user')
+            .leftJoin('mockExam.mockExamCategory', 'category')
+            .leftJoin('mockExam.examCoAuthor', 'examCoAuthor')
+            .select([
+              'mockExam.id',
+              'mockExam.title',
+              'mockExam.status',
+              'mockExam.slug',
+              'user.role',
+            ])
+            .where('category.name = :name', { name })
+            .andWhere(
+              new Brackets((qb) => {
+                qb.where('mockExam.user.id = :userId', {
+                  userId: user.id,
+                }).orWhere('examCoAuthor.user.id = :userId', {
+                  userId: user.id,
+                });
+              }),
+            )
+            .getMany();
+        }
       }
       if (!mockExamTitles) {
         return {

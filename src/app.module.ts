@@ -11,7 +11,6 @@ import { MailModule } from './mail/mail.module';
 import { MockExamQuestionFeedback } from './mock-exams/entities/mock-exam-question-feedback.entity';
 import { MockExamQuestion } from './mock-exams/entities/mock-exam-question.entity';
 import { MockExamCategory } from './mock-exams/entities/mock-exam-category.entity';
-import { User } from './users/entities/user.entity';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
@@ -48,6 +47,7 @@ import { QuestionCard } from './question-card/entities/question-card.entity';
 import { ExamCoAuthorModule } from './exam-co-author/exam-co-author.module';
 import { ExamCoAuthor } from './exam-co-author/entities/exam-co-author.entity';
 import { MockExamQuestionFeedbackRecommendation } from './mock-exams/entities/mock-exam-question-feedback-recommendation.entity';
+import { User } from './users/entities/user.entity';
 
 @Module({
   imports: [

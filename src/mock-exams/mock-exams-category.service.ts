@@ -1,4 +1,4 @@
-import { User } from 'src/users/entities/user.entity';
+import { User, UserRole } from 'src/users/entities/user.entity';
 import {
   CreateMockExamCategoryInput,
   CreateMockExamCategoryOutput,
@@ -173,6 +173,11 @@ export class MockExamCategoryService {
         relations: {
           user: true,
         },
+        order: {
+          user: {
+            role: 'DESC',
+          },
+        },
       });
       return {
         ok: true,
@@ -188,14 +193,21 @@ export class MockExamCategoryService {
 
   async readMyMockExamCategories(user: User) {
     try {
-      const categories = await this.mockExamCategories
-        .createQueryBuilder('mockExamCategory')
-        .leftJoinAndSelect('mockExamCategory.examCoAuthor', 'examCoAuthor')
-        .orWhere('mockExamCategory.user.id = :userId', { userId: user.id })
-        .orWhere('examCoAuthor.user.id = :examCoAuthorId', {
-          examCoAuthorId: user.id,
-        })
-        .getMany();
+      let categories: MockExamCategory[] = [];
+      if (user.role === UserRole.ADMIN) {
+        categories = await this.mockExamCategories
+          .createQueryBuilder('mockExamCategory')
+          .getMany();
+      } else {
+        categories = await this.mockExamCategories
+          .createQueryBuilder('mockExamCategory')
+          .leftJoinAndSelect('mockExamCategory.examCoAuthor', 'examCoAuthor')
+          .orWhere('mockExamCategory.user.id = :userId', { userId: user.id })
+          .orWhere('examCoAuthor.user.id = :examCoAuthorId', {
+            examCoAuthorId: user.id,
+          })
+          .getMany();
+      }
       return {
         ok: true,
         categories,

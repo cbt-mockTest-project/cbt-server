@@ -25,7 +25,7 @@ import { UserProfileInput, UserProfileOutput } from './dtos/userProfile.dto';
 import { RegisterInput, RegisterOutput } from './dtos/register.dto';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { LoginType, User, UserRole } from './entities/user.entity';
 import { LoginInput, LoginOutput } from './dtos/login.dto';
 import { Verification } from './entities/verification.entity';
@@ -44,6 +44,7 @@ import {
 } from './dtos/changePasswordAfterVerifying.dto';
 import { Feedback } from './entities/feedback.entity';
 import axios from 'axios';
+import { SearchUserInput, SearchUserOutput } from './dtos/searchUser.dto';
 @Injectable()
 export class UserService {
   constructor(
@@ -717,4 +718,28 @@ export class UserService {
       token,
     };
   }
+
+  async searchUser(
+    searchUserInput: SearchUserInput,
+  ): Promise<SearchUserOutput> {
+    try {
+      const { name } = searchUserInput;
+      const users = await this.users.find({
+        where: {
+          nickname: Like(`%${name}%`),
+        },
+      });
+      return {
+        ok: true,
+        users,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: error.message,
+      };
+    }
+  }
+
+  async editEdBlock() {}
 }

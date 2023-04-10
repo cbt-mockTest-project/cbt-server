@@ -36,6 +36,7 @@ import {
   ChangePasswordAfterVerifyingOutput,
   ChangePasswordAfterVerifyingInput,
 } from './dtos/changePasswordAfterVerifying.dto';
+import { SearchUserInput, SearchUserOutput } from './dtos/searchUser.dto';
 
 @Resolver(() => User)
 export class UserResolver {
@@ -154,5 +155,13 @@ export class UserResolver {
   ): Promise<KakaoLoginOutput> {
     const res: Response = context.req.res;
     return this.userService.kakaoLogin(kakaoLoginInput, res);
+  }
+
+  @Role(['ADMIN'])
+  @Query(() => SearchUserOutput)
+  async searchUser(
+    @Args('input') searchUserInput: SearchUserInput,
+  ): Promise<SearchUserOutput> {
+    return this.userService.searchUser(searchUserInput);
   }
 }

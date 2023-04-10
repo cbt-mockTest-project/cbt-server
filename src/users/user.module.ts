@@ -9,6 +9,8 @@ import { User } from './entities/user.entity';
 import { Notice } from './entities/notice.entity';
 import { NoticeService } from './notice.service';
 import { UserController } from './user.controller';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, Verification, Feedback, Notice])],

@@ -12,9 +12,9 @@ import { MockExamQuestionFeedback } from './mock-exams/entities/mock-exam-questi
 import { MockExamQuestion } from './mock-exams/entities/mock-exam-question.entity';
 import { MockExamCategory } from './mock-exams/entities/mock-exam-category.entity';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { Module } from '@nestjs/common';
+import { ExecutionContext, Injectable, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { GraphQLModule } from '@nestjs/graphql';
+import { GqlExecutionContext, GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -48,9 +48,24 @@ import { ExamCoAuthorModule } from './exam-co-author/exam-co-author.module';
 import { ExamCoAuthor } from './exam-co-author/entities/exam-co-author.entity';
 import { MockExamQuestionFeedbackRecommendation } from './mock-exams/entities/mock-exam-question-feedback-recommendation.entity';
 import { User } from './users/entities/user.entity';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
+@Injectable()
+export class GqlThrottlerGuard extends ThrottlerGuard {
+  getRequestResponse(context: ExecutionContext) {
+    const gqlCtx = GqlExecutionContext.create(context);
+    const ctx = gqlCtx.getContext();
+    console.log(ctx.req);
+    return { req: ctx.req, res: ctx.req.res };
+  }
+}
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot({
+      ttl: 60,
+      limit: 50,
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: process.env.NODE_ENV == 'dev' ? '.env.dev' : '.env.prod',
@@ -175,6 +190,11 @@ import { User } from './users/entities/user.entity';
     ExamCoAuthorModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: GqlThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {}

@@ -1,42 +1,46 @@
-import { KakaoLoginOutput, KakaoLoginInput } from './dtos/kakaoLogin.dto';
+import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Response } from 'express';
+import { AuthUser } from 'src/auth/auth-user.decorator';
+import { Role } from 'src/auth/role.decorators';
+import { CoreOutput } from 'src/common/dtos/output.dto';
+import {
+  EmailVerificationInput,
+  EmailVerificationOutput,
+} from './dtos/EmailVerification.dto';
+import {
+  ChangePasswordAfterVerifyingInput,
+  ChangePasswordAfterVerifyingOutput,
+} from './dtos/changePasswordAfterVerifying.dto';
+import {
+  CheckPasswordInput,
+  CheckPasswordOutput,
+} from './dtos/checkPassword.dto';
 import {
   CreateFeedbackInput,
   CreateFeedbackOutput,
 } from './dtos/createFeedback.dto';
+import { EditProfileInput, EditProfileOutput } from './dtos/editProfile.dto';
+import { KakaoLoginInput, KakaoLoginOutput } from './dtos/kakaoLogin.dto';
+import { LoginInput, LoginOutput } from './dtos/login.dto';
+import { MeOutput } from './dtos/me.dto';
+import { RegisterInput, RegisterOutput } from './dtos/register.dto';
+import { RestoreUserInput } from './dtos/restoreUser.dto';
+import { SearchUserInput, SearchUserOutput } from './dtos/searchUser.dto';
 import {
   SendFindPasswordMailInput,
   SendFindPasswordMailOutput,
 } from './dtos/sendFindPasswordMail.dto';
 import {
-  CheckPasswordInput,
-  CheckPasswordOutput,
-} from './dtos/checkPassword.dto';
-import { MeOutput } from './dtos/me.dto';
-import { CoreOutput } from 'src/common/dtos/output.dto';
-import {
   SendVerificationMailInput,
   SendVerificationMailOutput,
 } from './dtos/sendVerificationMail.dto';
-import { LoginInput, LoginOutput } from './dtos/login.dto';
-import { UserProfileOutput, UserProfileInput } from './dtos/userProfile.dto';
-import { RegisterInput, RegisterOutput } from './dtos/register.dto';
+import {
+  UpdateAdblockPermissionInput,
+  UpdateAdblockPermissionOutput,
+} from './dtos/updateAdblockPermission.dto';
+import { UserProfileInput, UserProfileOutput } from './dtos/userProfile.dto';
 import { User } from './entities/user.entity';
-import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UserService } from './user.service';
-import { AuthUser } from 'src/auth/auth-user.decorator';
-import {
-  EmailVerificationOutput,
-  EmailVerificationInput,
-} from './dtos/EmailVerification.dto';
-import { Response } from 'express';
-import { Role } from 'src/auth/role.decorators';
-import { EditProfileOutput, EditProfileInput } from './dtos/editProfile.dto';
-import { RestoreUserInput } from './dtos/restoreUser.dto';
-import {
-  ChangePasswordAfterVerifyingOutput,
-  ChangePasswordAfterVerifyingInput,
-} from './dtos/changePasswordAfterVerifying.dto';
-import { SearchUserInput, SearchUserOutput } from './dtos/searchUser.dto';
 
 @Resolver(() => User)
 export class UserResolver {
@@ -163,5 +167,15 @@ export class UserResolver {
     @Args('input') searchUserInput: SearchUserInput,
   ): Promise<SearchUserOutput> {
     return this.userService.searchUser(searchUserInput);
+  }
+
+  @Role(['ADMIN'])
+  @Mutation(() => UpdateAdblockPermissionOutput)
+  async updateAdBlockPermission(
+    @Args('input') updateAdBlockPermissionInput: UpdateAdblockPermissionInput,
+  ): Promise<UpdateAdblockPermissionOutput> {
+    return this.userService.updateAdBlockPermission(
+      updateAdBlockPermissionInput,
+    );
   }
 }

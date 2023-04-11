@@ -1,50 +1,54 @@
-import { KakaoLoginInput, KakaoLoginOutput } from './dtos/kakaoLogin.dto';
-import { NoticeService } from './notice.service';
-import { TelegramService } from './../telegram/telegram.service';
-import {
-  CreateFeedbackInput,
-  CreateFeedbackOutput,
-} from './dtos/createFeedback.dto';
-import {
-  SendFindPasswordMailInput,
-  SendFindPasswordMailOutput,
-} from './dtos/sendFindPasswordMail.dto';
-import { RestoreUserInput } from './dtos/restoreUser.dto';
-import {
-  CheckPasswordInput,
-  CheckPasswordOutput,
-} from './dtos/checkPassword.dto';
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import axios from 'axios';
+import * as bcrypt from 'bcrypt';
+import { Response } from 'express';
 import { CoreOutput } from 'src/common/dtos/output.dto';
+import { JwtService } from 'src/jwt/jwt.service';
+import { MailService } from 'src/mail/mail.service';
+import { Like, Repository } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
+import { TelegramService } from './../telegram/telegram.service';
 import {
   EmailVerificationInput,
   EmailVerificationOutput,
 } from './dtos/EmailVerification.dto';
-import { v4 as uuidv4 } from 'uuid';
-import { JwtService } from 'src/jwt/jwt.service';
-import { UserProfileInput, UserProfileOutput } from './dtos/userProfile.dto';
-import { RegisterInput, RegisterOutput } from './dtos/register.dto';
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Like, Repository } from 'typeorm';
-import { LoginType, User, UserRole } from './entities/user.entity';
-import { LoginInput, LoginOutput } from './dtos/login.dto';
-import { Verification } from './entities/verification.entity';
-import {
-  SendVerificationMailInput,
-  SendVerificationMailOutput,
-} from './dtos/sendVerificationMail.dto';
-import { MailService } from 'src/mail/mail.service';
-import { Response } from 'express';
-import { MeOutput } from './dtos/me.dto';
-import { EditProfileInput, EditProfileOutput } from './dtos/editProfile.dto';
-import * as bcrypt from 'bcrypt';
 import {
   ChangePasswordAfterVerifyingInput,
   ChangePasswordAfterVerifyingOutput,
 } from './dtos/changePasswordAfterVerifying.dto';
-import { Feedback } from './entities/feedback.entity';
-import axios from 'axios';
+import {
+  CheckPasswordInput,
+  CheckPasswordOutput,
+} from './dtos/checkPassword.dto';
+import {
+  CreateFeedbackInput,
+  CreateFeedbackOutput,
+} from './dtos/createFeedback.dto';
+import { EditProfileInput, EditProfileOutput } from './dtos/editProfile.dto';
+import { KakaoLoginInput, KakaoLoginOutput } from './dtos/kakaoLogin.dto';
+import { LoginInput, LoginOutput } from './dtos/login.dto';
+import { MeOutput } from './dtos/me.dto';
+import { RegisterInput, RegisterOutput } from './dtos/register.dto';
+import { RestoreUserInput } from './dtos/restoreUser.dto';
 import { SearchUserInput, SearchUserOutput } from './dtos/searchUser.dto';
+import {
+  SendFindPasswordMailInput,
+  SendFindPasswordMailOutput,
+} from './dtos/sendFindPasswordMail.dto';
+import {
+  SendVerificationMailInput,
+  SendVerificationMailOutput,
+} from './dtos/sendVerificationMail.dto';
+import {
+  UpdateAdblockPermissionInput,
+  UpdateAdblockPermissionOutput,
+} from './dtos/updateAdblockPermission.dto';
+import { UserProfileInput, UserProfileOutput } from './dtos/userProfile.dto';
+import { Feedback } from './entities/feedback.entity';
+import { LoginType, User, UserRole } from './entities/user.entity';
+import { Verification } from './entities/verification.entity';
+import { NoticeService } from './notice.service';
 @Injectable()
 export class UserService {
   constructor(
@@ -741,5 +745,29 @@ export class UserService {
     }
   }
 
-  async editEdBlock() {}
+  async updateAdBlockPermission(
+    updateAdBlockPermission: UpdateAdblockPermissionInput,
+  ): Promise<UpdateAdblockPermissionOutput> {
+    const { userId } = updateAdBlockPermission;
+    try {
+      const user = await this.users.findOne({ where: { id: userId } });
+      if (!user) {
+        return {
+          ok: false,
+          error: '유저를 찾을 수 없습니다.',
+        };
+      }
+      user.isAllowAdblock = !user.isAllowAdblock;
+      const { isAllowAdblock } = await this.users.save(user);
+      return {
+        ok: true,
+        adblockPermission: isAllowAdblock,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '광고차단 설정을 변경할 수 없습니다.',
+      };
+    }
+  }
 }

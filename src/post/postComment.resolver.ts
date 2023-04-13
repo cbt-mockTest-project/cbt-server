@@ -1,13 +1,11 @@
 import { PUB_SUB } from 'src/common/common.constants';
-import { CoreOutput } from 'src/common/dtos/output.dto';
 import { PostComment } from './entities/postComment.entity';
-
 import { User } from 'src/users/entities/user.entity';
 import {
   DeletePostCommentInput,
   DeletePostCommentOutput,
 } from './dtos/deletePostComment.dto';
-import { Args, Mutation, Resolver, Subscription } from '@nestjs/graphql';
+import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import { Role } from 'src/auth/role.decorators';
 import {
   CreatePostCommentInput,
@@ -65,16 +63,16 @@ export class PostCommentResolver {
     );
   }
 
-  @Role(['ANY'])
-  @Subscription(() => CoreOutput, {
-    filter: (payload, variables, context) => {
-      if (context.user.id !== payload.postCommentUpdates.authorId) {
-        return false;
-      }
-      return true;
-    },
-  })
-  postCommentUpdates() {
-    return this.pubSub.asyncIterator('postComments');
-  }
+  // @Role(['ANY'])
+  // @Subscription(() => CoreOutput, {
+  //   filter: (payload, variables, context) => {
+  //     if (context.user.id !== payload.postCommentUpdates.authorId) {
+  //       return false;
+  //     }
+  //     return true;
+  //   },
+  // })
+  // postCommentUpdates() {
+  //   return this.pubSub.asyncIterator('postComments');
+  // }
 }

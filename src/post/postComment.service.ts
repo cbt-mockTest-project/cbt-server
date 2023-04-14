@@ -63,12 +63,12 @@ export class PostCommentSerivce {
         content: noticeContent,
         link: `/post/${post.id}`,
       });
-      await this.pubSub.publish('postComments', {
-        postCommentUpdates: {
-          ok: true,
-          authorId: post.user.id,
-        },
-      });
+      // await this.pubSub.publish('postComments', {
+      //   postCommentUpdates: {
+      //     ok: true,
+      //     authorId: post.user.id,
+      //   },
+      // });
       return {
         comment,
         ok: true,

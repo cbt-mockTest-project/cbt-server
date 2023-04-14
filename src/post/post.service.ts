@@ -1,17 +1,17 @@
 import { RevalidateService } from './../revalidate/revalidate.service';
 import { PostComment } from './entities/postComment.entity';
 /* eslint-disable prefer-const */
-import { ReadPostsInput, ReadPostsOutput } from './dtos/readPosts.dto';
-import { ReadPostInput, ReadPostOutput } from './dtos/readPost.dto';
-import { DeletePostInput, DeletePostOutput } from './dtos/deletePost.dto';
-import { EditPostInput, EditPostOutput } from './dtos/editPost.dto';
-import { User } from 'src/users/entities/user.entity';
-import { Post } from './entities/post.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { User } from 'src/users/entities/user.entity';
 import { FindManyOptions, Repository } from 'typeorm';
 import { CreatePostInput, CreatePostOutput } from './dtos/createPost.dto';
+import { DeletePostInput, DeletePostOutput } from './dtos/deletePost.dto';
+import { EditPostInput, EditPostOutput } from './dtos/editPost.dto';
+import { ReadPostInput, ReadPostOutput } from './dtos/readPost.dto';
+import { ReadPostsInput, ReadPostsOutput } from './dtos/readPosts.dto';
 import { ViewPostInput, ViewPostOutput } from './dtos/viewPost.dto';
+import { Post } from './entities/post.entity';
 
 @Injectable()
 export class PostService {
@@ -127,18 +127,15 @@ export class PostService {
       }
       post.commentsCount = post.comment.length;
       post.likesCount = post.like.length;
-      if (user) {
-        post.comment = post.comment.map((el) => {
-          const likeState =
-            el.commentLike.filter((el) => el.user.id === user.id).length >= 1;
-          const newComment: PostComment = {
-            ...el,
-            likesCount: el.commentLike.length,
-            likeState,
-          };
+      post.comment = post.comment.map((el) => {
+        const newComment: PostComment = {
+          ...el,
+          likesCount: el.commentLike.length,
+        };
 
-          return newComment;
-        });
+        return newComment;
+      });
+      if (user) {
         post.likeState =
           post.like.filter((el) => el.user.id === user.id).length >= 1;
       }

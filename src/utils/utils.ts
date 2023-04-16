@@ -39,3 +39,10 @@ export const deduplication = (array: any[]) => {
   }
   return stack;
 };
+
+export const isIntrospectionQuery = (
+  operationName: string | undefined,
+  query: string | undefined,
+): boolean =>
+  operationName === 'IntrospectionQuery' ||
+  (query !== undefined && query.includes('__schema'));

@@ -12,7 +12,7 @@ import { MockExamQuestionFeedback } from './mock-exams/entities/mock-exam-questi
 import { MockExamQuestion } from './mock-exams/entities/mock-exam-question.entity';
 import { MockExamCategory } from './mock-exams/entities/mock-exam-category.entity';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { Module } from '@nestjs/common';
+import { Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -48,6 +48,9 @@ import { ExamCoAuthorModule } from './exam-co-author/exam-co-author.module';
 import { ExamCoAuthor } from './exam-co-author/entities/exam-co-author.entity';
 import { MockExamQuestionFeedbackRecommendation } from './mock-exams/entities/mock-exam-question-feedback-recommendation.entity';
 import { User } from './users/entities/user.entity';
+import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { LoggingInterceptor } from './logging.interceptor';
+import logger from './lib/logger';
 
 @Module({
   imports: [
@@ -73,6 +76,12 @@ import { User } from './users/entities/user.entity';
       installSubscriptionHandlers: true,
       autoSchemaFile: true,
       sortSchema: true, // 스키마 사전순으로 정렬
+      formatError(error) {
+        logger.error(
+          `GraphQL Validation Error: ${JSON.stringify(error, null, 2)}`,
+        );
+        return error;
+      },
       subscriptions: {
         'subscriptions-transport-ws': {
           onConnect: (connectionParams, websocket, context) => {
@@ -175,6 +184,11 @@ import { User } from './users/entities/user.entity';
     ExamCoAuthorModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
+    },
+  ],
 })
 export class AppModule {}

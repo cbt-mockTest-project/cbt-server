@@ -13,7 +13,7 @@ import { PostLike } from './postLike.entity';
 
 export enum PostCategory {
   FREE = 'FREE',
-  PASS = 'PASS',
+  REVIEW = 'REVIEW',
   NOTICE = 'NOTICE',
 }
 

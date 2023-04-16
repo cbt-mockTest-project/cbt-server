@@ -9,9 +9,24 @@ import { GqlContextType, GqlExecutionContext } from '@nestjs/graphql';
 import { Request, Response } from 'express';
 import logger from 'src/lib/logger';
 
+class GqlErrorWithData extends Error {
+  constructor(
+    message: string,
+    public locations: any,
+    public path: any,
+    public extensions: any,
+  ) {
+    super(message);
+  }
+}
+
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
-  catch(exception: unknown, host: ExecutionContext) {
+  public graphQLErrors: any[] | null = null;
+  setGraphQLErrors(errors: any[]) {
+    this.graphQLErrors = errors;
+  }
+  catch(exception: any, host: ExecutionContext) {
     const isGraphQL = host.getType<GqlContextType>() === 'graphql';
 
     let status: number;
@@ -29,7 +44,15 @@ export class AllExceptionsFilter implements ExceptionFilter {
       logger.error(
         `Response: ${status} Error: ${JSON.stringify(exception, null, 2)}`,
       );
-      throw exception; // 에러를 직접 던지도록 변경
+      const errorData = this.graphQLErrors?.[0] || {}; // 첫 번째 graphQLError를 가져옵니다.
+
+      const { locations, path, extensions } = errorData;
+      throw new GqlErrorWithData(
+        exception.message || 'An error occurred',
+        locations,
+        path,
+        extensions,
+      );
     } else {
       const ctx = host.switchToHttp();
       const req = ctx.getRequest<Request>();

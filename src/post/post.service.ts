@@ -159,7 +159,9 @@ export class PostService {
     try {
       const { page, limit, category, all } = readPostsInput;
       const skip = (page - 1) * limit;
-      let options: FindManyOptions<Post> = {};
+      let options: FindManyOptions<Post> = {
+        relations: { user: true, like: true, comment: true },
+      };
       if (!all) {
         options = {
           skip,
@@ -172,6 +174,10 @@ export class PostService {
         };
       }
       let [posts, count] = await this.post.findAndCount(options);
+      posts = posts.map((post) => {
+        console.log('asdasd', post.user);
+        return post;
+      });
       if (!all) {
         posts = posts.map((post) => {
           return {
@@ -186,7 +192,8 @@ export class PostService {
         count,
         ok: true,
       };
-    } catch {
+    } catch (e) {
+      console.log(e);
       return {
         ok: false,
         error: '게시글들을 불러오지 못했습니다.',

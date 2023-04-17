@@ -1,59 +1,59 @@
 import { ExamCoAuthor } from './../exam-co-author/entities/exam-co-author.entity';
 /* eslint-disable prefer-const */
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { MockExamQuestionBookmark } from 'src/mock-exams/entities/mock-exam-question-bookmark.entity';
+import { User } from 'src/users/entities/user.entity';
+import { FindOptionsWhere, In, Not, Repository } from 'typeorm';
+import {
+  CreateMockExamQuestionInput,
+  CreateMockExamQuestionOutput,
+} from './dtos/createMockExamQuestion.dto';
+import {
+  DeleteMockExamQuestionInput,
+  DeleteMockExamQuestionOutput,
+} from './dtos/deleteMockExamQuestion.dto';
+import {
+  EditMockExamQuestionInput,
+  EditMockExamQuestionOutput,
+} from './dtos/editMockExamQuestion.dto';
+import { ReadAllMockExamQuestionOutput } from './dtos/readAllMockExamQuestion.dto';
+import { ReadAllQuestionsOutput } from './dtos/readAllQuestions.dto';
+import {
+  ReadMockExamQuestionInput,
+  ReadMockExamQuestionOutput,
+} from './dtos/readMockExamQuestion.dto';
+import {
+  QuestionNumber,
+  ReadMockExamQuestionNumbersInput,
+  ReadMockExamQuestionNumbersOutput,
+} from './dtos/readMockExamQuestionNumbers.dto';
+import {
+  ReadMockExamQuestionsByMockExamIdInput,
+  ReadMockExamQuestionsByMockExamIdOutput,
+} from './dtos/readMockExamQuestionsByMockExamId.dto';
+import {
+  ReadMockExamQuestionsByStateInput,
+  ReadMockExamQuestionsByStateOutput,
+} from './dtos/readMockExamQuestionsByState.dto';
+import {
+  UpdateApprovedStateOfMockExamQuestionInput,
+  UpdateApprovedStateOfMockExamQuestionOutput,
+} from './dtos/updateApprovedStateOfMockExamQuestion.dto';
 import { MockExamQuestionComment } from './entities/mock-exam-question-comment.entity';
+import { QuestionFeedbackRecommendationType } from './entities/mock-exam-question-feedback-recommendation.entity';
 import {
   MockExamQuestionFeedback,
   MyRecommedationStatus,
   QuestionFeedbackType,
   RecommendationCount,
 } from './entities/mock-exam-question-feedback.entity';
-import { MockExamQuestionBookmark } from 'src/mock-exams/entities/mock-exam-question-bookmark.entity';
-import {
-  ReadMockExamQuestionsByMockExamIdInput,
-  ReadMockExamQuestionsByMockExamIdOutput,
-} from './dtos/readMockExamQuestionsByMockExamId.dto';
-import {
-  ReadMockExamQuestionInput,
-  ReadMockExamQuestionOutput,
-} from './dtos/readMockExamQuestion.dto';
-import {
-  UpdateApprovedStateOfMockExamQuestionInput,
-  UpdateApprovedStateOfMockExamQuestionOutput,
-} from './dtos/updateApprovedStateOfMockExamQuestion.dto';
 import {
   MockExamQuestionState,
   QuestionState,
 } from './entities/mock-exam-question-state.entity';
-import { ReadAllMockExamQuestionOutput } from './dtos/readAllMockExamQuestion.dto';
-import {
-  EditMockExamQuestionInput,
-  EditMockExamQuestionOutput,
-} from './dtos/editMockExamQuestion.dto';
-import { MockExam } from './entities/mock-exam.entity';
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, FindOptionsWhere, In, Not } from 'typeorm';
-import {
-  CreateMockExamQuestionInput,
-  CreateMockExamQuestionOutput,
-} from './dtos/createMockExamQuestion.dto';
 import { MockExamQuestion } from './entities/mock-exam-question.entity';
-import {
-  DeleteMockExamQuestionInput,
-  DeleteMockExamQuestionOutput,
-} from './dtos/deleteMockExamQuestion.dto';
-import { User } from 'src/users/entities/user.entity';
-import {
-  ReadMockExamQuestionsByStateInput,
-  ReadMockExamQuestionsByStateOutput,
-} from './dtos/readMockExamQuestionsByState.dto';
-import {
-  QuestionNumber,
-  ReadMockExamQuestionNumbersInput,
-  ReadMockExamQuestionNumbersOutput,
-} from './dtos/readMockExamQuestionNumbers.dto';
-import { ReadAllQuestionsOutput } from './dtos/readAllQuestions.dto';
-import { QuestionFeedbackRecommendationType } from './entities/mock-exam-question-feedback-recommendation.entity';
+import { MockExam } from './entities/mock-exam.entity';
 
 @Injectable()
 export class MockExamQuestionService {
@@ -628,6 +628,9 @@ export class MockExamQuestionService {
             return {
               ok: false,
               error: '로그인이 필요합니다.',
+              questions: [],
+              count: 0,
+              title: '전체',
             };
           }
           let questionStates = await this.mockExamQuestionState

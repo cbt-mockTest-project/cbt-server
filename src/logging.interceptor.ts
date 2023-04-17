@@ -6,10 +6,9 @@ import {
 } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 import logger from 'src/lib/logger';
 import { isIntrospectionQuery } from './utils/utils';
-import { catchError } from 'rxjs/operators';
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
@@ -34,15 +33,21 @@ export class LoggingInterceptor implements NestInterceptor {
     return next.handle().pipe(
       tap((data) => {
         if (isGraphQL && isIntrospectionQuery(operationName, query)) return;
-
         const endTime = Date.now();
         const duration = endTime - startTime;
         logger.info(`Request: ${request.method} ${request.originalUrl}`);
         logger.info(`Client IP: ${clientIp}`);
-        logger.info(`Body: ${JSON.stringify(request.body, null, 2)}`);
         logger.info(
-          `Response: ${response.statusCode} ${JSON.stringify(data, null, 2)}`,
+          `Operation: ${JSON.stringify(
+            request.body['operationName'],
+            null,
+            2,
+          )}`,
         );
+        // logger.info(`Body: ${JSON.stringify(request.body, null, 2)}`);
+        // logger.info(
+        //   `Response: ${response.statusCode} ${JSON.stringify(data, null, 2)}`,
+        // );
         logger.info(`Duration: ${duration} ms`);
       }),
       catchError((error) => {

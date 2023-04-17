@@ -175,7 +175,6 @@ export class PostService {
       }
       let [posts, count] = await this.post.findAndCount(options);
       posts = posts.map((post) => {
-        console.log('asdasd', post.user);
         return post;
       });
       if (!all) {

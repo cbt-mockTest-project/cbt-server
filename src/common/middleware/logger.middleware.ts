@@ -1,5 +1,5 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import logger from 'src/lib/logger';
 import { isIntrospectionQuery } from 'src/utils/utils';
 
@@ -20,15 +20,12 @@ export class LoggerMiddleware implements NestMiddleware {
         responseData += chunk;
         return originalWrite(chunk);
       };
-      console.log('들어오니');
       res.on('finish', () => {
         const endTime = Date.now();
         const duration = endTime - startTime;
         try {
           logger.info(`Request: ${req.method} ${req.originalUrl}`);
           logger.info(`Client IP: ${clientIp}`);
-          logger.info(`Body: ${JSON.stringify(req.body, null, 2)}`);
-          logger.info(`Response: ${res.statusCode} ${responseData}`);
           logger.info(`Duration: ${duration} ms`);
         } catch (error) {
           logger.error(`Request: ${req.method} ${req.originalUrl}`);

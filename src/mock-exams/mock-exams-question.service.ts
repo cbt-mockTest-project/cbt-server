@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MockExamQuestionBookmark } from 'src/mock-exams/entities/mock-exam-question-bookmark.entity';
 import { User } from 'src/users/entities/user.entity';
+import { shuffleArray } from 'src/utils/utils';
 import { FindOptionsWhere, In, Not, Repository } from 'typeorm';
 import {
   CreateMockExamQuestionInput,
@@ -633,6 +634,7 @@ export class MockExamQuestionService {
 
       // 랜덤모의고사
       if (ids) {
+        console.time('랜덤모의고사');
         if (states) {
           if (!user) {
             return {
@@ -642,6 +644,35 @@ export class MockExamQuestionService {
               count: 0,
               title: '전체',
             };
+          }
+          let coreQuestions: MockExamQuestion[] = [];
+          // QuestionState.CORE 인 경우 안 푼 문제를 포함시켜준다
+          if (states.includes(QuestionState.CORE)) {
+            const allQuestions = await this.mockExamQuestion.find({
+              relations: { mockExam: true },
+              where: {
+                mockExam: {
+                  id: In(ids),
+                },
+              },
+            });
+            const questionIds = allQuestions.map((q) => q.id);
+            const existingQuestionStates =
+              await this.mockExamQuestionState.find({
+                relations: { question: true, exam: true },
+                where: {
+                  user: { id: user.id },
+                  question: { id: In(questionIds) },
+                },
+              });
+
+            const existingQuestionStateMap = new Map(
+              existingQuestionStates.map((qs) => [qs.question.id, qs]),
+            );
+
+            coreQuestions = allQuestions.filter(
+              (question) => !existingQuestionStateMap.has(question.id),
+            );
           }
           let questionStates = await this.mockExamQuestionState
             .createQueryBuilder('mockExamQuestionState')
@@ -659,8 +690,16 @@ export class MockExamQuestionService {
             .getMany();
 
           let questions = questionStates.map((state) => state.question);
+          if (coreQuestions.length > 0) {
+            coreQuestions = shuffleArray(coreQuestions).slice(0, limit || 14);
+            questions = shuffleArray(questions.concat(coreQuestions)).slice(
+              0,
+              limit || 14,
+            );
+          }
           questions = await makeQuestionJoins(questions);
           questions = filterQuestionStates(questions);
+          console.timeEnd('랜덤모의고사');
           return {
             ok: true,
             questions,

@@ -1,3 +1,14 @@
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { CoreOutput } from 'src/common/dtos/output.dto';
+import { User } from 'src/users/entities/user.entity';
+import { deduplication } from 'src/utils/utils';
+import { FindOptionsWhere, In, Not, Repository } from 'typeorm';
+import {
+  CreateOrUpdateMockExamQuestionStateInput,
+  CreateOrUpdateMockExamQuestionStateOutput,
+} from './dtos/createOrUpdateMockExamQuestionState.dto';
+import { ReadExamTitleAndIdByQuestionStateOutput } from './dtos/readExamTitleAndIdByQuestionState.dto';
 import {
   ReadMyExamQuestionStateInput,
   ReadMyExamQuestionStateOutput,
@@ -6,21 +17,11 @@ import {
   ResetMyExamQuestionStateInput,
   ResetMyExamQuestionStateOutput,
 } from './dtos/resetMyExamQuestionState.dto';
-import { User } from 'src/users/entities/user.entity';
-import {
-  CreateOrUpdateMockExamQuestionStateInput,
-  CreateOrUpdateMockExamQuestionStateOutput,
-} from './dtos/createOrUpdateMockExamQuestionState.dto';
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, FindOptionsWhere, Not } from 'typeorm';
 import {
   MockExamQuestionState,
   QuestionState,
 } from './entities/mock-exam-question-state.entity';
 import { MockExamQuestion } from './entities/mock-exam-question.entity';
-import { ReadExamTitleAndIdByQuestionStateOutput } from './dtos/readExamTitleAndIdByQuestionState.dto';
-import { deduplication } from 'src/utils/utils';
 
 @Injectable()
 export class MockExamQuestionStateService {
@@ -207,5 +208,40 @@ export class MockExamQuestionStateService {
     } catch (e) {
       return { ok: false, error: '시험카테고리를 불러올 수 없습니다.' };
     }
+  }
+
+  // 안푼 문제들을 전부 Core상태로 바꿔주는 로직
+  async updateQuestionStatesToCore(user: User): Promise<CoreOutput> {
+    const questions = await this.mockExamQuestion.find();
+    const questionIds = questions.map((q) => q.id);
+    const existingQuestionStates = await this.mockExamQuestionState.find({
+      relations: { question: true, exam: true },
+      where: {
+        user: { id: user.id },
+        question: { id: In(questionIds) },
+      },
+    });
+
+    const existingQuestionStateMap = new Map(
+      existingQuestionStates.map((qs) => [qs.question.id, qs]),
+    );
+
+    const newQuestionStates = questions
+      .filter((question) => !existingQuestionStateMap.has(question.id))
+      .map((question) => {
+        return this.mockExamQuestionState.create({
+          question,
+          exam: question.mockExam,
+          state: QuestionState.CORE,
+          user,
+        });
+      });
+
+    if (newQuestionStates.length > 0) {
+      await this.mockExamQuestionState.save(newQuestionStates);
+    }
+    return {
+      ok: true,
+    };
   }
 }

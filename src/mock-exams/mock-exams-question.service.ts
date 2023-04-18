@@ -468,18 +468,28 @@ export class MockExamQuestionService {
       const makeQuestionJoins = async (questions: MockExamQuestion[]) => {
         const questionIds = questions.map((question) => question.id);
         await Promise.all([
-          (questionStates = await this.mockExamQuestionState.find({
-            relations: { question: true, user: true, exam: true },
-            where: {
-              question: In(questionIds),
-            },
-          })),
-          (questionBookmarks = await this.mockExamQuestionBookmark.find({
-            relations: { question: true, user: true },
-            where: {
-              question: In(questionIds),
-            },
-          })),
+          (questionStates = user
+            ? await this.mockExamQuestionState.find({
+                relations: { question: true, user: true, exam: true },
+                where: {
+                  question: In(questionIds),
+                  user: {
+                    id: user.id,
+                  },
+                },
+              })
+            : []),
+          (questionBookmarks = user
+            ? await this.mockExamQuestionBookmark.find({
+                relations: { question: true, user: true },
+                where: {
+                  question: In(questionIds),
+                  user: {
+                    id: user.id,
+                  },
+                },
+              })
+            : []),
           (questionFeedbacks = await this.mockExamQuestionFeedback.find({
             relations: {
               mockExamQuestion: true,
@@ -505,6 +515,12 @@ export class MockExamQuestionService {
             ...question,
             state: questionStates.filter(
               (state) => state.question.id === question.id,
+            ),
+            mockExamQuestionBookmark: questionBookmarks.filter(
+              (bookmark) => bookmark.question.id === question.id,
+            ),
+            mockExamQuestionComment: questionComments.filter(
+              (comment) => comment.question.id === question.id,
             ),
             mockExamQuestionFeedback: questionFeedbacks
               .filter(
@@ -560,12 +576,6 @@ export class MockExamQuestionService {
                   b.recommendationCount.good - a.recommendationCount.good ||
                   a.recommendationCount.bad - b.recommendationCount.bad,
               ),
-            mockExamQuestionBookmark: questionBookmarks.filter(
-              (bookmark) => bookmark.question.id === question.id,
-            ),
-            mockExamQuestionComment: questionComments.filter(
-              (comment) => comment.question.id === question.id,
-            ),
           };
         });
         return result;

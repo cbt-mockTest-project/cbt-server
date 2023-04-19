@@ -38,12 +38,17 @@ export class AllExceptionsFilter implements ExceptionFilter {
     if (isGraphQL) {
       const gqlCtx = GqlExecutionContext.create(host);
       const request = gqlCtx.getContext().req;
-
+      const clientIp =
+        request.headers['x-forwarded-for'] ||
+        request.connection.remoteAddress ||
+        request.socket.remoteAddress ||
+        '';
       logger.error(`Request: ${request.method} ${request.originalUrl}`);
       logger.error(`Body: ${JSON.stringify(request.body, null, 2)}`);
       logger.error(
         `Response: ${status} Error: ${JSON.stringify(exception, null, 2)}`,
       );
+      logger.error(`Client IP: ${clientIp}`);
       const errorData = this.graphQLErrors?.[0] || {}; // 첫 번째 graphQLError를 가져옵니다.
 
       const { locations, path, extensions } = errorData;
@@ -57,12 +62,17 @@ export class AllExceptionsFilter implements ExceptionFilter {
       const ctx = host.switchToHttp();
       const req = ctx.getRequest<Request>();
       const res = ctx.getResponse<Response>();
-
+      const clientIp =
+        req.headers['x-forwarded-for'] ||
+        req.socket.remoteAddress ||
+        req.connection.remoteAddress ||
+        '';
       logger.error(`Request: ${req.method} ${req.originalUrl}`);
       logger.error(`Body: ${JSON.stringify(req.body, null, 2)}`);
       logger.error(
         `Response: ${status} Error: ${JSON.stringify(exception, null, 2)}`,
       );
+      logger.error(`Client IP: ${clientIp}`);
 
       res.status(status).json({
         statusCode: status,

@@ -8,6 +8,10 @@ import {
   UpdateMockExamQuestionFeedbackRecommendationInput,
   UpdateMockExamQuestionFeedbackRecommendationOutput,
 } from './dtos/updateMockExamQuestionFeedbackRecommendation.dto';
+import {
+  GetFeedbacksByRecommendationCountInput,
+  GetFeedbacksByRecommendationCountOutput,
+} from './dtos/getFeedbacksByRecommendationCount.dto';
 
 @Injectable()
 export class MockExamQuestionFeedbackRecommendationService {
@@ -86,6 +90,34 @@ export class MockExamQuestionFeedbackRecommendationService {
       return {
         ok: false,
       };
+    }
+  }
+
+  async getFeedbacksByRecommendationCount(
+    getFeedbacksByRecommendationCountInput: GetFeedbacksByRecommendationCountInput,
+  ): Promise<GetFeedbacksByRecommendationCountOutput> {
+    try {
+      const { count } = getFeedbacksByRecommendationCountInput;
+      const subQuery = this.mockExamQuestionFeedback
+        .createQueryBuilder('subFeedback')
+        .leftJoin('subFeedback.recommendation', 'subRecommendation')
+        .select('subFeedback.id')
+        .groupBy('subFeedback.id')
+        .having(`COUNT(subRecommendation.id) >= ${count}`);
+
+      const feedbacks = await this.mockExamQuestionFeedback
+        .createQueryBuilder('feedback')
+        .leftJoinAndSelect('feedback.recommendation', 'recommendation')
+        .leftJoinAndSelect('feedback.mockExamQuestion', 'question')
+        .where(`feedback.id IN (${subQuery.getQuery()})`)
+        .setParameters(subQuery.getParameters())
+        .getMany();
+      return {
+        ok: true,
+        feedbacks,
+      };
+    } catch (e) {
+      console.log(e);
     }
   }
 }

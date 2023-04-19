@@ -1,4 +1,4 @@
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
 import { MockExamQuestionFeedbackRecommendation } from './entities/mock-exam-question-feedback-recommendation.entity';
 import { MockExamQuestionFeedbackRecommendationService } from './mock-exams-question-feedback-recommendation.service';
 import {
@@ -8,6 +8,11 @@ import {
 import { User } from 'src/users/entities/user.entity';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { Role } from 'src/auth/role.decorators';
+import { CoreOutput } from 'src/common/dtos/output.dto';
+import {
+  GetFeedbacksByRecommendationCountInput,
+  GetFeedbacksByRecommendationCountOutput,
+} from './dtos/getFeedbacksByRecommendationCount.dto';
 
 @Resolver(() => MockExamQuestionFeedbackRecommendation)
 export class MockExamQuestionFeedbackRecommendationResolver {
@@ -25,6 +30,16 @@ export class MockExamQuestionFeedbackRecommendationResolver {
     return this.mockExamQuestionFeedbackRecommendationService.updateMockExamQuestionFeedbackRecommendation(
       updateMockExamQuestionFeedbackRecommendationInput,
       user,
+    );
+  }
+
+  @Query(() => GetFeedbacksByRecommendationCountOutput)
+  async getFeedbacksByRecommendationCount(
+    @Args('input')
+    getFeedbacksByRecommendationCountInput: GetFeedbacksByRecommendationCountInput,
+  ) {
+    return this.mockExamQuestionFeedbackRecommendationService.getFeedbacksByRecommendationCount(
+      getFeedbacksByRecommendationCountInput,
     );
   }
 }

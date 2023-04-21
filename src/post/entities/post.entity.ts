@@ -61,6 +61,10 @@ export class Post extends CoreEntity {
   @Field(() => Boolean, { defaultValue: false })
   likeState: boolean;
 
+  @Column({ default: 0 })
+  @Field(() => Number, { defaultValue: 0 })
+  priority: number;
+
   @Field(() => Number, { defaultValue: 0 })
   likesCount?: number;
 

@@ -166,7 +166,7 @@ export class PostService {
         options = {
           skip,
           take: limit,
-          order: { created_at: 'DESC' },
+          order: { priority: 'DESC', created_at: 'DESC' },
           relations: { user: true, like: true, comment: true },
           where: {
             category,

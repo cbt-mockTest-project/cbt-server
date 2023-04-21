@@ -14,6 +14,7 @@ import { PostLike } from './postLike.entity';
 export enum PostCategory {
   FREE = 'FREE',
   REVIEW = 'REVIEW',
+  RECOVERY = 'RECOVERY',
   NOTICE = 'NOTICE',
 }
 

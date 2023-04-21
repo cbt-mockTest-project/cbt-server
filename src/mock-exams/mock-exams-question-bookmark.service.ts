@@ -119,11 +119,14 @@ export class MockExamQuestionBookmarkSerivce {
         },
       });
       const titleAndId = deduplication(
-        bookmarks.map((bookmark) => {
-          const { title, id } = bookmark.question.mockExam;
-          return { title, id };
-        }),
+        bookmarks
+          .map((bookmark) => {
+            const { title, id } = bookmark.question.mockExam;
+            return { title, id };
+          })
+          .sort((a, b) => (a.title > b.title ? 1 : -1)),
       );
+      console.log(titleAndId);
       return { ok: true, titleAndId };
     } catch {
       return { ok: false, error: '시험카테고리를 불러올 수 없습니다.' };

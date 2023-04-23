@@ -320,6 +320,7 @@ export class MockExamService {
       const titles: ExamTitleAndId[] = mockExamTitles
         .sort((a, b) => {
           return (
+            (a.title > b.title ? 1 : -1) ||
             Number(b.title.split('년')[0]) - Number(a.title.split('년')[0]) ||
             Number(b.title.split('-').at(-1).split('회차')[0]) -
               Number(a.title.split('-').at(-1).split('회차')[0])

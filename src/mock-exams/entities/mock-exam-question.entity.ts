@@ -40,8 +40,8 @@ export class MockExamQuestion extends CoreEntity {
   @Field(() => String, { nullable: true })
   solution?: string;
 
-  @Column()
-  @Field(() => Boolean)
+  @Column({ default: false })
+  @Field(() => Boolean, { defaultValue: false })
   approved: boolean;
 
   @Column({ type: 'json', default: [] })

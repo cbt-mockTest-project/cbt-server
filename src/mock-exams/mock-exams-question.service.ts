@@ -55,6 +55,7 @@ import {
 } from './entities/mock-exam-question-state.entity';
 import { MockExamQuestion } from './entities/mock-exam-question.entity';
 import { MockExam } from './entities/mock-exam.entity';
+import * as XLSX from 'xlsx';
 
 @Injectable()
 export class MockExamQuestionService {
@@ -880,6 +881,54 @@ export class MockExamQuestionService {
     return {
       ok: true,
       mockExamQusetions,
+    };
+  }
+
+  async parsingExcel() {
+    // 파일 읽기
+    const workbook = XLSX.readFile(
+      '/Users/sim-eungwang/Documents/cbt/cbt-server/src/mock-exams/작업형.xlsx',
+    );
+
+    for await (const index of [0, 1, 2]) {
+      // 첫 번째 워크시트 가져오기
+      const sheetName = workbook.SheetNames[index];
+      const worksheet = workbook.Sheets[sheetName];
+
+      // 워크시트를 JSON 객체로 변환
+      const questions = [];
+      XLSX.utils.sheet_to_json(worksheet).forEach((el) => {
+        const question = el['영상']
+          ? `${el['문제']}\n\n[영상]\n ${el['영상']}`
+          : el['문제'];
+        const solution = el['정답'];
+        questions.push({
+          question,
+          solution,
+        });
+      });
+      const exam = this.mockExam.create({
+        title: sheetName,
+        user: { id: 1 },
+        mockExamCategory: {
+          id: 6,
+        },
+      });
+      const res = await this.mockExam.save(exam);
+      await Promise.all(
+        questions.map(async (question, index) => {
+          const mockExamQuestion = this.mockExamQuestion.create({
+            ...question,
+            number: index + 1,
+            mockExam: { id: res.id },
+            user: { id: 1 },
+          });
+          await this.mockExamQuestion.save(mockExamQuestion);
+        }),
+      );
+    }
+    return {
+      ok: true,
     };
   }
 

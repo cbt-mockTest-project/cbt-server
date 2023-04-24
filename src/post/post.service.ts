@@ -12,7 +12,6 @@ import { ReadPostInput, ReadPostOutput } from './dtos/readPost.dto';
 import { ReadPostsInput, ReadPostsOutput } from './dtos/readPosts.dto';
 import { ViewPostInput, ViewPostOutput } from './dtos/viewPost.dto';
 import { Post } from './entities/post.entity';
-
 @Injectable()
 export class PostService {
   constructor(

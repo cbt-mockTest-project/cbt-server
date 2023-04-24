@@ -10,6 +10,7 @@ import { AuthUser } from 'src/auth/auth-user.decorator';
 import { EditPostInput, EditPostOutput } from './dtos/editPost.dto';
 import { DeletePostInput, DeletePostOutput } from './dtos/deletePost.dto';
 import { ReadPostsInput, ReadPostsOutput } from './dtos/readPosts.dto';
+import { CoreOutput } from 'src/common/dtos/output.dto';
 
 @Resolver(() => Post)
 export class PostResolver {

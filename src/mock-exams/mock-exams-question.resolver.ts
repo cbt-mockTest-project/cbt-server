@@ -150,6 +150,10 @@ export class MockExamQuestionResolver {
     return this.mockExamQuestionService.readAllQuestions();
   }
 
+  @Mutation(() => CoreOutput)
+  async parsingExcel() {
+    return this.mockExamQuestionService.parsingExcel();
+  }
   // @Mutation(() => CoreOutput)
   // async updateQuestionUserId() {
   //   return this.mockExamQuestionService.updateQuestionUserId();

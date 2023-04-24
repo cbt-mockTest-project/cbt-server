@@ -55,7 +55,8 @@
     "typeorm": "^0.3.10",
     "uuid": "^9.0.0",
     "winston": "^3.8.2",
-    "winston-daily-rotate-file": "^4.7.1"
+    "winston-daily-rotate-file": "^4.7.1",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",
@@ -67,6 +68,7 @@
     "@types/node": "^16.0.0",
     "@types/selenium-webdriver": "^4.1.10",
     "@types/supertest": "^2.0.11",
+    "@types/xlsx": "^0.0.36",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
     "eslint": "^8.0.1",

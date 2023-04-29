@@ -10,9 +10,19 @@ export class ZepService {
     @InjectRepository(MockExamQuestion)
     private readonly mockExamQuestion: Repository<MockExamQuestion>,
   ) {}
-  async getRandomQuestion(): Promise<GetRandomQuestionOutput> {
+  async getRandomQuestion(
+    categoryId: string,
+  ): Promise<GetRandomQuestionOutput> {
     try {
-      const questions = await this.mockExamQuestion.find();
+      const questions = await this.mockExamQuestion.find({
+        where: {
+          mockExam: {
+            mockExamCategory: {
+              id: Number(categoryId),
+            },
+          },
+        },
+      });
       const randomQuestion =
         questions[Math.floor(Math.random() * questions.length)];
       return {

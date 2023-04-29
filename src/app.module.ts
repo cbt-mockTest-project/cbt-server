@@ -51,6 +51,7 @@ import { UserModule } from './users/user.module';
 import { Visit } from './visit/entities/visit.entity';
 import { VisitHistory } from './visit/entities/visitHistory.entity';
 import { VisitModule } from './visit/visit.module';
+import { ZepModule } from './zep/zep.module';
 
 @Module({
   imports: [
@@ -98,8 +99,16 @@ import { VisitModule } from './visit/visit.module';
         credentials: true,
         origin:
           process.env.NODE_ENV == 'dev'
-            ? [process.env.CLIENT_URL, process.env.ADMIN_URL]
-            : [process.env.CLIENT_URL, process.env.NAVER_CRAWLER_BOT_URL],
+            ? [
+                process.env.CLIENT_URL,
+                process.env.ADMIN_URL,
+                process.env.PRIVATE_URL,
+              ]
+            : [
+                process.env.CLIENT_URL,
+                process.env.NAVER_CRAWLER_BOT_URL,
+                process.env.PRIVATE_URL,
+              ],
       },
     }),
     TypeOrmModule.forRoot({
@@ -182,6 +191,7 @@ import { VisitModule } from './visit/visit.module';
     CommonModule,
     QuestionCardModule,
     ExamCoAuthorModule,
+    ZepModule,
   ],
   controllers: [],
   providers: [

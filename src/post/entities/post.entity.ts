@@ -12,10 +12,12 @@ import { IsEnum } from 'class-validator';
 import { PostLike } from './postLike.entity';
 
 export enum PostCategory {
-  FREE = 'FREE',
-  REVIEW = 'REVIEW',
-  RECOVERY = 'RECOVERY',
-  NOTICE = 'NOTICE',
+  FREE = 'FREE', // 자유
+  REVIEW = 'REVIEW', // 시험후기
+  RECOVERY = 'RECOVERY', // 복원
+  NOTICE = 'NOTICE', //공지
+  CHECKIN = 'CHECKIN', //출석체크
+  SUGGENSTION = 'SUGGENSTION', //건의사항
 }
 
 registerEnumType(PostCategory, { name: 'PostCategory' });

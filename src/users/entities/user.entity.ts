@@ -38,8 +38,8 @@ import { MockExamQuestionFeedbackRecommendation } from 'src/mock-exams/entities/
 export enum UserRole {
   CLIENT = 'CLIENT',
   ADMIN = 'ADMIN',
+  PARTNER = 'PARTNER',
 }
-
 export enum LoginType {
   NAVER = 'NAVER',
   KAKAO = 'KAKAO',

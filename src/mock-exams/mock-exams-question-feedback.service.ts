@@ -17,6 +17,8 @@ import {
   DeleteMockExamQuestionFeedbackInput,
   DeleteMockExamQuestionFeedbackOutput,
 } from './dtos/deleteMockExamQuestionFeedback.dto';
+import { GetExamTitleWithFeedbackOutput } from './dtos/getExamTitleWithFeedback.dto';
+import { deduplication } from 'src/utils/utils';
 
 @Injectable()
 export class MockExamQuestionFeedbackSerivce {
@@ -137,6 +139,47 @@ export class MockExamQuestionFeedbackSerivce {
       return {
         ok: false,
         error: '피드백을 찾을 수 없습니다.',
+      };
+    }
+  }
+
+  async getExamTitleWithFeedback(
+    user: User,
+  ): Promise<GetExamTitleWithFeedbackOutput> {
+    try {
+      const feedbacks = await this.mockExamQuestionFeedback.find({
+        where: { mockExamQuestion: { mockExam: { user: { id: user.id } } } },
+        relations: {
+          mockExamQuestion: {
+            mockExam: true,
+          },
+        },
+        order: {
+          mockExamQuestion: {
+            mockExam: {
+              title: 'ASC',
+            },
+          },
+        },
+      });
+      const titles = deduplication(
+        feedbacks.map((feedback) => {
+          const { id, title } = feedback.mockExamQuestion.mockExam;
+          return {
+            id,
+            title,
+          };
+        }),
+      );
+      console.log(titles);
+      return {
+        ok: true,
+        titles,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '시험 리스트를 불러올 수 없습니다.',
       };
     }
   }

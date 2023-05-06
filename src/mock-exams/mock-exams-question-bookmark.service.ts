@@ -126,10 +126,9 @@ export class MockExamQuestionBookmarkSerivce {
           })
           .sort((a, b) => (a.title > b.title ? 1 : -1)),
       );
-      console.log(titleAndId);
       return { ok: true, titleAndId };
     } catch {
-      return { ok: false, error: '시험카테고리를 불러올 수 없습니다.' };
+      return { ok: false, error: '시험 리스트를 불러올 수 없습니다.' };
     }
   }
 }

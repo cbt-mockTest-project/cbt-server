@@ -17,6 +17,7 @@ import {
 } from './dtos/editMockExamQuestionFeedback.dto';
 import { ReadAllMockExamQuestionFeedbackOutput } from './dtos/readAllMockExamQuestionFeedback.dto';
 import { AuthUser } from 'src/auth/auth-user.decorator';
+import { GetExamTitleWithFeedbackOutput } from './dtos/getExamTitleWithFeedback.dto';
 
 @Resolver(() => MockExamQuestionFeedback)
 export class MockExamQuestionFeedbackResolver {
@@ -64,5 +65,12 @@ export class MockExamQuestionFeedbackResolver {
   @Query(() => ReadAllMockExamQuestionFeedbackOutput)
   async readAllMockExamQuestionFeedback(): Promise<ReadAllMockExamQuestionFeedbackOutput> {
     return this.mockExamQuestionFeedbackSerivce.readAllMockExamQuestionFeedback();
+  }
+
+  @Query(() => GetExamTitleWithFeedbackOutput)
+  async getExamTitleWithFeedback(
+    @AuthUser() user: User,
+  ): Promise<GetExamTitleWithFeedbackOutput> {
+    return this.mockExamQuestionFeedbackSerivce.getExamTitleWithFeedback(user);
   }
 }

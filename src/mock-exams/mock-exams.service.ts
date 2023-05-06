@@ -385,18 +385,4 @@ export class MockExamService {
       };
     }
   }
-  // async syncExamSlug() {
-  //   const slugify = (title: string) => {
-  //     const splited = title.split('-');
-  //     return splited[0] + '-' + splited.at(-1);
-  //   };
-  //   const mockExams = await this.mockExam.find();
-  //   for (const mockExam of mockExams) {
-  //     const slug = slugify(mockExam.title);
-  //     await this.mockExam.update(mockExam.id, { slug });
-  //   }
-  //   return {
-  //     ok: true,
-  //   };
-  // }
 }

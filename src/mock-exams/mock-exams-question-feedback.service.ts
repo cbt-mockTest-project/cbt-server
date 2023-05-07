@@ -12,13 +12,19 @@ import { MockExamQuestion } from './entities/mock-exam-question.entity';
 import { MockExamQuestionFeedback } from './entities/mock-exam-question-feedback.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Brackets, In, Repository } from 'typeorm';
 import {
   DeleteMockExamQuestionFeedbackInput,
   DeleteMockExamQuestionFeedbackOutput,
 } from './dtos/deleteMockExamQuestionFeedback.dto';
 import { GetExamTitleWithFeedbackOutput } from './dtos/getExamTitleWithFeedback.dto';
 import { deduplication } from 'src/utils/utils';
+import {
+  GetFeedbacksWithFilterInput,
+  GetFeedbacksWithFilterOutput,
+} from './dtos/getFeedbacksWithFilter.dto';
+import { QuestionFeedbackRecommendationType } from './entities/mock-exam-question-feedback-recommendation.entity';
+import { ExamCoAuthor } from 'src/exam-co-author/entities/exam-co-author.entity';
 
 @Injectable()
 export class MockExamQuestionFeedbackSerivce {
@@ -29,6 +35,8 @@ export class MockExamQuestionFeedbackSerivce {
     private readonly mockExamQuestion: Repository<MockExamQuestion>,
     @InjectRepository(User)
     private readonly users: Repository<User>,
+    @InjectRepository(ExamCoAuthor)
+    private readonly examCoAuthors: Repository<ExamCoAuthor>,
   ) {}
 
   async createMockExamQuestionFeedback(
@@ -171,7 +179,6 @@ export class MockExamQuestionFeedbackSerivce {
           };
         }),
       );
-      console.log(titles);
       return {
         ok: true,
         titles,
@@ -180,6 +187,61 @@ export class MockExamQuestionFeedbackSerivce {
       return {
         ok: false,
         error: '시험 리스트를 불러올 수 없습니다.',
+      };
+    }
+  }
+
+  async getFeedbacksWithFilter(
+    getFeedbacksWithFilterInput: GetFeedbacksWithFilterInput,
+    user: User,
+  ): Promise<GetFeedbacksWithFilterOutput> {
+    try {
+      const { examId, goodCount, badCount } = getFeedbacksWithFilterInput;
+      const coAuthors = await this.examCoAuthors.find({
+        where: { exam: { id: examId } },
+        relations: { user: true },
+      });
+      const coAuthorIds = coAuthors.map((coAuthor) => coAuthor.user.id);
+      console.log(user.id);
+      let feedbacks = await this.mockExamQuestionFeedback
+        .createQueryBuilder('feedback')
+        .leftJoinAndSelect('feedback.mockExamQuestion', 'mockExamQuestion')
+        .leftJoinAndSelect('feedback.recommendation', 'recommendation')
+        .leftJoin('mockExamQuestion.mockExam', 'mockExam')
+        .leftJoin('mockExam.examCoAuthor', 'examCoAuthor')
+        .leftJoin('examCoAuthor.user', 'coAuthorUser')
+        .leftJoin('mockExam.user', 'authorUser')
+        .where('mockExam.id = :examId', { examId })
+        .andWhere(
+          new Brackets((qb) => {
+            qb.where('authorUser.id = :userId', { userId: user.id });
+            // qb.where('coAuthorUser.id IN (:...coAuthorIds)', {
+            //   coAuthorIds,
+            // }).orWhere('authorUser.id = :userId', { userId: user.id });
+          }),
+        )
+        // .orderBy('mockExam.title', 'ASC')
+        .getMany();
+      feedbacks = feedbacks.filter((feedback) => {
+        const good = feedback.recommendation.filter(
+          (recommedation) =>
+            recommedation.type === QuestionFeedbackRecommendationType.GOOD,
+        );
+        const bad = feedback.recommendation.filter(
+          (recommedation) =>
+            recommedation.type === QuestionFeedbackRecommendationType.BAD,
+        );
+        return good.length >= goodCount && bad.length >= badCount;
+      });
+      return {
+        ok: true,
+        feedbacks,
+      };
+    } catch (e) {
+      console.log(e);
+      return {
+        ok: false,
+        error: '피드백을 불러올 수 없습니다.',
       };
     }
   }

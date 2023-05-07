@@ -18,6 +18,10 @@ import {
 import { ReadAllMockExamQuestionFeedbackOutput } from './dtos/readAllMockExamQuestionFeedback.dto';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { GetExamTitleWithFeedbackOutput } from './dtos/getExamTitleWithFeedback.dto';
+import {
+  GetFeedbacksWithFilterInput,
+  GetFeedbacksWithFilterOutput,
+} from './dtos/getFeedbacksWithFilter.dto';
 
 @Resolver(() => MockExamQuestionFeedback)
 export class MockExamQuestionFeedbackResolver {
@@ -72,5 +76,17 @@ export class MockExamQuestionFeedbackResolver {
     @AuthUser() user: User,
   ): Promise<GetExamTitleWithFeedbackOutput> {
     return this.mockExamQuestionFeedbackSerivce.getExamTitleWithFeedback(user);
+  }
+
+  @Query(() => GetFeedbacksWithFilterOutput)
+  async getFeedbacksWithFilter(
+    @Args('input')
+    getFeedbacksWithFilterInput: GetFeedbacksWithFilterInput,
+    @AuthUser() user: User,
+  ): Promise<GetFeedbacksWithFilterOutput> {
+    return this.mockExamQuestionFeedbackSerivce.getFeedbacksWithFilter(
+      getFeedbacksWithFilterInput,
+      user,
+    );
   }
 }

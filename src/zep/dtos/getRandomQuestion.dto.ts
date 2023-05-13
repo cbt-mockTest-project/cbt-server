@@ -7,6 +7,6 @@ export class GetRandomQuestionInput {}
 
 @ObjectType()
 export class GetRandomQuestionOutput extends CoreOutput {
-  @Field((type) => MockExamQuestion, { nullable: true })
+  @Field(() => MockExamQuestion, { nullable: true })
   question?: MockExamQuestion;
 }

@@ -21,7 +21,7 @@ export class ZepStudyTimeService {
     updateZepStudyTimeInput: UpdateZepStudyTimeInput,
   ): Promise<UpdateZepStudyTimeOutput> {
     try {
-      const { studyTime, grassCount, zepId } = updateZepStudyTimeInput;
+      const { studyTime, grassCount, zepId, date } = updateZepStudyTimeInput;
       const zepUser = await this.zepUser.findOne({ where: { zep_id: zepId } });
       if (!zepUser) {
         return {
@@ -29,24 +29,18 @@ export class ZepStudyTimeService {
           error: '유저를 찾을 수 없습니다.',
         };
       }
-      // 오늘 만들어진 스터디 타임이 있는지 확인
-      const today = new Date();
-      const startOfDay = new Date(today.setHours(0, 0, 0, 0));
-      const endOfDay = new Date(today.setHours(23, 59, 59, 999));
-      const studyTimeToday = await this.zepStudyTime
-        .createQueryBuilder('zepStudyTime')
-        .where('zepStudyTime.zepUser.id = :zepUserId', {
-          zepUserId: zepUser.id,
-        })
-        .andWhere('zepStudyTime.updated_at >= :startOfDay', { startOfDay })
-        .andWhere('zepStudyTime.updated_at <= :endOfDay', { endOfDay })
-        .getOne();
+
+      const studyTimeToday = await this.zepStudyTime.findOne({
+        where: { zepUser: { zep_id: zepId }, date },
+      });
       const zepStudyTime = await this.zepStudyTime.save({
         id: studyTimeToday && studyTimeToday.id,
         zepUser,
         grass_count: grassCount,
         study_time: studyTime,
+        date,
       });
+
       return {
         ok: true,
         zepStudyTime,

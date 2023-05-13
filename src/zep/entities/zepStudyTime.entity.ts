@@ -15,6 +15,9 @@ export class ZepStudyTime extends CoreEntity {
   @Field(() => Number)
   study_time: number;
 
+  @Column()
+  date: string;
+
   @ManyToOne(() => ZepUser, (zepUser) => zepUser.studyTimes, {
     onDelete: 'CASCADE',
   })

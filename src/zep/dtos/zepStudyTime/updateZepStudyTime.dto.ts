@@ -14,6 +14,10 @@ export class UpdateZepStudyTimeInput {
   @IsString()
   @IsNotEmpty()
   zepId: string;
+
+  @IsString()
+  @IsNotEmpty()
+  date: string;
 }
 
 export class UpdateZepStudyTimeOutput extends CoreOutput {

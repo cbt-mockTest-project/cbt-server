@@ -48,7 +48,7 @@ export class ZepUserService {
     }
   }
 
-  async getZepUser(id: number): Promise<GetZepUserOutput> {
+  async getZepUser(id: string): Promise<GetZepUserOutput> {
     try {
       const zepUser = await this.zepUser.findOne({
         where: { zep_id: id },

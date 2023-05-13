@@ -8,8 +8,8 @@ import { ZepStudyTime } from './zepStudyTime.entity';
 @Entity()
 export class ZepUser extends CoreEntity {
   @Column({ unique: true })
-  @Field(() => Number)
-  zep_id: number;
+  @Field(() => String)
+  zep_id: string;
 
   @Column()
   @Field(() => String)

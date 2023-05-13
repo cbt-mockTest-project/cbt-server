@@ -18,7 +18,7 @@ export class ZepUserController {
   }
 
   @Get('/:id')
-  async getZepUser(@Param('id') id: number): Promise<GetZepUserOutput> {
+  async getZepUser(@Param('id') id: string): Promise<GetZepUserOutput> {
     return this.zepUserService.getZepUser(id);
   }
 }

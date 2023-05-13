@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { CoreOutput } from 'src/common/dtos/output.dto';
 import { ZepStudyTime } from 'src/zep/entities/zepStudyTime.entity';
 
@@ -11,9 +11,9 @@ export class UpdateZepStudyTimeInput {
   @IsNumber()
   studyTime: number;
 
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
-  zepId: number;
+  zepId: string;
 }
 
 export class UpdateZepStudyTimeOutput extends CoreOutput {

@@ -52,6 +52,8 @@ import { Visit } from './visit/entities/visit.entity';
 import { VisitHistory } from './visit/entities/visitHistory.entity';
 import { VisitModule } from './visit/visit.module';
 import { ZepModule } from './zep/zep.module';
+import { ZepUser } from './zep/entities/zepUser.entity';
+import { ZepStudyTime } from './zep/entities/zepStudyTime.entity';
 
 @Module({
   imports: [
@@ -145,6 +147,8 @@ import { ZepModule } from './zep/zep.module';
         PostLike,
         Visit,
         VisitHistory,
+        ZepUser,
+        ZepStudyTime,
       ],
     }),
     UserModule,

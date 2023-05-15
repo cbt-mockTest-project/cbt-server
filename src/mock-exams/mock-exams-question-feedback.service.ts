@@ -156,7 +156,14 @@ export class MockExamQuestionFeedbackSerivce {
   ): Promise<GetExamTitleWithFeedbackOutput> {
     try {
       const feedbacks = await this.mockExamQuestionFeedback.find({
-        where: { mockExamQuestion: { mockExam: { user: { id: user.id } } } },
+        where: [
+          { mockExamQuestion: { mockExam: { user: { id: user.id } } } },
+          {
+            mockExamQuestion: {
+              mockExam: { examCoAuthor: { user: { id: user.id } } },
+            },
+          },
+        ],
         relations: {
           mockExamQuestion: {
             mockExam: true,
@@ -196,43 +203,64 @@ export class MockExamQuestionFeedbackSerivce {
     user: User,
   ): Promise<GetFeedbacksWithFilterOutput> {
     try {
-      const { examId, goodCount, badCount } = getFeedbacksWithFilterInput;
-      const coAuthors = await this.examCoAuthors.find({
-        where: { exam: { id: examId } },
-        relations: { user: true },
-      });
-      const coAuthorIds = coAuthors.map((coAuthor) => coAuthor.user.id);
-      console.log(user.id);
-      let feedbacks = await this.mockExamQuestionFeedback
+      const { examId, goodCount, badCount, types } =
+        getFeedbacksWithFilterInput;
+      let query = this.mockExamQuestionFeedback
         .createQueryBuilder('feedback')
         .leftJoinAndSelect('feedback.mockExamQuestion', 'mockExamQuestion')
         .leftJoinAndSelect('feedback.recommendation', 'recommendation')
+        .leftJoinAndSelect('feedback.user', 'user')
         .leftJoin('mockExamQuestion.mockExam', 'mockExam')
         .leftJoin('mockExam.examCoAuthor', 'examCoAuthor')
         .leftJoin('examCoAuthor.user', 'coAuthorUser')
         .leftJoin('mockExam.user', 'authorUser')
-        .where('mockExam.id = :examId', { examId })
-        .andWhere(
+        .where(
           new Brackets((qb) => {
-            qb.where('authorUser.id = :userId', { userId: user.id });
-            // qb.where('coAuthorUser.id IN (:...coAuthorIds)', {
-            //   coAuthorIds,
-            // }).orWhere('authorUser.id = :userId', { userId: user.id });
+            qb.where('authorUser.id = :userId', { userId: user.id }).orWhere(
+              'examCoAuthor.user.id =:coAuthorId',
+              {
+                coAuthorId: user.id,
+              },
+            );
           }),
-        )
-        // .orderBy('mockExam.title', 'ASC')
-        .getMany();
-      feedbacks = feedbacks.filter((feedback) => {
-        const good = feedback.recommendation.filter(
-          (recommedation) =>
-            recommedation.type === QuestionFeedbackRecommendationType.GOOD,
         );
-        const bad = feedback.recommendation.filter(
-          (recommedation) =>
-            recommedation.type === QuestionFeedbackRecommendationType.BAD,
-        );
-        return good.length >= goodCount && bad.length >= badCount;
-      });
+
+      if (examId) {
+        query = query.andWhere('mockExam.id = :examId', { examId });
+      }
+      if (types.length >= 1) {
+        query = query.andWhere('feedback.type IN (:...types)', { types });
+      }
+
+      let feedbacks = await query.getMany();
+      feedbacks = feedbacks
+        .filter((feedback) => {
+          const good = feedback.recommendation.filter(
+            (recommedation) =>
+              recommedation.type === QuestionFeedbackRecommendationType.GOOD,
+          );
+          const bad = feedback.recommendation.filter(
+            (recommedation) =>
+              recommedation.type === QuestionFeedbackRecommendationType.BAD,
+          );
+          return good.length >= goodCount && bad.length >= badCount;
+        })
+        .map((feedback) => {
+          return {
+            ...feedback,
+            recommendationCount: {
+              good: feedback.recommendation.filter(
+                (recommedation) =>
+                  recommedation.type ===
+                  QuestionFeedbackRecommendationType.GOOD,
+              ).length,
+              bad: feedback.recommendation.filter(
+                (recommedation) =>
+                  recommedation.type === QuestionFeedbackRecommendationType.BAD,
+              ).length,
+            },
+          };
+        });
       return {
         ok: true,
         feedbacks,

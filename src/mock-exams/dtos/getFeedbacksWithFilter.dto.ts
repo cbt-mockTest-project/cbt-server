@@ -1,6 +1,9 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { CoreOutput } from 'src/common/dtos/output.dto';
-import { MockExamQuestionFeedback } from '../entities/mock-exam-question-feedback.entity';
+import {
+  MockExamQuestionFeedback,
+  QuestionFeedbackType,
+} from '../entities/mock-exam-question-feedback.entity';
 
 @InputType()
 export class GetFeedbacksWithFilterInput {
@@ -10,6 +13,8 @@ export class GetFeedbacksWithFilterInput {
   goodCount: number;
   @Field(() => Number)
   badCount: number;
+  @Field(() => [QuestionFeedbackType])
+  types: QuestionFeedbackType[];
 }
 
 @ObjectType()

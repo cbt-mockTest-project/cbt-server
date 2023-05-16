@@ -222,4 +222,20 @@ export class PostService {
       };
     }
   }
+
+  async converS3bucket_post() {
+    const posts = await this.post.find();
+    Promise.all(
+      posts.map(async (post) => {
+        post.content = post.content.replace(
+          'cbteungwangnestjs961203',
+          'moducbt-seoul',
+        );
+        await this.post.save(post);
+      }),
+    );
+    return {
+      ok: true,
+    };
+  }
 }

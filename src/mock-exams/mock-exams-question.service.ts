@@ -883,15 +883,28 @@ export class MockExamQuestionService {
     };
   }
 
-  // async updateQuestionUserId() {
-  //   const questions = await this.mockExamQuestion.find();
-  //   await Promise.all(
-  //     questions.map(async (question) => {
-  //       await this.mockExamQuestion.save({ ...question, user: { id: 1 } });
-  //     }),
-  //   );
-  //   return {
-  //     ok: true,
-  //   };
-  // }
+  async converS3bucket_question() {
+    const questions = await this.mockExamQuestion.find();
+    Promise.all(
+      questions.map(async (question) => {
+        if (question.question_img[0]) {
+          question.question_img[0].url = question.question_img[0].url.replace(
+            'cbteungwangnestjs961203',
+            'moducbt-seoul',
+          );
+          await this.mockExamQuestion.save(question);
+        }
+        if (question.solution_img[0]) {
+          question.solution_img[0].url = question.solution_img[0].url.replace(
+            'cbteungwangnestjs961203',
+            'moducbt-seoul',
+          );
+          await this.mockExamQuestion.save(question);
+        }
+      }),
+    );
+    return {
+      ok: true,
+    };
+  }
 }

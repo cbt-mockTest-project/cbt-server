@@ -154,4 +154,8 @@ export class MockExamQuestionResolver {
   // async updateQuestionUserId() {
   //   return this.mockExamQuestionService.updateQuestionUserId();
   // }
+  @Mutation(() => CoreOutput)
+  async converS3bucket_question() {
+    return this.mockExamQuestionService.converS3bucket_question();
+  }
 }

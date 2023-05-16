@@ -10,6 +10,7 @@ import { AuthUser } from 'src/auth/auth-user.decorator';
 import { EditPostInput, EditPostOutput } from './dtos/editPost.dto';
 import { DeletePostInput, DeletePostOutput } from './dtos/deletePost.dto';
 import { ReadPostsInput, ReadPostsOutput } from './dtos/readPosts.dto';
+import { CoreOutput } from 'src/common/dtos/output.dto';
 
 @Resolver(() => Post)
 export class PostResolver {
@@ -68,5 +69,10 @@ export class PostResolver {
     @Args('input') readPostsInput: ReadPostsInput,
   ): Promise<ReadPostOutput> {
     return this.postService.readPosts(readPostsInput);
+  }
+
+  @Mutation(() => CoreOutput)
+  async converS3bucket_post() {
+    return this.postService.converS3bucket_post();
   }
 }

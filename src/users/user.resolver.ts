@@ -161,7 +161,7 @@ export class UserResolver {
     return this.userService.kakaoLogin(kakaoLoginInput, res);
   }
 
-  @Role(['ADMIN'])
+  @Role(['ADMIN', 'PARTNER'])
   @Query(() => SearchUserOutput)
   async searchUser(
     @Args('input') searchUserInput: SearchUserInput,
@@ -169,7 +169,7 @@ export class UserResolver {
     return this.userService.searchUser(searchUserInput);
   }
 
-  @Role(['ADMIN'])
+  @Role(['ADMIN', 'PARTNER'])
   @Mutation(() => UpdateAdblockPermissionOutput)
   async updateAdBlockPermission(
     @Args('input') updateAdBlockPermissionInput: UpdateAdblockPermissionInput,

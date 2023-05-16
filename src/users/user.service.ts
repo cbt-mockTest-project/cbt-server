@@ -729,9 +729,12 @@ export class UserService {
     try {
       const { name } = searchUserInput;
       const users = await this.users.find({
-        where: {
-          nickname: Like(`%${name}%`),
-        },
+        where: [
+          {
+            nickname: Like(`%${name}%`),
+          },
+          { email: Like(`%${name}%`) },
+        ],
       });
       return {
         ok: true,

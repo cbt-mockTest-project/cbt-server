@@ -37,6 +37,8 @@ import { MockExamQuestionFeedbackRecommendation } from 'src/mock-exams/entities/
 
 export enum UserRole {
   CLIENT = 'CLIENT',
+  CLIENT_BASIC = 'CLIENT_BASIC',
+  CLIENT_SAFE_PREMIUM = 'CLIENT_SAFE_PREMIUM',
   ADMIN = 'ADMIN',
   PARTNER = 'PARTNER',
 }

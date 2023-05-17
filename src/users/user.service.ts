@@ -49,6 +49,14 @@ import { Feedback } from './entities/feedback.entity';
 import { LoginType, User, UserRole } from './entities/user.entity';
 import { Verification } from './entities/verification.entity';
 import { NoticeService } from './notice.service';
+import {
+  CheckUserRoleInput,
+  CheckUserRoleOutput,
+} from './dtos/checkUserRole.dto';
+import {
+  ChangeClientRoleInput,
+  ChangeClientRoleOutput,
+} from './dtos/changeClientRole.dto';
 @Injectable()
 export class UserService {
   constructor(
@@ -770,6 +778,66 @@ export class UserService {
       return {
         ok: false,
         error: '광고차단 설정을 변경할 수 없습니다.',
+      };
+    }
+  }
+
+  async checkUserRole(
+    checkUserRoleInput: CheckUserRoleInput,
+    user: User,
+  ): Promise<CheckUserRoleOutput> {
+    try {
+      const { role } = checkUserRoleInput;
+      if (role.includes(user.role)) {
+        return {
+          ok: true,
+          confirmed: true,
+        };
+      } else {
+        return {
+          ok: true,
+          confirmed: false,
+        };
+      }
+    } catch {
+      return {
+        ok: false,
+        confirmed: false,
+        error: '권한을 확인할 수 없습니다.',
+      };
+    }
+  }
+
+  async changeClientRole(
+    changeClientRoleInput: ChangeClientRoleInput,
+    user: User,
+  ): Promise<ChangeClientRoleOutput> {
+    try {
+      const { role } = changeClientRoleInput;
+      const protectedRoleList = [UserRole.ADMIN, UserRole.PARTNER];
+      if (protectedRoleList.includes(role)) {
+        return {
+          ok: false,
+          error: '변경할 수 없는 권한입니다.',
+        };
+      }
+      const client = await this.users.findOne({ where: { id: user.id } });
+      if (!client) {
+        return {
+          ok: false,
+          error: '유저를 찾을 수 없습니다.',
+        };
+      }
+      client.role = role;
+      const newUser = await this.users.save(client);
+      return {
+        ok: true,
+        currentRole: newUser.role,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '권한을 변경할 수 없습니다.',
       };
     }
   }

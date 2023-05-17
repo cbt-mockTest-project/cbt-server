@@ -41,6 +41,10 @@ import {
 import { UserProfileInput, UserProfileOutput } from './dtos/userProfile.dto';
 import { User } from './entities/user.entity';
 import { UserService } from './user.service';
+import {
+  CheckUserRoleInput,
+  CheckUserRoleOutput,
+} from './dtos/checkUserRole.dto';
 
 @Resolver(() => User)
 export class UserResolver {
@@ -177,5 +181,14 @@ export class UserResolver {
     return this.userService.updateAdBlockPermission(
       updateAdBlockPermissionInput,
     );
+  }
+
+  @Role(['ANY'])
+  @Mutation(() => CheckUserRoleOutput)
+  async checkUserRole(
+    @Args('input') checkUserRoleInput: CheckUserRoleInput,
+    @AuthUser() user: User,
+  ) {
+    return this.userService.checkUserRole(checkUserRoleInput, user);
   }
 }

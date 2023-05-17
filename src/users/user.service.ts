@@ -53,10 +53,7 @@ import {
   CheckUserRoleInput,
   CheckUserRoleOutput,
 } from './dtos/checkUserRole.dto';
-import {
-  ChangeClientRoleInput,
-  ChangeClientRoleOutput,
-} from './dtos/changeClientRole.dto';
+import { ChangeClientRoleInput } from './dtos/changeClientRole.dto';
 @Injectable()
 export class UserService {
   constructor(
@@ -811,7 +808,7 @@ export class UserService {
   async changeClientRole(
     changeClientRoleInput: ChangeClientRoleInput,
     user: User,
-  ): Promise<ChangeClientRoleOutput> {
+  ): Promise<CoreOutput> {
     try {
       const { role } = changeClientRoleInput;
       const protectedRoleList = [UserRole.ADMIN, UserRole.PARTNER];
@@ -829,10 +826,9 @@ export class UserService {
         };
       }
       client.role = role;
-      const newUser = await this.users.save(client);
+      await this.users.save(client);
       return {
         ok: true,
-        currentRole: newUser.role,
       };
     } catch {
       return {

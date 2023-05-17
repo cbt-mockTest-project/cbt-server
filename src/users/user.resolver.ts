@@ -45,6 +45,7 @@ import {
   CheckUserRoleInput,
   CheckUserRoleOutput,
 } from './dtos/checkUserRole.dto';
+import { ChangeClientRoleInput } from './dtos/changeClientRole.dto';
 
 @Resolver(() => User)
 export class UserResolver {
@@ -188,7 +189,16 @@ export class UserResolver {
   async checkUserRole(
     @Args('input') checkUserRoleInput: CheckUserRoleInput,
     @AuthUser() user: User,
-  ) {
+  ): Promise<CheckUserRoleOutput> {
     return this.userService.checkUserRole(checkUserRoleInput, user);
+  }
+
+  @Mutation(() => CoreOutput)
+  @Role(['ANY'])
+  async changeClientRole(
+    @Args('input') changeClientRoleInput: ChangeClientRoleInput,
+    @AuthUser() user: User,
+  ): Promise<CoreOutput> {
+    return this.userService.changeClientRole(changeClientRoleInput, user);
   }
 }

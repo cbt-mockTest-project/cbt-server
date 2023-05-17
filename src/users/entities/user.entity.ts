@@ -41,6 +41,7 @@ export enum UserRole {
   CLIENT_SAFE_PREMIUM = 'CLIENT_SAFE_PREMIUM',
   ADMIN = 'ADMIN',
   PARTNER = 'PARTNER',
+  PAYMENT_TEST = 'PAYMENT_TEST',
 }
 export enum LoginType {
   NAVER = 'NAVER',

@@ -54,6 +54,8 @@ import { VisitModule } from './visit/visit.module';
 import { ZepModule } from './zep/zep.module';
 import { ZepUser } from './zep/entities/zepUser.entity';
 import { ZepStudyTime } from './zep/entities/zepStudyTime.entity';
+import { PaymentsModule } from './payments/payments.module';
+import { Payment } from './payments/entities/payment.entity';
 
 @Module({
   imports: [
@@ -149,6 +151,7 @@ import { ZepStudyTime } from './zep/entities/zepStudyTime.entity';
         VisitHistory,
         ZepUser,
         ZepStudyTime,
+        Payment,
       ],
     }),
     UserModule,
@@ -196,6 +199,7 @@ import { ZepStudyTime } from './zep/entities/zepStudyTime.entity';
     QuestionCardModule,
     ExamCoAuthorModule,
     ZepModule,
+    PaymentsModule,
   ],
   controllers: [],
   providers: [

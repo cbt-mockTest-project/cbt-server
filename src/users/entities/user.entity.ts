@@ -34,6 +34,7 @@ import { MockExam } from 'src/mock-exams/entities/mock-exam.entity';
 import { MockExamQuestion } from 'src/mock-exams/entities/mock-exam-question.entity';
 import { QuestionCardCategory } from 'src/question-card/entities/question-card-category';
 import { MockExamQuestionFeedbackRecommendation } from 'src/mock-exams/entities/mock-exam-question-feedback-recommendation.entity';
+import { Payment } from 'src/payments/entities/payment.entity';
 
 export enum UserRole {
   CLIENT = 'CLIENT',
@@ -148,6 +149,10 @@ export class User extends CoreEntity {
   @OneToMany(() => Notice, (notice) => notice.user)
   @Field(() => [Notice], { nullable: true })
   notice: Notice[];
+
+  @OneToMany(() => Payment, (payment) => payment.user)
+  @Field(() => [Payment])
+  payments: Payment[];
 
   @OneToMany(() => Post, (post) => post.user)
   @Field(() => [Post], { nullable: true })

@@ -23,6 +23,10 @@ export class Payment extends CoreEntity {
   @Field(() => String)
   receiptId: string;
 
+  @Column({ nullable: true })
+  @Field(() => String, { nullable: true })
+  receiptUrl: string;
+
   @ManyToOne(() => User, (user) => user.payments)
   @Field(() => User)
   user: User;

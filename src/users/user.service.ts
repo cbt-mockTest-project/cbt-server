@@ -54,6 +54,11 @@ import {
   CheckUserRoleOutput,
 } from './dtos/checkUserRole.dto';
 import { ChangeClientRoleInput } from './dtos/changeClientRole.dto';
+import {
+  ChangeClientRoleAndCreatePaymentInput,
+  ChangeClientRoleAndCreatePaymentOutput,
+} from './dtos/changeClientRoleAndCreatePayment.dto';
+import { PaymentService } from 'src/payments/payment.service';
 @Injectable()
 export class UserService {
   constructor(
@@ -66,6 +71,7 @@ export class UserService {
     private readonly jwtService: JwtService,
     private readonly telegramService: TelegramService,
     private readonly noticeService: NoticeService,
+    private readonly paymentService: PaymentService,
   ) {}
 
   async register(registerInput: RegisterInput): Promise<RegisterOutput> {
@@ -835,6 +841,37 @@ export class UserService {
         ok: false,
         error: '권한을 변경할 수 없습니다.',
       };
+    }
+  }
+
+  async changeClientRoleAndCreatePayment(
+    user: User,
+    changeClientRoleAndCreatePaymentInput: ChangeClientRoleAndCreatePaymentInput,
+  ): Promise<ChangeClientRoleAndCreatePaymentOutput> {
+    const queryRunner = this.users.manager.connection.createQueryRunner();
+    await queryRunner.startTransaction();
+    try {
+      const { changeClientRoleInput, createPaymentInput } =
+        changeClientRoleAndCreatePaymentInput;
+      await this.changeClientRole(changeClientRoleInput, user);
+      const createPaymentResponse = await this.paymentService.createPayment(
+        createPaymentInput,
+        user,
+      );
+      await queryRunner.commitTransaction();
+      return {
+        ok: true,
+        paymentId: createPaymentResponse.payment.id,
+      };
+    } catch (e) {
+      console.log('여기들어오니');
+      await queryRunner.rollbackTransaction();
+      return {
+        ok: false,
+        error: '권한 변경 및 결제에 실패했습니다.',
+      };
+    } finally {
+      await queryRunner.release();
     }
   }
 }

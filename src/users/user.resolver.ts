@@ -46,6 +46,10 @@ import {
   CheckUserRoleOutput,
 } from './dtos/checkUserRole.dto';
 import { ChangeClientRoleInput } from './dtos/changeClientRole.dto';
+import {
+  ChangeClientRoleAndCreatePaymentInput,
+  ChangeClientRoleAndCreatePaymentOutput,
+} from './dtos/changeClientRoleAndCreatePayment.dto';
 
 @Resolver(() => User)
 export class UserResolver {
@@ -200,5 +204,18 @@ export class UserResolver {
     @AuthUser() user: User,
   ): Promise<CoreOutput> {
     return this.userService.changeClientRole(changeClientRoleInput, user);
+  }
+
+  @Role(['ANY'])
+  @Mutation(() => ChangeClientRoleAndCreatePaymentOutput)
+  async changeClientRoleAndCreatePayment(
+    @Args('input')
+    changeClientRoleAndCreatePaymentInput: ChangeClientRoleAndCreatePaymentInput,
+    @AuthUser() user: User,
+  ): Promise<ChangeClientRoleAndCreatePaymentOutput> {
+    return this.userService.changeClientRoleAndCreatePayment(
+      user,
+      changeClientRoleAndCreatePaymentInput,
+    );
   }
 }

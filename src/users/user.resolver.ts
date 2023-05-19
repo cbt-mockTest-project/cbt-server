@@ -227,7 +227,7 @@ export class UserResolver {
     );
   }
 
-  @Role(['ADMIN', 'PARTNER'])
+  @Role(['ANY'])
   @Mutation(() => CreateUserRoleOutput)
   async createUserRole(
     @Args('input') createUserRoleInput: CreateUserRoleInput,
@@ -235,7 +235,7 @@ export class UserResolver {
     return this.userService.createUserRole(createUserRoleInput);
   }
 
-  @Role(['ADMIN', 'PARTNER'])
+  @Role(['ANY'])
   @Mutation(() => DeleteUserRoleOutput)
   async deleteUserRole(
     @Args('input') deleteUserRoleInput: DeleteUserRoleInput,

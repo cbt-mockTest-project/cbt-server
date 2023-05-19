@@ -6,7 +6,7 @@ import { Response } from 'express';
 import { CoreOutput } from 'src/common/dtos/output.dto';
 import { JwtService } from 'src/jwt/jwt.service';
 import { MailService } from 'src/mail/mail.service';
-import { Like, Repository } from 'typeorm';
+import { Like, QueryRunner, Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { TelegramService } from './../telegram/telegram.service';
 import {
@@ -814,6 +814,7 @@ export class UserService {
   async changeClientRole(
     changeClientRoleInput: ChangeClientRoleInput,
     user: User,
+    queryRunner?: QueryRunner,
   ): Promise<CoreOutput> {
     try {
       const { role } = changeClientRoleInput;
@@ -832,11 +833,18 @@ export class UserService {
         };
       }
       client.role = role;
-      await this.users.save(client);
+      if (queryRunner) {
+        await queryRunner.manager.save(client);
+      } else {
+        await this.users.save(client);
+      }
       return {
         ok: true,
       };
     } catch {
+      if (queryRunner) {
+        await queryRunner.rollbackTransaction();
+      }
       return {
         ok: false,
         error: '권한을 변경할 수 없습니다.',
@@ -853,10 +861,11 @@ export class UserService {
     try {
       const { changeClientRoleInput, createPaymentInput } =
         changeClientRoleAndCreatePaymentInput;
-      await this.changeClientRole(changeClientRoleInput, user);
+      await this.changeClientRole(changeClientRoleInput, user, queryRunner);
       const createPaymentResponse = await this.paymentService.createPayment(
         createPaymentInput,
         user,
+        queryRunner,
       );
       await queryRunner.commitTransaction();
       return {
@@ -864,7 +873,6 @@ export class UserService {
         paymentId: createPaymentResponse.payment.id,
       };
     } catch (e) {
-      console.log('여기들어오니');
       await queryRunner.rollbackTransaction();
       return {
         ok: false,

@@ -10,4 +10,7 @@ export class CreateUserRoleInput {
 }
 
 @ObjectType()
-export class CreateUserRoleOutput extends CoreOutput {}
+export class CreateUserRoleOutput extends CoreOutput {
+  @Field(() => Number, { nullable: true })
+  roleId?: number;
+}

@@ -50,6 +50,14 @@ import {
   ChangeClientRoleAndCreatePaymentInput,
   ChangeClientRoleAndCreatePaymentOutput,
 } from './dtos/changeClientRoleAndCreatePayment.dto';
+import {
+  CreateUserRoleInput,
+  CreateUserRoleOutput,
+} from './dtos/createUserRole.dto';
+import {
+  DeleteUserRoleInput,
+  DeleteUserRoleOutput,
+} from './dtos/deleteUserRole.dto';
 
 @Resolver(() => User)
 export class UserResolver {
@@ -217,5 +225,21 @@ export class UserResolver {
       user,
       changeClientRoleAndCreatePaymentInput,
     );
+  }
+
+  @Role(['ADMIN', 'PARTNER'])
+  @Mutation(() => CreateUserRoleOutput)
+  async createUserRole(
+    @Args('input') createUserRoleInput: CreateUserRoleInput,
+  ): Promise<CreateUserRoleOutput> {
+    return this.userService.createUserRole(createUserRoleInput);
+  }
+
+  @Role(['ADMIN', 'PARTNER'])
+  @Mutation(() => DeleteUserRoleOutput)
+  async deleteUserRole(
+    @Args('input') deleteUserRoleInput: DeleteUserRoleInput,
+  ): Promise<DeleteUserRoleOutput> {
+    return this.userService.deleteUserRole(deleteUserRoleInput);
   }
 }

@@ -65,6 +65,10 @@ import {
   CreateUserRoleInput,
   CreateUserRoleOutput,
 } from './dtos/createUserRole.dto';
+import {
+  DeleteUserRoleInput,
+  DeleteUserRoleOutput,
+} from './dtos/deleteUserRole.dto';
 @Injectable()
 export class UserService {
   constructor(
@@ -938,7 +942,7 @@ export class UserService {
           error: '이미 부여된 권한입니다.',
         };
       }
-      await this.userAndRole.save(
+      const userRole = await this.userAndRole.save(
         this.userAndRole.create({
           user,
           role,
@@ -946,11 +950,29 @@ export class UserService {
       );
       return {
         ok: true,
+        userRoleId: userRole.id,
       };
     } catch {
       return {
         ok: false,
         error: '권한을 변경할 수 없습니다.',
+      };
+    }
+  }
+
+  async deleteUserRole(
+    deleteUserRoleInput: DeleteUserRoleInput,
+  ): Promise<DeleteUserRoleOutput> {
+    const { id } = deleteUserRoleInput;
+    try {
+      await this.userAndRole.delete({ id });
+      return {
+        ok: true,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '권한을 삭제할 수 없습니다.',
       };
     }
   }

@@ -4,8 +4,8 @@ import { CoreOutput } from 'src/common/dtos/output.dto';
 
 @InputType()
 export class CheckUserRoleInput {
-  @Field(() => [UserRole])
-  role: [UserRole];
+  @Field(() => [Number])
+  roleIds: number[];
 }
 
 @ObjectType()

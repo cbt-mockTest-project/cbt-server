@@ -1,8 +1,9 @@
-import { InputType, ObjectType } from '@nestjs/graphql';
+import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { CoreOutput } from 'src/common/dtos/output.dto';
 
 @InputType()
 export class DeleteUserRoleInput {
+  @Field(() => Number)
   id: number;
 }
 

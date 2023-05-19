@@ -814,8 +814,16 @@ export class UserService {
     user: User,
   ): Promise<CheckUserRoleOutput> {
     try {
-      const { role } = checkUserRoleInput;
-      if (role.includes(user.role)) {
+      const { roleIds } = checkUserRoleInput;
+      const userRoles = await this.userAndRole.find({
+        where: {
+          user: {
+            id: user.id,
+          },
+        },
+      });
+      const userRoleIds = userRoles.map((userRole) => userRole.role.id);
+      if (userRoleIds.some((userRoleId) => roleIds.includes(userRoleId))) {
         return {
           ok: true,
           confirmed: true,
@@ -950,7 +958,7 @@ export class UserService {
       );
       return {
         ok: true,
-        userRoleId: userRole.id,
+        roleId: userRole.id,
       };
     } catch {
       return {

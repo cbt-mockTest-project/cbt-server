@@ -11,10 +11,20 @@ import { NoticeService } from './notice.service';
 import { UserController } from './user.controller';
 import { PaymentService } from 'src/payments/payment.service';
 import { Payment } from 'src/payments/entities/payment.entity';
+import { UserAndRole } from './entities/userAndRole.entity';
+import { Role } from './entities/role.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Verification, Feedback, Notice, Payment]),
+    TypeOrmModule.forFeature([
+      User,
+      Verification,
+      Feedback,
+      Notice,
+      Payment,
+      UserAndRole,
+      Role,
+    ]),
   ],
   providers: [
     UserResolver,

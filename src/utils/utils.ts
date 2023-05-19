@@ -1,5 +1,6 @@
-import { Between } from 'typeorm';
+import { Between, Check } from 'typeorm';
 import { addYears, subYears } from 'date-fns';
+import { User } from 'src/users/entities/user.entity';
 
 export const AfterDate = (date: Date) => Between(date, addYears(date, 100));
 export const BeforeDate = (date: Date) => Between(subYears(date, 100), date);

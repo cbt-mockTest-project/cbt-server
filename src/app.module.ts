@@ -56,6 +56,8 @@ import { ZepUser } from './zep/entities/zepUser.entity';
 import { ZepStudyTime } from './zep/entities/zepStudyTime.entity';
 import { PaymentsModule } from './payments/payments.module';
 import { Payment } from './payments/entities/payment.entity';
+import { UserAndRole } from './users/entities/userAndRole.entity';
+import { Role } from './users/entities/role.entity';
 
 @Module({
   imports: [
@@ -152,6 +154,8 @@ import { Payment } from './payments/entities/payment.entity';
         ZepUser,
         ZepStudyTime,
         Payment,
+        UserAndRole,
+        Role,
       ],
     }),
     UserModule,

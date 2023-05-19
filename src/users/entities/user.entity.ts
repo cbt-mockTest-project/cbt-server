@@ -35,6 +35,7 @@ import { MockExamQuestion } from 'src/mock-exams/entities/mock-exam-question.ent
 import { QuestionCardCategory } from 'src/question-card/entities/question-card-category';
 import { MockExamQuestionFeedbackRecommendation } from 'src/mock-exams/entities/mock-exam-question-feedback-recommendation.entity';
 import { Payment } from 'src/payments/entities/payment.entity';
+import { UserAndRole } from './userAndRole.entity';
 
 export enum UserRole {
   CLIENT = 'CLIENT',
@@ -204,6 +205,10 @@ export class User extends CoreEntity {
     (feedbackRecommendation) => feedbackRecommendation.user,
   )
   feedbackRecommendation: MockExamQuestionFeedbackRecommendation[];
+
+  @Field(() => [UserAndRole])
+  @OneToMany(() => UserAndRole, (userRole) => userRole.user)
+  userRoles: UserAndRole[];
 
   @BeforeInsert()
   @BeforeUpdate()

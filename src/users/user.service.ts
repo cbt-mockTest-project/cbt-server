@@ -59,6 +59,12 @@ import {
   ChangeClientRoleAndCreatePaymentOutput,
 } from './dtos/changeClientRoleAndCreatePayment.dto';
 import { PaymentService } from 'src/payments/payment.service';
+import { UserAndRole } from './entities/userAndRole.entity';
+import { Role } from './entities/role.entity';
+import {
+  CreateUserRoleInput,
+  CreateUserRoleOutput,
+} from './dtos/createUserRole.dto';
 @Injectable()
 export class UserService {
   constructor(
@@ -67,6 +73,10 @@ export class UserService {
     private readonly verification: Repository<Verification>,
     @InjectRepository(Feedback)
     private readonly feedback: Repository<Feedback>,
+    @InjectRepository(UserAndRole)
+    private readonly userAndRole: Repository<UserAndRole>,
+    @InjectRepository(Role)
+    private readonly role: Repository<Role>,
     private readonly mailService: MailService,
     private readonly jwtService: JwtService,
     private readonly telegramService: TelegramService,
@@ -262,6 +272,11 @@ export class UserService {
       const user = await this.users.findOne({
         where: {
           id,
+        },
+        relations: {
+          userRoles: {
+            role: true,
+          },
         },
       });
       if (!user) {
@@ -746,6 +761,11 @@ export class UserService {
           },
           { email: Like(`%${name}%`) },
         ],
+        relations: {
+          userRoles: {
+            role: true,
+          },
+        },
       });
       return {
         ok: true,
@@ -880,6 +900,58 @@ export class UserService {
       };
     } finally {
       await queryRunner.release();
+    }
+  }
+
+  async createUserRole(
+    createUserRoleInput: CreateUserRoleInput,
+  ): Promise<CreateUserRoleOutput> {
+    const { userId, roleId } = createUserRoleInput;
+    try {
+      const user = await this.users.findOne({ where: { id: userId } });
+      const role = await this.role.findOne({ where: { id: roleId } });
+      if (!user) {
+        return {
+          ok: false,
+          error: '유저를 찾을 수 없습니다.',
+        };
+      }
+      if (!role) {
+        return {
+          ok: false,
+          error: '권한을 찾을 수 없습니다.',
+        };
+      }
+      const existedRole = await this.userAndRole.findOne({
+        where: {
+          user: {
+            id: userId,
+          },
+          role: {
+            id: roleId,
+          },
+        },
+      });
+      if (existedRole) {
+        return {
+          ok: false,
+          error: '이미 부여된 권한입니다.',
+        };
+      }
+      await this.userAndRole.save(
+        this.userAndRole.create({
+          user,
+          role,
+        }),
+      );
+      return {
+        ok: true,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '권한을 변경할 수 없습니다.',
+      };
     }
   }
 }

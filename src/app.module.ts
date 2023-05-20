@@ -60,6 +60,7 @@ import { UserAndRole } from './users/entities/userAndRole.entity';
 import { Role } from './users/entities/role.entity';
 import { AttendanceModule } from './attendance/attendance.module';
 import { Attendance } from './attendance/entities/attendance.entity';
+import { ZepMapUserCount } from './zep/entities/zepMapUserCount.entity';
 
 @Module({
   imports: [
@@ -159,6 +160,7 @@ import { Attendance } from './attendance/entities/attendance.entity';
         UserAndRole,
         Role,
         Attendance,
+        ZepMapUserCount,
       ],
     }),
     UserModule,

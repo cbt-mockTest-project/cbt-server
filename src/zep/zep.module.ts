@@ -9,12 +9,25 @@ import { ZepUserController } from './zepUser.controller';
 import { ZepUserService } from './zepUser.service';
 import { ZepStudyTimeController } from './zepStudyTime.controller';
 import { ZepStudyTimeService } from './zepStudyTime.service';
+import { ZepMapUserCount } from './entities/zepMapUserCount.entity';
+import { ZepMapController } from './zepMap.controller';
+import { ZepMapService } from './zepMap.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([MockExamQuestion, ZepUser, ZepStudyTime]),
+    TypeOrmModule.forFeature([
+      MockExamQuestion,
+      ZepUser,
+      ZepStudyTime,
+      ZepMapUserCount,
+    ]),
   ],
-  controllers: [ZepController, ZepUserController, ZepStudyTimeController],
+  controllers: [
+    ZepController,
+    ZepUserController,
+    ZepStudyTimeController,
+    ZepMapController,
+  ],
   providers: [
     ZepController,
     ZepService,
@@ -22,6 +35,8 @@ import { ZepStudyTimeService } from './zepStudyTime.service';
     ZepUserService,
     ZepStudyTimeController,
     ZepStudyTimeService,
+    ZepMapService,
+    ZepMapController,
   ],
 })
 export class ZepModule {}

@@ -105,6 +105,9 @@ export class AttendanceService {
         where: {
           created_at: Between(today, tomorrow),
         },
+        relations: {
+          user: true,
+        },
       });
       return {
         ok: true,

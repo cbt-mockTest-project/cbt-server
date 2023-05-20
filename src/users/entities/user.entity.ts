@@ -36,6 +36,7 @@ import { QuestionCardCategory } from 'src/question-card/entities/question-card-c
 import { MockExamQuestionFeedbackRecommendation } from 'src/mock-exams/entities/mock-exam-question-feedback-recommendation.entity';
 import { Payment } from 'src/payments/entities/payment.entity';
 import { UserAndRole } from './userAndRole.entity';
+import { Attendance } from 'src/attendance/entities/attendance.entity';
 
 export enum UserRole {
   CLIENT = 'CLIENT',
@@ -162,6 +163,10 @@ export class User extends CoreEntity {
   @OneToMany(() => ExamCoAuthor, (examCoAuthor) => examCoAuthor.user)
   @Field(() => [ExamCoAuthor], { nullable: true })
   examCoAuthor: ExamCoAuthor[];
+
+  @OneToMany(() => Attendance, (attendance) => attendance.user)
+  @Field(() => [Attendance], { nullable: true })
+  attendances: Attendance[];
 
   @DeleteDateColumn()
   @Field(() => Date)

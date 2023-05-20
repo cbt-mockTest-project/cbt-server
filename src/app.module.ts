@@ -58,6 +58,8 @@ import { PaymentsModule } from './payments/payments.module';
 import { Payment } from './payments/entities/payment.entity';
 import { UserAndRole } from './users/entities/userAndRole.entity';
 import { Role } from './users/entities/role.entity';
+import { AttendanceModule } from './attendance/attendance.module';
+import { Attendance } from './attendance/entities/attendance.entity';
 
 @Module({
   imports: [
@@ -156,6 +158,7 @@ import { Role } from './users/entities/role.entity';
         Payment,
         UserAndRole,
         Role,
+        Attendance,
       ],
     }),
     UserModule,
@@ -204,6 +207,7 @@ import { Role } from './users/entities/role.entity';
     ExamCoAuthorModule,
     ZepModule,
     PaymentsModule,
+    AttendanceModule,
   ],
   controllers: [],
   providers: [

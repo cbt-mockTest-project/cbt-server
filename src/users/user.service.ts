@@ -69,6 +69,7 @@ import {
   DeleteUserRoleInput,
   DeleteUserRoleOutput,
 } from './dtos/deleteUserRole.dto';
+import { CreateFreeTrialRoleOutput } from './dtos/createFreeTrialRole.dto';
 @Injectable()
 export class UserService {
   constructor(
@@ -965,6 +966,41 @@ export class UserService {
         ok: false,
         error: '권한을 변경할 수 없습니다.',
       };
+    }
+  }
+
+  async createFreeTrialRole(user: User): Promise<CreateFreeTrialRoleOutput> {
+    if (user.usedFreeTrial) {
+      return {
+        ok: false,
+        error: '무료체험은 1회만 가능합니다.',
+      };
+    }
+    const queryRunner = this.users.manager.connection.createQueryRunner();
+    await queryRunner.startTransaction();
+    try {
+      await this.userAndRole.save(
+        this.userAndRole.create({
+          user,
+          role: {
+            id: 3,
+          },
+        }),
+      );
+      user.usedFreeTrial = true;
+      await this.users.save(user);
+      await queryRunner.commitTransaction();
+      return {
+        ok: true,
+      };
+    } catch {
+      await queryRunner.rollbackTransaction();
+      return {
+        ok: false,
+        error: '무료체험 등록에 실패했습니다.',
+      };
+    } finally {
+      await queryRunner.release();
     }
   }
 

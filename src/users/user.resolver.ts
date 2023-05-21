@@ -58,6 +58,7 @@ import {
   DeleteUserRoleInput,
   DeleteUserRoleOutput,
 } from './dtos/deleteUserRole.dto';
+import { CreateFreeTrialRoleOutput } from './dtos/createFreeTrialRole.dto';
 
 @Resolver(() => User)
 export class UserResolver {
@@ -241,5 +242,13 @@ export class UserResolver {
     @Args('input') deleteUserRoleInput: DeleteUserRoleInput,
   ): Promise<DeleteUserRoleOutput> {
     return this.userService.deleteUserRole(deleteUserRoleInput);
+  }
+
+  @Role(['ANY'])
+  @Mutation(() => CreateFreeTrialRoleOutput)
+  async createFreeTrialRole(
+    @AuthUser() user: User,
+  ): Promise<CreateFreeTrialRoleOutput> {
+    return this.userService.createFreeTrialRole(user);
   }
 }

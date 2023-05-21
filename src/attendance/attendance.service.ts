@@ -12,6 +12,10 @@ import {
   DeleteAttendanceOutput,
 } from './dtos/deleteAttendance.dto';
 import { GetTodayAttendanceOutput } from './dtos/getTodayAttendance.dto';
+import {
+  GetAttendanceInput,
+  GetAttendanceOutput,
+} from './dtos/getAttendance.dto';
 
 @Injectable()
 export class AttendanceService {
@@ -38,6 +42,9 @@ export class AttendanceService {
           user: {
             id: user.id,
           },
+        },
+        relations: {
+          user: true,
         },
       });
       if (todayAttendance) {
@@ -119,5 +126,28 @@ export class AttendanceService {
         error: '출석을 불러올 수 없습니다.',
       };
     }
+  }
+
+  async getAttendance(
+    getAttendanceInput: GetAttendanceInput,
+  ): Promise<GetAttendanceOutput> {
+    const {
+      date: { year, month, day },
+    } = getAttendanceInput;
+    const date = new Date(year, month - 1, day);
+    const nextDate = new Date(date);
+    nextDate.setDate(nextDate.getDate() + 1);
+    const attendances = await this.attendance.find({
+      where: {
+        created_at: Between(date, nextDate),
+      },
+      relations: {
+        user: true,
+      },
+    });
+    return {
+      ok: true,
+      attendances,
+    };
   }
 }

@@ -251,4 +251,9 @@ export class UserResolver {
   ): Promise<CreateFreeTrialRoleOutput> {
     return this.userService.createFreeTrialRole(user);
   }
+
+  @Mutation(() => CoreOutput)
+  async syncRole() {
+    return this.userService.syncRole();
+  }
 }

@@ -12,6 +12,7 @@ import { findUniqElem } from 'src/utils/utils';
 import { Repository } from 'typeorm';
 import { CrawlerService } from 'src/crawler/crawler.service';
 import { VisitService } from 'src/visit/visit.service';
+import { UserService } from 'src/users/user.service';
 
 @Injectable()
 export class SchedulerService {
@@ -22,6 +23,7 @@ export class SchedulerService {
     private readonly crawlerService: CrawlerService,
     private readonly visitService: VisitService,
     private readonly telegramService: TelegramService,
+    private readonly userService: UserService,
   ) {}
   // 매일 밤 12시
   @Cron('0 55 23 * * *', { timeZone: 'Asia/Seoul' })
@@ -41,6 +43,15 @@ export class SchedulerService {
         message: `방문자수 기록 실패`,
       });
     }
+  }
+
+  @Cron('0 * * * *', { timeZone: 'Asia/Seoul' })
+  async clearFreeTrial() {
+    if (process.env.NODE_ENV === 'dev') {
+      console.log('clearFreeTrial', 'dev');
+      return;
+    }
+    await this.userService.clearFreeTrialRole();
   }
 
   //6시간마다

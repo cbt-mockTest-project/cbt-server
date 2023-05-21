@@ -70,6 +70,7 @@ import {
   DeleteUserRoleOutput,
 } from './dtos/deleteUserRole.dto';
 import { CreateFreeTrialRoleOutput } from './dtos/createFreeTrialRole.dto';
+import { truncateSync } from 'fs';
 @Injectable()
 export class UserService {
   constructor(
@@ -979,16 +980,20 @@ export class UserService {
     const queryRunner = this.users.manager.connection.createQueryRunner();
     await queryRunner.startTransaction();
     try {
-      await this.userAndRole.save(
-        this.userAndRole.create({
-          user,
-          role: {
-            id: 3,
-          },
-        }),
-      );
-      user.usedFreeTrial = true;
-      await this.users.save(user);
+      const newUserAndRole = this.userAndRole.create({
+        user: {
+          id: user.id,
+        },
+        role: {
+          id: 3,
+        },
+      });
+      const newUser = this.users.create({
+        id: user.id,
+        usedFreeTrial: true,
+      });
+      await queryRunner.manager.save(newUserAndRole);
+      await queryRunner.manager.save(newUser);
       await queryRunner.commitTransaction();
       return {
         ok: true,
@@ -1019,5 +1024,53 @@ export class UserService {
         error: '권한을 삭제할 수 없습니다.',
       };
     }
+  }
+
+  async clearFreeTrialRole(): Promise<CoreOutput> {
+    const userAndRoles = await this.userAndRole.find({
+      where: {
+        role: {
+          id: 3,
+        },
+      },
+    });
+    // 생성된지 1일이 경과된 무료체험 권한 삭제
+    const filteredUserAndRoles = userAndRoles.filter((userAndRole) => {
+      const { created_at } = userAndRole;
+      const now = new Date();
+      const diff = now.getTime() - created_at.getTime();
+      const diffDays = diff / (1000 * 3600 * 24);
+      return diffDays > 1.5;
+    });
+    try {
+      await this.userAndRole.remove(filteredUserAndRoles);
+      return {
+        ok: true,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '무료체험 권한 삭제에 실패했습니다.',
+      };
+    }
+  }
+
+  async syncRole() {
+    const users = await this.users.find({
+      where: {
+        isAllowAdblock: true,
+      },
+    });
+    users.forEach(async (user) => {
+      await this.userAndRole.save({
+        user,
+        role: {
+          id: 1,
+        },
+      });
+    });
+    return {
+      ok: true,
+    };
   }
 }

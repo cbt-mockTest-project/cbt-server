@@ -61,6 +61,8 @@ import { Role } from './users/entities/role.entity';
 import { AttendanceModule } from './attendance/attendance.module';
 import { Attendance } from './attendance/entities/attendance.entity';
 import { ZepMapUserCount } from './zep/entities/zepMapUserCount.entity';
+import { VideoModule } from './video/video.module';
+import { Video } from './video/entities/video.entity';
 
 @Module({
   imports: [
@@ -161,6 +163,7 @@ import { ZepMapUserCount } from './zep/entities/zepMapUserCount.entity';
         Role,
         Attendance,
         ZepMapUserCount,
+        Video,
       ],
     }),
     UserModule,
@@ -210,6 +213,7 @@ import { ZepMapUserCount } from './zep/entities/zepMapUserCount.entity';
     ZepModule,
     PaymentsModule,
     AttendanceModule,
+    VideoModule,
   ],
   controllers: [],
   providers: [

@@ -16,6 +16,7 @@ import { MockExamQuestionComment } from './mock-exam-question-comment.entity';
 import { MockExamQuestionBookmark } from './mock-exam-question-bookmark.entity';
 import { MockExamQuestionMultipleChoice } from './mock-exam-question-multiple-choice.entity';
 import { User } from 'src/users/entities/user.entity';
+import { Video } from 'src/video/entities/video.entity';
 
 @InputType('MockExamQuestionImageInputType', { isAbstract: true })
 @ObjectType()
@@ -26,6 +27,14 @@ export class MockExamImageType {
   name: string;
   @Field(() => String)
   uid: string;
+}
+@InputType('MockExamQuestionVideoInputType', { isAbstract: true })
+@ObjectType()
+export class MockExamVideoType {
+  @Field(() => String)
+  url: string;
+  @Field(() => Number)
+  size: number;
 }
 
 @InputType('MockExamQuestionInputType', { isAbstract: true })
@@ -43,6 +52,10 @@ export class MockExamQuestion extends CoreEntity {
   @Column()
   @Field(() => Boolean)
   approved: boolean;
+
+  @Column({ type: 'json', default: [] })
+  @Field(() => [MockExamVideoType], { nullable: true })
+  question_video: MockExamVideoType[];
 
   @Column({ type: 'json', default: [] })
   @Field(() => [MockExamImageType], { nullable: true })

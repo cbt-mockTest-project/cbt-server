@@ -59,6 +59,7 @@ import {
   DeleteUserRoleOutput,
 } from './dtos/deleteUserRole.dto';
 import { CreateFreeTrialRoleOutput } from './dtos/createFreeTrialRole.dto';
+import { GetRoleCountInput, GetRoleCountOutput } from './dtos/getRoleCount';
 
 @Resolver(() => User)
 export class UserResolver {
@@ -255,5 +256,10 @@ export class UserResolver {
   @Mutation(() => CoreOutput)
   async syncRole() {
     return this.userService.syncRole();
+  }
+
+  @Query(() => GetRoleCountOutput)
+  async getRoleCount(@Args('input') getRoleCountInput: GetRoleCountInput) {
+    return this.userService.getRoleCount(getRoleCountInput);
   }
 }

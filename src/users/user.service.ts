@@ -72,6 +72,7 @@ import {
 import { CreateFreeTrialRoleOutput } from './dtos/createFreeTrialRole.dto';
 import * as momentTimezone from 'moment-timezone';
 import { ClearFreeTrialRoleOutput } from './dtos/clearFreeTrialRole.dto';
+import { GetRoleCountInput, GetRoleCountOutput } from './dtos/getRoleCount';
 @Injectable()
 export class UserService {
   constructor(
@@ -1054,6 +1055,30 @@ export class UserService {
       return {
         ok: false,
         error: '무료체험 권한 삭제에 실패했습니다.',
+      };
+    }
+  }
+
+  async getRoleCount(
+    getRoleCountInput: GetRoleCountInput,
+  ): Promise<GetRoleCountOutput> {
+    const { roleId } = getRoleCountInput;
+    try {
+      const roles = await this.userAndRole.find({
+        where: {
+          role: {
+            id: roleId,
+          },
+        },
+      });
+      return {
+        ok: true,
+        count: roles.length,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '권한을 확인할 수 없습니다.',
       };
     }
   }

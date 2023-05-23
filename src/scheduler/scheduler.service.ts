@@ -1,14 +1,14 @@
 import { TelegramService } from './../telegram/telegram.service';
 import {
   MockExamQuestion,
-  MockExamImageType,
+  // MockExamImageType,
 } from './../mock-exams/entities/mock-exam-question.entity';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Cron } from '@nestjs/schedule';
+import { Cron, Interval } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
-import * as AWS from 'aws-sdk';
-import { findUniqElem } from 'src/utils/utils';
+// import * as AWS from 'aws-sdk';
+// import { findUniqElem } from 'src/utils/utils';
 import { Repository } from 'typeorm';
 import { CrawlerService } from 'src/crawler/crawler.service';
 import { VisitService } from 'src/visit/visit.service';
@@ -45,13 +45,18 @@ export class SchedulerService {
     }
   }
 
-  @Cron('0 * * * *', { timeZone: 'Asia/Seoul' })
+  // 1시간에 1번
+  @Interval(1000 * 60 * 60)
   async clearFreeTrial() {
     if (process.env.NODE_ENV === 'dev') {
-      console.log('clearFreeTrial', 'dev');
       return;
     }
-    await this.userService.clearFreeTrialRole();
+    const res = await this.userService.clearFreeTrialRole();
+    if (res.ok) {
+      await this.telegramService.sendMessageToAlramChannelOfTelegram({
+        message: `무료체험권 만료갯수: ${res.count} `,
+      });
+    }
   }
 
   //6시간마다

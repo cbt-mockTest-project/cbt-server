@@ -70,7 +70,8 @@ import {
   DeleteUserRoleOutput,
 } from './dtos/deleteUserRole.dto';
 import { CreateFreeTrialRoleOutput } from './dtos/createFreeTrialRole.dto';
-import { truncateSync } from 'fs';
+import * as momentTimezone from 'moment-timezone';
+import { ClearFreeTrialRoleOutput } from './dtos/clearFreeTrialRole.dto';
 @Injectable()
 export class UserService {
   constructor(
@@ -1026,7 +1027,7 @@ export class UserService {
     }
   }
 
-  async clearFreeTrialRole(): Promise<CoreOutput> {
+  async clearFreeTrialRole(): Promise<ClearFreeTrialRoleOutput> {
     const userAndRoles = await this.userAndRole.find({
       where: {
         role: {
@@ -1037,15 +1038,17 @@ export class UserService {
     // 생성된지 1일이 경과된 무료체험 권한 삭제
     const filteredUserAndRoles = userAndRoles.filter((userAndRole) => {
       const { created_at } = userAndRole;
-      const now = new Date();
-      const diff = now.getTime() - created_at.getTime();
-      const diffDays = diff / (1000 * 3600 * 24);
-      return diffDays > 1.5;
+      const differenceInHours = momentTimezone(new Date()).diff(
+        momentTimezone(created_at),
+        'hours',
+      );
+      return differenceInHours > 24 + 9;
     });
     try {
-      await this.userAndRole.remove(filteredUserAndRoles);
+      // await this.userAndRole.remove(filteredUserAndRoles);
       return {
         ok: true,
+        count: filteredUserAndRoles.length,
       };
     } catch {
       return {

@@ -1046,7 +1046,7 @@ export class UserService {
       return differenceInHours > 24 + 9;
     });
     try {
-      // await this.userAndRole.remove(filteredUserAndRoles);
+      await this.userAndRole.remove(filteredUserAndRoles);
       return {
         ok: true,
         count: filteredUserAndRoles.length,

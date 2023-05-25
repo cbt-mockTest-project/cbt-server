@@ -91,4 +91,8 @@ export class MockExam extends CoreEntity {
   @Field(() => ExamStatus)
   @IsEnum(ExamStatus)
   status: ExamStatus;
+
+  @Column({ default: 0 })
+  @Field(() => Number, { defaultValue: 0 })
+  order: number;
 }

@@ -1,7 +1,8 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { CoreEntity } from 'src/common/entities/core.entity';
-import { Column, Entity, OneToMany } from 'typeorm';
+import { Column, Entity, ManyToMany, OneToMany } from 'typeorm';
 import { UserAndRole } from './userAndRole.entity';
+import { MockExamCategory } from 'src/mock-exams/entities/mock-exam-category.entity';
 
 @InputType('RoleInputType', { isAbstract: true })
 @ObjectType()
@@ -14,4 +15,11 @@ export class Role extends CoreEntity {
   @OneToMany(() => UserAndRole, (userRole) => userRole.role)
   @Field(() => [UserAndRole])
   userRoles: UserAndRole[];
+
+  @ManyToMany(
+    () => MockExamCategory,
+    (mockExamCategory) => mockExamCategory.roles,
+  )
+  @Field(() => [MockExamCategory])
+  mockExamCategories: MockExamCategory[];
 }

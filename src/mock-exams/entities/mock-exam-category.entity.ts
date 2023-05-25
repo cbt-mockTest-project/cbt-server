@@ -8,8 +8,17 @@ import {
   ObjectType,
   registerEnumType,
 } from '@nestjs/graphql';
-import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm';
 import { IsEnum } from 'class-validator';
+import { Role } from 'src/users/entities/role.entity';
+import Joi from 'joi';
 
 export enum MockExamCategoryTypes {
   written = 'written',
@@ -56,4 +65,22 @@ export class MockExamCategory extends CoreEntity {
     onDelete: 'SET NULL',
   })
   examCoAuthor: ExamCoAuthor[];
+
+  @ManyToMany(() => Role, (role) => role.mockExamCategories)
+  @JoinTable({ name: 'ExamCategoryRole' })
+  @Field(() => [Role])
+  roles: Role[];
+
+  @Column({ default: 0 })
+  @Field(() => Number)
+  order: number;
+}
+
+@Entity()
+export class ExamCategoryRole extends CoreEntity {
+  @ManyToOne(() => Role, (role) => role.mockExamCategories)
+  role: Role;
+
+  @ManyToOne(() => MockExamCategory, (category) => category.roles)
+  mockExamCategory: MockExamCategory;
 }

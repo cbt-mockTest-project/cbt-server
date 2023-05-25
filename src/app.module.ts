@@ -18,7 +18,10 @@ import { JwtModule } from './jwt/jwt.module';
 import logger from './lib/logger';
 import { LoggingInterceptor } from './logging.interceptor';
 import { MailModule } from './mail/mail.module';
-import { MockExamCategory } from './mock-exams/entities/mock-exam-category.entity';
+import {
+  ExamCategoryRole,
+  MockExamCategory,
+} from './mock-exams/entities/mock-exam-category.entity';
 import { MockExamHistory } from './mock-exams/entities/mock-exam-history';
 import { MockExamQuestionBookmark } from './mock-exams/entities/mock-exam-question-bookmark.entity';
 import { MockExamQuestionCommentLike } from './mock-exams/entities/mock-exam-question-comment-like.entity';
@@ -164,6 +167,7 @@ import { Video } from './video/entities/video.entity';
         Attendance,
         ZepMapUserCount,
         Video,
+        ExamCategoryRole,
       ],
     }),
     UserModule,

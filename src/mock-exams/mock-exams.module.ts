@@ -14,7 +14,10 @@ import { MockExamQuestion } from './entities/mock-exam-question.entity';
 import { MockExamQuestionResolver } from './mock-exams-question.resolver';
 import { MockExam } from './entities/mock-exam.entity';
 import { MockExamResolver } from './mock-exams.resolver';
-import { MockExamCategory } from './entities/mock-exam-category.entity';
+import {
+  ExamCategoryRole,
+  MockExamCategory,
+} from './entities/mock-exam-category.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MockExamCategoryService } from './mock-exams-category.service';
 import { MockExamCategoryResolver } from './mock-exams-category.resolver';
@@ -35,6 +38,7 @@ import { MockExamHistoryService } from './mock-exams-history.service';
 import { MockExamQuestionFeedbackRecommendation } from './entities/mock-exam-question-feedback-recommendation.entity';
 import { MockExamQuestionFeedbackRecommendationResolver } from './mock-exams-question-feedback-recommendation.resolver';
 import { MockExamQuestionFeedbackRecommendationService } from './mock-exams-question-feedback-recommendation.service';
+import { Role } from 'src/users/entities/role.entity';
 
 @Module({
   imports: [
@@ -51,6 +55,8 @@ import { MockExamQuestionFeedbackRecommendationService } from './mock-exams-ques
       MockExamQuestionMultipleChoice,
       MockExamQuestionFeedbackRecommendation,
       ExamCoAuthor,
+      Role,
+      ExamCategoryRole,
       User,
     ]),
   ],

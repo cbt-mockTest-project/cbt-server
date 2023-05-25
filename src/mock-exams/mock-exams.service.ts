@@ -261,7 +261,10 @@ export class MockExamService {
           ])
           .where('category.name = :name', { name })
           .andWhere('mockExam.approved = true')
-          .orderBy('mockExam.title', 'DESC')
+          .orderBy({
+            'mockExam.order': 'ASC',
+            'mockExam.title': 'DESC',
+          })
           .getMany();
       } else if (all && user) {
         // 내 시험지에서 타이틀 불러오기 할 경우
@@ -309,6 +312,10 @@ export class MockExamService {
                 });
               }),
             )
+            .orderBy({
+              'mockExam.order': 'ASC',
+              'mockExam.title': 'DESC',
+            })
             .getMany();
         }
       }

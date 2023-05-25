@@ -4,12 +4,13 @@ import {
   CreateMockExamCategoryOutput,
 } from './dtos/createCategory.dto';
 import {
+  ExamCategoryRole,
   MockExamCategory,
   MockExamCategoryTypes,
 } from './entities/mock-exam-category.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import {
   DeleteMockExamCategoryInput,
   DeleteMockExamCategoryOutput,
@@ -28,6 +29,8 @@ export class MockExamCategoryService {
   constructor(
     @InjectRepository(MockExamCategory)
     private readonly mockExamCategories: Repository<MockExamCategory>,
+    @InjectRepository(ExamCategoryRole)
+    private readonly examCategoryRoles: Repository<ExamCategoryRole>,
   ) {}
 
   async createMockExamCategory(
@@ -147,43 +150,54 @@ export class MockExamCategoryService {
   async readAllMockExamCategories(
     readAllMockExamCategoriesInput: ReadAllMockExamCategoriesInput,
   ): Promise<ReadAllMockExamCategoriesOutput> {
-    // default는 실기값
     try {
       let type = MockExamCategoryTypes.practical;
       if (readAllMockExamCategoriesInput) {
         type = readAllMockExamCategoriesInput.type;
       }
+      let categories: MockExamCategory[] = [];
       if (
         readAllMockExamCategoriesInput &&
-        readAllMockExamCategoriesInput.all
+        readAllMockExamCategoriesInput.roleIds.length > 0
       ) {
-        const categories = await this.mockExamCategories.find({
-          relations: { user: true },
-        });
-        return {
-          ok: true,
-          categories,
-        };
-      }
-      const categories = await this.mockExamCategories.find({
-        where: {
-          type,
-          approved: true,
-        },
-        relations: {
-          user: true,
-        },
-        order: {
-          user: {
-            role: 'DESC',
+        const categoryAndRoles = await this.examCategoryRoles.find({
+          where: {
+            role: {
+              id: In(readAllMockExamCategoriesInput.roleIds),
+            },
           },
-        },
-      });
+          relations: {
+            mockExamCategory: {
+              user: true,
+              roles: true,
+            },
+          },
+        });
+        categories = categoryAndRoles.map(
+          (categoryAndRole) => categoryAndRole.mockExamCategory,
+        );
+      } else {
+        categories = await this.mockExamCategories.find({
+          where: {
+            type,
+            approved: true,
+          },
+          relations: {
+            user: true,
+            roles: true,
+          },
+          order: {
+            order: 'ASC',
+          },
+        });
+      }
+
       return {
         ok: true,
         categories,
       };
-    } catch {
+    } catch (e) {
+      console.log(e);
       return {
         ok: false,
         error: '카테고리를 찾을 수 없습니다.',

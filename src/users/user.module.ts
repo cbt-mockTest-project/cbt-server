@@ -13,6 +13,10 @@ import { PaymentService } from 'src/payments/payment.service';
 import { Payment } from 'src/payments/entities/payment.entity';
 import { UserAndRole } from './entities/userAndRole.entity';
 import { Role } from './entities/role.entity';
+import {
+  ExamCategoryRole,
+  MockExamCategory,
+} from 'src/mock-exams/entities/mock-exam-category.entity';
 
 @Module({
   imports: [
@@ -24,6 +28,8 @@ import { Role } from './entities/role.entity';
       Payment,
       UserAndRole,
       Role,
+      ExamCategoryRole,
+      MockExamCategory,
     ]),
   ],
   providers: [

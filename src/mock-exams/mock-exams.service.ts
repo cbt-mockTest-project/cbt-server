@@ -261,6 +261,7 @@ export class MockExamService {
           ])
           .where('category.name = :name', { name })
           .andWhere('mockExam.approved = true')
+          .orderBy('mockExam.title', 'DESC')
           .getMany();
       } else if (all && user) {
         // 내 시험지에서 타이틀 불러오기 할 경우
@@ -317,16 +318,10 @@ export class MockExamService {
           error: '해당 카테고리에 맞는 시험이 존재하지 않습니다.',
         };
       }
-      const titles: ExamTitleAndId[] = mockExamTitles
-        .sort((a, b) => {
-          return (
-            (a.title > b.title ? 1 : -1) ||
-            Number(b.title.split('년')[0]) - Number(a.title.split('년')[0]) ||
-            Number(b.title.split('-').at(-1).split('회차')[0]) -
-              Number(a.title.split('-').at(-1).split('회차')[0])
-          );
-        })
-        .map((el) => ({ ...el, role: el.user.role }));
+      const titles: ExamTitleAndId[] = mockExamTitles.map((el) => ({
+        ...el,
+        role: el.user.role,
+      }));
       return {
         titles,
         ok: true,

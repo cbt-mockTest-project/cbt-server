@@ -155,7 +155,6 @@ export class MockExamCategoryService {
       if (readAllMockExamCategoriesInput) {
         type = readAllMockExamCategoriesInput.type;
       }
-
       const categories = await this.mockExamCategories.find({
         where: {
           type,
@@ -169,6 +168,7 @@ export class MockExamCategoryService {
         relations: {
           user: true,
           roles: true,
+          partner: true,
         },
         order: {
           order: 'ASC',

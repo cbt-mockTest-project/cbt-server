@@ -10,7 +10,7 @@ import {
 } from './entities/mock-exam-category.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { In, IsNull, Repository } from 'typeorm';
 import {
   DeleteMockExamCategoryInput,
   DeleteMockExamCategoryOutput,
@@ -155,42 +155,25 @@ export class MockExamCategoryService {
       if (readAllMockExamCategoriesInput) {
         type = readAllMockExamCategoriesInput.type;
       }
-      let categories: MockExamCategory[] = [];
-      if (
-        readAllMockExamCategoriesInput &&
-        readAllMockExamCategoriesInput.roleIds.length > 0
-      ) {
-        const categoryAndRoles = await this.examCategoryRoles.find({
-          where: {
-            role: {
-              id: In(readAllMockExamCategoriesInput.roleIds),
-            },
-          },
-          relations: {
-            mockExamCategory: {
-              user: true,
-              roles: true,
-            },
-          },
-        });
-        categories = categoryAndRoles.map(
-          (categoryAndRole) => categoryAndRole.mockExamCategory,
-        );
-      } else {
-        categories = await this.mockExamCategories.find({
-          where: {
-            type,
-            approved: true,
-          },
-          relations: {
-            user: true,
-            roles: true,
-          },
-          order: {
-            order: 'ASC',
-          },
-        });
-      }
+
+      const categories = await this.mockExamCategories.find({
+        where: {
+          type,
+          approved: true,
+          partner: readAllMockExamCategoriesInput?.partnerId
+            ? {
+                id: readAllMockExamCategoriesInput.partnerId,
+              }
+            : IsNull(),
+        },
+        relations: {
+          user: true,
+          roles: true,
+        },
+        order: {
+          order: 'ASC',
+        },
+      });
 
       return {
         ok: true,

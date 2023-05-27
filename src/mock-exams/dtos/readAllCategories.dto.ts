@@ -12,8 +12,8 @@ import { CoreOutput } from 'src/common/dtos/output.dto';
 export class ReadAllMockExamCategoriesInput extends PartialType(
   PickType(MockExamCategory, ['type']),
 ) {
-  @Field(() => [Number], { defaultValue: [] })
-  roleIds?: number[];
+  @Field(() => Number, { nullable: true })
+  partnerId?: number;
 }
 
 @ObjectType()

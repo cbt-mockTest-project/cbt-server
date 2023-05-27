@@ -18,7 +18,7 @@ import {
 } from 'typeorm';
 import { IsEnum } from 'class-validator';
 import { Role } from 'src/users/entities/role.entity';
-import Joi from 'joi';
+import { Partner } from 'src/partners/entities/partners.entity';
 
 export enum MockExamCategoryTypes {
   written = 'written',
@@ -59,6 +59,12 @@ export class MockExamCategory extends CoreEntity {
   })
   @Field(() => User)
   user: User;
+
+  @ManyToOne(() => Partner, (partner) => partner.examCategory, {
+    onDelete: 'SET NULL',
+  })
+  @Field(() => Partner, { nullable: true })
+  partner: Partner;
 
   @Field(() => [ExamCoAuthor], { nullable: true })
   @OneToMany(() => ExamCoAuthor, (examCoAuthor) => examCoAuthor.examCategory, {

@@ -29,8 +29,6 @@ export class CrawlerService {
       const naberPostContentClass = '.api_txt_lines.dsc_txt';
       const naverPostFlickerThumbClass = '.thumb._cross_trigger';
       const naverPostThumbClass = '.thumb.api_get';
-      const daumPostBoxClass = '.info_item';
-      const daumPostBlogNameClass = '.fc_mid';
       const naverwhereArray = ['view', 'blog'];
       const daumwhereArray = ['view', 'blog'];
       const rank: SearchCounts = {
@@ -98,20 +96,18 @@ export class CrawlerService {
         let page = 0;
         let index = 1;
         let finished = false;
-        while (page < 1) {
+        while (page < 10) {
           page++;
           const res = await axios.get(daumUrl(page), {
             headers: { 'Accept-Encoding': 'gzip,deflate,compress' },
           });
           const $ = load(res.data);
-          const postBoxArray = $(daumPostBoxClass);
-          if (!postBoxArray.text()) {
-            break;
-          }
-          postBoxArray.each((i, post) => {
-            const postBlogName = $(post)
-              .find(daumPostBlogNameClass)
-              .text()
+          $('c-card').each(function (i, elem) {
+            const postBlogName = $(
+              $(this).html().replace('<c-frag>', '').replace('</c-frag>', ''),
+            )
+              .find('c-frag')
+              .html()
               .replace(/ /g, '');
             if (postBlogName.indexOf(blogName.replace(/ /g, '')) > -1) {
               finished = true;

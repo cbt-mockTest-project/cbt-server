@@ -12,6 +12,8 @@ export class ReadPostsInput {
   category: PostCategory;
   @Field(() => Boolean, { defaultValue: false })
   all: boolean;
+  @Field(() => String, { nullable: true })
+  search?: string;
 }
 
 @ObjectType()

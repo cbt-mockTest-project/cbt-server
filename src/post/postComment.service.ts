@@ -19,6 +19,8 @@ import {
 import { PubSub } from 'graphql-subscriptions';
 import { PUB_SUB } from 'src/common/common.constants';
 import { NoticeService } from 'src/users/notice.service';
+import { MailService } from 'src/mail/mail.service';
+import { ellipsisText } from 'src/utils/utils';
 
 @Injectable()
 export class PostCommentSerivce {
@@ -29,6 +31,7 @@ export class PostCommentSerivce {
     private readonly mockExamQuestion: Repository<Post>,
     @Inject(PUB_SUB) private readonly pubSub: PubSub,
     private readonly noticeService: NoticeService,
+    private readonly mailService: MailService,
   ) {}
 
   async createPostComment(
@@ -58,11 +61,17 @@ export class PostCommentSerivce {
         0,
         5,
       )}...게시글에 새로운 댓글이 달렸습니다.`;
-      await this.noticeService.createNotice({
+      this.noticeService.createNotice({
         userId: post.user.id,
         content: noticeContent,
         link: `/post/${post.id}`,
       });
+      this.mailService.sendCommentNoticeEmail(
+        ellipsisText(post.title, 10) + ' 게시글에 댓글이 달렸습니다.',
+        post.user.email,
+        `https://moducbt.com/post/${post.id}`,
+        ellipsisText(post.title, 10),
+      );
       // await this.pubSub.publish('postComments', {
       //   postCommentUpdates: {
       //     ok: true,

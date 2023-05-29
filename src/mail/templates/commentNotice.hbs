@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>verify-mail</title>
+  <style>
+    .verify-mail-block {
+      display: flex;
+    }
+    .verify-mail-container {
+      border: 1px solid #999;
+      display:  flex;
+      align-items: center;
+      flex-direction: column;
+      padding: 20px;
+    }
+    .verify-mail-button {
+      margin-top: 20px;
+      background-color :#e4e4e4;
+      padding: 10px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all .2s ease-in ;
+    }
+    .verify-mail-button:hover {
+      background-color :#bcbcbc;
+    }
+
+  </style>
+ 
+</head>
+<body>
+  <div class="background" style="width: 100%; height: 100%; background: #f8fbfb; padding-top: 150px; padding-bottom: 150px; min-height: 450px;">
+        <div style="width: 680px; margin: 0 auto; height: 5px; background: #1a1b1c;"/>
+        <div
+          style="width: 680px; margin: 0 auto; background-color: white; border:1px solid #e5eaea; padding: 33px 24px 40px 24px; box-sizing: border-box;"
+        >
+          <div class="top-wrapper">
+            <h1 style="font-size: 20px;">{{title}} 게시글에 댓글이 달렸습니다 !</h1>
+            <div style="font-size: 14px; margin-top: 17px;">
+              <p style="margin: 0;">아래 버튼을 눌러 댓글을 확인해보세요.</p>
+            </div>
+            <div style="margin-top: 36px;">
+              <a
+                href="{{ link }}"
+                style="display: inline-block; background: #57b3ff; padding: 13px 20px 11px; text-decoration: none; border-radius: 5px; cursor: pointer;"
+              >
+                <div style="width: 108px; text-align: center; color: white; ">
+                  확인하러 가기
+                </div>
+              </a>
+            </div>
+
+          </div>
+       
+        </div>
+      </div>
+</body>
+</html>

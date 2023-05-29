@@ -47,3 +47,6 @@ export const isIntrospectionQuery = (
 ): boolean =>
   operationName === 'IntrospectionQuery' ||
   (query !== undefined && query.includes('__schema'));
+
+export const ellipsisText = (string: string, count: number) =>
+  string.slice(0, count) + '...';

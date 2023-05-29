@@ -24,15 +24,41 @@ export class MailService {
     return true;
   }
 
-  sendFindPasswordEmail(email: string, link: string) {
+  async sendFindPasswordEmail(email: string, link: string) {
     const path = `${__dirname.split('dist')[0]}src/mail/templates`;
-    this.mailerService
+    await this.mailerService
       .sendMail({
         to: email,
         subject: '[모두CBT] 비밀번호 찾기',
         template: path + '/findPassword', // The `.pug` or `.hbs` extension is appended automatically.
         context: {
           link,
+        },
+      })
+      .then((success) => {
+        console.log(success);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    return true;
+  }
+
+  sendCommentNoticeEmail(
+    subject: string,
+    email: string,
+    link: string,
+    title: string,
+  ) {
+    const path = `${__dirname.split('dist')[0]}src/mail/templates`;
+    this.mailerService
+      .sendMail({
+        to: email,
+        subject: `[모두CBT] ${subject}`,
+        template: path + '/commentNotice', // The `.pug` or `.hbs` extension is appended automatically.
+        context: {
+          link,
+          title,
         },
       })
       .then((success) => {

@@ -4,7 +4,7 @@ import { PostComment } from './entities/postComment.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
-import { FindManyOptions, Repository } from 'typeorm';
+import { FindManyOptions, Like, Repository } from 'typeorm';
 import { CreatePostInput, CreatePostOutput } from './dtos/createPost.dto';
 import { DeletePostInput, DeletePostOutput } from './dtos/deletePost.dto';
 import { EditPostInput, EditPostOutput } from './dtos/editPost.dto';
@@ -157,7 +157,7 @@ export class PostService {
 
   async readPosts(readPostsInput: ReadPostsInput): Promise<ReadPostsOutput> {
     try {
-      const { page, limit, category, all } = readPostsInput;
+      const { page, limit, category, all, search } = readPostsInput;
       const skip = (page - 1) * limit;
       let options: FindManyOptions<Post> = {
         relations: { user: true, like: true, comment: true },
@@ -170,6 +170,7 @@ export class PostService {
           relations: { user: true, like: true, comment: true },
           where: {
             category,
+            title: search ? Like(`%${search}%`) : undefined,
           },
         };
       }

@@ -171,6 +171,7 @@ export class PostService {
           where: {
             category,
             title: search ? Like(`%${search}%`) : undefined,
+            isHidden: false,
           },
         };
       }

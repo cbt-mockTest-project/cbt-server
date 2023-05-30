@@ -16,6 +16,8 @@ import { ZepPost } from './entities/zepPost.entity';
 import { ZepComment } from './entities/zepComment.entity';
 import { ZepPostController } from './zepPost.controller';
 import { ZepPostService } from './zepPost.service';
+import { ZepCommentController } from './zepComment.controller';
+import { ZepCommentService } from './zepComment.service';
 
 @Module({
   imports: [
@@ -34,6 +36,7 @@ import { ZepPostService } from './zepPost.service';
     ZepStudyTimeController,
     ZepMapController,
     ZepPostController,
+    ZepCommentController,
   ],
   providers: [
     ZepController,
@@ -46,6 +49,8 @@ import { ZepPostService } from './zepPost.service';
     ZepMapController,
     ZepPostController,
     ZepPostService,
+    ZepCommentController,
+    ZepCommentService,
   ],
 })
 export class ZepModule {}

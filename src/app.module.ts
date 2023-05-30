@@ -68,6 +68,8 @@ import { VideoModule } from './video/video.module';
 import { Video } from './video/entities/video.entity';
 import { PartnersModule } from './partners/partners.module';
 import { Partner } from './partners/entities/partners.entity';
+import { ZepComment } from './zep/entities/zepComment.entity';
+import { ZepPost } from './zep/entities/zepPost.entity';
 
 @Module({
   imports: [
@@ -171,6 +173,8 @@ import { Partner } from './partners/entities/partners.entity';
         Video,
         ExamCategoryRole,
         Partner,
+        ZepPost,
+        ZepComment,
       ],
     }),
     UserModule,

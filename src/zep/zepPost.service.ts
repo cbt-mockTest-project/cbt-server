@@ -100,7 +100,9 @@ export class ZepPostService {
         where: { id: Number(postId) },
         relations: {
           zepUser: true,
-          zepComment: true,
+          zepComment: {
+            zepUser: true,
+          },
         },
       });
       if (!post) {

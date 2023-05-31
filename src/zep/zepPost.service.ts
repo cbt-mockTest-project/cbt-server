@@ -69,19 +69,22 @@ export class ZepPostService {
     const { category, limit, page } = getZepPostsInput;
     const skip = (Number(page) - 1) * Number(limit);
     try {
-      const posts = await this.zepPost.find({
+      const [posts, total] = await this.zepPost.findAndCount({
         where: { category },
         skip,
         take: Number(limit),
         order: { created_at: 'DESC' },
         relations: {
           zepUser: true,
-          zepComment: true,
+          zepComment: {
+            zepUser: true,
+          },
         },
       });
       return {
         ok: true,
         posts,
+        total,
       };
     } catch (e) {
       return {

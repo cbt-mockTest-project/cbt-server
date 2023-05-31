@@ -16,4 +16,6 @@ export class GetZepPostsInput {
 export class GetZepPostsOutput extends CoreOutput {
   @IsOptional()
   posts?: ZepPost[] = [];
+  @IsOptional()
+  total?: number;
 }

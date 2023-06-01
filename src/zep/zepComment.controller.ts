@@ -13,7 +13,7 @@ export class ZepCommentController {
     return this.zepCommentService.createZepComment(createZepCommentInput);
   }
 
-  @Put('/:id')
+  @Post('/:id')
   async updateZepComment(
     @Body() updateZepCommentInput: UpdateZepCommentInput,
     @Param('id') id: string,
@@ -21,7 +21,7 @@ export class ZepCommentController {
     return this.zepCommentService.updateZepComment(id, updateZepCommentInput);
   }
 
-  @Delete('/:id')
+  @Post('delete/:id')
   async deleteZepComment(
     @Param('id') id: string,
     @Body() deleteZepCommentInput: DeleteZepCommentInput,

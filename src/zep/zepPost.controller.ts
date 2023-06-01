@@ -50,7 +50,7 @@ export class ZepPostController {
     return this.zepPostService.getZepPost(id);
   }
 
-  @Put('/:id')
+  @Post('/:id')
   async updateZepPost(
     @Param('id') id: string,
     @Body() updateZepPostInput: UpdateZepPostInput,
@@ -58,7 +58,7 @@ export class ZepPostController {
     return this.zepPostService.updateZepPost(id, updateZepPostInput);
   }
 
-  @Delete('/:id')
+  @Post('delete/:id')
   async deleteZepPost(
     @Body() deleteZepPostInput: DeleteZepPostInput,
     @Param('id') id: string,

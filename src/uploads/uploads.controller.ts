@@ -25,7 +25,9 @@ export class UploadsController {
     });
     try {
       const hasCustomPath = uploadInput && uploadInput.path;
-      const objectName = `${Date.now() + file.originalname}`;
+      const objectName = `${
+        (uploadInput.id + '_' || '') + Date.now() + '_' + file.originalname
+      }`;
       const Key = hasCustomPath
         ? uploadInput.path + '/' + objectName
         : objectName;

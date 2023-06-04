@@ -70,6 +70,8 @@ import { PartnersModule } from './partners/partners.module';
 import { Partner } from './partners/entities/partners.entity';
 import { ZepComment } from './zep/entities/zepComment.entity';
 import { ZepPost } from './zep/entities/zepPost.entity';
+import { ChatModule } from './chat/chat.module';
+import { Chat } from './chat/entities/chat.entity';
 
 @Module({
   imports: [
@@ -175,6 +177,7 @@ import { ZepPost } from './zep/entities/zepPost.entity';
         Partner,
         ZepPost,
         ZepComment,
+        Chat,
       ],
     }),
     UserModule,
@@ -226,6 +229,7 @@ import { ZepPost } from './zep/entities/zepPost.entity';
     AttendanceModule,
     VideoModule,
     PartnersModule,
+    ChatModule,
   ],
   controllers: [],
   providers: [

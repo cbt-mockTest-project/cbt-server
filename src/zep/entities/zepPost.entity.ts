@@ -14,6 +14,9 @@ export enum ZepPostCategory {
   FREE = 'FREE', // 자유
   STUDY = 'STUDY', // 스터디
   NOTICE = 'NOTICE', //공지
+  FEEDBACK = 'FEEDBACK', //피드백
+  ALGORISM = 'ALGORISM', //알고리즘
+  PROJECT = 'PROJECT', // 프로젝트
 }
 
 registerEnumType(ZepPostCategory, { name: 'ZepPostCategory' });

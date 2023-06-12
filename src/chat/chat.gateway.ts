@@ -24,6 +24,7 @@ import {
     allowedHeaders: [], // 허용할 헤더들
     credentials: true,
   },
+  transports: ['websocket'],
 })
 export class ChatGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
@@ -38,7 +39,7 @@ export class ChatGateway
   userNameMap: { [clientId: string]: string } = {};
 
   afterInit(server: Server) {
-    // console.log('Init');
+    console.log('Init');
   }
 
   handleConnection(client: Socket, ...args: any[]) {

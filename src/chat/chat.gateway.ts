@@ -16,6 +16,7 @@ import {
   HandleRoomJoinPayload,
   HandleRoomLeavePayload,
 } from './dtos/chat.dto';
+import { RedisService } from 'src/redis/redis.service';
 
 @WebSocketGateway(8080, {
   cors: {
@@ -31,28 +32,34 @@ export class ChatGateway
 {
   constructor(
     @InjectRepository(Chat) private readonly chatsRepository: Repository<Chat>,
+    private readonly redisService: RedisService,
   ) {}
 
   @WebSocketServer() server: Server;
-  roomUserCount: { [clientId: string]: number } = {};
-  userRoomMap: { [clientId: string]: string } = {};
-  userNameMap: { [clientId: string]: string } = {};
-
   afterInit(server: Server) {
     console.log('Init');
   }
 
-  handleConnection(client: Socket, ...args: any[]) {
-    this.userNameMap[client.id] = `수험생#${client.id.slice(0, 5)}`;
-    this.server.to(client.id).emit('connected', {
-      clientId: client.id,
-      username: this.userNameMap[client.id],
-    });
+  async handleConnection(client: Socket, ...args: any[]) {
+    try {
+      const userName = `수험생#${client.id.slice(0, 5)}`;
+      this.redisService.hset('userNameMap', client.id, userName);
+      this.server.to(client.id).emit('connected', {
+        clientId: client.id,
+        username: userName,
+      });
+    } catch (e) {
+      console.log(e);
+    }
   }
 
-  handleDisconnect(client: Socket) {
-    const room = this.userRoomMap[client.id];
-    this.leaveRoom(client, room);
+  async handleDisconnect(client: Socket) {
+    try {
+      const room = await this.redisService.hget('userRoomMap', client.id);
+      this.leaveRoom(client, room);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   @SubscribeMessage('chat')
@@ -60,14 +67,18 @@ export class ChatGateway
     client: Socket,
     payload: HandleMessagePayload,
   ): Promise<void> {
-    const username = this.userNameMap[client.id];
-    let newMessage = this.chatsRepository.create({
-      clientId: client.id,
-      username,
-      ...payload,
-    });
-    newMessage = await this.chatsRepository.save(newMessage);
-    this.server.to(payload.room).emit('chat', newMessage);
+    try {
+      const username = await this.redisService.hget('userNameMap', client.id);
+      let newMessage = this.chatsRepository.create({
+        clientId: client.id,
+        username,
+        ...payload,
+      });
+      newMessage = await this.chatsRepository.save(newMessage);
+      this.server.to(payload.room).emit('chat', newMessage);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   @SubscribeMessage('joinRoom')
@@ -75,53 +86,73 @@ export class ChatGateway
     client: Socket,
     payload: HandleRoomJoinPayload,
   ): Promise<void> {
-    const { room } = payload;
-    this.joinRoom(client, room);
-    const chatHistory = await this.chatsRepository.find({
-      where: { room },
-      order: { created_at: 'DESC' },
-      take: 50,
-    });
-    this.server.to(room).emit('chatHistory', chatHistory.reverse());
+    try {
+      const { room } = payload;
+      this.joinRoom(client, room);
+      const chatHistory = await this.chatsRepository.find({
+        where: { room },
+        order: { created_at: 'DESC' },
+        take: 50,
+      });
+      this.server.to(room).emit('chatHistory', chatHistory.reverse());
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   @SubscribeMessage('leaveRoom')
   handleRoomLeave(client: Socket, payload: HandleRoomLeavePayload): void {
-    const { room } = payload;
-    this.leaveRoom(client, room);
+    try {
+      const { room } = payload;
+      this.leaveRoom(client, room);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   @SubscribeMessage('setUsername')
-  handleSetUsername(client: Socket, username: string): void {
-    console.log(username);
-    this.userNameMap[client.id] = username; // Set the username for the client
+  async handleSetUsername(client: Socket, username: string): Promise<void> {
+    try {
+      this.redisService.hset('userNameMap', client.id, username);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
-  private updateRoomUserCount(room: string) {
-    this.roomUserCount = Object.values(this.userRoomMap).reduce((acc, cur) => {
-      acc[cur] = (acc[cur] || 0) + 1;
-      return acc;
-    }, {});
-    this.server.to(room).emit('roomUserCount', this.roomUserCount);
-    this.server.to(room).emit(
-      'roomUserList',
-      Object.keys(this.userRoomMap)
-        .filter((key) => this.userRoomMap[key] === room)
-        .map((clientId) => this.userNameMap[clientId]),
-    );
+  private async updateRoomUserCount(room: string) {
+    try {
+      const roomUserCount = await this.redisService.hget('roomUserCount', room);
+      const roomUserList = await this.redisService.smembers(`room:${room}`);
+      this.server.to(room).emit('roomUserCount', roomUserCount);
+      this.server.to(room).emit('roomUserList', roomUserList);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
-  private leaveRoom(client: Socket, room: string) {
-    client.leave(room); // 클라이언트가 방에서 나감
-    delete this.userRoomMap[client.id]; // 클라이언트가 접속한 방 삭제
-    this.updateRoomUserCount(room);
-    this.server.to(room).emit('leftRoom', client.id);
+  private async leaveRoom(client: Socket, room: string) {
+    try {
+      client.leave(room); // 클라이언트가 방에서 나감
+      this.redisService.hdel('userRoomMap', client.id);
+      this.redisService.hincrby('roomUserCount', room, -1);
+      this.redisService.srem(`room:${room}`, client.id);
+      this.updateRoomUserCount(room);
+      this.server.to(room).emit('leftRoom', client.id);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
-  private joinRoom(client: Socket, room: string) {
-    client.join(room); // 클라이언트가 방에 접속
-    this.userRoomMap[client.id] = room; // 클라이언트가 접속한 방 저장
-    this.updateRoomUserCount(room);
-    this.server.to(room).emit('joinedRoom', client.id);
+  private async joinRoom(client: Socket, room: string) {
+    try {
+      client.join(room);
+      this.redisService.hset('userRoomMap', client.id, room);
+      this.redisService.hincrby('roomUserCount', room, 1);
+      this.redisService.sadd(`room:${room}`, client.id);
+      this.updateRoomUserCount(room);
+      this.server.to(room).emit('joinedRoom', client.id);
+    } catch (e) {
+      console.log(e);
+    }
   }
 }

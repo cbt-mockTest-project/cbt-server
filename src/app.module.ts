@@ -72,6 +72,7 @@ import { ZepComment } from './zep/entities/zepComment.entity';
 import { ZepPost } from './zep/entities/zepPost.entity';
 import { ChatModule } from './chat/chat.module';
 import { Chat } from './chat/entities/chat.entity';
+import { RedisService } from './redis/redis.service';
 
 @Module({
   imports: [
@@ -237,6 +238,7 @@ import { Chat } from './chat/entities/chat.entity';
       provide: APP_INTERCEPTOR,
       useClass: LoggingInterceptor,
     },
+    RedisService,
   ],
 })
 export class AppModule {}

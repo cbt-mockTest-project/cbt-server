@@ -20,10 +20,12 @@ import { RedisService } from 'src/redis/redis.service';
 
 @WebSocketGateway(8080, {
   cors: {
-    origin:
-      process.env.NODE_ENV === 'dev'
-        ? 'http://localhost:3000'
-        : 'https://moducbt.com', // 클라이언트의 주소를 명시적으로 지정
+    origin: [
+      'http://localhost:3000',
+      'https://www.moducbt.com/',
+      'https://www.moducbt.com',
+      'https://moducbt.com/',
+    ], // 클라이언트의 주소를 명시적으로 지정
     methods: ['GET', 'POST'], // 허용할 HTTP 메소드 지정
     allowedHeaders: [], // 허용할 헤더들
     credentials: true,

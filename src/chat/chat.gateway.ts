@@ -20,7 +20,10 @@ import { RedisService } from 'src/redis/redis.service';
 
 @WebSocketGateway(8080, {
   cors: {
-    origin: 'http://localhost:3000', // 클라이언트의 주소를 명시적으로 지정
+    origin:
+      process.env.NODE_ENV === 'dev'
+        ? 'http://localhost:3000'
+        : 'https://moducbt.com', // 클라이언트의 주소를 명시적으로 지정
     methods: ['GET', 'POST'], // 허용할 HTTP 메소드 지정
     allowedHeaders: [], // 허용할 헤더들
     credentials: true,
@@ -42,7 +45,7 @@ export class ChatGateway
 
   async handleConnection(client: Socket, ...args: any[]) {
     try {
-      const userName = `수험생#${client.id.slice(0, 5)}`;
+      const userName = '';
       this.redisService.hset('userNameMap', client.id, userName);
       this.server.to(client.id).emit('connected', {
         clientId: client.id,
@@ -114,6 +117,9 @@ export class ChatGateway
   async handleSetUsername(client: Socket, username: string): Promise<void> {
     try {
       this.redisService.hset('userNameMap', client.id, username);
+      this.server
+        .to(client.id)
+        .emit('setUsername', { clientId: client.id, username });
     } catch (e) {
       console.log(e);
     }

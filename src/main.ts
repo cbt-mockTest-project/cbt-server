@@ -21,11 +21,8 @@ async function bootstrap() {
   const server = await app.listen(80);
 
   const cleanup = async (signal) => {
-    console.log(
-      `Received ${signal}. Close server and disconnect from Redis...`,
-    );
-    server.close(async () => {
-      await redisService.disconnect(); // Redis 연결 종료 메소드를 추가해야 합니다.
+    server.close(() => {
+      redisService.disconnect(); // Redis 연결 종료 메소드를 추가해야 합니다.
       process.exit(0);
     });
   };

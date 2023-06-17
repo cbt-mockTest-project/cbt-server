@@ -37,6 +37,7 @@ import { MockExamQuestionFeedbackRecommendation } from 'src/mock-exams/entities/
 import { Payment } from 'src/payments/entities/payment.entity';
 import { UserAndRole } from './userAndRole.entity';
 import { Attendance } from 'src/attendance/entities/attendance.entity';
+import { Todo } from 'src/todo/entities/Todo.entity';
 
 export enum UserRole {
   CLIENT = 'CLIENT',
@@ -196,6 +197,10 @@ export class User extends CoreEntity {
   @Field(() => [MockExamHistory])
   @OneToMany(() => MockExamHistory, (mockExamHistory) => mockExamHistory.user)
   mockExamHistory: MockExamHistory[];
+
+  @Field(() => [Todo])
+  @OneToMany(() => Todo, (todo) => todo.user)
+  todos: Todo[];
 
   @Field(() => [QuestionCard])
   @OneToMany(() => QuestionCard, (questionCard) => questionCard.user)

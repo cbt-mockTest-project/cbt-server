@@ -8,6 +8,8 @@ import { Column, Entity, ManyToOne } from 'typeorm';
 export class TodoList {
   @Field(() => String)
   todo: string;
+  @Field(() => Boolean)
+  isDone: boolean;
 }
 
 @InputType('TodoInputType', { isAbstract: true })
@@ -15,7 +17,7 @@ export class TodoList {
 @Entity()
 export class Todo extends CoreEntity {
   @Column({ type: 'json', default: [] })
-  @Field(() => [TodoList])
+  @Field(() => [TodoList], { defaultValue: [] })
   todoList: TodoList[];
 
   @Column()

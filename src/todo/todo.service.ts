@@ -59,11 +59,13 @@ export class TodoService {
           await this.todo.delete(todo.id);
           return { ok: true };
         }
-        await this.todo.update(todo.id, { todoList });
-        return { ok: true };
+        const newTodo = await this.todo.save({ ...todo, todoList });
+        return { ok: true, todo: newTodo };
       } else {
-        await this.todo.save(this.todo.create({ todoList, dateString, user }));
-        return { ok: true };
+        const newTodo = await this.todo.save(
+          this.todo.create({ todoList, dateString, user }),
+        );
+        return { ok: true, todo: newTodo };
       }
     } catch (error) {
       return { ok: false, error: '일정을 추가할 수 없습니다.' };

@@ -46,18 +46,18 @@ export class SchedulerService {
   }
 
   // 1시간에 1번
-  @Interval(1000 * 60 * 60)
-  async clearFreeTrial() {
-    if (process.env.NODE_ENV === 'dev') {
-      return;
-    }
-    const res = await this.userService.clearFreeTrialRole();
-    if (res.ok) {
-      await this.telegramService.sendMessageToAlramChannelOfTelegram({
-        message: `무료체험권 만료갯수: ${res.count} `,
-      });
-    }
-  }
+  // @Interval(1000 * 60 * 60)
+  // async clearFreeTrial() {
+  //   if (process.env.NODE_ENV === 'dev') {
+  //     return;
+  //   }
+  //   const res = await this.userService.clearFreeTrialRole();
+  //   if (res.ok) {
+  //     await this.telegramService.sendMessageToAlramChannelOfTelegram({
+  //       message: `무료체험권 만료갯수: ${res.count} `,
+  //     });
+  //   }
+  // }
 
   //6시간마다
   // @Cron('0 */5 * * *')

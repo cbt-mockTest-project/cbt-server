@@ -1,0 +1,1 @@
+{"version":3,"file":"changeClientRole.dto.js","sourceRoot":"","sources":["../../../src/users/dtos/changeClientRole.dto.ts"],"names":[],"mappings":";;;;;;;;;;;;AAAA,6CAA+D;AAC/D,yDAAmD;AAG5C,IAAM,qBAAqB,GAA3B,MAAM,qBAAqB;CAGjC,CAAA;AAFC;IAAC,IAAA,eAAK,EAAC,GAAG,EAAE,CAAC,sBAAQ,CAAC;;mDACP;AAFJ,qBAAqB;IADjC,IAAA,mBAAS,GAAE;GACC,qBAAqB,CAGjC;AAHY,sDAAqB"}

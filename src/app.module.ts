@@ -95,7 +95,6 @@ import { Todo } from './todo/entities/Todo.entity';
     ScheduleModule.forRoot(),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
-      installSubscriptionHandlers: true,
       autoSchemaFile: true,
       sortSchema: true, // 스키마 사전순으로 정렬
       formatError(error) {
@@ -105,9 +104,12 @@ import { Todo } from './todo/entities/Todo.entity';
         return error;
       },
       subscriptions: {
-        'subscriptions-transport-ws': {
-          onConnect: (connectionParams, websocket, context) => {
-            return { headers: websocket.upgradeReq.headers };
+        'graphql-ws': {
+          path: '/subscriptions',
+          onConnect: (context) => {
+            const { connectionParams, extra } = context;
+            console.log('connectionParams', connectionParams);
+            console.log('extra', extra);
           },
         },
       },

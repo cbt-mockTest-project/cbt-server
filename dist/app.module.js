@@ -103,7 +103,6 @@ AppModule = __decorate([
             schedule_1.ScheduleModule.forRoot(),
             graphql_1.GraphQLModule.forRoot({
                 driver: apollo_1.ApolloDriver,
-                installSubscriptionHandlers: true,
                 autoSchemaFile: true,
                 sortSchema: true,
                 formatError(error) {
@@ -111,9 +110,12 @@ AppModule = __decorate([
                     return error;
                 },
                 subscriptions: {
-                    'subscriptions-transport-ws': {
-                        onConnect: (connectionParams, websocket, context) => {
-                            return { headers: websocket.upgradeReq.headers };
+                    'graphql-ws': {
+                        path: '/subscriptions',
+                        onConnect: (context) => {
+                            const { connectionParams, extra } = context;
+                            console.log('connectionParams', connectionParams);
+                            console.log('extra', extra);
                         },
                     },
                 },

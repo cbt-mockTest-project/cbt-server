@@ -15,6 +15,7 @@ module.exports = {
       env: {
         NODE_PATH: '.',
         NODE_ENV: 'prod',
+        PORT: 8080,
       },
       exp_backoff_restart_delay: 100,
       node_args: '-r ts-node/register',

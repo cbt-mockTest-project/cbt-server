@@ -58,9 +58,9 @@ jobs:
           host: ${{ secrets.LIGHTSAIL_HOST }}
           username: ${{env.LIGHTSAIL_USERNAME}}
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
-          source: 'dist/*'
+          source: '*'
           strip_components: 1
-          target: '/home/bitnami/cbt-server/dist'
+          target: '/home/bitnami/cbt-server'
 
       - name: Restart PM2 process
         uses: appleboy/ssh-action@master
@@ -68,4 +68,4 @@ jobs:
           host: ${{ secrets.LIGHTSAIL_HOST }}
           username: ${{env.LIGHTSAIL_USERNAME}}
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
-          script: pm2 restart app
+          script: cd cbt-server && yarn start:pm2

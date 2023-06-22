@@ -87,7 +87,6 @@ jobs:
           username: ${{env.LIGHTSAIL_USERNAME}}
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
           script: |
-            cp package.json /home/ubuntu/cbt-server
             cd /home/ubuntu/cbt-server
             yarn
             yarn cross-env NODE_ENV=prod pm2 start ecosystem.config.js

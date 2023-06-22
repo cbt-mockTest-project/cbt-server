@@ -2,57 +2,43 @@ name: Deploy
 
 on:
   push:
-    branches: ['main']
+    branches: ['release']
   pull_request:
-    branches: ['main']
+    branches: ['release']
 
 env:
   LIGHTSAIL_SSH_KEY: ${{ secrets.LIGHTSAIL_SSH_KEY }}
   LIGHTSAIL_HOST: ${{ secrets.LIGHTSAIL_HOST }}
-  LIGHTSAIL_USERNAME: bitnami
+  LIGHTSAIL_USERNAME: ubuntu
   AWS_REGION: ap-northeast-2
 
-  jobs:
+jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # 브런치로 체크아웃
-      - name: 해당 브런치로 체크아웃
+      - name: Checkout Code
         uses: actions/checkout@v2
 
-      # nodeJs를 설치합니다.
-      - name: 노드 설치
+      - name: Set up Node
         uses: actions/setup-node@v1
         with:
           node-version: 16
 
-      # package.json의 dependencies 설치
-      - name: 프로젝트 디펜던시 설치
+      - name: Install Dependencies
         run: yarn
 
-      # 프로젝트를 빌드합니다.
-      - name: 프로젝트 빌드하기
+      - name: Build Project
         run: yarn build
 
-      # 빌드 파일이 생성되었는지 확인합니다.
-      - name: 빌드 파일 생성 체크
-        run: ls -la
-
-      # AWS 인증을 시작합니다.
-      - name: AWS 인증하기
+      - name: Configure AWS
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-region: ${{ env.AWS_REGION }}
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      # AWS 인증이 완료되었는지 테스트합니다.
-      - name: AWS Lightsail에 연결되었는지 확인
-        run: aws configure list
-
-      # 배포 자동화를 시작합니다.
-      - name: 배포 자동화
+      - name: Deploy Files
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.LIGHTSAIL_HOST }}
@@ -60,12 +46,33 @@ env:
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
           source: 'dist/*'
           strip_components: 1
-          target: '/home/bitnami/cbt-server/dist'
+          target: '/home/ubuntu/cbt-server/dist'
 
-      - name: Restart PM2 process
+      - name: Copy pm2 config
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.LIGHTSAIL_HOST }}
+          username: ${{env.LIGHTSAIL_USERNAME}}
+          key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
+          source: 'ecosystem.config.js'
+          target: '/home/ubuntu/cbt-server'
+
+      - name: Copy package.json
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.LIGHTSAIL_HOST }}
+          username: ${{env.LIGHTSAIL_USERNAME}}
+          key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
+          source: 'package.json'
+          target: '/home/ubuntu/cbt-server'
+
+      - name: Install Packages and Start/Restart PM2
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.LIGHTSAIL_HOST }}
           username: ${{env.LIGHTSAIL_USERNAME}}
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
-          script: pm2 restart app
+          script: |
+            cd /home/ubuntu/cbt-server
+            yarn
+            yarn cross-env NODE_ENV=prod pm2 start ecosystem.config.js

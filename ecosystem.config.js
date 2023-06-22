@@ -3,7 +3,7 @@ module.exports = {
     {
       name: 'moducbt-server',
       script: 'dist/main.js',
-      instances: '2',
+      instances: '0',
       exec_mode: 'cluster', // cluster mode
       wait_ready: true,
       autorestart: true, // 프로세스 실패시 자동 재시작

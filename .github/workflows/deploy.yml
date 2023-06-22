@@ -48,13 +48,22 @@ jobs:
           strip_components: 1
           target: '/home/ubuntu/cbt-server/dist'
 
-      - name: Copy config files
+      - name: Copy pm2 config
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.LIGHTSAIL_HOST }}
           username: ${{env.LIGHTSAIL_USERNAME}}
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
-          source: 'ecosystem.config.js package.json'
+          source: 'ecosystem.config.js'
+          target: '/home/ubuntu/cbt-server'
+
+      - name: Copy package.json
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.LIGHTSAIL_HOST }}
+          username: ${{env.LIGHTSAIL_USERNAME}}
+          key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
+          source: 'package.json'
           target: '/home/ubuntu/cbt-server'
 
       - name: Install Packages and Start/Restart PM2

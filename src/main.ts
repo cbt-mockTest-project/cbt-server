@@ -16,7 +16,7 @@ async function bootstrap() {
   // const redisIoAdapter = new RedisIoAdapter(redisService);
   // await redisIoAdapter.connectToRedis();
   // app.useWebSocketAdapter(redisIoAdapter);
-  const server = await app.listen(8080);
+  const server = await app.listen(80);
 
   // const cleanup = async (signal) => {
   //   server.close(() => {
@@ -29,7 +29,7 @@ async function bootstrap() {
   // process.on('SIGTERM', cleanup);
   // process.on('uncaughtException', cleanup);
 
-  console.log('go to graphql : http://localhost:8080/graphql');
+  console.log('go to graphql : http://localhost:80/graphql');
 }
 
 bootstrap();

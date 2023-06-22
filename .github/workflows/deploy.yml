@@ -71,6 +71,15 @@ jobs:
           source: 'ecosystem.config.js'
           target: '/home/bitnami/cbt-server'
 
+      - name: package.json 파일 복사
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.LIGHTSAIL_HOST }}
+          username: ${{env.LIGHTSAIL_USERNAME}}
+          key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
+          source: 'package.json'
+          target: '/home/bitnami/cbt-server'
+
       - name: 패키지 설치
         uses: appleboy/ssh-action@master
         with:

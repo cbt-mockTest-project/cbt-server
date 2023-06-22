@@ -4,7 +4,8 @@ on:
   push:
     branches: ['release']
   pull_request:
-    branches: ['release']
+    branches:
+      - release
 
 env:
   LIGHTSAIL_SSH_KEY: ${{ secrets.LIGHTSAIL_SSH_KEY }}

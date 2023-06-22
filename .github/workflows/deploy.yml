@@ -75,4 +75,4 @@ jobs:
           script: |
             cd /home/ubuntu/cbt-server
             yarn
-            yarn cross-env NODE_ENV=prod pm2 start ecosystem.config.js --no-daemon
+            yarn cross-env NODE_ENV=prod pm2 start ecosystem.config.js

@@ -16,8 +16,6 @@ module.exports = {
         NODE_PATH: '.',
         NODE_ENV: 'prod',
       },
-      listen_timeout: 8000,
-      kill_timeout: 1600,
     },
   ],
 };

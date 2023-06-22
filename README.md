@@ -4,4 +4,4 @@
 
 ### Stack
 
-Nestjs, Typeorm, Postgresql, Aws, Docker
+Nestjs, Typeorm, Postgresql, Aws, Redis

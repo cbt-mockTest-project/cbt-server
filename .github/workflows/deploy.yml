@@ -9,7 +9,7 @@ on:
 env:
   LIGHTSAIL_SSH_KEY: ${{ secrets.LIGHTSAIL_SSH_KEY }}
   LIGHTSAIL_HOST: ${{ secrets.LIGHTSAIL_HOST }}
-  LIGHTSAIL_USERNAME: bitnami
+  LIGHTSAIL_USERNAME: ubuntu
   AWS_REGION: ap-northeast-2
 
 jobs:
@@ -60,7 +60,7 @@ jobs:
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
           source: 'dist/*'
           strip_components: 1
-          target: '/home/bitnami/cbt-server/dist'
+          target: '/home/ubuntu/cbt-server/dist'
 
       - name: pm2 config 파일 복사
         uses: appleboy/scp-action@master
@@ -69,7 +69,7 @@ jobs:
           username: ${{env.LIGHTSAIL_USERNAME}}
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
           source: 'ecosystem.config.js'
-          target: '/home/bitnami/cbt-server'
+          target: '/home/ubuntu/cbt-server'
 
       - name: package.json 파일 복사
         uses: appleboy/scp-action@master
@@ -78,7 +78,7 @@ jobs:
           username: ${{env.LIGHTSAIL_USERNAME}}
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
           source: 'package.json'
-          target: '/home/bitnami/cbt-server'
+          target: '/home/ubuntu/cbt-server'
 
       - name: 패키지 설치
         uses: appleboy/ssh-action@master
@@ -87,7 +87,7 @@ jobs:
           username: ${{env.LIGHTSAIL_USERNAME}}
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
           script: |
-            cp package.json /home/bitnami/cbt-server
-            cd /home/bitnami/cbt-server
+            cp package.json /home/ubuntu/cbt-server
+            cd /home/ubuntu/cbt-server
             yarn
             yarn cross-env NODE_ENV=prod pm2 start ecosystem.config.js

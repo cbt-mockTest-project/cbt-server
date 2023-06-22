@@ -12,7 +12,7 @@ env:
   LIGHTSAIL_USERNAME: bitnami
   AWS_REGION: ap-northeast-2
 
-  jobs:
+jobs:
   build:
     runs-on: ubuntu-latest
 

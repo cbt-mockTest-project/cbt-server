@@ -72,13 +72,13 @@ jobs:
             yarn install
 
       # 배포 자동화를 시작합니다.
-      - name: 배포 자동화
+     - name: 배포 자동화
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.LIGHTSAIL_HOST }}
           username: ${{env.LIGHTSAIL_USERNAME}}
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
-          source: '/dist/*'
+          source: 'dist/*'
           strip_components: 1
           target: '/home/bitnami/cbt-server/dist'
 

@@ -51,6 +51,17 @@ jobs:
       - name: AWS Lightsail에 연결되었는지 확인
         run: aws configure list
 
+      # 배포 자동화를 시작합니다.
+      - name: 배포 자동화
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.LIGHTSAIL_HOST }}
+          username: ${{env.LIGHTSAIL_USERNAME}}
+          key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
+          source: 'dist/*'
+          strip_components: 1
+          target: '/home/bitnami/cbt-server/dist'
+
       - name: pm2 config 파일 복사
         uses: appleboy/scp-action@master
         with:
@@ -69,25 +80,5 @@ jobs:
           script: |
             cp package.json /home/bitnami/cbt-server
             cd /home/bitnami/cbt-server
-            yarn install
-
-      # 배포 자동화를 시작합니다.
-      - name: 배포 자동화
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.LIGHTSAIL_HOST }}
-          username: ${{env.LIGHTSAIL_USERNAME}}
-          key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
-          source: 'dist/*'
-          strip_components: 1
-          target: '/home/bitnami/cbt-server/dist'
-
-      - name: Restart PM2 process
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.LIGHTSAIL_HOST }}
-          username: ${{env.LIGHTSAIL_USERNAME}}
-          key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
-          script: |
-            cd cbt-server
+            yarn
             yarn cross-env NODE_ENV=dev pm2 start ecosystem.config.js

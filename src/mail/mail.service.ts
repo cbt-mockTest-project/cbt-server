@@ -5,7 +5,10 @@ import { MailerService } from '@nestjs-modules/mailer';
 export class MailService {
   constructor(private readonly mailerService: MailerService) {}
   sendVerificationEmail(email: string, link: string) {
-    const path = `${__dirname.split('dist')[0]}src/mail/templates`;
+    const path =
+      process.env.NODE_ENV === 'dev'
+        ? `${__dirname.split('dist')[0]}src/mail/templates`
+        : `${__dirname.split('dist')[0]}dist/mail/templates`;
     this.mailerService
       .sendMail({
         to: email,

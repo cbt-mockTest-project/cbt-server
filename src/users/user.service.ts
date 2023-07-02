@@ -233,6 +233,7 @@ export class UserService {
         email,
         `${process.env.CLIENT_URL}/register/password?key=${code}`,
       );
+
       return {
         ok: true,
       };

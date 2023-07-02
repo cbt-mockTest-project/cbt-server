@@ -23,6 +23,10 @@ export class MailService {
       })
       .catch((err) => {
         console.log(err);
+        return {
+          ok: false,
+          error: '메일을 보낼 수 없습니다.',
+        };
       });
     return true;
   }
@@ -36,7 +40,7 @@ export class MailService {
       .sendMail({
         to: email,
         subject: '[모두CBT] 비밀번호 찾기',
-        template: path + '/findPassword', // The `.pug` or `.hbs` extension is appended automatically.
+        template: path + '/findPassword',
         context: {
           link,
         },
@@ -46,6 +50,10 @@ export class MailService {
       })
       .catch((err) => {
         console.log(err);
+        return {
+          ok: false,
+          error: '메일을 보낼 수 없습니다.',
+        };
       });
     return true;
   }
@@ -75,6 +83,10 @@ export class MailService {
       })
       .catch((err) => {
         console.log(err);
+        return {
+          ok: false,
+          error: '메일을 보낼 수 없습니다.',
+        };
       });
     return true;
   }

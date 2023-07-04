@@ -39,6 +39,11 @@ export class PostCommentSerivce {
     user: User,
   ): Promise<CreatePostCommentOutput> {
     try {
+      this.mailService.requestMailTransport({
+        to: 'moducbt@gmail.com',
+        subject: 'test',
+        html: 'test',
+      });
       const { postId, content } = createPostCommentInput;
 
       const post = await this.mockExamQuestion.findOne({

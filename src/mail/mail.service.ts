@@ -1,9 +1,55 @@
 import { Injectable } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
+import * as aws from '@aws-sdk/client-ses';
+import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class MailService {
-  constructor(private readonly mailerService: MailerService) {}
+  private readonly transporter;
+  constructor(private readonly mailerService: MailerService) {
+    const ses = new aws.SES({
+      apiVersion: '2010-12-01',
+      region: 'ap-northeast-1',
+      credentials: {
+        accessKeyId: process.env.AWS_SES_ACCESSKEY,
+        secretAccessKey: process.env.AWS_SES_SECRETKEY,
+      },
+    });
+    this.transporter = nodemailer.createTransport({
+      SES: { ses, aws },
+    });
+  }
+
+  async requestMailTransport({
+    to,
+    subject,
+    html,
+  }: {
+    to: string;
+    subject: string;
+    html: string;
+  }) {
+    return this.transporter
+      .sendMail({
+        from: 'moducbt@gmail.com', // 발신 이메일
+        to, // 수신 이메일
+        subject, // 제목
+        html, // 본문
+      })
+      .then((res) => {
+        console.log('성공');
+        return {
+          ok: true,
+        };
+      })
+      .catch((err) => {
+        console.log(err);
+        return {
+          ok: false,
+        };
+      });
+  }
+
   sendVerificationEmail(email: string, link: string) {
     const path =
       process.env.NODE_ENV === 'dev'

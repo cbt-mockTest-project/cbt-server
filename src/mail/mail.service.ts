@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import * as aws from '@aws-sdk/client-ses';
 import * as nodemailer from 'nodemailer';
+import hbs from 'nodemailer-express-handlebars';
 
 @Injectable()
 export class MailService {

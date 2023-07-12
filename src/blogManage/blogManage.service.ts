@@ -1,11 +1,11 @@
 import {
-  NaverViewTapCrawlerInput,
-  NaverViewTapCrawlerOutput,
+  GetMyBlogPostRankInput,
+  GetMyBlogPostRankOutput,
   SearchCounts,
-} from './dtos/naverViewTapCrawler.dto';
+} from './dtos/getMyBlogPostRank';
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
-import { TelegramService } from './../telegram/telegram.service';
+import { TelegramService } from '../telegram/telegram.service';
 import { load } from 'cheerio';
 import * as webdriver from 'selenium-webdriver';
 import * as chrome from 'selenium-webdriver/chrome';
@@ -16,13 +16,13 @@ import {
 } from './dtos/naverBlogViewMacro.dto';
 
 @Injectable()
-export class CrawlerService {
+export class BlogManageService {
   constructor(private readonly telegramService: TelegramService) {}
-  async naverViewTapCrawler(
-    naverViewTapCrawlerInput: NaverViewTapCrawlerInput,
-  ): Promise<NaverViewTapCrawlerOutput> {
+  async getMyBlogPostRank(
+    getMyBlogPostRankInput: GetMyBlogPostRankInput,
+  ): Promise<GetMyBlogPostRankOutput> {
     try {
-      const { keyword, blogName } = naverViewTapCrawlerInput;
+      const { keyword, blogName } = getMyBlogPostRankInput;
       const naverPostBoxClass = '.total_wrap.api_ani_send';
       const naverPostBlogNameClass = '.sub_txt.sub_name';
       const naverPostTitleClass = '.api_txt_lines.total_tit';

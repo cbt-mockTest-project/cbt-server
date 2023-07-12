@@ -10,7 +10,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 // import * as AWS from 'aws-sdk';
 // import { findUniqElem } from 'src/utils/utils';
 import { Repository } from 'typeorm';
-import { CrawlerService } from 'src/blogManage/blogManage.service';
 import { VisitService } from 'src/visit/visit.service';
 import { UserService } from 'src/users/user.service';
 
@@ -20,7 +19,6 @@ export class SchedulerService {
     @InjectRepository(MockExamQuestion)
     private readonly mockExamQuestions: Repository<MockExamQuestion>,
     private readonly configService: ConfigService,
-    private readonly crawlerService: CrawlerService,
     private readonly visitService: VisitService,
     private readonly telegramService: TelegramService,
     private readonly userService: UserService,

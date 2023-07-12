@@ -32,7 +32,7 @@ class PostInfo {
 }
 
 @InputType()
-export class NaverViewTapCrawlerInput {
+export class GetMyBlogPostRankInput {
   @Field(() => String)
   keyword: string;
 
@@ -41,7 +41,7 @@ export class NaverViewTapCrawlerInput {
 }
 
 @ObjectType()
-export class NaverViewTapCrawlerOutput extends CoreOutput {
+export class GetMyBlogPostRankOutput extends CoreOutput {
   @Field(() => String, { nullable: true })
   message?: string;
   @Field(() => SearchCounts, { nullable: true })

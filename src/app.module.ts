@@ -11,7 +11,7 @@ import * as Joi from 'joi';
 import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
 import { CommonModule } from './common/common.module';
-import { CrawlerModule } from './crawler/crawler.module';
+import { BlogManageModule } from './blogManage/blogManage.module';
 import { ExamCoAuthor } from './exam-co-author/entities/exam-co-author.entity';
 import { ExamCoAuthorModule } from './exam-co-author/exam-co-author.module';
 import { JwtModule } from './jwt/jwt.module';
@@ -221,7 +221,7 @@ import { Todo } from './todo/entities/Todo.entity';
     }),
     RevalidateModule,
     TelegramModule,
-    CrawlerModule,
+    BlogManageModule,
     PostModule,
     CommonModule,
     QuestionCardModule,

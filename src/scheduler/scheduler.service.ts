@@ -10,7 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 // import * as AWS from 'aws-sdk';
 // import { findUniqElem } from 'src/utils/utils';
 import { Repository } from 'typeorm';
-import { CrawlerService } from 'src/crawler/crawler.service';
+import { CrawlerService } from 'src/blogManage/blogManage.service';
 import { VisitService } from 'src/visit/visit.service';
 import { UserService } from 'src/users/user.service';
 

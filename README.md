@@ -4,4 +4,4 @@
 
 ### Stack
 
-Nestjs, Typeorm, Postgresql, Aws
+Nestjs, Typeorm, Postgresql, Aws, GithubAction

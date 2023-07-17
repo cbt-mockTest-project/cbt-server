@@ -42,8 +42,10 @@ export class UploadsController {
         .promise();
 
       const url = hasCustomPath
-        ? `https://${BUCKET_NAME}.s3.amazonaws.com/${uploadInput.path}/${objectName}`
-        : `https://${BUCKET_NAME}.s3.amazonaws.com/${objectName}`;
+        ? `${this.configService.get('CLOUD_FRONT_DOMAIN')}/${
+            uploadInput.path
+          }/${objectName}`
+        : `${this.configService.get('CLOUD_FRONT_DOMAIN')}/${objectName}`;
       return { url };
     } catch (e) {
       console.log(e);

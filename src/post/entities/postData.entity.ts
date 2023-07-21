@@ -9,9 +9,9 @@ import { User } from 'src/users/entities/user.entity';
 @ObjectType()
 @Entity()
 export class PostData extends CoreEntity {
-  @Column({ default: '' })
-  @Field(() => String)
-  price: string;
+  @Column({ default: 0 })
+  @Field(() => Number)
+  price: number;
 
   @OneToMany(() => Post, (post) => post.data)
   @Field(() => [Post])

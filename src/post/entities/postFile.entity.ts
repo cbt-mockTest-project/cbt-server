@@ -16,6 +16,10 @@ export class PostFile extends CoreEntity {
   @Field(() => String, { defaultValue: '' })
   url: string;
 
+  @Column()
+  @Field(() => Number, { defaultValue: 0 })
+  page: number;
+
   @ManyToOne(() => PostData, (postData) => postData.postFile, {
     onDelete: 'CASCADE',
   })

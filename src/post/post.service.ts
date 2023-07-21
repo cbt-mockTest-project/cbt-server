@@ -12,12 +12,18 @@ import { ReadPostInput, ReadPostOutput } from './dtos/readPost.dto';
 import { ReadPostsInput, ReadPostsOutput } from './dtos/readPosts.dto';
 import { ViewPostInput, ViewPostOutput } from './dtos/viewPost.dto';
 import { Post } from './entities/post.entity';
+import { PostData } from './entities/postData.entity';
+import { PostFile } from './entities/postFile.entity';
 
 @Injectable()
 export class PostService {
   constructor(
     @InjectRepository(Post)
     private readonly post: Repository<Post>,
+    @InjectRepository(PostData)
+    private readonly postData: Repository<PostData>,
+    @InjectRepository(PostFile)
+    private readonly postFile: Repository<PostFile>,
     private readonly revalidateService: RevalidateService,
   ) {}
 
@@ -25,23 +31,58 @@ export class PostService {
     createPostInput: CreatePostInput,
     user: User,
   ): Promise<CreatePostOutput> {
+    const queryRunner = this.post.manager.connection.createQueryRunner();
     try {
-      const { content, title, category } = createPostInput;
-      if (content && title && user) {
-        const post = this.post.create({ content, title, user, category });
-        await this.post.save(post);
-        await this.revalidateService.revalidate({
-          path: `/post/${post.id}`,
-        });
+      const { content, title, category, data } = createPostInput;
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+
+      if (data) {
+        const postData = await queryRunner.manager.save(
+          this.postData.create({
+            user,
+            price: data.price,
+          }),
+        );
+        await queryRunner.manager.save(
+          this.postFile.create({
+            name: data.fileName,
+            url: data.fileUrl,
+            postData,
+            user,
+          }),
+        );
+        await queryRunner.manager.save(
+          this.post.create({
+            content,
+            title,
+            user,
+            data: postData,
+          }),
+        );
+        await queryRunner.commitTransaction();
+        return {
+          ok: true,
+        };
       }
+
+      const post = this.post.create({ content, title, user, category });
+      await queryRunner.manager.save(post);
+      await this.revalidateService.revalidate({
+        path: `/post/${post.id}`,
+      });
+      await queryRunner.commitTransaction();
       return {
         ok: true,
       };
     } catch {
+      await queryRunner.rollbackTransaction();
       return {
         ok: false,
         error: '게시글 작성에 실패했습니다.',
       };
+    } finally {
+      await queryRunner.release();
     }
   }
 

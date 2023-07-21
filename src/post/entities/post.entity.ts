@@ -19,6 +19,7 @@ export enum PostCategory {
   NOTICE = 'NOTICE', //공지
   CHECKIN = 'CHECKIN', //출석체크
   SUGGENSTION = 'SUGGENSTION', //건의사항
+  DATA = 'DATA', //자료실
 }
 
 registerEnumType(PostCategory, { name: 'PostCategory' });
@@ -51,9 +52,11 @@ export class Post extends CoreEntity {
   @Field(() => [PostLike])
   like: PostLike[];
 
-  @OneToMany(() => PostData, (postData) => postData.post)
-  @Field(() => [PostData])
-  data: PostData[];
+  @ManyToOne(() => PostData, (postData) => postData.post, {
+    nullable: true,
+  })
+  @Field(() => PostData)
+  data: PostData;
 
   @ManyToOne(() => User, (user) => user.post, {
     onDelete: 'CASCADE',

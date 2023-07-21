@@ -11,7 +11,7 @@ export class Attendance extends CoreEntity {
   @Field(() => String)
   content: string;
 
-  @ManyToOne(() => User, (user) => user.attendances)
+  @ManyToOne(() => User, (user) => user.attendances, { onDelete: 'CASCADE' })
   @Field(() => User)
   user: User;
 }

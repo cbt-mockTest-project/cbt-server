@@ -3,6 +3,7 @@ import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { Post } from './post.entity';
 import { CoreEntity } from '../../common/entities/core.entity';
 import { PostFile } from './postFile.entity';
+import { User } from 'src/users/entities/user.entity';
 
 @InputType('PostDataInputType', { isAbstract: true })
 @ObjectType()
@@ -12,11 +13,15 @@ export class PostData extends CoreEntity {
   @Field(() => String)
   price: string;
 
-  @ManyToOne(() => Post, (post) => post.data, { onDelete: 'CASCADE' })
-  @Field(() => Post)
-  post: Post;
+  @OneToMany(() => Post, (post) => post.data)
+  @Field(() => [Post])
+  post: Post[];
 
   @OneToMany(() => PostFile, (postFile) => postFile.postData)
   @Field(() => [PostFile])
   postFile: PostFile[];
+
+  @ManyToOne(() => User, (user) => user.postData, { onDelete: 'CASCADE' })
+  @Field(() => User)
+  user: User;
 }

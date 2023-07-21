@@ -3,9 +3,21 @@ import { Post, PostCategory } from './../entities/post.entity';
 import { Field, InputType, ObjectType, PickType } from '@nestjs/graphql';
 
 @InputType()
+class PostDataInput {
+  @Field(() => String, { defaultValue: 0 })
+  price: string;
+  @Field(() => String, { defaultValue: '' })
+  fileName: string;
+  @Field(() => String, { defaultValue: '' })
+  fileUrl: string;
+}
+
+@InputType()
 export class CreatePostInput extends PickType(Post, ['content', 'title']) {
   @Field(() => PostCategory, { nullable: true })
   category?: PostCategory;
+  @Field(() => PostDataInput, { nullable: true })
+  data?: PostDataInput;
 }
 
 @ObjectType()

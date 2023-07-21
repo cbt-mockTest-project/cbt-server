@@ -48,6 +48,7 @@ export class PostService {
           this.postFile.create({
             name: data.fileName,
             url: data.fileUrl,
+            page: data.filePage,
             postData,
             user,
           }),
@@ -57,6 +58,7 @@ export class PostService {
             content,
             title,
             user,
+            category,
             data: postData,
           }),
         );

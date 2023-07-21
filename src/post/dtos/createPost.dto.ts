@@ -4,12 +4,14 @@ import { Field, InputType, ObjectType, PickType } from '@nestjs/graphql';
 
 @InputType()
 class PostDataInput {
-  @Field(() => String, { defaultValue: 0 })
-  price: string;
+  @Field(() => Number, { defaultValue: 0 })
+  price: number;
   @Field(() => String, { defaultValue: '' })
   fileName: string;
   @Field(() => String, { defaultValue: '' })
   fileUrl: string;
+  @Field(() => Number, { defaultValue: 0 })
+  filePage: number;
 }
 
 @InputType()

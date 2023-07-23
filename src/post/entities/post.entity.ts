@@ -55,7 +55,7 @@ export class Post extends CoreEntity {
   @ManyToOne(() => PostData, (postData) => postData.post, {
     nullable: true,
   })
-  @Field(() => PostData)
+  @Field(() => PostData, { nullable: true })
   data: PostData;
 
   @ManyToOne(() => User, (user) => user.post, {
@@ -79,6 +79,7 @@ export class Post extends CoreEntity {
   @Field(() => Boolean, { defaultValue: false })
   isHidden: boolean;
 
+  @Column({ default: 0 })
   @Field(() => Number, { defaultValue: 0 })
   likesCount?: number;
 

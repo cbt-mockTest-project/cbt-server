@@ -217,9 +217,7 @@ export class PostService {
         if (order === PostOrderType.like) {
           orderOption.likesCount = 'DESC';
         }
-        if (order === PostOrderType.createdAt) {
-          orderOption.created_at = 'DESC';
-        }
+        orderOption.created_at = 'DESC';
         options = {
           skip,
           take: limit,

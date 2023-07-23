@@ -13,7 +13,7 @@ export enum PostOrderType {
 }
 
 registerEnumType(PostOrderType, {
-  name: 'OrderType',
+  name: 'PostOrderType',
   description: 'Order by criteria for posts',
 });
 

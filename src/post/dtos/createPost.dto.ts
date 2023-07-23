@@ -23,4 +23,7 @@ export class CreatePostInput extends PickType(Post, ['content', 'title']) {
 }
 
 @ObjectType()
-export class CreatePostOutput extends CoreOutput {}
+export class CreatePostOutput extends CoreOutput {
+  @Field(() => Number, { nullable: true })
+  postId?: number;
+}

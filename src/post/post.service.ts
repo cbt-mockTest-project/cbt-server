@@ -4,14 +4,18 @@ import { PostComment } from './entities/postComment.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
-import { FindManyOptions, Like, Repository } from 'typeorm';
+import { FindManyOptions, FindOptionsOrder, Like, Repository } from 'typeorm';
 import { CreatePostInput, CreatePostOutput } from './dtos/createPost.dto';
 import { DeletePostInput, DeletePostOutput } from './dtos/deletePost.dto';
 import { EditPostInput, EditPostOutput } from './dtos/editPost.dto';
 import { ReadPostInput, ReadPostOutput } from './dtos/readPost.dto';
-import { ReadPostsInput, ReadPostsOutput } from './dtos/readPosts.dto';
+import {
+  PostOrderType,
+  ReadPostsInput,
+  ReadPostsOutput,
+} from './dtos/readPosts.dto';
 import { ViewPostInput, ViewPostOutput } from './dtos/viewPost.dto';
-import { Post } from './entities/post.entity';
+import { Post, PostCategory } from './entities/post.entity';
 import { PostData } from './entities/postData.entity';
 import { PostFile } from './entities/postFile.entity';
 
@@ -53,7 +57,7 @@ export class PostService {
             user,
           }),
         );
-        await queryRunner.manager.save(
+        const post = await queryRunner.manager.save(
           this.post.create({
             content,
             title,
@@ -65,6 +69,7 @@ export class PostService {
         await queryRunner.commitTransaction();
         return {
           ok: true,
+          postId: post.id,
         };
       }
 
@@ -75,6 +80,7 @@ export class PostService {
       });
       await queryRunner.commitTransaction();
       return {
+        postId: post.id,
         ok: true,
       };
     } catch {
@@ -160,6 +166,7 @@ export class PostService {
           user: true,
           like: { user: true },
           comment: { user: true, commentLike: { user: true } },
+          data: { postFile: true },
         },
       });
       if (!post) {
@@ -200,17 +207,29 @@ export class PostService {
 
   async readPosts(readPostsInput: ReadPostsInput): Promise<ReadPostsOutput> {
     try {
-      const { page, limit, category, all, search } = readPostsInput;
+      const { page, limit, category, all, search, order } = readPostsInput;
       const skip = (page - 1) * limit;
       let options: FindManyOptions<Post> = {
         relations: { user: true, like: true, comment: true },
       };
       if (!all) {
+        const orderOption: FindOptionsOrder<Post> = { priority: 'DESC' };
+        if (order === PostOrderType.like) {
+          orderOption.likesCount = 'DESC';
+        }
+        if (order === PostOrderType.createdAt) {
+          orderOption.created_at = 'DESC';
+        }
         options = {
           skip,
           take: limit,
-          order: { priority: 'DESC', created_at: 'DESC' },
-          relations: { user: true, like: true, comment: true },
+          order: orderOption,
+          relations: {
+            user: true,
+            like: true,
+            comment: true,
+            data: category === PostCategory.DATA ? { postFile: true } : false,
+          },
           where: {
             category,
             title: search ? Like(`%${search}%`) : undefined,
@@ -219,9 +238,6 @@ export class PostService {
         };
       }
       let [posts, count] = await this.post.findAndCount(options);
-      posts = posts.map((post) => {
-        return post;
-      });
       if (!all) {
         posts = posts.map((post) => {
           return {

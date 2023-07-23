@@ -10,6 +10,7 @@ import { FileInterceptor } from '@nestjs/platform-express/multer';
 import * as AWS from 'aws-sdk';
 import { ConfigService } from '@nestjs/config';
 import { UploadInput } from './uploads.dto';
+import { v4 as uuidv4 } from 'uuid';
 
 @Controller('uploads')
 export class UploadsController {
@@ -26,9 +27,7 @@ export class UploadsController {
     });
     try {
       const hasCustomPath = uploadInput && uploadInput.path;
-      const objectName = `${
-        (uploadInput.id + '_' || '') + Date.now() + '_' + file.originalname
-      }`;
+      const objectName = `${uuidv4() + '_' + Date.now()}`;
       const Key = hasCustomPath
         ? uploadInput.path + '/' + objectName
         : objectName;
@@ -77,9 +76,7 @@ export class UploadsController {
     });
     try {
       const hasCustomPath = uploadInput && uploadInput.path;
-      const objectName = `${
-        (uploadInput.id + '_' || '') + Date.now() + '_' + file.originalname
-      }`;
+      const objectName = `${uuidv4() + Date.now()}`;
       const Key = hasCustomPath
         ? uploadInput.path + '/' + objectName
         : objectName;
@@ -93,7 +90,6 @@ export class UploadsController {
           ContentType: file.mimetype,
         })
         .promise();
-
       const url = hasCustomPath
         ? `${this.configService.get('CLOUD_FRONT_DOMAIN')}/${
             uploadInput.path

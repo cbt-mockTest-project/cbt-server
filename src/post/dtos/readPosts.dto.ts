@@ -1,6 +1,21 @@
 import { CoreOutput } from './../../common/dtos/output.dto';
 import { Post, PostCategory } from './../entities/post.entity';
-import { Field, InputType, ObjectType } from '@nestjs/graphql';
+import {
+  Field,
+  InputType,
+  ObjectType,
+  registerEnumType,
+} from '@nestjs/graphql';
+
+export enum PostOrderType {
+  createdAt = 'createdAt',
+  like = 'like',
+}
+
+registerEnumType(PostOrderType, {
+  name: 'PostOrderType',
+  description: 'Order by criteria for posts',
+});
 
 @InputType()
 export class ReadPostsInput {
@@ -14,6 +29,8 @@ export class ReadPostsInput {
   all: boolean;
   @Field(() => String, { nullable: true })
   search?: string;
+  @Field(() => PostOrderType, { defaultValue: PostOrderType.createdAt })
+  order: PostOrderType;
 }
 
 @ObjectType()

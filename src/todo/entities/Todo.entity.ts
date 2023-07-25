@@ -24,7 +24,7 @@ export class Todo extends CoreEntity {
   @Field(() => String)
   dateString: string;
 
-  @ManyToOne(() => User, (user) => user.todos)
+  @ManyToOne(() => User, (user) => user.todos, { onDelete: 'CASCADE' })
   @Field(() => User)
   user: User;
 }

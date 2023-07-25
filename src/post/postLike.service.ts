@@ -19,8 +19,11 @@ export class PostLikeService {
     editPostLikeInput: EditPostLikeInput,
     user: User,
   ): Promise<EditPostLikeOutput> {
+    const queryRunner = this.postLike.manager.connection.createQueryRunner();
     try {
       const { postId } = editPostLikeInput;
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
       const post = await this.post.findOne({
         where: {
           id: postId,
@@ -43,7 +46,16 @@ export class PostLikeService {
         },
       });
       if (prevLike) {
-        await this.postLike.delete({ id: prevLike.id });
+        await queryRunner.manager.delete(PostLike, {
+          id: prevLike.id,
+        });
+        await queryRunner.manager.decrement(
+          Post,
+          { id: postId },
+          'likesCount',
+          1,
+        );
+        await queryRunner.commitTransaction();
         return {
           ok: true,
           currentState: false,
@@ -53,17 +65,26 @@ export class PostLikeService {
         user,
         post,
       });
-      await this.postLike.save(newLike);
+      await queryRunner.manager.save(newLike);
+      await queryRunner.manager.increment(
+        Post,
+        { id: postId },
+        'likesCount',
+        1,
+      );
+      await queryRunner.commitTransaction();
       return {
         ok: true,
         currentState: true,
       };
     } catch (e) {
-      console.log(e);
+      await queryRunner.rollbackTransaction();
       return {
         ok: false,
         error: '좋아요 요청에 실패했습니다.',
       };
+    } finally {
+      await queryRunner.release();
     }
   }
 }

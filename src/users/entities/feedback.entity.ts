@@ -11,9 +11,7 @@ export class Feedback extends CoreEntity {
   @Field(() => String)
   content: string;
 
-  @ManyToOne(() => User, (user) => user.feedback, {
-    onDelete: 'SET NULL',
-  })
+  @ManyToOne(() => User, (user) => user.feedback, { onDelete: 'CASCADE' })
   @Field(() => User)
   user: User;
 }

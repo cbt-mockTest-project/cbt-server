@@ -38,6 +38,8 @@ import { Payment } from 'src/payments/entities/payment.entity';
 import { UserAndRole } from './userAndRole.entity';
 import { Attendance } from 'src/attendance/entities/attendance.entity';
 import { Todo } from 'src/todo/entities/Todo.entity';
+import { PostData } from 'src/post/entities/postData.entity';
+import { PostFile } from 'src/post/entities/postFile.entity';
 
 export enum UserRole {
   CLIENT = 'CLIENT',
@@ -130,6 +132,14 @@ export class User extends CoreEntity {
   @OneToMany(() => PostComment, (postComment) => postComment.user)
   @Field(() => [PostComment])
   postComment: PostComment[];
+
+  @OneToMany(() => PostData, (postData) => postData.user)
+  @Field(() => [PostData])
+  postData: PostData[];
+
+  @OneToMany(() => PostFile, (postFile) => postFile.user)
+  @Field(() => [PostFile])
+  postFile: PostFile[];
 
   @OneToMany(
     () => MockExamQuestionCommentLike,

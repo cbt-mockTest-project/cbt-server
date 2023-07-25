@@ -1,5 +1,4 @@
 import { UserModule } from 'src/users/user.module';
-import { NoticeService } from './../users/notice.service';
 import { PostCommentLikeService } from './postCommentLike.service';
 import { PostCommentResolver } from './postComment.resolver';
 import { PostCommentSerivce } from './postComment.service';
@@ -15,6 +14,8 @@ import { PostResolver } from './post.resolver';
 import { PostCommentLike } from './entities/postCommentLike.entity';
 import { PostCommentLikeResolver } from './postCommentLike.resolver';
 import { Notice } from 'src/users/entities/notice.entity';
+import { PostData } from './entities/postData.entity';
+import { PostFile } from './entities/postFile.entity';
 
 @Module({
   imports: [
@@ -22,6 +23,8 @@ import { Notice } from 'src/users/entities/notice.entity';
       Post,
       PostComment,
       PostCommentLike,
+      PostData,
+      PostFile,
       PostLike,
       Notice,
     ]),

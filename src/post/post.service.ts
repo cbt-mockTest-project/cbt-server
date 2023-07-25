@@ -4,20 +4,30 @@ import { PostComment } from './entities/postComment.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
-import { FindManyOptions, Like, Repository } from 'typeorm';
+import { FindManyOptions, FindOptionsOrder, Like, Repository } from 'typeorm';
 import { CreatePostInput, CreatePostOutput } from './dtos/createPost.dto';
 import { DeletePostInput, DeletePostOutput } from './dtos/deletePost.dto';
 import { EditPostInput, EditPostOutput } from './dtos/editPost.dto';
 import { ReadPostInput, ReadPostOutput } from './dtos/readPost.dto';
-import { ReadPostsInput, ReadPostsOutput } from './dtos/readPosts.dto';
+import {
+  PostOrderType,
+  ReadPostsInput,
+  ReadPostsOutput,
+} from './dtos/readPosts.dto';
 import { ViewPostInput, ViewPostOutput } from './dtos/viewPost.dto';
-import { Post } from './entities/post.entity';
+import { Post, PostCategory } from './entities/post.entity';
+import { PostData } from './entities/postData.entity';
+import { PostFile } from './entities/postFile.entity';
 
 @Injectable()
 export class PostService {
   constructor(
     @InjectRepository(Post)
     private readonly post: Repository<Post>,
+    @InjectRepository(PostData)
+    private readonly postData: Repository<PostData>,
+    @InjectRepository(PostFile)
+    private readonly postFile: Repository<PostFile>,
     private readonly revalidateService: RevalidateService,
   ) {}
 
@@ -25,23 +35,65 @@ export class PostService {
     createPostInput: CreatePostInput,
     user: User,
   ): Promise<CreatePostOutput> {
+    const queryRunner = this.post.manager.connection.createQueryRunner();
     try {
-      const { content, title, category } = createPostInput;
-      if (content && title && user) {
-        const post = this.post.create({ content, title, user, category });
-        await this.post.save(post);
+      const { content, title, category, data } = createPostInput;
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+
+      if (data) {
+        const postData = await queryRunner.manager.save(
+          this.postData.create({
+            user,
+            price: data.price,
+          }),
+        );
+        await queryRunner.manager.save(
+          this.postFile.create({
+            name: data.fileName,
+            url: data.fileUrl,
+            page: data.filePage,
+            postData,
+            user,
+          }),
+        );
+        const post = await queryRunner.manager.save(
+          this.post.create({
+            content,
+            title,
+            user,
+            category,
+            data: postData,
+          }),
+        );
+        await queryRunner.commitTransaction();
         await this.revalidateService.revalidate({
           path: `/post/${post.id}`,
         });
+        return {
+          ok: true,
+          postId: post.id,
+        };
       }
+
+      const post = this.post.create({ content, title, user, category });
+      await queryRunner.manager.save(post);
+      await this.revalidateService.revalidate({
+        path: `/post/${post.id}`,
+      });
+      await queryRunner.commitTransaction();
       return {
+        postId: post.id,
         ok: true,
       };
     } catch {
+      await queryRunner.rollbackTransaction();
       return {
         ok: false,
         error: '게시글 작성에 실패했습니다.',
       };
+    } finally {
+      await queryRunner.release();
     }
   }
 
@@ -49,10 +101,19 @@ export class PostService {
     editPostInput: EditPostInput,
     user: User,
   ): Promise<EditPostOutput> {
+    const queryRunner = this.post.manager.connection.createQueryRunner();
     try {
-      const { title, content, id } = editPostInput;
+      const { title, content, id, data } = editPostInput;
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+
       const prevPost = await this.post.findOne({
         where: { id, user: { id: user.id } },
+        relations: {
+          data: {
+            postFile: true,
+          },
+        },
       });
       if (!prevPost) {
         return {
@@ -60,13 +121,49 @@ export class PostService {
           error: '존재하지 않는 게시글입니다.',
         };
       }
+      if (data) {
+        await queryRunner.manager.update(
+          PostData,
+          { id: prevPost.data.id },
+          {
+            price: data.price,
+          },
+        );
+        await queryRunner.manager.update(
+          PostFile,
+          {
+            id: prevPost.data.postFile[0].id,
+          },
+          {
+            name: data.fileName,
+            url: data.fileUrl,
+            page: data.filePage,
+            user,
+          },
+        );
+        await queryRunner.manager.update(
+          Post,
+          { id },
+          {
+            content,
+            title,
+            user,
+          },
+        );
+        await queryRunner.commitTransaction();
+        this.revalidateService.revalidate({
+          path: `/post/${id}`,
+        });
+        return { ok: true };
+      }
       const savedPost = await this.post.save({
         title: title,
         content: content,
         id,
       });
-      await this.revalidateService.revalidate({
-        path: `/post/${savedPost.id}`,
+      await queryRunner.commitTransaction();
+      this.revalidateService.revalidate({
+        path: `/post/${id}`,
       });
       return { ok: true, title: savedPost.title, content: savedPost.content };
     } catch (e) {
@@ -75,6 +172,8 @@ export class PostService {
         ok: false,
         error: '게시글 수정에 실패했습니다.',
       };
+    } finally {
+      await queryRunner.release();
     }
   }
 
@@ -117,6 +216,7 @@ export class PostService {
           user: true,
           like: { user: true },
           comment: { user: true, commentLike: { user: true } },
+          data: { postFile: true },
         },
       });
       if (!post) {
@@ -157,17 +257,27 @@ export class PostService {
 
   async readPosts(readPostsInput: ReadPostsInput): Promise<ReadPostsOutput> {
     try {
-      const { page, limit, category, all, search } = readPostsInput;
+      const { page, limit, category, all, search, order } = readPostsInput;
       const skip = (page - 1) * limit;
       let options: FindManyOptions<Post> = {
         relations: { user: true, like: true, comment: true },
       };
       if (!all) {
+        const orderOption: FindOptionsOrder<Post> = { priority: 'DESC' };
+        if (order === PostOrderType.like) {
+          orderOption.likesCount = 'DESC';
+        }
+        orderOption.created_at = 'DESC';
         options = {
           skip,
           take: limit,
-          order: { priority: 'DESC', created_at: 'DESC' },
-          relations: { user: true, like: true, comment: true },
+          order: orderOption,
+          relations: {
+            user: true,
+            like: true,
+            comment: true,
+            data: category === PostCategory.DATA ? { postFile: true } : false,
+          },
           where: {
             category,
             title: search ? Like(`%${search}%`) : undefined,
@@ -176,9 +286,6 @@ export class PostService {
         };
       }
       let [posts, count] = await this.post.findAndCount(options);
-      posts = posts.map((post) => {
-        return post;
-      });
       if (!all) {
         posts = posts.map((post) => {
           return {

@@ -17,6 +17,8 @@ export class QuestionCardCategory extends CoreEntity {
   name: string;
 
   @Field(() => User)
-  @ManyToOne(() => User, (user) => user.questionCardCategorys)
+  @ManyToOne(() => User, (user) => user.questionCardCategorys, {
+    onDelete: 'CASCADE',
+  })
   user: User;
 }

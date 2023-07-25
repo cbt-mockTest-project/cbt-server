@@ -12,7 +12,7 @@ export class UserAndRole extends CoreEntity {
   @Field(() => Role)
   role: Role;
 
-  @ManyToOne(() => User, (user) => user.userRoles)
+  @ManyToOne(() => User, (user) => user.userRoles, { onDelete: 'CASCADE' })
   @Field(() => User)
   user: User;
 }

@@ -55,7 +55,7 @@ export class MockExamCategory extends CoreEntity {
   approved: boolean;
 
   @ManyToOne(() => User, (user) => user.mockExamCategory, {
-    onDelete: 'SET NULL',
+    onDelete: 'CASCADE',
   })
   @Field(() => User)
   user: User;

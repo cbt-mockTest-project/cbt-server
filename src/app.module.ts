@@ -73,6 +73,8 @@ import { ZepPost } from './zep/entities/zepPost.entity';
 import { Chat } from './chat/entities/chat.entity';
 import { TodoModule } from './todo/todo.module';
 import { Todo } from './todo/entities/Todo.entity';
+import { PostFile } from './post/entities/postFile.entity';
+import { PostData } from './post/entities/postData.entity';
 
 @Module({
   imports: [
@@ -180,6 +182,8 @@ import { Todo } from './todo/entities/Todo.entity';
         ZepComment,
         Chat,
         Todo,
+        PostFile,
+        PostData,
       ],
     }),
     UserModule,

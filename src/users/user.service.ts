@@ -73,6 +73,10 @@ import { CreateFreeTrialRoleOutput } from './dtos/createFreeTrialRole.dto';
 import * as momentTimezone from 'moment-timezone';
 import { ClearFreeTrialRoleOutput } from './dtos/clearFreeTrialRole.dto';
 import { GetRoleCountInput, GetRoleCountOutput } from './dtos/getRoleCount';
+import {
+  GetUserByNicknameOrEmailInput,
+  GetUserByNicknameOrEmailOutput,
+} from './dtos/getUserByNicknameOrEmail.dto';
 @Injectable()
 export class UserService {
   constructor(
@@ -756,6 +760,36 @@ export class UserService {
       ok: true,
       token,
     };
+  }
+  async getUserByNicknamOrEmail(
+    getUserByNicknameOrEmailInput: GetUserByNicknameOrEmailInput,
+  ): Promise<GetUserByNicknameOrEmailOutput> {
+    try {
+      const { keyword } = getUserByNicknameOrEmailInput;
+      const user = await this.users.findOne({
+        where: [
+          {
+            nickname: keyword,
+          },
+          { email: keyword },
+        ],
+      });
+      if (!user) {
+        return {
+          ok: false,
+          error: '유저를 찾을 수 없습니다.',
+        };
+      }
+      return {
+        ok: true,
+        user,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '유저를 찾을 수 없습니다.',
+      };
+    }
   }
 
   async searchUser(

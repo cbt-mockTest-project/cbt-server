@@ -54,6 +54,7 @@ export class Post extends CoreEntity {
 
   @ManyToOne(() => PostData, (postData) => postData.post, {
     nullable: true,
+    onDelete: 'SET NULL',
   })
   @Field(() => PostData, { nullable: true })
   data: PostData;

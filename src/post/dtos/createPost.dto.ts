@@ -3,7 +3,7 @@ import { Post, PostCategory } from './../entities/post.entity';
 import { Field, InputType, ObjectType, PickType } from '@nestjs/graphql';
 
 @InputType()
-class PostDataInput {
+export class PostDataInput {
   @Field(() => Number, { defaultValue: 0 })
   price: number;
   @Field(() => String, { defaultValue: '' })

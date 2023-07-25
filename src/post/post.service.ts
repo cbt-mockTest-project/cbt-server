@@ -67,6 +67,9 @@ export class PostService {
           }),
         );
         await queryRunner.commitTransaction();
+        await this.revalidateService.revalidate({
+          path: `/post/${post.id}`,
+        });
         return {
           ok: true,
           postId: post.id,
@@ -98,10 +101,19 @@ export class PostService {
     editPostInput: EditPostInput,
     user: User,
   ): Promise<EditPostOutput> {
+    const queryRunner = this.post.manager.connection.createQueryRunner();
     try {
-      const { title, content, id } = editPostInput;
+      const { title, content, id, data } = editPostInput;
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+
       const prevPost = await this.post.findOne({
         where: { id, user: { id: user.id } },
+        relations: {
+          data: {
+            postFile: true,
+          },
+        },
       });
       if (!prevPost) {
         return {
@@ -109,13 +121,49 @@ export class PostService {
           error: '존재하지 않는 게시글입니다.',
         };
       }
+      if (data) {
+        await queryRunner.manager.update(
+          PostData,
+          { id: prevPost.data.id },
+          {
+            price: data.price,
+          },
+        );
+        await queryRunner.manager.update(
+          PostFile,
+          {
+            id: prevPost.data.postFile[0].id,
+          },
+          {
+            name: data.fileName,
+            url: data.fileUrl,
+            page: data.filePage,
+            user,
+          },
+        );
+        await queryRunner.manager.update(
+          Post,
+          { id },
+          {
+            content,
+            title,
+            user,
+          },
+        );
+        await queryRunner.commitTransaction();
+        this.revalidateService.revalidate({
+          path: `/post/${id}`,
+        });
+        return { ok: true };
+      }
       const savedPost = await this.post.save({
         title: title,
         content: content,
         id,
       });
-      await this.revalidateService.revalidate({
-        path: `/post/${savedPost.id}`,
+      await queryRunner.commitTransaction();
+      this.revalidateService.revalidate({
+        path: `/post/${id}`,
       });
       return { ok: true, title: savedPost.title, content: savedPost.content };
     } catch (e) {
@@ -124,6 +172,8 @@ export class PostService {
         ok: false,
         error: '게시글 수정에 실패했습니다.',
       };
+    } finally {
+      await queryRunner.release();
     }
   }
 

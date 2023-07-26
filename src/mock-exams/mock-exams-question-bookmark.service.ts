@@ -14,6 +14,7 @@ import {
   ReadMockExamQuestionBookmarkOutput,
 } from './dtos/readMockExamQuestionBookmark.dto';
 import { ReadExamTitleAndIdOfBookmarkedQuestionOutput } from './dtos/readExamTitleAndIdOfBookmarkedQuestion.dto';
+import { CoreOutput } from 'src/common/dtos/output.dto';
 @Injectable()
 export class MockExamQuestionBookmarkSerivce {
   constructor(
@@ -129,6 +130,20 @@ export class MockExamQuestionBookmarkSerivce {
       return { ok: true, titleAndId };
     } catch {
       return { ok: false, error: '시험 리스트를 불러올 수 없습니다.' };
+    }
+  }
+
+  async resetMyQuestionBookmark(user: User): Promise<CoreOutput> {
+    try {
+      await this.mockExamQuestionBookmark.delete({ user: { id: user.id } });
+      return {
+        ok: true,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '북마크를 초기화할 수 없습니다.',
+      };
     }
   }
 }

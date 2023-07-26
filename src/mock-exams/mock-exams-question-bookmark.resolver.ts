@@ -13,6 +13,7 @@ import {
   ReadMockExamQuestionBookmarkInput,
 } from './dtos/readMockExamQuestionBookmark.dto';
 import { ReadExamTitleAndIdOfBookmarkedQuestionOutput } from './dtos/readExamTitleAndIdOfBookmarkedQuestion.dto';
+import { CoreOutput } from 'src/common/dtos/output.dto';
 
 @Resolver(() => MockExamQuestionBookmark)
 export class MockExamQuestionBookmarkResolver {
@@ -56,5 +57,11 @@ export class MockExamQuestionBookmarkResolver {
     return this.mockExamQuestionBookmarkSerivce.readExamTitleAndIdOfBookmarkedQuestion(
       user,
     );
+  }
+
+  @Mutation(() => CoreOutput)
+  @Role(['ANY'])
+  async resetMyQuestionBookmark(@AuthUser() user: User): Promise<CoreOutput> {
+    return this.mockExamQuestionBookmarkSerivce.resetMyQuestionBookmark(user);
   }
 }

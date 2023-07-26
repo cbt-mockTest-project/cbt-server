@@ -244,4 +244,20 @@ export class MockExamQuestionStateService {
       ok: true,
     };
   }
+
+  async restMyAllQuestionStates(user: User): Promise<CoreOutput> {
+    try {
+      await this.mockExamQuestionState.delete({
+        user: { id: user.id },
+      });
+      return {
+        ok: true,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '성취도를 초기화 할 수 없습니다.',
+      };
+    }
+  }
 }

@@ -13,6 +13,7 @@ import { MockExamQuestion } from './mock-exam-question.entity';
 import { MockExamQuestionState } from './mock-exam-question-state.entity';
 import { IsEnum } from 'class-validator';
 import { MockExamHistory } from './mock-exam-history';
+import { ExamViewer } from 'src/exam-viewer/entities/exam-viewer.entity';
 
 export enum ExamStatus {
   UNSET = 'UNSET',
@@ -80,6 +81,12 @@ export class MockExam extends CoreEntity {
     onDelete: 'SET NULL',
   })
   examCoAuthor: ExamCoAuthor[];
+
+  @Field(() => [ExamViewer], { nullable: true })
+  @OneToMany(() => ExamViewer, (examViewer) => examViewer.exam, {
+    onDelete: 'SET NULL',
+  })
+  examViewer: ExamViewer[];
 
   @ManyToOne(() => User, (user) => user.mockExam, {
     onDelete: 'SET NULL',

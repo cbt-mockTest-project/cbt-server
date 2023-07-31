@@ -75,6 +75,8 @@ import { TodoModule } from './todo/todo.module';
 import { Todo } from './todo/entities/Todo.entity';
 import { PostFile } from './post/entities/postFile.entity';
 import { PostData } from './post/entities/postData.entity';
+import { ExamViewer } from './exam-viewer/entities/exam-viewer.entity';
+import { ExamViewerModule } from './exam-viewer/exam-viewer.module';
 
 @Module({
   imports: [
@@ -99,7 +101,7 @@ import { PostData } from './post/entities/postData.entity';
       driver: ApolloDriver,
       installSubscriptionHandlers: true,
       autoSchemaFile: true,
-      sortSchema: true, // 스키마 사전순으로 정렬
+      sortSchema: true, //default: false
       formatError(error) {
         logger.error(
           `GraphQL Validation Error: ${JSON.stringify(error, null, 2)}`,
@@ -184,6 +186,7 @@ import { PostData } from './post/entities/postData.entity';
         Todo,
         PostFile,
         PostData,
+        ExamViewer,
       ],
     }),
     UserModule,
@@ -236,6 +239,7 @@ import { PostData } from './post/entities/postData.entity';
     VideoModule,
     PartnersModule,
     TodoModule,
+    ExamViewerModule,
   ],
   controllers: [],
   providers: [

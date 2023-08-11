@@ -16,6 +16,8 @@ export class ExamTitleAndId {
   status: ExamStatus;
   @Field(() => UserRole)
   role: UserRole;
+  @Field(() => Number)
+  order: number;
 }
 @InputType()
 export class ReadMockExamTitlesByCateoryInput extends PickType(

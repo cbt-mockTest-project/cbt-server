@@ -30,7 +30,10 @@ import {
   ReadMockExamTitlesByCateoryInput,
 } from './dtos/readMockExamTitlesByCateory.dto';
 import { AuthUser } from 'src/auth/auth-user.decorator';
-import { CoreOutput } from 'src/common/dtos/output.dto';
+import {
+  UpdateExamOrderInput,
+  UpdateExamOrderOutput,
+} from './dtos/updateExamOrder.dto';
 
 @Resolver(() => MockExam)
 export class MockExamResolver {
@@ -60,6 +63,15 @@ export class MockExamResolver {
     @Args('input') deleteMockExamInput: DeleteMockExamInput,
   ): Promise<DeleteMockExamOutput> {
     return this.mockExamService.deleteMockExam(user, deleteMockExamInput);
+  }
+
+  @Mutation(() => UpdateExamOrderOutput)
+  @Role(['ANY'])
+  updateExamOrder(
+    @AuthUser() user: User,
+    @Args('input') updateExamOrderInput: UpdateExamOrderInput,
+  ): Promise<UpdateExamOrderOutput> {
+    return this.mockExamService.updateExamOrder(user, updateExamOrderInput);
   }
 
   @Query(() => ReadAllMockExamsOutput)

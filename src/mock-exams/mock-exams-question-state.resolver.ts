@@ -78,4 +78,10 @@ export class MockExamQuestionStateResolver {
   ): Promise<CoreOutput> {
     return this.mockExamQuestionStateService.updateQuestionStatesToCore(user);
   }
+
+  @Mutation(() => CoreOutput)
+  @Role(['ANY'])
+  async restMyAllQuestionStates(@AuthUser() user: User): Promise<CoreOutput> {
+    return this.mockExamQuestionStateService.restMyAllQuestionStates(user);
+  }
 }

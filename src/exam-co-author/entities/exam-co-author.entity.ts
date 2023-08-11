@@ -10,7 +10,7 @@ import { MockExam } from 'src/mock-exams/entities/mock-exam.entity';
 @Entity()
 export class ExamCoAuthor extends CoreEntity {
   @Field(() => User)
-  @ManyToOne(() => User, (user) => user.examCoAuthor)
+  @ManyToOne(() => User, (user) => user.examCoAuthor, { onDelete: 'CASCADE' })
   user: User;
 
   @Field(() => MockExam)

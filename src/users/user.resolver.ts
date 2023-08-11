@@ -60,6 +60,10 @@ import {
 } from './dtos/deleteUserRole.dto';
 import { CreateFreeTrialRoleOutput } from './dtos/createFreeTrialRole.dto';
 import { GetRoleCountInput, GetRoleCountOutput } from './dtos/getRoleCount';
+import {
+  GetUserByNicknameOrEmailInput,
+  GetUserByNicknameOrEmailOutput,
+} from './dtos/getUserByNicknameOrEmail.dto';
 
 @Resolver(() => User)
 export class UserResolver {
@@ -261,5 +265,14 @@ export class UserResolver {
   @Query(() => GetRoleCountOutput)
   async getRoleCount(@Args('input') getRoleCountInput: GetRoleCountInput) {
     return this.userService.getRoleCount(getRoleCountInput);
+  }
+
+  @Query(() => GetUserByNicknameOrEmailOutput)
+  async getUserByNicknameOrEmail(
+    @Args('input') getUserByNicknameOrEmailInput: GetUserByNicknameOrEmailInput,
+  ): Promise<GetUserByNicknameOrEmailOutput> {
+    return this.userService.getUserByNicknamOrEmail(
+      getUserByNicknameOrEmailInput,
+    );
   }
 }

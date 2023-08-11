@@ -13,6 +13,8 @@ export class MockExamHistory extends CoreEntity {
   exam: MockExam;
 
   @Field(() => User)
-  @ManyToOne(() => User, (user) => user.mockExamHistory)
+  @ManyToOne(() => User, (user) => user.mockExamHistory, {
+    onDelete: 'CASCADE',
+  })
   user: User;
 }

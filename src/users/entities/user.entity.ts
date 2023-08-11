@@ -38,6 +38,9 @@ import { Payment } from 'src/payments/entities/payment.entity';
 import { UserAndRole } from './userAndRole.entity';
 import { Attendance } from 'src/attendance/entities/attendance.entity';
 import { Todo } from 'src/todo/entities/Todo.entity';
+import { PostData } from 'src/post/entities/postData.entity';
+import { PostFile } from 'src/post/entities/postFile.entity';
+import { ExamViewer } from 'src/exam-viewer/entities/exam-viewer.entity';
 
 export enum UserRole {
   CLIENT = 'CLIENT',
@@ -131,6 +134,14 @@ export class User extends CoreEntity {
   @Field(() => [PostComment])
   postComment: PostComment[];
 
+  @OneToMany(() => PostData, (postData) => postData.user)
+  @Field(() => [PostData])
+  postData: PostData[];
+
+  @OneToMany(() => PostFile, (postFile) => postFile.user)
+  @Field(() => [PostFile])
+  postFile: PostFile[];
+
   @OneToMany(
     () => MockExamQuestionCommentLike,
     (mockExamQuestionCommentLike) => mockExamQuestionCommentLike.user,
@@ -168,6 +179,10 @@ export class User extends CoreEntity {
   @OneToMany(() => ExamCoAuthor, (examCoAuthor) => examCoAuthor.user)
   @Field(() => [ExamCoAuthor], { nullable: true })
   examCoAuthor: ExamCoAuthor[];
+
+  @OneToMany(() => ExamViewer, (examViewer) => examViewer.user)
+  @Field(() => [ExamViewer], { nullable: true })
+  examViewer: ExamViewer[];
 
   @OneToMany(() => Attendance, (attendance) => attendance.user)
   @Field(() => [Attendance], { nullable: true })

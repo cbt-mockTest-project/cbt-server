@@ -19,6 +19,7 @@ import {
 import { IsEnum } from 'class-validator';
 import { Role } from 'src/users/entities/role.entity';
 import { Partner } from 'src/partners/entities/partners.entity';
+import { ExamViewer } from 'src/exam-viewer/entities/exam-viewer.entity';
 
 export enum MockExamCategoryTypes {
   written = 'written',
@@ -55,7 +56,7 @@ export class MockExamCategory extends CoreEntity {
   approved: boolean;
 
   @ManyToOne(() => User, (user) => user.mockExamCategory, {
-    onDelete: 'SET NULL',
+    onDelete: 'CASCADE',
   })
   @Field(() => User)
   user: User;
@@ -71,6 +72,12 @@ export class MockExamCategory extends CoreEntity {
     onDelete: 'SET NULL',
   })
   examCoAuthor: ExamCoAuthor[];
+
+  @Field(() => [ExamViewer], { nullable: true })
+  @OneToMany(() => ExamViewer, (examViewer) => examViewer.examCategory, {
+    onDelete: 'SET NULL',
+  })
+  examViewer: ExamViewer[];
 
   @ManyToMany(() => Role, (role) => role.mockExamCategories)
   @JoinTable({ name: 'ExamCategoryRole' })

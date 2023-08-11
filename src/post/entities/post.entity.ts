@@ -10,6 +10,7 @@ import { CoreEntity } from 'src/common/entities/core.entity';
 import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { IsEnum } from 'class-validator';
 import { PostLike } from './postLike.entity';
+import { PostData } from './postData.entity';
 
 export enum PostCategory {
   FREE = 'FREE', // 자유
@@ -18,6 +19,7 @@ export enum PostCategory {
   NOTICE = 'NOTICE', //공지
   CHECKIN = 'CHECKIN', //출석체크
   SUGGENSTION = 'SUGGENSTION', //건의사항
+  DATA = 'DATA', //자료실
 }
 
 registerEnumType(PostCategory, { name: 'PostCategory' });
@@ -50,6 +52,13 @@ export class Post extends CoreEntity {
   @Field(() => [PostLike])
   like: PostLike[];
 
+  @ManyToOne(() => PostData, (postData) => postData.post, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
+  @Field(() => PostData, { nullable: true })
+  data: PostData;
+
   @ManyToOne(() => User, (user) => user.post, {
     onDelete: 'CASCADE',
   })
@@ -71,6 +80,7 @@ export class Post extends CoreEntity {
   @Field(() => Boolean, { defaultValue: false })
   isHidden: boolean;
 
+  @Column({ default: 0 })
   @Field(() => Number, { defaultValue: 0 })
   likesCount?: number;
 

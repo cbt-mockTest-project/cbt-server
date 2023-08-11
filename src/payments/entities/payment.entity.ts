@@ -27,7 +27,7 @@ export class Payment extends CoreEntity {
   @Field(() => String, { nullable: true })
   receiptUrl: string;
 
-  @ManyToOne(() => User, (user) => user.payments)
+  @ManyToOne(() => User, (user) => user.payments, { onDelete: 'CASCADE' })
   @Field(() => User)
   user: User;
 }

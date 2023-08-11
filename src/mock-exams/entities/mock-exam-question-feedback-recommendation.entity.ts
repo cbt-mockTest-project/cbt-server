@@ -34,7 +34,9 @@ export class MockExamQuestionFeedbackRecommendation extends CoreEntity {
   feedback: MockExamQuestionFeedback;
 
   @Field(() => User)
-  @ManyToOne(() => User, (user) => user.feedbackRecommendation)
+  @ManyToOne(() => User, (user) => user.feedbackRecommendation, {
+    onDelete: 'CASCADE',
+  })
   user: User;
   @Column({
     type: 'enum',

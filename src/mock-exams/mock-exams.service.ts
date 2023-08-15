@@ -34,6 +34,10 @@ import {
   FindMyExamHistoryInput,
   TitleAndId,
 } from './dtos/findMyExamHistory.dto';
+import {
+  UpdateExamOrderInput,
+  UpdateExamOrderOutput,
+} from './dtos/updateExamOrder.dto';
 
 @Injectable()
 export class MockExamService {
@@ -79,6 +83,41 @@ export class MockExamService {
       ok: true,
       mockExam,
     };
+  }
+
+  async updateExamOrder(
+    user: User,
+    updateExamOrderInput: UpdateExamOrderInput,
+  ): Promise<UpdateExamOrderOutput> {
+    try {
+      const { examOrders } = updateExamOrderInput;
+      const examIds = examOrders.map((examOrder) => examOrder.examId);
+      const mockExams = await this.mockExam.find({
+        where: {
+          id: Raw((id) => `${id} IN (${examIds})`),
+          user: {
+            id: user.id,
+          },
+        },
+      });
+      const updatedMockExams = mockExams.map((mockExam) => {
+        const examOrder = examOrders.find(
+          (examOrder) => examOrder.examId === mockExam.id,
+        );
+        mockExam.order = examOrder.order;
+        return mockExam;
+      });
+      const savedMockExams = await this.mockExam.save(updatedMockExams);
+      return {
+        ok: true,
+        mockExams: savedMockExams,
+      };
+    } catch (e) {
+      return {
+        ok: false,
+        error: '순서 변경에 실패했습니다. 다시 시도해주세요.',
+      };
+    }
   }
 
   async editMockExam(
@@ -257,6 +296,7 @@ export class MockExamService {
             'mockExam.title',
             'mockExam.status',
             'mockExam.slug',
+            'mockExam.order',
             'user.role',
           ])
           .where('category.name = :name', { name })
@@ -285,9 +325,14 @@ export class MockExamService {
               'mockExam.title',
               'mockExam.status',
               'mockExam.slug',
+              'mockExam.order',
               'user.role',
             ])
             .where('category.name = :name', { name })
+            .orderBy({
+              'mockExam.order': 'ASC',
+              'mockExam.title': 'DESC',
+            })
             .getMany();
         } else {
           mockExamTitles = await this.mockExam
@@ -300,6 +345,7 @@ export class MockExamService {
               'mockExam.title',
               'mockExam.status',
               'mockExam.slug',
+              'mockExam.order',
               'user.role',
             ])
             .where('category.name = :name', { name })

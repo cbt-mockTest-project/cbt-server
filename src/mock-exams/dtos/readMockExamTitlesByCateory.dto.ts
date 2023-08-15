@@ -13,8 +13,6 @@ export class ExamTitleAndId {
   slug?: string;
   @Field(() => ExamStatus)
   status: ExamStatus;
-  @Field(() => UserRole)
-  role: UserRole;
   @Field(() => Number)
   order: number;
 }

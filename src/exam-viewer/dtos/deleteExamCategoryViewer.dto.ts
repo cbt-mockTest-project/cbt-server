@@ -7,6 +7,8 @@ export class DeleteExamCategoryViewerInput {
   examViewerId: number;
   @Field(() => Number)
   categoryId: number;
+  @Field(() => String, { defaultValue: 'author' })
+  executor?: 'author' | 'viewer';
 }
 
 @ObjectType()

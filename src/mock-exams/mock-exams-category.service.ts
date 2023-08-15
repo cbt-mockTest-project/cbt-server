@@ -23,6 +23,7 @@ import {
   ReadAllMockExamCategoriesInput,
   ReadAllMockExamCategoriesOutput,
 } from './dtos/readAllCategories.dto';
+import { ReadMyMockExamCategoriesInput } from './dtos/readMyMockExamCategories.dto';
 
 @Injectable()
 export class MockExamCategoryService {
@@ -188,22 +189,43 @@ export class MockExamCategoryService {
     }
   }
 
-  async readMyMockExamCategories(user: User) {
+  async readMyMockExamCategories(
+    user: User,
+    readMyMockExamCategoriesInput?: ReadMyMockExamCategoriesInput,
+  ) {
     try {
+      const { type } = readMyMockExamCategoriesInput;
+      if (!user) {
+        return {
+          ok: true,
+          categories: [],
+        };
+      }
       let categories: MockExamCategory[] = [];
       if (user.role === UserRole.ADMIN) {
         categories = await this.mockExamCategories
           .createQueryBuilder('mockExamCategory')
           .getMany();
       } else {
-        categories = await this.mockExamCategories
+        const queryBuilder = this.mockExamCategories
           .createQueryBuilder('mockExamCategory')
           .leftJoinAndSelect('mockExamCategory.examCoAuthor', 'examCoAuthor')
+          .leftJoinAndSelect('mockExamCategory.examViewer', 'examViewer')
           .orWhere('mockExamCategory.user.id = :userId', { userId: user.id })
           .orWhere('examCoAuthor.user.id = :examCoAuthorId', {
             examCoAuthorId: user.id,
-          })
-          .getMany();
+          });
+
+        if (type !== 'author') {
+          queryBuilder.orWhere(
+            'examViewer.user.id = :examViewerId AND examViewer.isApprove = :isApprove',
+            {
+              examViewerId: user.id,
+              isApprove: true,
+            },
+          );
+        }
+        categories = await queryBuilder.getMany();
       }
       return {
         ok: true,

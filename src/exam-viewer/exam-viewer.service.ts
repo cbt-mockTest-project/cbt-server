@@ -18,10 +18,10 @@ import {
   DeleteExamCategoryViewerOutput,
 } from './dtos/deleteExamCategoryViewer.dto';
 import {
-  UpdateExamViewerArroveStateInput,
-  UpdateExamViewerArroveStateOutput,
-} from './dtos/updateExamViewerArroveState.dto';
-import { GetMyExamViewersOutput } from './dtos/getMyExamViewers.dto';
+  UpdateExamViewerApproveStateInput,
+  UpdateExamViewerApproveStateOutput,
+} from './dtos/updateExamViewerApproveState.dto';
+import { GetInvitedExamsOutput } from './dtos/getInvitedExams.dto';
 
 @Injectable()
 export class ExamViewerService {
@@ -36,12 +36,12 @@ export class ExamViewerService {
     private readonly user: Repository<User>,
   ) {}
 
-  async updateExamViewerArroveState(
+  async updateExamViewerApproveState(
     user: User,
-    updateExamViewerArroveStateInput: UpdateExamViewerArroveStateInput,
-  ): Promise<UpdateExamViewerArroveStateOutput> {
+    updateExamViewerApproveStateInput: UpdateExamViewerApproveStateInput,
+  ): Promise<UpdateExamViewerApproveStateOutput> {
     try {
-      const { examViewerId } = updateExamViewerArroveStateInput;
+      const { examViewerId } = updateExamViewerApproveStateInput;
       const examViewer = await this.examViewer.findOne({
         where: {
           id: examViewerId,
@@ -56,9 +56,8 @@ export class ExamViewerService {
           error: '등록되지 않은 유저입니다.',
         };
       }
-      await this.examViewer.save({
-        ...examViewer,
-        isApproved: !examViewer.isApprove,
+      await this.examViewer.update(examViewerId, {
+        isApprove: true,
       });
       return {
         ok: true,
@@ -71,7 +70,7 @@ export class ExamViewerService {
     }
   }
 
-  async getMyExamViewers(user: User): Promise<GetMyExamViewersOutput> {
+  async getInvitedExams(user: User): Promise<GetInvitedExamsOutput> {
     try {
       const examViewers = await this.examViewer.find({
         where: {
@@ -80,7 +79,9 @@ export class ExamViewerService {
           },
         },
         relations: {
-          examCategory: true,
+          examCategory: {
+            user: true,
+          },
         },
       });
       return {
@@ -138,23 +139,42 @@ export class ExamViewerService {
     deleteExamCategoryViewrInput: DeleteExamCategoryViewerInput,
   ): Promise<DeleteExamCategoryViewerOutput> {
     try {
-      const { examViewerId, categoryId } = deleteExamCategoryViewrInput;
-      const examCategory = await this.mockExamCategory.findOne({
-        where: {
-          id: categoryId,
-          user: {
-            id: user.id,
+      const { examViewerId, categoryId, executor } =
+        deleteExamCategoryViewrInput;
+      if (executor === 'viewer') {
+        const examViewer = await this.examViewer.findOne({
+          where: {
+            id: examViewerId,
+            user: {
+              id: user.id,
+            },
           },
-        },
-        relations: {
-          examViewer: true,
-        },
-      });
-      if (!examCategory) {
-        return {
-          ok: false,
-          error: '권한이 없습니다.',
-        };
+        });
+        if (!examViewer) {
+          return {
+            ok: false,
+            error: '권한이 없습니다.',
+          };
+        }
+      }
+      if (executor === 'author') {
+        const examCategory = await this.mockExamCategory.findOne({
+          where: {
+            id: categoryId,
+            user: {
+              id: user.id,
+            },
+          },
+          relations: {
+            examViewer: true,
+          },
+        });
+        if (!examCategory) {
+          return {
+            ok: false,
+            error: '권한이 없습니다.',
+          };
+        }
       }
       await this.examViewer.delete({
         id: examViewerId,
@@ -165,7 +185,7 @@ export class ExamViewerService {
     } catch (e) {
       return {
         ok: false,
-        error: '카테고리를 삭제할 수 없습니다.',
+        error: '뷰어 권한을 삭제할 수 없습니다.',
       };
     }
   }

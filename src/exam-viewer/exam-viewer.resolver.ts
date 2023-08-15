@@ -17,9 +17,10 @@ import {
   DeleteExamCategoryViewerOutput,
 } from './dtos/deleteExamCategoryViewer.dto';
 import {
-  UpdateExamViewerArroveStateInput,
-  UpdateExamViewerArroveStateOutput,
-} from './dtos/updateExamViewerArroveState.dto';
+  UpdateExamViewerApproveStateInput,
+  UpdateExamViewerApproveStateOutput,
+} from './dtos/updateExamViewerApproveState.dto';
+import { GetInvitedExamsOutput } from './dtos/getInvitedExams.dto';
 
 @Resolver(() => ExamViewer)
 export class ExamViewerResolver {
@@ -62,15 +63,21 @@ export class ExamViewerResolver {
   }
 
   @Role(['ANY'])
-  @Mutation(() => UpdateExamViewerArroveStateOutput)
-  async updateExamViewerArroveState(
+  @Mutation(() => UpdateExamViewerApproveStateOutput)
+  async updateExamViewerApproveState(
     @AuthUser() user: User,
     @Args('input')
-    updateExamViewerArroveStateInput: UpdateExamViewerArroveStateInput,
+    updateExamViewerApproveStateInput: UpdateExamViewerApproveStateInput,
   ) {
-    return this.examViewerService.updateExamViewerArroveState(
+    return this.examViewerService.updateExamViewerApproveState(
       user,
-      updateExamViewerArroveStateInput,
+      updateExamViewerApproveStateInput,
     );
+  }
+
+  @Role(['ANY'])
+  @Query(() => GetInvitedExamsOutput)
+  async getInvitedExams(@AuthUser() user: User) {
+    return this.examViewerService.getInvitedExams(user);
   }
 }

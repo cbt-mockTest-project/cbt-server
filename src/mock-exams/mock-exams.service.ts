@@ -363,6 +363,26 @@ export class MockExamService {
               'mockExam.title': 'DESC',
             })
             .getMany();
+          const invitedExamCategory = await this.mockExamCategory.findOne({
+            where: {
+              name,
+              examViewer: {
+                user: {
+                  id: user.id,
+                },
+                isApprove: true,
+              },
+            },
+            relations: {
+              mockExam: true,
+            },
+          });
+          if (invitedExamCategory) {
+            mockExamTitles = [
+              ...mockExamTitles,
+              ...invitedExamCategory.mockExam,
+            ];
+          }
         }
       }
       if (!mockExamTitles) {
@@ -371,12 +391,8 @@ export class MockExamService {
           error: '해당 카테고리에 맞는 시험이 존재하지 않습니다.',
         };
       }
-      const titles: ExamTitleAndId[] = mockExamTitles.map((el) => ({
-        ...el,
-        role: el.user.role,
-      }));
       return {
-        titles,
+        titles: mockExamTitles,
         ok: true,
       };
     } catch (e) {

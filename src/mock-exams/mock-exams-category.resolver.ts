@@ -1,4 +1,7 @@
-import { ReadMyMockExamCategoriesOutput } from './dtos/readMyMockExamCategories.dto';
+import {
+  ReadMyMockExamCategoriesInput,
+  ReadMyMockExamCategoriesOutput,
+} from './dtos/readMyMockExamCategories.dto';
 import { User } from 'src/users/entities/user.entity';
 import {
   ReadAllMockExamCategoriesInput,
@@ -74,11 +77,18 @@ export class MockExamCategoryResolver {
     );
   }
 
-  @Role(['ANY'])
   @Query(() => ReadMyMockExamCategoriesOutput)
   readMyMockExamCategories(
     @AuthUser() user: User,
+    @Args('input', { nullable: true })
+    readMyMockExamCategoriesInput?: ReadMyMockExamCategoriesInput,
   ): Promise<ReadMyMockExamCategoriesOutput> {
-    return this.mockExamCategoryService.readMyMockExamCategories(user);
+    console.log(readMyMockExamCategoriesInput);
+    return this.mockExamCategoryService.readMyMockExamCategories(
+      user,
+      readMyMockExamCategoriesInput || {
+        type: 'author',
+      },
+    );
   }
 }

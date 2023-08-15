@@ -74,7 +74,6 @@ export class MockExamCategoryResolver {
     );
   }
 
-  @Role(['ANY'])
   @Query(() => ReadMyMockExamCategoriesOutput)
   readMyMockExamCategories(
     @AuthUser() user: User,

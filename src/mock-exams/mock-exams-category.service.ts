@@ -190,6 +190,12 @@ export class MockExamCategoryService {
 
   async readMyMockExamCategories(user: User) {
     try {
+      if (!user) {
+        return {
+          ok: true,
+          categories: [],
+        };
+      }
       let categories: MockExamCategory[] = [];
       if (user.role === UserRole.ADMIN) {
         categories = await this.mockExamCategories
@@ -199,10 +205,18 @@ export class MockExamCategoryService {
         categories = await this.mockExamCategories
           .createQueryBuilder('mockExamCategory')
           .leftJoinAndSelect('mockExamCategory.examCoAuthor', 'examCoAuthor')
+          .leftJoinAndSelect('mockExamCategory.examViewer', 'examViewer')
           .orWhere('mockExamCategory.user.id = :userId', { userId: user.id })
           .orWhere('examCoAuthor.user.id = :examCoAuthorId', {
             examCoAuthorId: user.id,
           })
+          .orWhere(
+            'examViewer.user.id = :examViewerId AND examViewer.isApprove = :isApprove',
+            {
+              examViewerId: user.id,
+              isApprove: true,
+            },
+          )
           .getMany();
       }
       return {

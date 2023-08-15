@@ -20,6 +20,7 @@ import {
   UpdateExamViewerArroveStateInput,
   UpdateExamViewerArroveStateOutput,
 } from './dtos/updateExamViewerArroveState.dto';
+import { GetInvitedExamsOutput } from './dtos/getInvitedExams.dto';
 
 @Resolver(() => ExamViewer)
 export class ExamViewerResolver {
@@ -72,5 +73,11 @@ export class ExamViewerResolver {
       user,
       updateExamViewerArroveStateInput,
     );
+  }
+
+  @Role(['ANY'])
+  @Query(() => GetInvitedExamsOutput)
+  async getInvitedExams(@AuthUser() user: User) {
+    return this.examViewerService.getInvitedExams(user);
   }
 }

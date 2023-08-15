@@ -1,4 +1,3 @@
-import { UserRole } from './../../users/entities/user.entity';
 import { CoreOutput } from 'src/common/dtos/output.dto';
 import { MockExamCategory } from '../entities/mock-exam-category.entity';
 import { Field, InputType, ObjectType, PickType } from '@nestjs/graphql';
@@ -14,8 +13,6 @@ export class ExamTitleAndId {
   slug?: string;
   @Field(() => ExamStatus)
   status: ExamStatus;
-  @Field(() => UserRole)
-  role: UserRole;
 }
 @InputType()
 export class ReadMockExamTitlesByCateoryInput extends PickType(

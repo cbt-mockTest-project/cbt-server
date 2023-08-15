@@ -21,7 +21,7 @@ import {
   UpdateExamViewerArroveStateInput,
   UpdateExamViewerArroveStateOutput,
 } from './dtos/updateExamViewerArroveState.dto';
-import { GetMyExamViewersOutput } from './dtos/getMyExamViewers.dto';
+import { GetInvitedExamsOutput } from './dtos/getInvitedExams.dto';
 
 @Injectable()
 export class ExamViewerService {
@@ -71,7 +71,7 @@ export class ExamViewerService {
     }
   }
 
-  async getMyExamViewers(user: User): Promise<GetMyExamViewersOutput> {
+  async getInvitedExams(user: User): Promise<GetInvitedExamsOutput> {
     try {
       const examViewers = await this.examViewer.find({
         where: {
@@ -80,7 +80,9 @@ export class ExamViewerService {
           },
         },
         relations: {
-          examCategory: true,
+          examCategory: {
+            user: true,
+          },
         },
       });
       return {

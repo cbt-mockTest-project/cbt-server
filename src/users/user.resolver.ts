@@ -64,6 +64,7 @@ import {
   GetUserByNicknameOrEmailInput,
   GetUserByNicknameOrEmailOutput,
 } from './dtos/getUserByNicknameOrEmail.dto';
+import { ProxyIp } from 'src/common/decorators/ip.decorator';
 
 @Resolver(() => User)
 export class UserResolver {
@@ -106,8 +107,8 @@ export class UserResolver {
   }
 
   @Query(() => MeOutput)
-  me(@AuthUser() user: User): Promise<MeOutput> {
-    return this.userService.me(user);
+  me(@AuthUser() user: User, @ProxyIp() ip: string): Promise<MeOutput> {
+    return this.userService.me(user, ip);
   }
 
   @Mutation(() => EmailVerificationOutput)

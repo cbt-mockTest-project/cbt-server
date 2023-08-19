@@ -24,6 +24,10 @@ import {
   ReadAllMockExamCategoriesOutput,
 } from './dtos/readAllCategories.dto';
 import { ReadMyMockExamCategoriesInput } from './dtos/readMyMockExamCategories.dto';
+import {
+  ReadMockExamCategoryByExamIdInput,
+  ReadMockExamCategoryByExamIdOutput,
+} from './dtos/readMockExamCategoryByExamId.dto';
 
 @Injectable()
 export class MockExamCategoryService {
@@ -187,6 +191,25 @@ export class MockExamCategoryService {
         error: '카테고리를 찾을 수 없습니다.',
       };
     }
+  }
+
+  async readMockExamCategoryByExamId(
+    readMockExamCategoryByExamIdInput: ReadMockExamCategoryByExamIdInput,
+  ): Promise<ReadMockExamCategoryByExamIdOutput> {
+    try {
+      const { examId } = readMockExamCategoryByExamIdInput;
+      const category = await this.mockExamCategories.findOne({
+        where: {
+          mockExam: {
+            id: examId,
+          },
+        },
+      });
+      return {
+        ok: true,
+        category,
+      };
+    } catch {}
   }
 
   async readMyMockExamCategories(

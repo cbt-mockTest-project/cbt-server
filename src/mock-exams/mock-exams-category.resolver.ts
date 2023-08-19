@@ -24,6 +24,10 @@ import {
   EditMockExamCategoryOutput,
 } from './dtos/editCategory.dto';
 import { AuthUser } from 'src/auth/auth-user.decorator';
+import {
+  ReadMockExamCategoryByExamIdInput,
+  ReadMockExamCategoryByExamIdOutput,
+} from './dtos/readMockExamCategoryByExamId.dto';
 
 @Resolver(() => MockExamCategory)
 export class MockExamCategoryResolver {
@@ -89,6 +93,16 @@ export class MockExamCategoryResolver {
       readMyMockExamCategoriesInput || {
         type: 'author',
       },
+    );
+  }
+
+  @Query(() => ReadMockExamCategoryByExamIdOutput)
+  readMockExamCategoryByExamId(
+    @Args('input')
+    readMockExamCategoryByExamIdInput: ReadMockExamCategoryByExamIdInput,
+  ): Promise<ReadMockExamCategoryByExamIdOutput> {
+    return this.mockExamCategoryService.readMockExamCategoryByExamId(
+      readMockExamCategoryByExamIdInput,
     );
   }
 }

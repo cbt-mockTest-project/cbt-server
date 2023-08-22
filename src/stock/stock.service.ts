@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Stock } from './entities/stock.entity';
 import * as xlsx from 'xlsx';
 import { SearchStockInput, SearchStockOutput } from './dtos/searchStock.dto.';
+import axios from 'axios';
 
 @Injectable()
 export class StockService {
@@ -44,9 +45,21 @@ export class StockService {
         error: '종목을 찾을 수 없습니다.',
       };
     }
+    const stockData = await axios.get(
+      `https://api.finance.naver.com/service/itemSummary.nhn?itemcode=${stock.code}`,
+    );
+    const stockInfo = {
+      종목명: stock.name,
+      시가총액: String(stockData.data.marketSum).substring(0, 3) + '억',
+      현재가: stockData.data.now.toLocaleString('ko-KR'),
+      상승률: stockData.data.rate + '%',
+      고가: stockData.data.high.toLocaleString('ko-KR'),
+      저가: stockData.data.low.toLocaleString('ko-KR'),
+      거래량: stockData.data.quant,
+    };
     return {
       ok: true,
-      code: stock.code,
+      ...stockInfo,
     };
   }
 }

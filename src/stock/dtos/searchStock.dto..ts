@@ -10,5 +10,15 @@ export class SearchStockInput {
 @ObjectType()
 export class SearchStockOutput extends CoreOutput {
   @Field(() => String, { nullable: true })
-  code?: string;
+  시가총액?: string;
+  @Field(() => String, { nullable: true })
+  현재가?: string;
+  @Field(() => String, { nullable: true })
+  상승률?: string;
+  @Field(() => String, { nullable: true })
+  고가?: string;
+  @Field(() => String, { nullable: true })
+  저가?: string;
+  @Field(() => String, { nullable: true })
+  거래량?: string;
 }

@@ -96,6 +96,10 @@ export class User extends CoreEntity {
   @IsEnum(UserRole)
   role: UserRole;
 
+  @Field(() => String, { defaultValue: '' })
+  @Column({ default: '' })
+  lastLogInIp: string;
+
   @Column({
     type: 'enum',
     enum: LoginType,

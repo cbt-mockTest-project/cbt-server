@@ -371,9 +371,11 @@ export class UserService {
     };
   }
 
-  async me(user: User): Promise<MeOutput> {
+  async me(user: User, ip: string): Promise<MeOutput> {
     const { notices } = await this.noticeService.readMyNotice(user);
+
     if (user && notices) {
+      await this.users.update(user.id, { lastLogInIp: ip });
       return {
         ok: true,
         user,

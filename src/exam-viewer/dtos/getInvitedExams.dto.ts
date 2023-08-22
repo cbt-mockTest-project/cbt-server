@@ -3,10 +3,10 @@ import { CoreOutput } from 'src/common/dtos/output.dto';
 import { ExamViewer } from '../entities/exam-viewer.entity';
 
 @InputType()
-export class GetMyExamViewersInput {}
+export class GetInvitedExamsInput {}
 
 @ObjectType()
-export class GetMyExamViewersOutput extends CoreOutput {
+export class GetInvitedExamsOutput extends CoreOutput {
   @Field(() => [ExamViewer], { nullable: true })
   examViewers?: ExamViewer[];
 }

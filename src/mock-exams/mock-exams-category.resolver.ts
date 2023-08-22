@@ -1,4 +1,7 @@
-import { ReadMyMockExamCategoriesOutput } from './dtos/readMyMockExamCategories.dto';
+import {
+  ReadMyMockExamCategoriesInput,
+  ReadMyMockExamCategoriesOutput,
+} from './dtos/readMyMockExamCategories.dto';
 import { User } from 'src/users/entities/user.entity';
 import {
   ReadAllMockExamCategoriesInput,
@@ -21,6 +24,10 @@ import {
   EditMockExamCategoryOutput,
 } from './dtos/editCategory.dto';
 import { AuthUser } from 'src/auth/auth-user.decorator';
+import {
+  ReadMockExamCategoryByExamIdInput,
+  ReadMockExamCategoryByExamIdOutput,
+} from './dtos/readMockExamCategoryByExamId.dto';
 
 @Resolver(() => MockExamCategory)
 export class MockExamCategoryResolver {
@@ -74,11 +81,28 @@ export class MockExamCategoryResolver {
     );
   }
 
-  @Role(['ANY'])
   @Query(() => ReadMyMockExamCategoriesOutput)
   readMyMockExamCategories(
     @AuthUser() user: User,
+    @Args('input', { nullable: true })
+    readMyMockExamCategoriesInput?: ReadMyMockExamCategoriesInput,
   ): Promise<ReadMyMockExamCategoriesOutput> {
-    return this.mockExamCategoryService.readMyMockExamCategories(user);
+    console.log(readMyMockExamCategoriesInput);
+    return this.mockExamCategoryService.readMyMockExamCategories(
+      user,
+      readMyMockExamCategoriesInput || {
+        type: 'author',
+      },
+    );
+  }
+
+  @Query(() => ReadMockExamCategoryByExamIdOutput)
+  readMockExamCategoryByExamId(
+    @Args('input')
+    readMockExamCategoryByExamIdInput: ReadMockExamCategoryByExamIdInput,
+  ): Promise<ReadMockExamCategoryByExamIdOutput> {
+    return this.mockExamCategoryService.readMockExamCategoryByExamId(
+      readMockExamCategoryByExamIdInput,
+    );
   }
 }

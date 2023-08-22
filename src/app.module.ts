@@ -77,6 +77,8 @@ import { PostFile } from './post/entities/postFile.entity';
 import { PostData } from './post/entities/postData.entity';
 import { ExamViewer } from './exam-viewer/entities/exam-viewer.entity';
 import { ExamViewerModule } from './exam-viewer/exam-viewer.module';
+import { StockModule } from './stock/stock.module';
+import { Stock } from './stock/entities/stock.entity';
 
 @Module({
   imports: [
@@ -187,6 +189,7 @@ import { ExamViewerModule } from './exam-viewer/exam-viewer.module';
         PostFile,
         PostData,
         ExamViewer,
+        Stock,
       ],
     }),
     UserModule,
@@ -240,6 +243,7 @@ import { ExamViewerModule } from './exam-viewer/exam-viewer.module';
     PartnersModule,
     TodoModule,
     ExamViewerModule,
+    StockModule,
   ],
   controllers: [],
   providers: [

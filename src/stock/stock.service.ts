@@ -14,15 +14,14 @@ export class StockService {
   ) {}
 
   async parsingStockData() {
-    const workbook = xlsx.readFile(
-      '/Users/sim-eungwang/Documents/cbt/cbt-server/src/stock/data_0344_20230822.xlsx',
-    ); // 읽을 파일의 경로를 지정합니다.
-    const sheetName = workbook.SheetNames[0]; // 첫 번째 시트의 이름을 가져옵니다.
+    const workbook = xlsx.readFile(process.env.STOCK_LIST_PATH as string);
+    const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[sheetName];
     const jsonData = xlsx.utils.sheet_to_json(sheet);
+    await this.stock.delete({});
     const stockCodeList = jsonData.map((data) => ({
       code: data['종목코드'],
-      name: data['종목명'].trim().replace(/(\s*)/g, ''),
+      name: data['종목명'].trim().replace(/(\s*)/g, '').toLowerCase(),
     }));
     await this.stock.save(stockCodeList);
     return {
@@ -34,9 +33,10 @@ export class StockService {
     searchStockInput: SearchStockInput,
   ): Promise<SearchStockOutput> {
     const { keyword } = searchStockInput;
+    console.log(keyword);
     const stock = await this.stock.findOne({
       where: {
-        name: keyword.trim().replace(/(\s*)/g, ''),
+        name: keyword.trim().replace(/(\s*)/g, '').toLowerCase(),
       },
     });
     if (!stock) {
@@ -49,7 +49,7 @@ export class StockService {
       `https://api.finance.naver.com/service/itemSummary.nhn?itemcode=${stock.code}`,
     );
     const stockInfo = {
-      종목명: stock.name,
+      종목명: stock.name.toUpperCase(),
       시가총액: String(stockData.data.marketSum).substring(0, 3) + '억',
       현재가: stockData.data.now.toLocaleString('ko-KR'),
       상승률: stockData.data.rate + '%',

@@ -287,7 +287,7 @@ export class MockExamQuestionService {
       if (user) {
         const mockExamQuestionBookmark =
           question.mockExamQuestionBookmark.filter(
-            (bookmark) => user.id === bookmark.user.id,
+            (bookmark) => user.id === bookmark.user?.id,
           );
         question = { ...question, mockExamQuestionBookmark };
       } else {

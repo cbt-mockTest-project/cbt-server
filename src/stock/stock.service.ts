@@ -33,7 +33,6 @@ export class StockService {
     searchStockInput: SearchStockInput,
   ): Promise<SearchStockOutput> {
     const { keyword } = searchStockInput;
-    console.log(keyword);
     const stock = await this.stock.findOne({
       where: {
         name: keyword.trim().replace(/(\s*)/g, '').toLowerCase(),
@@ -48,9 +47,17 @@ export class StockService {
     const stockData = await axios.get(
       `https://api.finance.naver.com/service/itemSummary.nhn?itemcode=${stock.code}`,
     );
+    function convertToKoreanNumberFormat(num: number) {
+      const 억 = Math.floor((num % 1000000) / 100);
+      const 조 = Math.floor(num / 1000000);
+      if (조) {
+        return 조 + '조 ' + 억 + '억 ';
+      }
+      return 억 + '억';
+    }
     const stockInfo = {
       종목명: stock.name.toUpperCase(),
-      시가총액: String(stockData.data.marketSum).substring(0, 3) + '억',
+      시가총액: convertToKoreanNumberFormat(stockData.data.marketSum),
       현재가: stockData.data.now.toLocaleString('ko-KR'),
       상승률: stockData.data.rate + '%',
       고가: stockData.data.high.toLocaleString('ko-KR'),

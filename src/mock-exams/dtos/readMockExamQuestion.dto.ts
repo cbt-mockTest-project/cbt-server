@@ -13,7 +13,7 @@ export class ReadMockExamQuestionInput {
 
 @ObjectType()
 export class ReadMockExamQuestionOutput extends CoreOutput {
-  @Field(() => MockExamQuestion)
+  @Field(() => MockExamQuestion, { nullable: true })
   mockExamQusetion?: MockExamQuestion;
   @Field(() => QuestionState, { nullable: true })
   state?: QuestionState;

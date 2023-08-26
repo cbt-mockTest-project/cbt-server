@@ -79,6 +79,7 @@ import { ExamViewer } from './exam-viewer/entities/exam-viewer.entity';
 import { ExamViewerModule } from './exam-viewer/exam-viewer.module';
 import { StockModule } from './stock/stock.module';
 import { Stock } from './stock/entities/stock.entity';
+import { WeatherModule } from './weather/weather.module';
 
 @Module({
   imports: [
@@ -244,6 +245,7 @@ import { Stock } from './stock/entities/stock.entity';
     TodoModule,
     ExamViewerModule,
     StockModule,
+    WeatherModule,
   ],
   controllers: [],
   providers: [

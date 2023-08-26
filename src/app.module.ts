@@ -80,6 +80,7 @@ import { ExamViewerModule } from './exam-viewer/exam-viewer.module';
 import { StockModule } from './stock/stock.module';
 import { Stock } from './stock/entities/stock.entity';
 import { WeatherModule } from './weather/weather.module';
+import { ChatbotModule } from './chatbot/chatbot.module';
 
 @Module({
   imports: [
@@ -246,6 +247,7 @@ import { WeatherModule } from './weather/weather.module';
     ExamViewerModule,
     StockModule,
     WeatherModule,
+    ChatbotModule,
   ],
   controllers: [],
   providers: [

@@ -12,13 +12,7 @@ export class WeatherController {
       let locationName = keyword;
       const locations = Object.keys(LOCATION_MAP);
       locationName = locations.find((location) => keyword.includes(location));
-      if (!locationName) {
-        return {
-          ok: false,
-          error: '지역을 찾을 수 없습니다.',
-        };
-      }
-      const locationDetailName = LOCATION_MAP[locationName].find(
+      const locationDetailName = LOCATION_MAP[locationName]?.find(
         (detail) =>
           keyword.includes(detail) ||
           keyword.includes(LOCATION_DETAIL_MAP[detail]),
@@ -28,14 +22,17 @@ export class WeatherController {
           locationName + ' ' + LOCATION_DETAIL_MAP[locationDetailName] ||
           locationDetailName;
       }
+      console.log(locationName || keyword);
       const res = await axios.get(
-        `https://ac.search.naver.com/nx/ac?q=${locationName}&con=0&frm=nv&ans=2&r_format=json&r_enc=UTF-8&r_unicode=0&t_koreng=1&run=2&rev=4&q_enc=UTF-8&st=100`,
+        `https://ac.search.naver.com/nx/ac?q=${
+          locationName || keyword
+        }&con=0&frm=nv&ans=2&r_format=json&r_enc=UTF-8&r_unicode=0&t_koreng=1&run=2&rev=4&q_enc=UTF-8&st=100`,
       );
       const { answer } = res.data;
       if (answer.length === 0) {
         return {
           ok: false,
-          error: '날씨를 가져올 수 없습니다.',
+          error: '등록되지 않은 지역입니다.\n개발자한테 알려주세요.',
         };
       }
       let result = '';

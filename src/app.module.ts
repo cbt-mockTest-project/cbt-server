@@ -81,6 +81,7 @@ import { StockModule } from './stock/stock.module';
 import { Stock } from './stock/entities/stock.entity';
 import { WeatherModule } from './weather/weather.module';
 import { ChatbotModule } from './chatbot/chatbot.module';
+import { ChatbotKey } from './chatbot/entities/chatbot-key.entity';
 
 @Module({
   imports: [
@@ -192,6 +193,7 @@ import { ChatbotModule } from './chatbot/chatbot.module';
         PostData,
         ExamViewer,
         Stock,
+        ChatbotKey,
       ],
     }),
     UserModule,

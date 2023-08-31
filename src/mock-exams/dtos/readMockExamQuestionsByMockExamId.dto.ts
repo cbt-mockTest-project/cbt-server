@@ -29,4 +29,6 @@ export class ReadMockExamQuestionsByMockExamIdOutput extends CoreOutput {
   title?: string;
   @Field(() => String, { defaultValue: '' })
   author?: string;
+  @Field(() => Boolean, { defaultValue: false })
+  isPremium?: boolean;
 }

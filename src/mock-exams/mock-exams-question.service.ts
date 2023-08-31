@@ -634,7 +634,6 @@ export class MockExamQuestionService {
 
       // 랜덤모의고사
       if (ids) {
-        console.time('랜덤모의고사');
         if (states) {
           if (!user) {
             return {
@@ -699,12 +698,12 @@ export class MockExamQuestionService {
           }
           questions = await makeQuestionJoins(questions);
           questions = filterQuestionStates(questions);
-          console.timeEnd('랜덤모의고사');
           return {
             ok: true,
             questions,
             title: '랜덤모의고사',
             count: questions.length,
+            isPremium: questions[0].mockExam.isPremium,
           };
         }
 
@@ -736,6 +735,7 @@ export class MockExamQuestionService {
           questions,
           title: '랜덤모의고사',
           count: questions.length,
+          isPremium: questions[0].mockExam.isPremium,
         };
       }
 
@@ -796,6 +796,7 @@ export class MockExamQuestionService {
         ok: true,
         title: mockExam.title,
         author: mockExam.user.nickname,
+        isPremium: mockExam.isPremium,
         questions,
         count,
       };

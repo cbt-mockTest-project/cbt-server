@@ -40,6 +40,10 @@ export class MockExam extends CoreEntity {
   @Field(() => Boolean, { defaultValue: false })
   approved: boolean;
 
+  @Column({ default: false })
+  @Field(() => Boolean, { defaultValue: false })
+  isPremium: boolean;
+
   @Field(() => MockExamCategory)
   @ManyToOne(
     () => MockExamCategory,

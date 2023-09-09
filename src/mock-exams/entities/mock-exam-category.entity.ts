@@ -1,6 +1,6 @@
 import { ExamCoAuthor } from './../../exam-co-author/entities/exam-co-author.entity';
 import { User } from 'src/users/entities/user.entity';
-import { MockExam } from './mock-exam.entity';
+import { ExamSource, MockExam } from './mock-exam.entity';
 import { CoreEntity } from '../../common/entities/core.entity';
 import {
   Field,
@@ -87,6 +87,11 @@ export class MockExamCategory extends CoreEntity {
   @Column({ default: 0 })
   @Field(() => Number)
   order: number;
+
+  @Column({ type: 'enum', enum: ExamSource, default: ExamSource.MOUD_CBT })
+  @Field(() => ExamSource)
+  @IsEnum(ExamSource)
+  source: ExamSource;
 }
 
 @Entity()

@@ -1,7 +1,7 @@
 import { CoreOutput } from 'src/common/dtos/output.dto';
 import { MockExamCategory } from '../entities/mock-exam-category.entity';
 import { Field, InputType, ObjectType, PickType } from '@nestjs/graphql';
-import { ExamStatus } from '../entities/mock-exam.entity';
+import { ExamSource, ExamStatus } from '../entities/mock-exam.entity';
 
 @ObjectType()
 export class ExamTitleAndId {
@@ -23,6 +23,11 @@ export class ReadMockExamTitlesByCateoryInput extends PickType(
 ) {
   @Field(() => Boolean, { defaultValue: false, nullable: true })
   all?: boolean;
+  @Field(() => ExamSource, {
+    nullable: true,
+    defaultValue: ExamSource.MOUD_CBT,
+  })
+  source?: ExamSource;
 }
 
 @ObjectType()

@@ -2,7 +2,6 @@ import { deduplication } from './../utils/utils';
 import { User, UserRole } from './../users/entities/user.entity';
 import { MockExamQuestionState } from 'src/mock-exams/entities/mock-exam-question-state.entity';
 import {
-  ExamTitleAndId,
   ReadMockExamTitlesByCateoryInput,
   ReadMockExamTitlesByCateoryOutput,
 } from './dtos/readMockExamTitlesByCateory.dto';
@@ -20,10 +19,10 @@ import {
   DeleteMockExamOutput,
 } from './dtos/deleteMockExam.dto';
 import { MockExamCategory } from './entities/mock-exam-category.entity';
-import { MockExam } from './entities/mock-exam.entity';
+import { ExamSource, MockExam } from './entities/mock-exam.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Raw, Repository, FindOptionsWhere, Brackets } from 'typeorm';
+import { Raw, Repository, FindOptionsWhere, Brackets, Not } from 'typeorm';
 import {
   CreateMockExamInput,
   CreateMockExamOutput,
@@ -76,6 +75,7 @@ export class MockExamService {
       title,
       mockExamCategory,
       approved: false,
+      source: user.id === 1 ? ExamSource.MOUD_CBT : ExamSource.USER,
       user,
     });
     const mockExam = await this.mockExam.save(newMockExam);
@@ -284,7 +284,7 @@ export class MockExamService {
     readMockExamTitlesByCateoryInput: ReadMockExamTitlesByCateoryInput,
   ): Promise<ReadMockExamTitlesByCateoryOutput> {
     try {
-      const { name, all } = readMockExamTitlesByCateoryInput;
+      const { name, all, source } = readMockExamTitlesByCateoryInput;
       let mockExamTitles: MockExam[] = [];
       if (!all) {
         mockExamTitles = await this.mockExam
@@ -300,6 +300,9 @@ export class MockExamService {
             'user.role',
           ])
           .where('category.name = :name', { name })
+          .andWhere('mockExam.source = :source', {
+            source: source || ExamSource.MOUD_CBT,
+          })
           .andWhere('mockExam.approved = true')
           .orderBy({
             'mockExam.order': 'ASC',
@@ -449,4 +452,24 @@ export class MockExamService {
       };
     }
   }
+
+  //   async sync() {
+  //     const mockExams = await this.mockExam.find({
+  //       where: {
+  //         user: {
+  //           id: Not(1),
+  //         },
+  //       },
+  //     });
+  //     const updatedMockExams = mockExams.map((mockExam) => {
+  //       return {
+  //         ...mockExam,
+  //         source: ExamSource.USER,
+  //       };
+  //     });
+  //     this.mockExam.save(updatedMockExams);
+  //     return {
+  //       ok: true,
+  //     };
+  //   }
 }

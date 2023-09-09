@@ -116,7 +116,7 @@ export class MockExamResolver {
   }
 
   // @Mutation(() => CoreOutput)
-  // async syncExamSlug() {
-  //   return this.mockExamService.syncExamSlug();
+  // async sync() {
+  //   return this.mockExamService.sync();
   // }
 }

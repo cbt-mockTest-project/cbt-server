@@ -22,6 +22,13 @@ export enum ExamStatus {
   REJECTED = 'REJECTED',
 }
 
+export enum ExamSource {
+  MOUD_CBT = 'MOUD_CBT',
+  USER = 'USER',
+  EHS_MASTER = 'EHS_MASTER',
+}
+
+registerEnumType(ExamSource, { name: 'ExamSource' });
 registerEnumType(ExamStatus, { name: 'ExamStatus' });
 
 @InputType('MockExamInputType', { isAbstract: true })
@@ -102,6 +109,11 @@ export class MockExam extends CoreEntity {
   @Field(() => ExamStatus)
   @IsEnum(ExamStatus)
   status: ExamStatus;
+
+  @Column({ type: 'enum', enum: ExamSource, default: ExamSource.MOUD_CBT })
+  @Field(() => ExamSource)
+  @IsEnum(ExamSource)
+  source: ExamSource;
 
   @Column({ default: 0 })
   @Field(() => Number, { defaultValue: 0 })

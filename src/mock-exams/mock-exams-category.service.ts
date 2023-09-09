@@ -10,7 +10,7 @@ import {
 } from './entities/mock-exam-category.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, IsNull, Repository } from 'typeorm';
+import { FindOptionsWhere, In, IsNull, Repository } from 'typeorm';
 import {
   DeleteMockExamCategoryInput,
   DeleteMockExamCategoryOutput,
@@ -28,6 +28,11 @@ import {
   ReadMockExamCategoryByExamIdInput,
   ReadMockExamCategoryByExamIdOutput,
 } from './dtos/readMockExamCategoryByExamId.dto';
+import {
+  ReadMockExamCategoriesInput,
+  ReadMockExamCategoriesOutput,
+} from './dtos/readMockExamCategories.dto';
+import { ExamSource } from './entities/mock-exam.entity';
 
 @Injectable()
 export class MockExamCategoryService {
@@ -57,6 +62,7 @@ export class MockExamCategoryService {
         name: createMockExamCategoryInput.name,
         user,
         approved: false,
+        source: user.id === 1 ? ExamSource.MOUD_CBT : ExamSource.USER,
       });
       const category = await this.mockExamCategories.save(newCategory);
       return {
@@ -153,23 +159,27 @@ export class MockExamCategoryService {
   }
 
   async readAllMockExamCategories(
-    readAllMockExamCategoriesInput: ReadAllMockExamCategoriesInput,
+    readAllMockExamCategoriesInput: ReadAllMockExamCategoriesInput = {
+      source: ExamSource.MOUD_CBT,
+      type: MockExamCategoryTypes.practical,
+      partnerId: null,
+    },
   ): Promise<ReadAllMockExamCategoriesOutput> {
     try {
-      let type = MockExamCategoryTypes.practical;
-      if (readAllMockExamCategoriesInput) {
-        type = readAllMockExamCategoriesInput.type;
+      const { type, source, partnerId } = readAllMockExamCategoriesInput;
+      const where: FindOptionsWhere<MockExamCategory> = {
+        type,
+        approved: true,
+        partner: IsNull(),
+        source,
+      };
+      if (readAllMockExamCategoriesInput?.partnerId) {
+        where.partner = {
+          id: partnerId,
+        };
       }
       const categories = await this.mockExamCategories.find({
-        where: {
-          type,
-          approved: true,
-          partner: readAllMockExamCategoriesInput?.partnerId
-            ? {
-                id: readAllMockExamCategoriesInput.partnerId,
-              }
-            : IsNull(),
-        },
+        where,
         relations: {
           user: true,
           roles: true,
@@ -250,6 +260,29 @@ export class MockExamCategoryService {
         }
         categories = await queryBuilder.getMany();
       }
+      return {
+        ok: true,
+        categories,
+      };
+    } catch (e) {
+      console.log(e);
+      return {
+        ok: false,
+        error: '카테고리를 찾을 수 없습니다.',
+      };
+    }
+  }
+
+  async readMockExamCategories(
+    readMockExamCategoriesInput?: ReadMockExamCategoriesInput,
+  ): Promise<ReadMockExamCategoriesOutput> {
+    const { source } = readMockExamCategoriesInput;
+    const categories = await this.mockExamCategories.find({
+      where: {
+        source,
+      },
+    });
+    try {
       return {
         ok: true,
         categories,

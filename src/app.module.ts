@@ -82,6 +82,8 @@ import { Stock } from './stock/entities/stock.entity';
 import { WeatherModule } from './weather/weather.module';
 import { ChatbotModule } from './chatbot/chatbot.module';
 import { ChatbotKey } from './chatbot/entities/chatbot-key.entity';
+import { DiscountCodeModule } from './discount-code/discount-code.module';
+import { DiscountCode } from './discount-code/discount-code.entity';
 
 @Module({
   imports: [
@@ -154,6 +156,7 @@ import { ChatbotKey } from './chatbot/entities/chatbot-key.entity';
         ExamCoAuthor,
         QuestionCard,
         QuestionCardCategory,
+        DiscountCode,
         User,
         Verification,
         MockExam,
@@ -250,6 +253,7 @@ import { ChatbotKey } from './chatbot/entities/chatbot-key.entity';
     StockModule,
     WeatherModule,
     ChatbotModule,
+    DiscountCodeModule,
   ],
   controllers: [],
   providers: [

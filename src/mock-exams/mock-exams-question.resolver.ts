@@ -39,6 +39,10 @@ import {
   ReadMockExamQuestionsByStateOutput,
 } from './dtos/readMockExamQuestionsByState.dto';
 import { ReadAllQuestionsOutput } from './dtos/readAllQuestions.dto';
+import {
+  SearchQuestionsByKeywordInput,
+  SearchQuestionsByKeywordOutput,
+} from './dtos/searchQuestionsByKeyword.dto';
 
 @Resolver(() => MockExamQuestion)
 export class MockExamQuestionResolver {
@@ -148,6 +152,15 @@ export class MockExamQuestionResolver {
   @Query(() => ReadAllQuestionsOutput)
   async readAllQuestions(): Promise<ReadAllQuestionsOutput> {
     return this.mockExamQuestionService.readAllQuestions();
+  }
+
+  @Query(() => SearchQuestionsByKeywordOutput)
+  async searchQuestionsByKeyword(
+    @Args('input') searchQuestionsByKeywordInput: SearchQuestionsByKeywordInput,
+  ): Promise<SearchQuestionsByKeywordOutput> {
+    return this.mockExamQuestionService.searchQuestionsByKeyword(
+      searchQuestionsByKeywordInput,
+    );
   }
 
   // @Mutation(() => CoreOutput)

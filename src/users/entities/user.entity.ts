@@ -41,6 +41,7 @@ import { Todo } from 'src/todo/entities/Todo.entity';
 import { PostData } from 'src/post/entities/postData.entity';
 import { PostFile } from 'src/post/entities/postFile.entity';
 import { ExamViewer } from 'src/exam-viewer/entities/exam-viewer.entity';
+import { DiscountCode } from 'src/discount-code/discount-code.entity';
 
 export enum UserRole {
   CLIENT = 'CLIENT',
@@ -183,6 +184,10 @@ export class User extends CoreEntity {
   @OneToMany(() => ExamCoAuthor, (examCoAuthor) => examCoAuthor.user)
   @Field(() => [ExamCoAuthor], { nullable: true })
   examCoAuthor: ExamCoAuthor[];
+
+  @OneToMany(() => DiscountCode, (discountCode) => discountCode.user)
+  @Field(() => [DiscountCode], { nullable: true })
+  discountCode: DiscountCode[];
 
   @OneToMany(() => ExamViewer, (examViewer) => examViewer.user)
   @Field(() => [ExamViewer], { nullable: true })

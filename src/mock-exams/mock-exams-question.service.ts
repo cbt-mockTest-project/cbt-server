@@ -898,15 +898,15 @@ export class MockExamQuestionService {
         .createQueryBuilder('question')
         .leftJoinAndSelect('question.mockExam', 'mockExam')
         .where(
-          "LOWER(REPLACE(question.question, ' ', '')) LIKE :formattedKeyword",
-          { formattedKeyword },
-        )
-        .orWhere(
-          "LOWER(REPLACE(question.solution, ' ', '')) LIKE :formattedKeyword",
+          "(LOWER(REPLACE(question.question, ' ', '')) LIKE :formattedKeyword OR LOWER(REPLACE(question.solution, ' ', '')) LIKE :formattedKeyword) AND mockExam.approved = true",
           { formattedKeyword },
         )
         .limit(10)
         .getMany();
+      return {
+        questions,
+        ok: true,
+      };
       return {
         questions,
         ok: true,

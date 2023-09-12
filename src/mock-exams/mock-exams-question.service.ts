@@ -55,6 +55,10 @@ import {
 } from './entities/mock-exam-question-state.entity';
 import { MockExamQuestion } from './entities/mock-exam-question.entity';
 import { MockExam } from './entities/mock-exam.entity';
+import {
+  SearchQuestionsByKeywordInput,
+  SearchQuestionsByKeywordOutput,
+} from './dtos/searchQuestionsByKeyword.dto';
 
 @Injectable()
 export class MockExamQuestionService {
@@ -882,6 +886,37 @@ export class MockExamQuestionService {
       ok: true,
       mockExamQusetions,
     };
+  }
+
+  async searchQuestionsByKeyword(
+    searchQuestionsByKeywordInput: SearchQuestionsByKeywordInput,
+  ): Promise<SearchQuestionsByKeywordOutput> {
+    try {
+      const { keyword } = searchQuestionsByKeywordInput;
+      const formattedKeyword = `%${keyword.replace(/\s+/g, '').toLowerCase()}%`;
+      const questions = await this.mockExamQuestion
+        .createQueryBuilder('question')
+        .leftJoinAndSelect('question.mockExam', 'mockExam')
+        .where(
+          "LOWER(REPLACE(question.question, ' ', '')) LIKE :formattedKeyword",
+          { formattedKeyword },
+        )
+        .orWhere(
+          "LOWER(REPLACE(question.solution, ' ', '')) LIKE :formattedKeyword",
+          { formattedKeyword },
+        )
+        .limit(10)
+        .getMany();
+      return {
+        questions,
+        ok: true,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '문제를 찾을 수 없습니다.',
+      };
+    }
   }
 
   // async updateQuestionUserId() {

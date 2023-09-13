@@ -53,6 +53,10 @@ export class MockExamQuestion extends CoreEntity {
   @Field(() => Boolean)
   approved: boolean;
 
+  @Column({ default: '' })
+  @Field(() => String)
+  label: string;
+
   @Column({ type: 'json', default: [] })
   @Field(() => [MockExamVideoType], { nullable: true })
   question_video: MockExamVideoType[];

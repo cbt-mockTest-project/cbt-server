@@ -318,7 +318,7 @@ export class MockExamQuestionService {
     editMockExamQuestionInput: EditMockExamQuestionInput,
   ): Promise<EditMockExamQuestionOutput> {
     try {
-      const { id, question, question_img, solution, solution_img } =
+      const { id, question, question_img, solution, solution_img, label } =
         editMockExamQuestionInput;
       const prevMockExamQuestion = await this.mockExamQuestion.findOne({
         where: { id },
@@ -354,6 +354,7 @@ export class MockExamQuestionService {
         question_img,
         solution,
         solution_img,
+        label,
       });
       return {
         ok: true,

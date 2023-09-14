@@ -349,13 +349,16 @@ export class MockExamQuestionService {
           error: '권한이 없습니다.',
         };
       }
-      await this.mockExamQuestion.update(id, {
+      const dataToUpdate = {
         question,
         question_img,
         solution,
         solution_img,
-        label,
-      });
+      };
+      if (label) {
+        dataToUpdate['label'] = label;
+      }
+      await this.mockExamQuestion.update(id, dataToUpdate);
       return {
         ok: true,
       };
@@ -906,10 +909,6 @@ export class MockExamQuestionService {
         )
         .limit(10)
         .getMany();
-      return {
-        questions,
-        ok: true,
-      };
       return {
         questions,
         ok: true,

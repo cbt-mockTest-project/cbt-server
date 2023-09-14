@@ -54,8 +54,8 @@ export class MockExamQuestion extends CoreEntity {
   approved: boolean;
 
   @Column({ default: '' })
-  @Field(() => String)
-  label: string;
+  @Field(() => String, { nullable: true, defaultValue: '' })
+  label?: string;
 
   @Column({ type: 'json', default: [] })
   @Field(() => [MockExamVideoType], { nullable: true })

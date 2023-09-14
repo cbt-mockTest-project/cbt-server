@@ -91,6 +91,7 @@ export class MockExamQuestionService {
         solution_img,
         mockExamId,
         number,
+        label,
       } = createMockExamQuestionInput;
       const mockExam = await this.mockExam.findOne({
         relations: { user: true },
@@ -143,6 +144,7 @@ export class MockExamQuestionService {
         approved: false,
         number,
         user,
+        label,
       });
       const savedQestion = await this.mockExamQuestion.save(newExamQuestion);
       return { ok: true, questionId: savedQestion.id };

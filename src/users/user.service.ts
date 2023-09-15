@@ -6,7 +6,7 @@ import { Response } from 'express';
 import { CoreOutput } from 'src/common/dtos/output.dto';
 import { JwtService } from 'src/jwt/jwt.service';
 import { MailService } from 'src/mail/mail.service';
-import { Like, QueryRunner, Repository } from 'typeorm';
+import { In, Like, QueryRunner, Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { TelegramService } from './../telegram/telegram.service';
 import {
@@ -77,6 +77,7 @@ import {
   GetUserByNicknameOrEmailInput,
   GetUserByNicknameOrEmailOutput,
 } from './dtos/getUserByNicknameOrEmail.dto';
+import { GetRolesCountInput, GetRolesCountOutput } from './dtos/getRolesCount';
 @Injectable()
 export class UserService {
   constructor(
@@ -1108,6 +1109,31 @@ export class UserService {
           },
         },
       });
+      return {
+        ok: true,
+        count: roles.length,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '권한을 확인할 수 없습니다.',
+      };
+    }
+  }
+
+  async getRolesCount(
+    getRolesCountInput: GetRolesCountInput,
+  ): Promise<GetRolesCountOutput> {
+    const { roleIds } = getRolesCountInput;
+    try {
+      const roles = await this.userAndRole.find({
+        where: {
+          role: {
+            id: In(roleIds),
+          },
+        },
+      });
+
       return {
         ok: true,
         count: roles.length,

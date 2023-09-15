@@ -65,6 +65,7 @@ import {
   GetUserByNicknameOrEmailOutput,
 } from './dtos/getUserByNicknameOrEmail.dto';
 import { ProxyIp } from 'src/common/decorators/ip.decorator';
+import { GetRolesCountInput, GetRolesCountOutput } from './dtos/getRolesCount';
 
 @Resolver(() => User)
 export class UserResolver {
@@ -266,6 +267,11 @@ export class UserResolver {
   @Query(() => GetRoleCountOutput)
   async getRoleCount(@Args('input') getRoleCountInput: GetRoleCountInput) {
     return this.userService.getRoleCount(getRoleCountInput);
+  }
+
+  @Query(() => GetRolesCountOutput)
+  async getRolesCount(@Args('input') getRolesCountInput: GetRolesCountInput) {
+    return this.userService.getRolesCount(getRolesCountInput);
   }
 
   @Query(() => GetUserByNicknameOrEmailOutput)

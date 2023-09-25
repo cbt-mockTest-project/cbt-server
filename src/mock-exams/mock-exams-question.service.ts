@@ -557,7 +557,7 @@ export class MockExamQuestionService {
                   isBad: false,
                 };
                 feedback.recommendation.forEach((recommendation) => {
-                  if (recommendation.user.id === user?.id) {
+                  if (recommendation.user?.id === user?.id) {
                     if (
                       recommendation.type ===
                       QuestionFeedbackRecommendationType.GOOD

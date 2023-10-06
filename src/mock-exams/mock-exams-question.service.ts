@@ -245,7 +245,7 @@ export class MockExamQuestionService {
             feedback.mockExamQuestion.id === question.id &&
             (feedback.type !== QuestionFeedbackType.PRIVATE ||
               (feedback.type === QuestionFeedbackType.PRIVATE &&
-                feedback.user.id === user?.id)),
+                feedback.user?.id === user?.id)),
         )
         .map((feedback) => {
           const goodCount = feedback.recommendation.filter(
@@ -261,7 +261,7 @@ export class MockExamQuestionService {
             isBad: false,
           };
           feedback.recommendation.forEach((recommendation) => {
-            if (recommendation.user.id === user?.id) {
+            if (recommendation.user?.id === user?.id) {
               if (
                 recommendation.type === QuestionFeedbackRecommendationType.GOOD
               ) {
@@ -293,7 +293,7 @@ export class MockExamQuestionService {
       if (user) {
         const mockExamQuestionBookmark =
           question.mockExamQuestionBookmark.filter(
-            (bookmark) => user.id === bookmark.user?.id,
+            (bookmark) => user?.id === bookmark.user?.id,
           );
         question = { ...question, mockExamQuestionBookmark };
       } else {

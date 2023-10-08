@@ -697,7 +697,6 @@ export class MockExamQuestionService {
             .limit(limit || 14)
             .orderBy('RANDOM()')
             .getMany();
-
           let questions = questionStates.map((state) => state.question);
           if (coreQuestions.length > 0) {
             coreQuestions = shuffleArray(coreQuestions).slice(0, limit || 14);
@@ -713,10 +712,10 @@ export class MockExamQuestionService {
             questions,
             title: '랜덤모의고사',
             count: questions.length,
-            isPremium: questions[0].mockExam.isPremium,
+            isPremium:
+              questions.length > 1 ? questions[0].mockExam.isPremium : false,
           };
         }
-
         let questions: MockExamQuestion[] = await this.mockExamQuestion
           .createQueryBuilder('mockExamQuestion')
           .leftJoinAndSelect('mockExamQuestion.mockExam', 'mockExam')

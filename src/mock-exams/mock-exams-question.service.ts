@@ -189,6 +189,113 @@ export class MockExamQuestionService {
   ): Promise<ReadMockExamQuestionOutput> {
     try {
       const { questionId, examId } = readMockExamQuestionInput;
+      let questionBookmarks: MockExamQuestionBookmark[] = [];
+      let questionFeedbacks: MockExamQuestionFeedback[] = [];
+      let questionComments: MockExamQuestionComment[] = [];
+      const makeQuestionJoins = async (question: MockExamQuestion) => {
+        await Promise.all([
+          (questionBookmarks = user
+            ? await this.mockExamQuestionBookmark.find({
+                relations: { question: true, user: true },
+                where: {
+                  question: {
+                    id: question.id,
+                  },
+                  user: {
+                    id: user.id,
+                  },
+                },
+              })
+            : []),
+          (questionFeedbacks = await this.mockExamQuestionFeedback.find({
+            relations: {
+              mockExamQuestion: true,
+              user: true,
+              recommendation: { user: true },
+            },
+            where: {
+              mockExamQuestion: {
+                id: question.id,
+              },
+            },
+            order: {
+              type: 'ASC',
+            },
+          })),
+          (questionComments = await this.mockExamQuestionComment.find({
+            relations: { question: true, user: true },
+            where: {
+              question: {
+                id: question.id,
+              },
+            },
+          })),
+        ]);
+        const result: MockExamQuestion = {
+          ...question,
+          mockExamQuestionBookmark: questionBookmarks.filter(
+            (bookmark) => bookmark.question.id === question.id,
+          ),
+          mockExamQuestionComment: questionComments.filter(
+            (comment) => comment.question.id === question.id,
+          ),
+          mockExamQuestionFeedback: questionFeedbacks
+            .filter(
+              (feedback) =>
+                feedback.mockExamQuestion.id === question.id &&
+                (feedback.type !== QuestionFeedbackType.PRIVATE ||
+                  (feedback.type === QuestionFeedbackType.PRIVATE &&
+                    feedback.user.id === user?.id)),
+            )
+            .map((feedback) => {
+              const goodCount = feedback.recommendation.filter(
+                (recommendation) =>
+                  recommendation.type ===
+                  QuestionFeedbackRecommendationType.GOOD,
+              ).length;
+              const badCount = feedback.recommendation.filter(
+                (recommendation) =>
+                  recommendation.type ===
+                  QuestionFeedbackRecommendationType.BAD,
+              ).length;
+              const myRecommedationStatus: MyRecommedationStatus = {
+                isGood: false,
+                isBad: false,
+              };
+              feedback.recommendation.forEach((recommendation) => {
+                if (recommendation.user?.id === user?.id) {
+                  if (
+                    recommendation.type ===
+                    QuestionFeedbackRecommendationType.GOOD
+                  ) {
+                    myRecommedationStatus.isGood = true;
+                  }
+                  if (
+                    recommendation.type ===
+                    QuestionFeedbackRecommendationType.BAD
+                  ) {
+                    myRecommedationStatus.isBad = true;
+                  }
+                }
+              });
+              const recommendationCount: RecommendationCount = {
+                good: goodCount,
+                bad: badCount,
+              };
+              return {
+                ...feedback,
+                recommendationCount,
+                myRecommedationStatus,
+              };
+            })
+            .sort(
+              (a, b) =>
+                b.recommendationCount.good - a.recommendationCount.good ||
+                a.recommendationCount.bad - b.recommendationCount.bad,
+            ),
+        };
+        return result;
+      };
       const where: FindOptionsWhere<MockExamQuestion> = examId
         ? {
             id: questionId,
@@ -201,22 +308,11 @@ export class MockExamQuestionService {
       let question = await this.mockExamQuestion.findOne({
         where,
         relations: {
-          mockExam: true,
-          mockExamQuestionComment: { user: true },
-          mockExamQuestionBookmark: user ? { user: true } : false,
-          mockExamQuestionFeedback: {
-            user: true,
-            recommendation: { user: true },
-            mockExamQuestion: true,
-          },
           user: true,
-        },
-        order: {
-          mockExamQuestionFeedback: {
-            type: 'ASC',
-          },
+          mockExam: true,
         },
       });
+      question = await makeQuestionJoins(question);
       let isCoAuthor = false;
       if (user) {
         const examCoAuthor = await this.examCoAuthor.findOne({
@@ -233,72 +329,7 @@ export class MockExamQuestionService {
           isCoAuthor = true;
         }
       }
-      if (!question) {
-        return {
-          ok: false,
-          error: '존재하지 않는 문제입니다.',
-        };
-      }
-      question.mockExamQuestionFeedback = question.mockExamQuestionFeedback
-        .filter(
-          (feedback) =>
-            feedback.mockExamQuestion.id === question.id &&
-            (feedback.type !== QuestionFeedbackType.PRIVATE ||
-              (feedback.type === QuestionFeedbackType.PRIVATE &&
-                feedback.user?.id === user?.id)),
-        )
-        .map((feedback) => {
-          const goodCount = feedback.recommendation.filter(
-            (recommendation) =>
-              recommendation.type === QuestionFeedbackRecommendationType.GOOD,
-          ).length;
-          const badCount = feedback.recommendation.filter(
-            (recommendation) =>
-              recommendation.type === QuestionFeedbackRecommendationType.BAD,
-          ).length;
-          const myRecommedationStatus: MyRecommedationStatus = {
-            isGood: false,
-            isBad: false,
-          };
-          feedback.recommendation.forEach((recommendation) => {
-            if (recommendation.user?.id === user?.id) {
-              if (
-                recommendation.type === QuestionFeedbackRecommendationType.GOOD
-              ) {
-                myRecommedationStatus.isGood = true;
-              }
-              if (
-                recommendation.type === QuestionFeedbackRecommendationType.BAD
-              ) {
-                myRecommedationStatus.isBad = true;
-              }
-            }
-          });
-          const recommendationCount: RecommendationCount = {
-            good: goodCount,
-            bad: badCount,
-          };
-          return {
-            ...feedback,
-            recommendationCount,
-            myRecommedationStatus,
-          };
-        })
-        .sort(
-          (a, b) =>
-            b.recommendationCount.good - a.recommendationCount.good ||
-            a.recommendationCount.bad - b.recommendationCount.bad,
-        );
 
-      if (user) {
-        const mockExamQuestionBookmark =
-          question.mockExamQuestionBookmark.filter(
-            (bookmark) => user?.id === bookmark.user?.id,
-          );
-        question = { ...question, mockExamQuestionBookmark };
-      } else {
-        question = { ...question, mockExamQuestionBookmark: [] };
-      }
       return {
         ok: true,
         mockExamQusetion: question,

@@ -3,8 +3,8 @@ import { Inject, Injectable } from '@nestjs/common';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { TelegramModuleOptions } from './telegramBot.interface';
 import {
-  SendMessageToAlramChannelOfTelegramInput,
-  SendMessageToAlramChannelOfTelegramOutput,
+  sendMessageToTelegramInput,
+  sendMessageToTelegramOutput,
 } from './telegram.dto';
 
 @Injectable()
@@ -13,14 +13,14 @@ export class TelegramService {
     @Inject(CONFIG_OPTIONS) private readonly options: TelegramModuleOptions,
   ) {}
 
-  async sendMessageToAlramChannelOfTelegram(
-    sendMessageToAlramChannelOfTelegramInput: SendMessageToAlramChannelOfTelegramInput,
-  ): Promise<SendMessageToAlramChannelOfTelegramOutput> {
+  async sendMessageToTelegram(
+    sendMessageToTelegramInput: sendMessageToTelegramInput,
+  ): Promise<sendMessageToTelegramOutput> {
     try {
-      const { message } = sendMessageToAlramChannelOfTelegramInput;
+      const { message, channelId } = sendMessageToTelegramInput;
       const bot = new TelegramBot(this.options.token);
 
-      bot.sendMessage(this.options.alramChannelId, message);
+      bot.sendMessage(channelId, message);
       return {
         ok: true,
       };

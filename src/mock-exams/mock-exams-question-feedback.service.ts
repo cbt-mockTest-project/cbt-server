@@ -9,10 +9,13 @@ import {
   CreateMockExamQuestionFeedbackOutput,
 } from './dtos/createMockExamQuestionFeedback.dto';
 import { MockExamQuestion } from './entities/mock-exam-question.entity';
-import { MockExamQuestionFeedback } from './entities/mock-exam-question-feedback.entity';
+import {
+  MockExamQuestionFeedback,
+  QuestionFeedbackType,
+} from './entities/mock-exam-question-feedback.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Brackets, In, Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 import {
   DeleteMockExamQuestionFeedbackInput,
   DeleteMockExamQuestionFeedbackOutput,
@@ -24,7 +27,9 @@ import {
   GetFeedbacksWithFilterOutput,
 } from './dtos/getFeedbacksWithFilter.dto';
 import { QuestionFeedbackRecommendationType } from './entities/mock-exam-question-feedback-recommendation.entity';
-import { ExamCoAuthor } from 'src/exam-co-author/entities/exam-co-author.entity';
+
+import { ExamSource } from './entities/mock-exam.entity';
+import { TelegramService } from 'src/telegram/telegram.service';
 
 @Injectable()
 export class MockExamQuestionFeedbackSerivce {
@@ -33,10 +38,7 @@ export class MockExamQuestionFeedbackSerivce {
     private readonly mockExamQuestionFeedback: Repository<MockExamQuestionFeedback>,
     @InjectRepository(MockExamQuestion)
     private readonly mockExamQuestion: Repository<MockExamQuestion>,
-    @InjectRepository(User)
-    private readonly users: Repository<User>,
-    @InjectRepository(ExamCoAuthor)
-    private readonly examCoAuthors: Repository<ExamCoAuthor>,
+    private readonly telegramService: TelegramService,
   ) {}
 
   async createMockExamQuestionFeedback(
@@ -48,6 +50,9 @@ export class MockExamQuestionFeedbackSerivce {
 
       const question = await this.mockExamQuestion.findOne({
         where: { id: questionId },
+        relations: {
+          mockExam: { mockExamCategory: true },
+        },
       });
       if (!question) {
         return {
@@ -62,6 +67,17 @@ export class MockExamQuestionFeedbackSerivce {
         user,
       });
       feedback = await this.mockExamQuestionFeedback.save(feedback);
+
+      if (type === QuestionFeedbackType.REPORT) {
+        if (
+          question.mockExam.mockExamCategory.source === ExamSource.EHS_MASTER
+        ) {
+          this.telegramService.sendMessageToTelegram({
+            channelId: Number(process.env.TELEGRAM_EHSMASTER_REPORT_CHANNEL),
+            message: `문제 피드백이 도착했습니다.\n보고자: ${user.nickname}\nhttps://moducbt.com/question/${question.id}`,
+          });
+        }
+      }
       feedback.recommendationCount = { bad: 0, good: 0 };
       feedback.myRecommedationStatus = { isBad: false, isGood: false };
       return {

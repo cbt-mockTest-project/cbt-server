@@ -145,8 +145,9 @@ export class BlogManageService {
     naverBlogViewMacroInput: NaverBlogViewMacroInput,
   ): Promise<NaverBlogViewMacroOutput> {
     const { blogUrl } = naverBlogViewMacroInput;
-    this.telegramService.sendMessageToAlramChannelOfTelegram({
+    this.telegramService.sendMessageToTelegram({
       message: '블로그 매크로 시작',
+      channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
     });
     const waitFor = (delay: number) =>
       new Promise((resolve) => setTimeout(resolve, delay));
@@ -206,8 +207,9 @@ export class BlogManageService {
         await waitFor(10000);
         i++;
       }
-      this.telegramService.sendMessageToAlramChannelOfTelegram({
+      this.telegramService.sendMessageToTelegram({
         message: '블로그 매크로 완료',
+        channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
       });
       await driver.quit();
       return {
@@ -216,8 +218,9 @@ export class BlogManageService {
     } catch (e) {
       await driver.quit();
       console.log(e);
-      this.telegramService.sendMessageToAlramChannelOfTelegram({
+      this.telegramService.sendMessageToTelegram({
         message: '블로그 매크로 실패',
+        channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
       });
       return {
         ok: false,

@@ -33,12 +33,14 @@ export class SchedulerService {
       const { totalViewCount, todayViewCount } =
         await this.visitService.createVisitHistory();
       await this.visitService.clearVisit();
-      await this.telegramService.sendMessageToAlramChannelOfTelegram({
+      await this.telegramService.sendMessageToTelegram({
         message: `오늘의 방문자수는 ${todayViewCount}명입니다.\n지금까지 총 방문자수는 ${totalViewCount}명입니다.`,
+        channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
       });
     } catch {
-      await this.telegramService.sendMessageToAlramChannelOfTelegram({
+      await this.telegramService.sendMessageToTelegram({
         message: `방문자수 기록 실패`,
+        channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
       });
     }
   }
@@ -51,7 +53,7 @@ export class SchedulerService {
     }
     const res = await this.userService.clearFreeTrialRole();
     // if (res.ok) {
-    //   await this.telegramService.sendMessageToAlramChannelOfTelegram({
+    //   await this.telegramService.sendMessageToTelegram({
     //     message: `무료체험권 만료갯수: ${res.count} `,
     //   });
     // }

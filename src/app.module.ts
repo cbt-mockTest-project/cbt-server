@@ -101,6 +101,7 @@ import { DiscountCode } from './discount-code/discount-code.entity';
         REVALIDATE_KEY: Joi.string().required(),
         TELEGRAM_BOT_TOKEN: Joi.string().required(),
         TELEGRAM_ALRAM_CHANNEL: Joi.string().required(),
+        TELEGRAM_EHSMASTER_REPORT_CHANNEL: Joi.string().required(),
       }),
     }),
     ScheduleModule.forRoot(),
@@ -206,6 +207,9 @@ import { DiscountCode } from './discount-code/discount-code.entity';
     TelegramModule.forRoot({
       token: process.env.TELEGRAM_BOT_TOKEN,
       alramChannelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
+      ehsMasterReportChannelId: Number(
+        process.env.TELEGRAM_EHSMASTER_REPORT_CHANNEL,
+      ),
     }),
     RevalidateModule.forRoot({
       revalidateKey: process.env.REVALIDATE_KEY,

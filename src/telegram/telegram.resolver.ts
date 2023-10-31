@@ -3,6 +3,8 @@ import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import {
   SendMessageToAlramChannelOfTelegramInput,
   SendMessageToAlramChannelOfTelegramOutput,
+  sendMessageToTelegramInput,
+  sendMessageToTelegramOutput,
 } from './telegram.dto';
 
 @Resolver()
@@ -16,6 +18,16 @@ export class TelegramResolver {
   ): Promise<SendMessageToAlramChannelOfTelegramOutput> {
     return this.telegramService.sendMessageToAlramChannelOfTelegram(
       sendMessageToAlramChannelOfTelegramInput,
+    );
+  }
+
+  @Mutation(() => sendMessageToTelegramOutput)
+  async sendMessageToTelegram(
+    @Args('input')
+    sendMessageToTelegramInput: sendMessageToTelegramInput,
+  ): Promise<sendMessageToTelegramOutput> {
+    return this.telegramService.sendMessageToTelegram(
+      sendMessageToTelegramInput,
     );
   }
 }

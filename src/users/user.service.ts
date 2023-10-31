@@ -139,8 +139,9 @@ export class UserService {
         this.users.create({ email, password, nickname, role: UserRole.CLIENT }),
       );
       await this.verification.delete({ email });
-      this.telegramService.sendMessageToAlramChannelOfTelegram({
+      this.telegramService.sendMessageToTelegram({
         message: `${nickname} 님이 회원가입 하셨습니다. `,
+        channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
       });
       await this.noticeService.createNotice({
         userId: user.id,
@@ -644,8 +645,9 @@ export class UserService {
         LoginType: LoginType.KAKAO,
       });
       newUser = await this.users.save(newUser);
-      this.telegramService.sendMessageToAlramChannelOfTelegram({
+      this.telegramService.sendMessageToTelegram({
         message: `${newUser.nickname} 님이 회원가입 하셨습니다. `,
+        channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
       });
       token = this.jwtService.sign(newUser.id);
     } else {
@@ -737,8 +739,9 @@ export class UserService {
         LoginType: LoginType.GOOGLE,
       });
       newUser = await this.users.save(newUser);
-      this.telegramService.sendMessageToAlramChannelOfTelegram({
+      this.telegramService.sendMessageToTelegram({
         message: `${newUser.nickname} 님이 회원가입 하셨습니다. `,
+        channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
       });
       token = this.jwtService.sign(newUser.id);
     } else {

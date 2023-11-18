@@ -42,11 +42,11 @@ export class MockExamVideoType {
 @Entity()
 export class MockExamQuestion extends CoreEntity {
   @Column()
-  @Field(() => String)
-  question: string;
+  @Field(() => String, { nullable: true, defaultValue: '' })
+  question?: string;
 
   @Column({ nullable: true })
-  @Field(() => String, { nullable: true })
+  @Field(() => String, { nullable: true, defaultValue: '' })
   solution?: string;
 
   @Column()

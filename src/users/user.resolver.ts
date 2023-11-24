@@ -177,15 +177,6 @@ export class UserResolver {
     return this.userService.createFeedback(createFeedback, user);
   }
 
-  @Mutation(() => KakaoLoginOutput)
-  async kakaoLogin(
-    @Args('input') kakaoLoginInput: KakaoLoginInput,
-    @Context() context,
-  ): Promise<KakaoLoginOutput> {
-    const res: Response = context.req.res;
-    return this.userService.kakaoLogin(kakaoLoginInput, res);
-  }
-
   @Role(['ADMIN', 'PARTNER'])
   @Query(() => SearchUserOutput)
   async searchUser(

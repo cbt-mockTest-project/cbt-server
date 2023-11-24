@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import axios from 'axios';
 import * as bcrypt from 'bcrypt';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import { CoreOutput } from 'src/common/dtos/output.dto';
 import { JwtService } from 'src/jwt/jwt.service';
 import { MailService } from 'src/mail/mail.service';
@@ -26,7 +26,7 @@ import {
   CreateFeedbackOutput,
 } from './dtos/createFeedback.dto';
 import { EditProfileInput, EditProfileOutput } from './dtos/editProfile.dto';
-import { KakaoLoginInput, KakaoLoginOutput } from './dtos/kakaoLogin.dto';
+import { KakaoLoginOutput } from './dtos/kakaoLogin.dto';
 import { LoginInput, LoginOutput } from './dtos/login.dto';
 import { MeOutput } from './dtos/me.dto';
 import { RegisterInput, RegisterOutput } from './dtos/register.dto';
@@ -78,6 +78,7 @@ import {
   GetUserByNicknameOrEmailOutput,
 } from './dtos/getUserByNicknameOrEmail.dto';
 import { GetRolesCountInput, GetRolesCountOutput } from './dtos/getRolesCount';
+import { parseCookies } from 'src/lib/utils/parseCookies';
 @Injectable()
 export class UserService {
   constructor(
@@ -578,11 +579,8 @@ export class UserService {
     }
   }
 
-  async kakaoLogin(
-    kakaoLoginInput: KakaoLoginInput,
-    res: Response,
-  ): Promise<KakaoLoginOutput> {
-    const { code } = kakaoLoginInput;
+  async kakaoLogin(req: Request, res: Response): Promise<KakaoLoginOutput> {
+    const code = req.url.split('code=').at(-1);
     const resToToken = await axios.post(
       'https://kauth.kakao.com/oauth/token',
       {
@@ -674,11 +672,8 @@ export class UserService {
     };
   }
 
-  async googleLogin(
-    kakaoLoginInput: KakaoLoginInput,
-    res: Response,
-  ): Promise<KakaoLoginOutput> {
-    const { code } = kakaoLoginInput;
+  async googleLogin(req: Request, res: Response): Promise<KakaoLoginOutput> {
+    const code = req.url.split('code=').at(-1).split('&').at(0);
     const resToToken = await axios.post(
       `https://oauth2.googleapis.com/token?code=${code}&client_id=${process.env.GOOGLE_CLIENT_ID}&client_secret=${process.env.GOOGLE_SECRET_KEY}&redirect_uri=${process.env.REDIRECT_URI}/google&grant_type=authorization_code`,
       {},

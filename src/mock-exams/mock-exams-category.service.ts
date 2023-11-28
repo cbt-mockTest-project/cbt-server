@@ -34,6 +34,10 @@ import {
 } from './dtos/readMockExamCategories.dto';
 import { ExamSource } from './entities/mock-exam.entity';
 import { ReadMockExamCategoryIdsOutput } from './dtos/readMockExamCategoryIds.dto';
+import {
+  ReadMockExamCategoryByCategoryIdInput,
+  ReadMockExamCategoryByCategoryIdOutput,
+} from './dtos/readMockExamCategoryByCategoryId.dto';
 
 @Injectable()
 export class MockExamCategoryService {
@@ -220,7 +224,37 @@ export class MockExamCategoryService {
         ok: true,
         category,
       };
-    } catch {}
+    } catch {
+      return {
+        ok: false,
+        error: '카테고리를 찾을 수 없습니다.',
+      };
+    }
+  }
+
+  async readMockExamCategoryByCategoryId(
+    readMockExamCategoryByCategoryIdInput: ReadMockExamCategoryByCategoryIdInput,
+  ): Promise<ReadMockExamCategoryByCategoryIdOutput> {
+    try {
+      const { id } = readMockExamCategoryByCategoryIdInput;
+      const category = await this.mockExamCategories.findOne({
+        where: {
+          id,
+        },
+        relations: {
+          user: true,
+          mockExam: true,
+        },
+      });
+      return {
+        ok: true,
+        category,
+      };
+    } catch {
+      return {
+        ok: false,
+      };
+    }
   }
 
   async readMyMockExamCategories(

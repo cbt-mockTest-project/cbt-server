@@ -33,6 +33,10 @@ import {
   ReadMockExamCategoriesOutput,
 } from './dtos/readMockExamCategories.dto';
 import { ReadMockExamCategoryIdsOutput } from './dtos/readMockExamCategoryIds.dto';
+import {
+  ReadMockExamCategoryByCategoryIdInput,
+  ReadMockExamCategoryByCategoryIdOutput,
+} from './dtos/readMockExamCategoryByCategoryId.dto';
 
 @Resolver(() => MockExamCategory)
 export class MockExamCategoryResolver {
@@ -124,5 +128,15 @@ export class MockExamCategoryResolver {
   @Query(() => ReadMockExamCategoryIdsOutput)
   async readMockExamCategoryIds(): Promise<ReadMockExamCategoryIdsOutput> {
     return this.mockExamCategoryService.readMockExamCategoryIds();
+  }
+
+  @Query(() => ReadMockExamCategoryByCategoryIdOutput)
+  async readMockExamCategoryByCategoryId(
+    @Args('input')
+    readMockExamCategoryByCategoryIdInput: ReadMockExamCategoryByCategoryIdInput,
+  ): Promise<ReadMockExamCategoryByCategoryIdOutput> {
+    return this.mockExamCategoryService.readMockExamCategoryByCategoryId(
+      readMockExamCategoryByCategoryIdInput,
+    );
   }
 }

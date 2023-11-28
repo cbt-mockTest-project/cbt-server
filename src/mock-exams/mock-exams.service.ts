@@ -284,10 +284,10 @@ export class MockExamService {
     readMockExamTitlesByCateoryInput: ReadMockExamTitlesByCateoryInput,
   ): Promise<ReadMockExamTitlesByCateoryOutput> {
     try {
-      const { name, all, source } = readMockExamTitlesByCateoryInput;
+      const { name, id, all, source } = readMockExamTitlesByCateoryInput;
       let mockExamTitles: MockExam[] = [];
       if (!all) {
-        mockExamTitles = await this.mockExam
+        let query = this.mockExam
           .createQueryBuilder('mockExam')
           .leftJoin('mockExam.user', 'user')
           .leftJoin('mockExam.mockExamCategory', 'category')
@@ -299,16 +299,22 @@ export class MockExamService {
             'mockExam.order',
             'user.role',
           ])
-          .where('category.name = :name', { name })
           .andWhere('mockExam.source = :source', {
             source: source || ExamSource.MOUD_CBT,
           })
-          .andWhere('mockExam.approved = true')
-          .orderBy({
-            'mockExam.order': 'ASC',
-            'mockExam.title': 'DESC',
-          })
-          .getMany();
+          .andWhere('mockExam.approved = true');
+
+        if (name) {
+          query.andWhere('category.name = :name', { name });
+        }
+        if (id) {
+          query.andWhere('category.id = :id', { id });
+        }
+        query = query.orderBy({
+          'mockExam.order': 'ASC',
+          'mockExam.title': 'DESC',
+        });
+        mockExamTitles = await query.getMany();
       } else if (all && user) {
         // 내 시험지에서 타이틀 불러오기 할 경우
         if (!user) {
@@ -318,7 +324,7 @@ export class MockExamService {
           };
         }
         if (user.role === UserRole.ADMIN) {
-          mockExamTitles = await this.mockExam
+          let query = this.mockExam
             .createQueryBuilder('mockExam')
             .leftJoin('mockExam.user', 'user')
             .leftJoin('mockExam.mockExamCategory', 'category')
@@ -330,15 +336,21 @@ export class MockExamService {
               'mockExam.slug',
               'mockExam.order',
               'user.role',
-            ])
-            .where('category.name = :name', { name })
-            .orderBy({
-              'mockExam.order': 'ASC',
-              'mockExam.title': 'DESC',
-            })
-            .getMany();
+            ]);
+          if (name) {
+            query = query.andWhere('category.name = :name', { name });
+          }
+          if (id) {
+            query = query.andWhere('category.id = :id', { id });
+          }
+          query = query.orderBy({
+            'mockExam.order': 'ASC',
+            'mockExam.title': 'DESC',
+          });
+
+          mockExamTitles = await query.getMany();
         } else {
-          mockExamTitles = await this.mockExam
+          const query = this.mockExam
             .createQueryBuilder('mockExam')
             .leftJoin('mockExam.user', 'user')
             .leftJoin('mockExam.mockExamCategory', 'category')
@@ -351,7 +363,6 @@ export class MockExamService {
               'mockExam.order',
               'user.role',
             ])
-            .where('category.name = :name', { name })
             .andWhere(
               new Brackets((qb) => {
                 qb.where('mockExam.user.id = :userId', {
@@ -360,12 +371,19 @@ export class MockExamService {
                   userId: user.id,
                 });
               }),
-            )
-            .orderBy({
-              'mockExam.order': 'ASC',
-              'mockExam.title': 'DESC',
-            })
-            .getMany();
+            );
+          if (name) {
+            query.andWhere('category.name = :name', { name });
+          }
+          if (id) {
+            query.andWhere('category.id = :id', { id });
+          }
+          query.orderBy({
+            'mockExam.order': 'ASC',
+            'mockExam.title': 'DESC',
+          });
+
+          mockExamTitles = await query.getMany();
           const invitedExamCategory = await this.mockExamCategory.findOne({
             where: {
               name,
@@ -399,7 +417,6 @@ export class MockExamService {
         ok: true,
       };
     } catch (e) {
-      console.log(e);
       return {
         ok: false,
         error: '타이틀을 찾을 수 없습니다.',

@@ -17,10 +17,13 @@ export class ExamTitleAndId {
   order: number;
 }
 @InputType()
-export class ReadMockExamTitlesByCateoryInput extends PickType(
-  MockExamCategory,
-  ['name'],
-) {
+export class ReadMockExamTitlesByCateoryInput {
+  @Field(() => String, { nullable: true })
+  name?: string;
+
+  @Field(() => Number, { nullable: true })
+  id?: number;
+
   @Field(() => Boolean, { defaultValue: false, nullable: true })
   all?: boolean;
   @Field(() => ExamSource, {

@@ -20,7 +20,6 @@ import {
   CreateFeedbackOutput,
 } from './dtos/createFeedback.dto';
 import { EditProfileInput, EditProfileOutput } from './dtos/editProfile.dto';
-import { KakaoLoginInput, KakaoLoginOutput } from './dtos/kakaoLogin.dto';
 import { LoginInput, LoginOutput } from './dtos/login.dto';
 import { MeOutput } from './dtos/me.dto';
 import { RegisterInput, RegisterOutput } from './dtos/register.dto';

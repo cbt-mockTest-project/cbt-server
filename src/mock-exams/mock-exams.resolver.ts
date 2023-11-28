@@ -121,7 +121,7 @@ export class MockExamResolver {
 
   @Query(() => ReadMockExamByCategoryIdOutput)
   async readMockExamByCategoryId(
-    readMockExamByCategoryIdInput: ReadMockExamByCategoryIdInput,
+    @Args('input') readMockExamByCategoryIdInput: ReadMockExamByCategoryIdInput,
   ): Promise<ReadMockExamByCategoryIdOutput> {
     return this.mockExamService.readMockExamByCategoryId(
       readMockExamByCategoryIdInput,

@@ -33,6 +33,7 @@ import {
   ReadMockExamCategoriesOutput,
 } from './dtos/readMockExamCategories.dto';
 import { ExamSource } from './entities/mock-exam.entity';
+import { ReadMockExamCategoryIdsOutput } from './dtos/readMockExamCategoryIds.dto';
 
 @Injectable()
 export class MockExamCategoryService {
@@ -289,6 +290,24 @@ export class MockExamCategoryService {
       };
     } catch (e) {
       console.log(e);
+      return {
+        ok: false,
+        error: '카테고리를 찾을 수 없습니다.',
+      };
+    }
+  }
+
+  async readMockExamCategoryIds(): Promise<ReadMockExamCategoryIdsOutput> {
+    try {
+      const categories = await this.mockExamCategories.find({
+        select: ['id'],
+      });
+      const ids = categories.map((category) => category.id);
+      return {
+        ok: true,
+        ids,
+      };
+    } catch {
       return {
         ok: false,
         error: '카테고리를 찾을 수 없습니다.',

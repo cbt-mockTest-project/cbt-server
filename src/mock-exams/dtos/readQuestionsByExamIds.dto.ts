@@ -17,6 +17,6 @@ export class ReadQuestionsByExamIdsInput {
 
 @ObjectType()
 export class ReadQuestionsByExamIdsOutput extends CoreOutput {
-  @Field(() => [MockExamQuestion], { nullable: true, defaultValue: [] })
+  @Field(() => [MockExamQuestion], { defaultValue: [] })
   questions?: MockExamQuestion[];
 }

@@ -37,6 +37,10 @@ import {
   UpdateExamOrderInput,
   UpdateExamOrderOutput,
 } from './dtos/updateExamOrder.dto';
+import {
+  ReadMockExamByCategoryIdInput,
+  ReadMockExamByCategoryIdOutput,
+} from './dtos/readMockExamByCategoryId.dto';
 
 @Injectable()
 export class MockExamService {
@@ -470,23 +474,35 @@ export class MockExamService {
     }
   }
 
-  //   async sync() {
-  //     const mockExams = await this.mockExam.find({
-  //       where: {
-  //         user: {
-  //           id: Not(1),
-  //         },
-  //       },
-  //     });
-  //     const updatedMockExams = mockExams.map((mockExam) => {
-  //       return {
-  //         ...mockExam,
-  //         source: ExamSource.USER,
-  //       };
-  //     });
-  //     this.mockExam.save(updatedMockExams);
-  //     return {
-  //       ok: true,
-  //     };
-  //   }
+  async readMockExamByCategoryId(
+    readMockExamByCategoryIdInput: ReadMockExamByCategoryIdInput,
+  ): Promise<ReadMockExamByCategoryIdOutput> {
+    const { categoryId } = readMockExamByCategoryIdInput;
+    try {
+      const mockExams = await this.mockExam.find({
+        where: {
+          mockExamCategory: {
+            id: categoryId,
+          },
+        },
+        relations: {
+          user: true,
+          mockExamQuestion: true,
+        },
+        order: {
+          order: 'ASC',
+          title: 'DESC',
+        },
+      });
+      return {
+        ok: true,
+        mockExams,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '시험을 찾을 수 없습니다.',
+      };
+    }
+  }
 }

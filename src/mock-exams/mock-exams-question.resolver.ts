@@ -43,6 +43,10 @@ import {
   SearchQuestionsByKeywordInput,
   SearchQuestionsByKeywordOutput,
 } from './dtos/searchQuestionsByKeyword.dto';
+import {
+  ReadQuestionsByExamIdsInput,
+  ReadQuestionsByExamIdsOutput,
+} from './dtos/readQuestionsByExamIds.dto';
 
 @Resolver(() => MockExamQuestion)
 export class MockExamQuestionResolver {
@@ -163,8 +167,16 @@ export class MockExamQuestionResolver {
     );
   }
 
-  // @Mutation(() => CoreOutput)
-  // async updateQuestionUserId() {
-  //   return this.mockExamQuestionService.updateQuestionUserId();
-  // }
+  @Query(() => ReadQuestionsByExamIdsOutput)
+  async readQuestionsByExamIds(
+    @AuthUser()
+    user: User,
+    @Args('input')
+    readQuestionsByExamIdsInput: ReadQuestionsByExamIdsInput,
+  ): Promise<ReadQuestionsByExamIdsOutput> {
+    return this.mockExamQuestionService.readQuestionsByExamIds(
+      user,
+      readQuestionsByExamIdsInput,
+    );
+  }
 }

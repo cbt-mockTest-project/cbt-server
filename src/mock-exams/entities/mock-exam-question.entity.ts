@@ -11,12 +11,14 @@ import {
   RelationId,
 } from 'typeorm';
 import { MockExamQuestionFeedback } from './mock-exam-question-feedback.entity';
-import { MockExamQuestionState } from './mock-exam-question-state.entity';
+import {
+  MockExamQuestionState,
+  QuestionState,
+} from './mock-exam-question-state.entity';
 import { MockExamQuestionComment } from './mock-exam-question-comment.entity';
 import { MockExamQuestionBookmark } from './mock-exam-question-bookmark.entity';
 import { MockExamQuestionMultipleChoice } from './mock-exam-question-multiple-choice.entity';
 import { User } from 'src/users/entities/user.entity';
-import { Video } from 'src/video/entities/video.entity';
 
 @InputType('MockExamQuestionImageInputType', { isAbstract: true })
 @ObjectType()
@@ -129,4 +131,13 @@ export class MockExamQuestion extends CoreEntity {
   })
   @Field(() => User)
   user: User;
+
+  @Field(() => QuestionState, {
+    nullable: true,
+    defaultValue: QuestionState.CORE,
+  })
+  myQuestionState?: QuestionState = QuestionState.CORE;
+
+  @Field(() => Boolean, { nullable: true, defaultValue: false })
+  isBookmarked?: boolean = false;
 }

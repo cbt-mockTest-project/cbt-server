@@ -118,13 +118,4 @@ export class MockExamResolver {
   ): Promise<FindMyExamHistoryOutput> {
     return this.mockExamService.findMyExamHistory(user, findMyExamHistoryInput);
   }
-
-  @Query(() => ReadMockExamByCategoryIdOutput)
-  async readMockExamByCategoryId(
-    @Args('input') readMockExamByCategoryIdInput: ReadMockExamByCategoryIdInput,
-  ): Promise<ReadMockExamByCategoryIdOutput> {
-    return this.mockExamService.readMockExamByCategoryId(
-      readMockExamByCategoryIdInput,
-    );
-  }
 }

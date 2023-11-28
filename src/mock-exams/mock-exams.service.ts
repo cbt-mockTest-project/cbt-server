@@ -473,36 +473,4 @@ export class MockExamService {
       };
     }
   }
-
-  async readMockExamByCategoryId(
-    readMockExamByCategoryIdInput: ReadMockExamByCategoryIdInput,
-  ): Promise<ReadMockExamByCategoryIdOutput> {
-    const { categoryId } = readMockExamByCategoryIdInput;
-    try {
-      const mockExams = await this.mockExam.find({
-        where: {
-          mockExamCategory: {
-            id: categoryId,
-          },
-        },
-        relations: {
-          user: true,
-          mockExamQuestion: true,
-        },
-        order: {
-          order: 'ASC',
-          title: 'DESC',
-        },
-      });
-      return {
-        ok: true,
-        mockExams,
-      };
-    } catch {
-      return {
-        ok: false,
-        error: '시험을 찾을 수 없습니다.',
-      };
-    }
-  }
 }

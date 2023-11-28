@@ -34,6 +34,10 @@ import {
   UpdateExamOrderInput,
   UpdateExamOrderOutput,
 } from './dtos/updateExamOrder.dto';
+import {
+  ReadMockExamByCategoryIdInput,
+  ReadMockExamByCategoryIdOutput,
+} from './dtos/readMockExamByCategoryId.dto';
 
 @Resolver(() => MockExam)
 export class MockExamResolver {
@@ -115,8 +119,12 @@ export class MockExamResolver {
     return this.mockExamService.findMyExamHistory(user, findMyExamHistoryInput);
   }
 
-  // @Mutation(() => CoreOutput)
-  // async sync() {
-  //   return this.mockExamService.sync();
-  // }
+  @Query(() => ReadMockExamByCategoryIdOutput)
+  async readMockExamByCategoryId(
+    readMockExamByCategoryIdInput: ReadMockExamByCategoryIdInput,
+  ): Promise<ReadMockExamByCategoryIdOutput> {
+    return this.mockExamService.readMockExamByCategoryId(
+      readMockExamByCategoryIdInput,
+    );
+  }
 }

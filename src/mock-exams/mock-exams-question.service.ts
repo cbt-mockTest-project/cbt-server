@@ -1151,10 +1151,11 @@ export class MockExamQuestionService {
                 myRecommedationStatus,
               };
             })
-            .sort(
-              (a, b) =>
-                b.recommendationCount.good - a.recommendationCount.good ||
-                a.recommendationCount.bad - b.recommendationCount.bad,
+            .sort((a, b) =>
+              a.type === QuestionFeedbackType.PRIVATE
+                ? -1
+                : b.recommendationCount.good - a.recommendationCount.good ||
+                  a.recommendationCount.bad - b.recommendationCount.bad,
             ),
         };
       });

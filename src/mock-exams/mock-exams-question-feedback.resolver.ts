@@ -47,8 +47,10 @@ export class MockExamQuestionFeedbackResolver {
   async editMockExamQuestionFeedback(
     @Args('input')
     editMockExamQuestionFeedbackInput: EditMockExamQuestionFeedbackInput,
+    @AuthUser() user: User,
   ): Promise<EditMockExamQuestionFeedbackOutput> {
     return this.mockExamQuestionFeedbackSerivce.editMockExamQuestionFeedback(
+      user,
       editMockExamQuestionFeedbackInput,
     );
   }

@@ -5,7 +5,7 @@ import { InputType, ObjectType, PickType } from '@nestjs/graphql';
 @InputType()
 export class EditMockExamQuestionFeedbackInput extends PickType(
   MockExamQuestionFeedback,
-  ['id', 'content'],
+  ['id', 'content', 'type'],
 ) {}
 
 @ObjectType()

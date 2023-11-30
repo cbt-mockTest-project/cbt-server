@@ -94,12 +94,13 @@ export class MockExamQuestionFeedbackSerivce {
   }
 
   async editMockExamQuestionFeedback(
+    user: User,
     editMockExamQuestionFeedbackInput: EditMockExamQuestionFeedbackInput,
   ): Promise<EditMockExamQuestionFeedbackOutput> {
     try {
-      const { id, content } = editMockExamQuestionFeedbackInput;
+      const { id, content, type } = editMockExamQuestionFeedbackInput;
       const prevFeedback = await this.mockExamQuestionFeedback.findOne({
-        where: { id },
+        where: { id, user: { id: user.id } },
       });
       if (!prevFeedback) {
         return {
@@ -108,6 +109,7 @@ export class MockExamQuestionFeedbackSerivce {
         };
       }
       prevFeedback.content = content;
+      prevFeedback.type = type;
       await this.mockExamQuestionFeedback.save([prevFeedback]);
       return {
         ok: true,

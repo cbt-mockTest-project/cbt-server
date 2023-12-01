@@ -92,6 +92,10 @@ export class MockExamCategory extends CoreEntity {
   @Field(() => ExamSource)
   @IsEnum(ExamSource)
   source: ExamSource;
+
+  @Column({ default: false })
+  @Field(() => Boolean)
+  isPulic: boolean;
 }
 
 @Entity()

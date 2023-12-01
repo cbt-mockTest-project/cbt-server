@@ -73,7 +73,7 @@ export class MockExamQuestion extends CoreEntity {
 
   @Field(() => MockExam, { nullable: true })
   @ManyToOne(() => MockExam, (mockExam) => mockExam.mockExamQuestion, {
-    onDelete: 'SET NULL',
+    onDelete: 'CASCADE',
   })
   mockExam: MockExam;
 

@@ -9,7 +9,9 @@ import { MockExam } from './mock-exam.entity';
 @Entity()
 export class MockExamHistory extends CoreEntity {
   @Field(() => MockExam)
-  @ManyToOne(() => MockExam, (mockExam) => mockExam.history)
+  @ManyToOne(() => MockExam, (mockExam) => mockExam.history, {
+    onDelete: 'CASCADE',
+  })
   exam: MockExam;
 
   @Field(() => User)

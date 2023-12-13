@@ -72,6 +72,7 @@ export class MockExamBookmarkService {
       }
       return {
         ok: true,
+        isBookmarked: !bookmark,
       };
     } catch (error) {
       return {

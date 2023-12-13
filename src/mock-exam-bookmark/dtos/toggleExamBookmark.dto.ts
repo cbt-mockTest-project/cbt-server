@@ -8,4 +8,7 @@ export class ToggleExamBookmarkInput {
 }
 
 @ObjectType()
-export class ToggleExamBookmarkOutput extends CoreOutput {}
+export class ToggleExamBookmarkOutput extends CoreOutput {
+  @Field(() => Boolean, { nullable: true })
+  isBookmarked?: boolean;
+}

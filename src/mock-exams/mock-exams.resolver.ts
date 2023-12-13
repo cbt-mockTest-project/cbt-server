@@ -34,10 +34,7 @@ import {
   UpdateExamOrderInput,
   UpdateExamOrderOutput,
 } from './dtos/updateExamOrder.dto';
-import {
-  ReadMockExamByCategoryIdInput,
-  ReadMockExamByCategoryIdOutput,
-} from './dtos/readMockExamByCategoryId.dto';
+import { GetMyExamsOutput } from './dtos/getMyExams.dto';
 
 @Resolver(() => MockExam)
 export class MockExamResolver {
@@ -117,5 +114,11 @@ export class MockExamResolver {
     @Args('input') findMyExamHistoryInput: FindMyExamHistoryInput,
   ): Promise<FindMyExamHistoryOutput> {
     return this.mockExamService.findMyExamHistory(user, findMyExamHistoryInput);
+  }
+
+  @Role(['ANY'])
+  @Query(() => GetMyExamsOutput)
+  async getMyExams(@AuthUser() user: User): Promise<GetMyExamsOutput> {
+    return this.mockExamService.getMyExams(user);
   }
 }

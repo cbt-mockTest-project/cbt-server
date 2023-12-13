@@ -37,10 +37,7 @@ import {
   UpdateExamOrderInput,
   UpdateExamOrderOutput,
 } from './dtos/updateExamOrder.dto';
-import {
-  ReadMockExamByCategoryIdInput,
-  ReadMockExamByCategoryIdOutput,
-} from './dtos/readMockExamByCategoryId.dto';
+import { GetMyExamsInput, GetMyExamsOutput } from './dtos/getMyExams.dto';
 
 @Injectable()
 export class MockExamService {
@@ -470,6 +467,31 @@ export class MockExamService {
       return {
         ok: false,
         error: '시험기록을 조회할 수 없습니다.',
+      };
+    }
+  }
+
+  async getMyExams(user: User): Promise<GetMyExamsOutput> {
+    try {
+      const exams = await this.mockExam.find({
+        where: {
+          user: {
+            id: user.id,
+          },
+        },
+        order: {
+          order: 'ASC',
+          created_at: 'DESC',
+        },
+      });
+      return {
+        ok: true,
+        exams,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '시험지를 불러올 수 없습니다.',
       };
     }
   }

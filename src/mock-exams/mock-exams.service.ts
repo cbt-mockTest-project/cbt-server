@@ -37,7 +37,11 @@ import {
   UpdateExamOrderInput,
   UpdateExamOrderOutput,
 } from './dtos/updateExamOrder.dto';
-import { GetMyExamsInput, GetMyExamsOutput } from './dtos/getMyExams.dto';
+import { GetMyExamsOutput } from './dtos/getMyExams.dto';
+import {
+  AddExamToCategoryInput,
+  AddExamToCategoryOutput,
+} from './dtos/addExamToCategory.dto';
 
 @Injectable()
 export class MockExamService {
@@ -492,6 +496,68 @@ export class MockExamService {
       return {
         ok: false,
         error: '시험지를 불러올 수 없습니다.',
+      };
+    }
+  }
+
+  async addExamToCategory(
+    user: User,
+    addExamToCategoryInput: AddExamToCategoryInput,
+  ): Promise<AddExamToCategoryOutput> {
+    try {
+      const { examId, categoryId } = addExamToCategoryInput;
+      const exam = await this.mockExam.findOne({
+        where: {
+          id: examId,
+          user: {
+            id: user.id,
+          },
+        },
+      });
+      if (!exam) {
+        return {
+          ok: false,
+          error: '시험지를 찾을 수 없습니다.',
+        };
+      }
+      const category = await this.mockExamCategory.findOne({
+        where: {
+          id: categoryId,
+          user: {
+            id: user.id,
+          },
+        },
+      });
+      if (!category) {
+        return {
+          ok: false,
+          error: '폴더를 찾을 수 없습니다.',
+        };
+      }
+      const exitingRelation = await this.mockExam
+        .createQueryBuilder()
+        .relation(MockExam, 'mockExamCategory')
+        .of(examId)
+        .loadMany();
+      if (exitingRelation.find((relation) => relation.id === categoryId)) {
+        return {
+          ok: false,
+          error: '이미 폴더에 추가되어 있습니다.',
+        };
+      }
+      await this.mockExam
+        .createQueryBuilder()
+        .relation(MockExam, 'mockExamCategory')
+        .of(examId)
+        .add(categoryId);
+      return {
+        ok: true,
+      };
+    } catch (e) {
+      console.log(e);
+      return {
+        ok: false,
+        error: '폴더를 추가하는데 실패했습니다.',
       };
     }
   }

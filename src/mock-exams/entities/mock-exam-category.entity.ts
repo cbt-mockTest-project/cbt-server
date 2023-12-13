@@ -40,9 +40,7 @@ export class MockExamCategory extends CoreEntity {
   description?: string;
 
   @Field(() => [MockExam])
-  @ManyToMany(() => MockExam, (mockExam) => mockExam.mockExamCategory, {
-    onDelete: 'CASCADE',
-  })
+  @ManyToMany(() => MockExam, (mockExam) => mockExam.mockExamCategory)
   @JoinTable({
     name: 'category_and_exam',
     joinColumn: {

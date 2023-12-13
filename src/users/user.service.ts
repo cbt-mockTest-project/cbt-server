@@ -78,7 +78,6 @@ import {
   GetUserByNicknameOrEmailOutput,
 } from './dtos/getUserByNicknameOrEmail.dto';
 import { GetRolesCountInput, GetRolesCountOutput } from './dtos/getRolesCount';
-import { parseCookies } from 'src/lib/utils/parseCookies';
 @Injectable()
 export class UserService {
   constructor(

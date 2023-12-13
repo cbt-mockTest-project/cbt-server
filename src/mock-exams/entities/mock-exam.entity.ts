@@ -14,6 +14,7 @@ import { MockExamQuestionState } from './mock-exam-question-state.entity';
 import { IsEnum } from 'class-validator';
 import { MockExamHistory } from './mock-exam-history';
 import { ExamViewer } from 'src/exam-viewer/entities/exam-viewer.entity';
+import { MockExamBookmark } from 'src/mock-exam-bookmark/entities/mock-exam-bookmark.entity';
 
 export enum ExamStatus {
   UNSET = 'UNSET',
@@ -104,6 +105,10 @@ export class MockExam extends CoreEntity {
   })
   @Field(() => User)
   user: User;
+
+  @OneToMany(() => MockExamBookmark, (bookmark) => bookmark.exam)
+  @Field(() => [MockExamBookmark])
+  examBookmarks: MockExamBookmark[];
 
   @Column({ type: 'enum', enum: ExamStatus, default: ExamStatus.UNSET })
   @Field(() => ExamStatus)

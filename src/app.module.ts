@@ -84,6 +84,8 @@ import { ChatbotModule } from './chatbot/chatbot.module';
 import { ChatbotKey } from './chatbot/entities/chatbot-key.entity';
 import { DiscountCodeModule } from './discount-code/discount-code.module';
 import { DiscountCode } from './discount-code/discount-code.entity';
+import { MockExamBookmarkModule } from './mock-exam-bookmark/mock-exam-bookmark.module';
+import { MockExamBookmark } from './mock-exam-bookmark/entities/mock-exam-bookmark.entity';
 
 @Module({
   imports: [
@@ -198,6 +200,7 @@ import { DiscountCode } from './discount-code/discount-code.entity';
         ExamViewer,
         Stock,
         ChatbotKey,
+        MockExamBookmark,
       ],
     }),
     UserModule,
@@ -258,6 +261,7 @@ import { DiscountCode } from './discount-code/discount-code.entity';
     WeatherModule,
     ChatbotModule,
     DiscountCodeModule,
+    MockExamBookmarkModule,
   ],
   controllers: [],
   providers: [

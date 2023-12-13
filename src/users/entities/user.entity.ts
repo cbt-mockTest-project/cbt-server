@@ -42,6 +42,7 @@ import { PostData } from 'src/post/entities/postData.entity';
 import { PostFile } from 'src/post/entities/postFile.entity';
 import { ExamViewer } from 'src/exam-viewer/entities/exam-viewer.entity';
 import { DiscountCode } from 'src/discount-code/discount-code.entity';
+import { MockExamBookmark } from 'src/mock-exam-bookmark/entities/mock-exam-bookmark.entity';
 
 export enum UserRole {
   CLIENT = 'CLIENT',
@@ -146,6 +147,10 @@ export class User extends CoreEntity {
   @OneToMany(() => PostFile, (postFile) => postFile.user)
   @Field(() => [PostFile])
   postFile: PostFile[];
+
+  @OneToMany(() => MockExamBookmark, (bookmark) => bookmark.user)
+  @Field(() => [MockExamBookmark])
+  examBookmarks: MockExamBookmark[];
 
   @OneToMany(
     () => MockExamQuestionCommentLike,

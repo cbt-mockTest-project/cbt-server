@@ -30,6 +30,7 @@ import { QuestionFeedbackRecommendationType } from './entities/mock-exam-questio
 
 import { ExamSource } from './entities/mock-exam.entity';
 import { TelegramService } from 'src/telegram/telegram.service';
+import { MockExamCategory } from './entities/mock-exam-category.entity';
 
 @Injectable()
 export class MockExamQuestionFeedbackSerivce {
@@ -38,6 +39,8 @@ export class MockExamQuestionFeedbackSerivce {
     private readonly mockExamQuestionFeedback: Repository<MockExamQuestionFeedback>,
     @InjectRepository(MockExamQuestion)
     private readonly mockExamQuestion: Repository<MockExamQuestion>,
+    @InjectRepository(MockExamCategory)
+    private readonly mockExamCategory: Repository<MockExamCategory>,
     private readonly telegramService: TelegramService,
   ) {}
 
@@ -51,7 +54,17 @@ export class MockExamQuestionFeedbackSerivce {
       const question = await this.mockExamQuestion.findOne({
         where: { id: questionId },
         relations: {
-          mockExam: { mockExamCategory: true },
+          mockExam: true,
+        },
+      });
+      const category = await this.mockExamCategory.findOne({
+        where: {
+          mockExam: {
+            id: question.mockExam.id,
+            user: {
+              id: user.id,
+            },
+          },
         },
       });
       if (!question) {
@@ -69,9 +82,7 @@ export class MockExamQuestionFeedbackSerivce {
       feedback = await this.mockExamQuestionFeedback.save(feedback);
 
       if (type === QuestionFeedbackType.REPORT) {
-        if (
-          question.mockExam.mockExamCategory.source === ExamSource.EHS_MASTER
-        ) {
+        if (category.source === ExamSource.EHS_MASTER) {
           this.telegramService.sendMessageToTelegram({
             channelId: Number(process.env.TELEGRAM_EHSMASTER_REPORT_CHANNEL),
             message: `문제 피드백이 도착했습니다.\n보고자: ${user.nickname}\nhttps://moducbt.com/question/${question.id}`,

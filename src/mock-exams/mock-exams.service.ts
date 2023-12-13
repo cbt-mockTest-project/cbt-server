@@ -77,7 +77,7 @@ export class MockExamService {
     }
     const newMockExam = this.mockExam.create({
       title,
-      mockExamCategory,
+      mockExamCategory: [mockExamCategory],
       approved: false,
       source: user.id === 1 ? ExamSource.MOUD_CBT : ExamSource.USER,
       user,

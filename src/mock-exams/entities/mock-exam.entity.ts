@@ -8,7 +8,7 @@ import {
   ObjectType,
   registerEnumType,
 } from '@nestjs/graphql';
-import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, ManyToMany, ManyToOne, OneToMany } from 'typeorm';
 import { MockExamQuestion } from './mock-exam-question.entity';
 import { MockExamQuestionState } from './mock-exam-question-state.entity';
 import { IsEnum } from 'class-validator';
@@ -51,15 +51,15 @@ export class MockExam extends CoreEntity {
   @Field(() => Boolean, { defaultValue: false })
   isPremium: boolean;
 
-  @Field(() => MockExamCategory)
-  @ManyToOne(
+  @Field(() => [MockExamCategory])
+  @ManyToMany(
     () => MockExamCategory,
     (mockExamCategory) => mockExamCategory.mockExam,
     {
-      onDelete: 'SET NULL', // category 삭제될시  mockExam's categoryId가 null
+      onDelete: 'CASCADE',
     },
   )
-  mockExamCategory: MockExamCategory;
+  mockExamCategory: MockExamCategory[];
 
   @Field(() => [MockExamQuestion])
   @OneToMany(

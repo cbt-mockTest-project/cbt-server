@@ -35,6 +35,10 @@ export class MockExamCategory extends CoreEntity {
   @Field(() => String)
   name: string;
 
+  @Column({ default: '' })
+  @Field(() => String, { defaultValue: '' })
+  description?: string;
+
   @Field(() => [MockExam])
   @OneToMany(() => MockExam, (mockExam) => mockExam.mockExamCategory)
   mockExam: MockExam[];
@@ -94,8 +98,8 @@ export class MockExamCategory extends CoreEntity {
   source: ExamSource;
 
   @Column({ default: false })
-  @Field(() => Boolean)
-  isPulic: boolean;
+  @Field(() => Boolean, { defaultValue: false })
+  isPublic: boolean;
 }
 
 @Entity()

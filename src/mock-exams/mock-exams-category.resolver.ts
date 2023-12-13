@@ -37,6 +37,14 @@ import {
   ReadMockExamCategoryByCategoryIdInput,
   ReadMockExamCategoryByCategoryIdOutput,
 } from './dtos/readMockExamCategoryByCategoryId.dto';
+import {
+  SearchMockExamCategoriesInput,
+  SearchMockExamCategoriesOutput,
+} from './dtos/searchMockExamCategories.dto';
+import {
+  GetExamCategoriesInput,
+  GetExamCategoriesOutput,
+} from './dtos/getExamCategories.dto';
 
 @Resolver(() => MockExamCategory)
 export class MockExamCategoryResolver {
@@ -137,6 +145,26 @@ export class MockExamCategoryResolver {
   ): Promise<ReadMockExamCategoryByCategoryIdOutput> {
     return this.mockExamCategoryService.readMockExamCategoryByCategoryId(
       readMockExamCategoryByCategoryIdInput,
+    );
+  }
+
+  @Query(() => SearchMockExamCategoriesOutput)
+  async searchMockExamCategories(
+    @Args('input') searchMockExamCategoriesInput: SearchMockExamCategoriesInput,
+  ): Promise<SearchMockExamCategoriesOutput> {
+    return this.mockExamCategoryService.searchMockExamCategories(
+      searchMockExamCategoriesInput,
+    );
+  }
+
+  @Query(() => GetExamCategoriesOutput)
+  async getExamCategories(
+    @AuthUser() user: User,
+    @Args('input') getExamCategoriesInput: GetExamCategoriesInput,
+  ): Promise<GetExamCategoriesOutput> {
+    return this.mockExamCategoryService.getExamCategories(
+      user,
+      getExamCategoriesInput,
     );
   }
 }

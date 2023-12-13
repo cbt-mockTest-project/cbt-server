@@ -4,13 +4,12 @@ import {
   CreateMockExamCategoryOutput,
 } from './dtos/createCategory.dto';
 import {
-  ExamCategoryRole,
   MockExamCategory,
   MockExamCategoryTypes,
 } from './entities/mock-exam-category.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsWhere, In, IsNull, Repository } from 'typeorm';
+import { FindOptionsWhere, IsNull, Repository } from 'typeorm';
 import {
   DeleteMockExamCategoryInput,
   DeleteMockExamCategoryOutput,
@@ -38,22 +37,63 @@ import {
   ReadMockExamCategoryByCategoryIdInput,
   ReadMockExamCategoryByCategoryIdOutput,
 } from './dtos/readMockExamCategoryByCategoryId.dto';
+import {
+  SearchMockExamCategoriesInput,
+  SearchMockExamCategoriesOutput,
+} from './dtos/searchMockExamCategories.dto';
+import {
+  GetExamCategoriesInput,
+  GetExamCategoriesOutput,
+} from './dtos/getExamCategories.dto';
 
 @Injectable()
 export class MockExamCategoryService {
   constructor(
     @InjectRepository(MockExamCategory)
     private readonly mockExamCategories: Repository<MockExamCategory>,
-    @InjectRepository(ExamCategoryRole)
-    private readonly examCategoryRoles: Repository<ExamCategoryRole>,
   ) {}
+
+  async getExamCategories(
+    user: User,
+    getExamCategoriesInput: GetExamCategoriesInput,
+  ): Promise<GetExamCategoriesOutput> {
+    const { examSource } = getExamCategoriesInput;
+    const where: FindOptionsWhere<MockExamCategory>[] = [
+      {
+        source: examSource,
+        isPublic: true,
+      },
+    ];
+    if (user) {
+      where.push({
+        source: examSource,
+        isPublic: false,
+        user: {
+          id: user.id,
+        },
+      });
+    }
+    const categories = await this.mockExamCategories.find({
+      where,
+      relations: {
+        user: true,
+      },
+      order: {
+        created_at: 'DESC',
+      },
+    });
+    return {
+      ok: true,
+      categories,
+    };
+  }
 
   async createMockExamCategory(
     user: User,
     createMockExamCategoryInput: CreateMockExamCategoryInput,
   ): Promise<CreateMockExamCategoryOutput> {
     try {
-      const { name } = createMockExamCategoryInput;
+      const { name, isPublic, description } = createMockExamCategoryInput;
       const exists = await this.mockExamCategories.findOne({
         where: { name },
       });
@@ -67,7 +107,10 @@ export class MockExamCategoryService {
         name: createMockExamCategoryInput.name,
         user,
         approved: false,
-        source: user.id === 1 ? ExamSource.MOUD_CBT : ExamSource.USER,
+        isPublic,
+        description,
+        source:
+          user.role === UserRole.ADMIN ? ExamSource.MOUD_CBT : ExamSource.USER,
       });
       const category = await this.mockExamCategories.save(newCategory);
       return {
@@ -128,7 +171,7 @@ export class MockExamCategoryService {
     user: User,
     editMockExamCategoryInput: EditMockExamCategoryInput,
   ): Promise<EditMockExamCategoryOutput> {
-    const { id, name } = editMockExamCategoryInput;
+    const { id } = editMockExamCategoryInput;
     const prevCategory = await this.mockExamCategories.findOne({
       where: { id },
       relations: { user: true },
@@ -139,22 +182,10 @@ export class MockExamCategoryService {
         error: '존재하지 않는 카테고리입니다.',
       };
     }
-    if (prevCategory.approved) {
-      return {
-        ok: false,
-        error: '승인된 카테고리는 수정할 수 없습니다.',
-      };
-    }
     if (user.id !== prevCategory.user.id) {
       return {
         ok: false,
         error: '권한이 없습니다.',
-      };
-    }
-    if (prevCategory.name === name) {
-      return {
-        ok: false,
-        error: '현재와 동일한 카테고리 이름입니다.',
       };
     }
     await this.mockExamCategories.save([editMockExamCategoryInput]);
@@ -244,6 +275,12 @@ export class MockExamCategoryService {
         relations: {
           user: true,
           mockExam: true,
+        },
+        order: {
+          mockExam: {
+            order: 'ASC',
+            title: 'DESC',
+          },
         },
       });
       return {
@@ -345,6 +382,38 @@ export class MockExamCategoryService {
       return {
         ok: false,
         error: '카테고리를 찾을 수 없습니다.',
+      };
+    }
+  }
+
+  async searchMockExamCategories(
+    searchMockExamCategoriesInput: SearchMockExamCategoriesInput,
+  ): Promise<SearchMockExamCategoriesOutput> {
+    try {
+      const { keyword, limit, page, isPublic } = searchMockExamCategoriesInput;
+      const skip = (Number(page) - 1) * Number(limit);
+      const formattedKeyword = `%${keyword.replace(/\s+/g, '').toLowerCase()}%`;
+      const query = this.mockExamCategories
+        .createQueryBuilder('category')
+        .leftJoinAndSelect('category.user', 'user')
+        .where(
+          "(LOWER(REPLACE(category.name, ' ', '')) LIKE :formattedKeyword OR LOWER(REPLACE(user.nickname, ' ', '')) LIKE :formattedKeyword) AND category.isPublic = :isPublic",
+          { formattedKeyword, isPublic: isPublic },
+        );
+
+      const totalCount = await query.getCount();
+
+      const categories = await query.skip(skip).take(limit).getMany();
+
+      return {
+        totalCount,
+        categories,
+        ok: true,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '문제를 찾을 수 없습니다.',
       };
     }
   }

@@ -42,6 +42,10 @@ import {
   AddExamToCategoryInput,
   AddExamToCategoryOutput,
 } from './dtos/addExamToCategory.dto';
+import {
+  RemoveExamFromCategoryInput,
+  RemoveExamFromCategoryOutput,
+} from './dtos/removeExamFromCategory.dto';
 
 @Injectable()
 export class MockExamService {
@@ -554,10 +558,73 @@ export class MockExamService {
         ok: true,
       };
     } catch (e) {
-      console.log(e);
       return {
         ok: false,
         error: '폴더를 추가하는데 실패했습니다.',
+      };
+    }
+  }
+
+  async removeExamFromCategory(
+    user: User,
+    removeExamFromCategoryInput: RemoveExamFromCategoryInput,
+  ): Promise<RemoveExamFromCategoryOutput> {
+    try {
+      const { examId, categoryId } = removeExamFromCategoryInput;
+      const exam = await this.mockExam.findOne({
+        where: {
+          id: examId,
+          user: {
+            id: user.id,
+          },
+        },
+      });
+      if (!exam) {
+        return {
+          ok: false,
+          error: '시험지를 찾을 수 없습니다.',
+        };
+      }
+      const category = await this.mockExamCategory.findOne({
+        where: {
+          id: categoryId,
+          user: {
+            id: user.id,
+          },
+        },
+      });
+      if (!category) {
+        return {
+          ok: false,
+          error: '폴더를 찾을 수 없습니다.',
+        };
+      }
+
+      const exitingRelation = await this.mockExam
+        .createQueryBuilder()
+        .relation(MockExam, 'mockExamCategory')
+        .of(examId)
+        .loadMany();
+
+      if (!exitingRelation.find((relation) => relation.id === categoryId)) {
+        return {
+          ok: false,
+          error: '폴더에 추가되어 있지 않습니다.',
+        };
+      }
+
+      await this.mockExam
+        .createQueryBuilder()
+        .relation(MockExam, 'mockExamCategory')
+        .of(examId)
+        .remove(categoryId);
+      return {
+        ok: true,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '폴더를 삭제하는데 실패했습니다.',
       };
     }
   }

@@ -39,6 +39,10 @@ import {
   AddExamToCategoryInput,
   AddExamToCategoryOutput,
 } from './dtos/addExamToCategory.dto';
+import {
+  RemoveExamFromCategoryInput,
+  RemoveExamFromCategoryOutput,
+} from './dtos/removeExamFromCategory.dto';
 
 @Resolver(() => MockExam)
 export class MockExamResolver {
@@ -133,5 +137,17 @@ export class MockExamResolver {
     @Args('input') addExamToCategoryInput: AddExamToCategoryInput,
   ): Promise<AddExamToCategoryOutput> {
     return this.mockExamService.addExamToCategory(user, addExamToCategoryInput);
+  }
+
+  @Role(['ANY'])
+  @Mutation(() => RemoveExamFromCategoryOutput)
+  async removeExamFromCategory(
+    @AuthUser() user: User,
+    @Args('input') removeExamFromCategoryInput: RemoveExamFromCategoryInput,
+  ): Promise<RemoveExamFromCategoryOutput> {
+    return this.mockExamService.removeExamFromCategory(
+      user,
+      removeExamFromCategoryInput,
+    );
   }
 }

@@ -274,7 +274,9 @@ export class MockExamCategoryService {
         },
         relations: {
           user: true,
-          mockExam: true,
+          mockExam: {
+            user: true,
+          },
         },
         order: {
           mockExam: {

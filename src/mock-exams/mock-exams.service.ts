@@ -487,6 +487,9 @@ export class MockExamService {
             id: user.id,
           },
         },
+        relations: {
+          user: true,
+        },
         order: {
           order: 'ASC',
           created_at: 'DESC',

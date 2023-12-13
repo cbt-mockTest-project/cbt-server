@@ -25,7 +25,9 @@ export class MockExamBookmarkService {
           },
         },
         relations: {
-          exam: true,
+          exam: {
+            user: true,
+          },
         },
       });
       return {

@@ -46,6 +46,7 @@ import {
   GetExamCategoriesOutput,
 } from './dtos/getExamCategories.dto';
 import { MockExamBookmark } from 'src/mock-exam-bookmark/entities/mock-exam-bookmark.entity';
+import { GetMyExamCategoriesOutput } from './dtos/getMyExamCategories.dto';
 
 @Injectable()
 export class MockExamCategoryService {
@@ -89,6 +90,33 @@ export class MockExamCategoryService {
       ok: true,
       categories,
     };
+  }
+
+  async getMyExamCategories(user: User): Promise<GetMyExamCategoriesOutput> {
+    try {
+      const categories = await this.mockExamCategories.find({
+        where: {
+          user: {
+            id: user.id,
+          },
+        },
+        relations: {
+          user: true,
+        },
+        order: {
+          created_at: 'DESC',
+        },
+      });
+      return {
+        ok: true,
+        categories,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '카테고리를 찾을 수 없습니다.',
+      };
+    }
   }
 
   async createMockExamCategory(
@@ -297,7 +325,6 @@ export class MockExamCategoryService {
             user: {
               id: user.id,
             },
-
             exam: In(mockExamIds),
           },
           relations: {

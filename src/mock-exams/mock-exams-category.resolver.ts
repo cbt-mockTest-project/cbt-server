@@ -45,6 +45,7 @@ import {
   GetExamCategoriesInput,
   GetExamCategoriesOutput,
 } from './dtos/getExamCategories.dto';
+import { GetMyExamCategoriesOutput } from './dtos/getMyExamCategories.dto';
 
 @Resolver(() => MockExamCategory)
 export class MockExamCategoryResolver {
@@ -168,5 +169,12 @@ export class MockExamCategoryResolver {
       user,
       getExamCategoriesInput,
     );
+  }
+
+  @Query(() => GetMyExamCategoriesOutput)
+  async getMyExamCategories(
+    @AuthUser() user: User,
+  ): Promise<GetMyExamCategoriesOutput> {
+    return this.mockExamCategoryService.getMyExamCategories(user);
   }
 }

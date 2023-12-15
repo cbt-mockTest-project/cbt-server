@@ -140,10 +140,12 @@ export class MockExamCategoryResolver {
 
   @Query(() => ReadMockExamCategoryByCategoryIdOutput)
   async readMockExamCategoryByCategoryId(
+    @AuthUser() user: User,
     @Args('input')
     readMockExamCategoryByCategoryIdInput: ReadMockExamCategoryByCategoryIdInput,
   ): Promise<ReadMockExamCategoryByCategoryIdOutput> {
     return this.mockExamCategoryService.readMockExamCategoryByCategoryId(
+      user,
       readMockExamCategoryByCategoryIdInput,
     );
   }

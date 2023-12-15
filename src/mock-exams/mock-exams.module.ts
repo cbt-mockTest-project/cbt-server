@@ -39,6 +39,7 @@ import { MockExamQuestionFeedbackRecommendation } from './entities/mock-exam-que
 import { MockExamQuestionFeedbackRecommendationResolver } from './mock-exams-question-feedback-recommendation.resolver';
 import { MockExamQuestionFeedbackRecommendationService } from './mock-exams-question-feedback-recommendation.service';
 import { Role } from 'src/users/entities/role.entity';
+import { MockExamBookmark } from 'src/mock-exam-bookmark/entities/mock-exam-bookmark.entity';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { Role } from 'src/users/entities/role.entity';
       ExamCoAuthor,
       Role,
       ExamCategoryRole,
+      MockExamBookmark,
       User,
     ]),
   ],

@@ -123,4 +123,7 @@ export class MockExam extends CoreEntity {
   @Column({ default: 0 })
   @Field(() => Number, { defaultValue: 0 })
   order: number;
+
+  @Field(() => Boolean, { nullable: true, defaultValue: false })
+  isBookmarked?: boolean = false;
 }

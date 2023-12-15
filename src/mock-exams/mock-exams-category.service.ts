@@ -7,9 +7,9 @@ import {
   MockExamCategory,
   MockExamCategoryTypes,
 } from './entities/mock-exam-category.entity';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsWhere, IsNull, Repository } from 'typeorm';
+import { FindOptionsWhere, In, IsNull, Repository } from 'typeorm';
 import {
   DeleteMockExamCategoryInput,
   DeleteMockExamCategoryOutput,
@@ -45,12 +45,15 @@ import {
   GetExamCategoriesInput,
   GetExamCategoriesOutput,
 } from './dtos/getExamCategories.dto';
+import { MockExamBookmark } from 'src/mock-exam-bookmark/entities/mock-exam-bookmark.entity';
 
 @Injectable()
 export class MockExamCategoryService {
   constructor(
     @InjectRepository(MockExamCategory)
     private readonly mockExamCategories: Repository<MockExamCategory>,
+    @InjectRepository(MockExamBookmark)
+    private readonly mockExamBookmarks: Repository<MockExamBookmark>,
   ) {}
 
   async getExamCategories(
@@ -264,6 +267,7 @@ export class MockExamCategoryService {
   }
 
   async readMockExamCategoryByCategoryId(
+    user: User,
     readMockExamCategoryByCategoryIdInput: ReadMockExamCategoryByCategoryIdInput,
   ): Promise<ReadMockExamCategoryByCategoryIdOutput> {
     try {
@@ -285,13 +289,45 @@ export class MockExamCategoryService {
           },
         },
       });
+      // 로그인 상태일 경우, 북마크 여부를 조회한다.
+      if (user) {
+        const mockExamIds = category.mockExam.map((exam) => exam.id);
+        const mockExamBookmarks = await this.mockExamBookmarks.find({
+          where: {
+            user: {
+              id: user.id,
+            },
+
+            exam: In(mockExamIds),
+          },
+          relations: {
+            exam: true,
+          },
+        });
+        category.mockExam = category.mockExam.map((exam) => {
+          const bookmark = mockExamBookmarks.find(
+            (mockExamBookmark) => mockExamBookmark.exam.id === exam.id,
+          );
+          if (bookmark) {
+            return {
+              ...exam,
+              isBookmarked: true,
+            };
+          }
+          return {
+            ...exam,
+            isBookmarked: false,
+          };
+        });
+      }
       return {
         ok: true,
         category,
       };
-    } catch {
+    } catch (e) {
       return {
         ok: false,
+        error: '카테고리를 찾을 수 없습니다.',
       };
     }
   }

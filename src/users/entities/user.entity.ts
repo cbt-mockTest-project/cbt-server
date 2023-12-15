@@ -71,6 +71,10 @@ export class User extends CoreEntity {
   @IsEmail()
   email: string;
 
+  @Column({ default: '' })
+  @Field(() => String, { defaultValue: '' })
+  profileImg: string;
+
   @Column({ unique: true })
   @Field(() => String)
   nickname: string;

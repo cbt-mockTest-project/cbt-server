@@ -6,6 +6,7 @@ import { InputType, ObjectType, PartialType, PickType } from '@nestjs/graphql';
 export class EditProfileInput extends PickType(PartialType(User), [
   'nickname',
   'password',
+  'profileImg',
 ]) {}
 
 @ObjectType()

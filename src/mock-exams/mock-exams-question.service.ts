@@ -978,32 +978,38 @@ export class MockExamQuestionService {
        */
       if (user && states) {
         let coreQuestions: MockExamQuestion[] = [];
+        let allQuestions: MockExamQuestion[] = [];
+        let existingQuestionStates: MockExamQuestionState[] = [];
         if (states.includes(QuestionState.CORE)) {
-          const allQuestions = await this.mockExamQuestion.find({
-            where: {
-              mockExam: {
-                id: In(ids),
-              },
-            },
-          });
-          const existingQuestionStates = await this.mockExamQuestionState.find({
-            relations: { question: true, exam: true },
-            where: {
-              user: { id: user.id },
-              question: { id: In(questionIds) },
-            },
-          });
-
+          await Promise.all([
+            this.mockExamQuestion
+              .find({
+                where: {
+                  mockExam: {
+                    id: In(ids),
+                  },
+                },
+              })
+              .then((questions) => (allQuestions = questions)),
+            this.mockExamQuestionState
+              .find({
+                relations: { question: true, exam: true },
+                where: {
+                  user: { id: user.id },
+                  question: { id: In(questionIds) },
+                },
+              })
+              .then((states) => (existingQuestionStates = states)),
+          ]);
           const existingQuestionStateMap = new Map(
             existingQuestionStates.map((qs) => [qs.question.id, qs]),
           );
-
           coreQuestions = allQuestions.filter(
             (question) => !existingQuestionStateMap.has(question.id),
           );
         }
 
-        let questionStatesQuery = await this.mockExamQuestionState
+        let questionStatesQuery = this.mockExamQuestionState
           .createQueryBuilder('mockExamQuestionState')
           .leftJoinAndSelect('mockExamQuestionState.question', 'question')
           .leftJoinAndSelect('question.mockExam', 'mockExam')
@@ -1037,54 +1043,61 @@ export class MockExamQuestionService {
       if (limit) {
         questions = questions.slice(0, limit);
       }
-
       questionIds = questions.map((question) => question.id);
       let questionStates: MockExamQuestionState[] = [];
       let questionBookmarks: MockExamQuestionBookmark[] = [];
       let questionFeedbacks: MockExamQuestionFeedback[] = [];
       let questionComments: MockExamQuestionComment[] = [];
       await Promise.all([
-        (questionStates = user
-          ? await this.mockExamQuestionState.find({
-              relations: { question: true },
-              where: {
-                question: In(questionIds),
-                user: {
-                  id: user.id,
+        user
+          ? this.mockExamQuestionState
+              .find({
+                relations: { question: true },
+                where: {
+                  question: In(questionIds),
+                  user: {
+                    id: user.id,
+                  },
                 },
-              },
-            })
-          : []),
-        (questionBookmarks = user
-          ? await this.mockExamQuestionBookmark.find({
-              relations: { question: true },
-              where: {
-                question: In(questionIds),
-                user: {
-                  id: user.id,
+              })
+              .then((states) => (questionStates = states))
+          : (questionStates = []),
+        user
+          ? this.mockExamQuestionBookmark
+              .find({
+                relations: { question: true },
+                where: {
+                  question: In(questionIds),
+                  user: {
+                    id: user.id,
+                  },
                 },
-              },
-            })
-          : []),
-        (questionFeedbacks = await this.mockExamQuestionFeedback.find({
-          relations: {
-            mockExamQuestion: true,
-            user: true,
-            recommendation: { user: true },
-          },
-          where: {
-            mockExamQuestion: In(questionIds),
-          },
-          order: {
-            type: 'ASC',
-          },
-        })),
-        (questionComments = await this.mockExamQuestionComment.find({
-          relations: { question: true, user: true },
-          where: {
-            question: In(questionIds),
-          },
-        })),
+              })
+              .then((bookmarks) => (questionBookmarks = bookmarks))
+          : (questionBookmarks = []),
+        this.mockExamQuestionFeedback
+          .find({
+            relations: {
+              mockExamQuestion: true,
+              user: true,
+              recommendation: { user: true },
+            },
+            where: {
+              mockExamQuestion: In(questionIds),
+            },
+            order: {
+              type: 'ASC',
+            },
+          })
+          .then((feedbacks) => (questionFeedbacks = feedbacks)),
+        this.mockExamQuestionComment
+          .find({
+            relations: { question: true, user: true },
+            where: {
+              question: In(questionIds),
+            },
+          })
+          .then((comments) => (questionComments = comments)),
       ]);
 
       questions = questions.map((question) => {
@@ -1164,7 +1177,6 @@ export class MockExamQuestionService {
         questions,
       };
     } catch (e) {
-      console.log(e);
       return {
         ok: false,
         error: '문제를 찾을 수 없습니다.',

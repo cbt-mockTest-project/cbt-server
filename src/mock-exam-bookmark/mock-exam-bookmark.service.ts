@@ -59,7 +59,14 @@ export class MockExamBookmarkService {
         },
       });
       if (bookmark) {
-        await this.mockExamBookmark.delete(bookmark.id);
+        await this.mockExamBookmark.delete({
+          exam: {
+            id: examId,
+          },
+          user: {
+            id: user.id,
+          },
+        });
       } else {
         await this.mockExamBookmark.save(
           this.mockExamBookmark.create({

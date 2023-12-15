@@ -34,7 +34,7 @@ import {
   UpdateExamOrderInput,
   UpdateExamOrderOutput,
 } from './dtos/updateExamOrder.dto';
-import { GetMyExamsOutput } from './dtos/getMyExams.dto';
+import { GetMyExamsInput, GetMyExamsOutput } from './dtos/getMyExams.dto';
 import {
   AddExamToCategoryInput,
   AddExamToCategoryOutput,
@@ -126,8 +126,11 @@ export class MockExamResolver {
 
   @Role(['ANY'])
   @Query(() => GetMyExamsOutput)
-  async getMyExams(@AuthUser() user: User): Promise<GetMyExamsOutput> {
-    return this.mockExamService.getMyExams(user);
+  async getMyExams(
+    @Args('input') getMyExamsInput: GetMyExamsInput,
+    @AuthUser() user: User,
+  ): Promise<GetMyExamsOutput> {
+    return this.mockExamService.getMyExams(user, getMyExamsInput);
   }
 
   @Role(['ANY'])

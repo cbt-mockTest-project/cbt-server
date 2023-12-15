@@ -3,7 +3,10 @@ import { CoreOutput } from 'src/common/dtos/output.dto';
 import { MockExam } from '../entities/mock-exam.entity';
 
 @InputType()
-export class GetMyExamsInput {}
+export class GetMyExamsInput {
+  @Field(() => Boolean, { nullable: true, defaultValue: false })
+  isBookmarked?: boolean;
+}
 
 @ObjectType()
 export class GetMyExamsOutput extends CoreOutput {

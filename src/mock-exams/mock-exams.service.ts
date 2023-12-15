@@ -37,7 +37,7 @@ import {
   UpdateExamOrderInput,
   UpdateExamOrderOutput,
 } from './dtos/updateExamOrder.dto';
-import { GetMyExamsOutput } from './dtos/getMyExams.dto';
+import { GetMyExamsInput, GetMyExamsOutput } from './dtos/getMyExams.dto';
 import {
   AddExamToCategoryInput,
   AddExamToCategoryOutput,
@@ -46,10 +46,13 @@ import {
   RemoveExamFromCategoryInput,
   RemoveExamFromCategoryOutput,
 } from './dtos/removeExamFromCategory.dto';
+import { MockExamBookmark } from 'src/mock-exam-bookmark/entities/mock-exam-bookmark.entity';
 
 @Injectable()
 export class MockExamService {
   constructor(
+    @InjectRepository(MockExamBookmark)
+    private readonly mockExamBookmark: Repository<MockExamBookmark>,
     @InjectRepository(MockExam)
     private readonly mockExam: Repository<MockExam>,
     @InjectRepository(MockExamCategory)
@@ -479,9 +482,39 @@ export class MockExamService {
     }
   }
 
-  async getMyExams(user: User): Promise<GetMyExamsOutput> {
+  async getMyExams(
+    user: User,
+    getMyExams: GetMyExamsInput,
+  ): Promise<GetMyExamsOutput> {
     try {
-      const exams = await this.mockExam.find({
+      const { isBookmarked } = getMyExams;
+      let exams: MockExam[] = [];
+      if (isBookmarked) {
+        const bookmarks = await this.mockExamBookmark.find({
+          where: {
+            user: {
+              id: user.id,
+            },
+          },
+          relations: {
+            exam: {
+              user: true,
+            },
+          },
+          order: {
+            exam: {
+              order: 'ASC',
+              created_at: 'DESC',
+            },
+          },
+        });
+        exams = bookmarks.map((bookmark) => bookmark.exam);
+        return {
+          ok: true,
+          exams,
+        };
+      }
+      exams = await this.mockExam.find({
         where: {
           user: {
             id: user.id,

@@ -171,6 +171,7 @@ export class MockExamCategoryResolver {
     );
   }
 
+  @Role(['ANY'])
   @Query(() => GetMyExamCategoriesOutput)
   async getMyExamCategories(
     @AuthUser() user: User,

@@ -40,6 +40,7 @@ import { MockExamQuestionFeedbackRecommendationResolver } from './mock-exams-que
 import { MockExamQuestionFeedbackRecommendationService } from './mock-exams-question-feedback-recommendation.service';
 import { Role } from 'src/users/entities/role.entity';
 import { MockExamBookmark } from 'src/mock-exam-bookmark/entities/mock-exam-bookmark.entity';
+import { ExamLike } from 'src/exam-like/entities/exam-like.entity';
 
 @Module({
   imports: [
@@ -59,6 +60,7 @@ import { MockExamBookmark } from 'src/mock-exam-bookmark/entities/mock-exam-book
       Role,
       ExamCategoryRole,
       MockExamBookmark,
+      ExamLike,
       User,
     ]),
   ],

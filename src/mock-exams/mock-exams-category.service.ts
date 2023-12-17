@@ -7,7 +7,7 @@ import {
   MockExamCategory,
   MockExamCategoryTypes,
 } from './entities/mock-exam-category.entity';
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, In, IsNull, Repository } from 'typeorm';
 import {
@@ -47,6 +47,7 @@ import {
 } from './dtos/getExamCategories.dto';
 import { MockExamBookmark } from 'src/mock-exam-bookmark/entities/mock-exam-bookmark.entity';
 import { GetMyExamCategoriesOutput } from './dtos/getMyExamCategories.dto';
+import { ExamLike } from 'src/exam-like/entities/exam-like.entity';
 
 @Injectable()
 export class MockExamCategoryService {
@@ -55,6 +56,8 @@ export class MockExamCategoryService {
     private readonly mockExamCategories: Repository<MockExamCategory>,
     @InjectRepository(MockExamBookmark)
     private readonly mockExamBookmarks: Repository<MockExamBookmark>,
+    @InjectRepository(ExamLike)
+    private readonly examLikes: Repository<ExamLike>,
   ) {}
 
   async getExamCategories(
@@ -83,6 +86,7 @@ export class MockExamCategoryService {
         user: true,
       },
       order: {
+        order: 'ASC',
         created_at: 'DESC',
       },
     });
@@ -104,6 +108,7 @@ export class MockExamCategoryService {
           user: true,
         },
         order: {
+          order: 'ASC',
           created_at: 'DESC',
         },
       });
@@ -317,10 +322,12 @@ export class MockExamCategoryService {
           },
         },
       });
-      // 로그인 상태일 경우, 북마크 여부를 조회한다.
+      // 로그인 상태일 경우, 북마크 여부, 좋아요 여부를 조회한다.
       if (user) {
         const mockExamIds = category.mockExam.map((exam) => exam.id);
-        const mockExamBookmarks = await this.mockExamBookmarks.find({
+        let mockExamBookmarks: MockExamBookmark[] = [];
+        let examLikes: ExamLike[] = [];
+        const findOption = {
           where: {
             user: {
               id: user.id,
@@ -330,23 +337,28 @@ export class MockExamCategoryService {
           relations: {
             exam: true,
           },
-        });
+        };
+        await Promise.all([
+          this.mockExamBookmarks
+            .find(findOption)
+            .then((res) => (mockExamBookmarks = res)),
+          this.examLikes.find(findOption).then((res) => (examLikes = res)),
+        ]);
+
         category.mockExam = category.mockExam.map((exam) => {
           const bookmark = mockExamBookmarks.find(
             (mockExamBookmark) => mockExamBookmark.exam.id === exam.id,
           );
-          if (bookmark) {
-            return {
-              ...exam,
-              isBookmarked: true,
-            };
-          }
-          return {
-            ...exam,
-            isBookmarked: false,
-          };
+          const like = examLikes.find(
+            (examLike) => examLike.exam.id === exam.id,
+          );
+          const newExam = { ...exam };
+          if (like) newExam.isLiked = true;
+          if (bookmark) newExam.isBookmarked = true;
+          return newExam;
         });
       }
+
       return {
         ok: true,
         category,
@@ -413,19 +425,22 @@ export class MockExamCategoryService {
   async readMockExamCategories(
     readMockExamCategoriesInput?: ReadMockExamCategoriesInput,
   ): Promise<ReadMockExamCategoriesOutput> {
-    const { source } = readMockExamCategoriesInput;
-    const categories = await this.mockExamCategories.find({
-      where: {
-        source,
-      },
-    });
     try {
+      const { source } = readMockExamCategoriesInput;
+      const categories = await this.mockExamCategories.find({
+        where: {
+          source,
+        },
+        order: {
+          order: 'ASC',
+          created_at: 'DESC',
+        },
+      });
       return {
         ok: true,
         categories,
       };
     } catch (e) {
-      console.log(e);
       return {
         ok: false,
         error: '카테고리를 찾을 수 없습니다.',

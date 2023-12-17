@@ -549,9 +549,6 @@ export class MockExamService {
       const exam = await this.mockExam.findOne({
         where: {
           id: examId,
-          user: {
-            id: user.id,
-          },
         },
       });
       if (!exam) {
@@ -610,9 +607,6 @@ export class MockExamService {
       const exam = await this.mockExam.findOne({
         where: {
           id: examId,
-          user: {
-            id: user.id,
-          },
         },
       });
       if (!exam) {

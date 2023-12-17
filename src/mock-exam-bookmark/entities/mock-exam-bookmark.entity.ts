@@ -13,12 +13,14 @@ export class MockExamBookmark {
   @PrimaryColumn()
   examId: number;
 
-  @ManyToOne(() => User, (user) => user.examBookmarks)
+  @ManyToOne(() => User, (user) => user.examBookmarks, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   @Field(() => User)
   user: User;
 
-  @ManyToOne(() => MockExam, (exam) => exam.examBookmarks)
+  @ManyToOne(() => MockExam, (exam) => exam.examBookmarks, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'examId' })
   @Field(() => MockExam)
   exam: MockExam;

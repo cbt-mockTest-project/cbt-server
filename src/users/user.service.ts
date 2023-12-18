@@ -471,7 +471,7 @@ export class UserService {
 
       if (password) user.password = password;
       if (nickname) user.nickname = nickname;
-      if (profileImg) user.profileImg = profileImg;
+      if (typeof profileImg === 'string') user.profileImg = profileImg;
       await this.users.save(user);
       return {
         ok: true,

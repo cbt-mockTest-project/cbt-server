@@ -166,8 +166,8 @@ export class MockExamCategoryResolver {
     @Args('input') getExamCategoriesInput: GetExamCategoriesInput,
   ): Promise<GetExamCategoriesOutput> {
     return this.mockExamCategoryService.getExamCategories(
-      user,
       getExamCategoriesInput,
+      user,
     );
   }
 

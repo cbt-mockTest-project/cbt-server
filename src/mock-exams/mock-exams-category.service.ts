@@ -61,8 +61,8 @@ export class MockExamCategoryService {
   ) {}
 
   async getExamCategories(
-    user: User,
     getExamCategoriesInput: GetExamCategoriesInput,
+    user?: User,
   ): Promise<GetExamCategoriesOutput> {
     const { examSource, categoryMakerId } = getExamCategoriesInput;
     const where: FindOptionsWhere<MockExamCategory>[] = [];
@@ -89,10 +89,10 @@ export class MockExamCategoryService {
         },
         isPublic: true,
       });
-      if (user) {
+      if (user?.id === categoryMakerId) {
         where.push({
           user: {
-            id: user.id,
+            id: categoryMakerId,
           },
           isPublic: false,
         });

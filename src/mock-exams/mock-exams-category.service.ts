@@ -64,22 +64,41 @@ export class MockExamCategoryService {
     user: User,
     getExamCategoriesInput: GetExamCategoriesInput,
   ): Promise<GetExamCategoriesOutput> {
-    const { examSource } = getExamCategoriesInput;
-    const where: FindOptionsWhere<MockExamCategory>[] = [
-      {
-        source: examSource,
-        isPublic: true,
-      },
-    ];
-    if (user) {
+    const { examSource, categoryMakerId } = getExamCategoriesInput;
+    const where: FindOptionsWhere<MockExamCategory>[] = [];
+    if (examSource) {
       where.push({
         source: examSource,
-        isPublic: false,
-        user: {
-          id: user.id,
-        },
+        isPublic: true,
       });
+      if (user) {
+        where.push({
+          source: examSource,
+          isPublic: false,
+          user: {
+            id: user.id,
+          },
+        });
+      }
     }
+
+    if (categoryMakerId) {
+      where.push({
+        user: {
+          id: categoryMakerId,
+        },
+        isPublic: true,
+      });
+      if (user) {
+        where.push({
+          user: {
+            id: user.id,
+          },
+          isPublic: false,
+        });
+      }
+    }
+
     const categories = await this.mockExamCategories.find({
       where,
       relations: {

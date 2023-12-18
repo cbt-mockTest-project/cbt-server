@@ -7,6 +7,9 @@ import { MockExamCategory } from '../entities/mock-exam-category.entity';
 export class GetExamCategoriesInput {
   @Field(() => ExamSource, { nullable: true })
   examSource?: ExamSource;
+
+  @Field(() => Number, { nullable: true, defaultValue: 0 })
+  categoryMakerId?: number;
 }
 
 @ObjectType()

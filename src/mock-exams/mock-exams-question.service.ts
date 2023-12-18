@@ -193,51 +193,76 @@ export class MockExamQuestionService {
   ): Promise<ReadMockExamQuestionOutput> {
     try {
       const { questionId, examId } = readMockExamQuestionInput;
+      let questionStates: MockExamQuestionState[] = [];
       let questionBookmarks: MockExamQuestionBookmark[] = [];
       let questionFeedbacks: MockExamQuestionFeedback[] = [];
       let questionComments: MockExamQuestionComment[] = [];
       const makeQuestionJoins = async (question: MockExamQuestion) => {
         await Promise.all([
-          (questionBookmarks = user
-            ? await this.mockExamQuestionBookmark.find({
-                relations: { question: true, user: true },
-                where: {
-                  question: {
-                    id: question.id,
+          user
+            ? this.mockExamQuestionState
+                .find({
+                  relations: { question: true },
+                  where: {
+                    question: {
+                      id: question.id,
+                    },
+                    user: {
+                      id: user.id,
+                    },
                   },
-                  user: {
-                    id: user.id,
+                })
+                .then((states) => (questionStates = states))
+            : (questionStates = []),
+          user
+            ? this.mockExamQuestionBookmark
+                .find({
+                  relations: { question: true, user: true },
+                  where: {
+                    question: {
+                      id: question.id,
+                    },
+                    user: {
+                      id: user.id,
+                    },
                   },
+                })
+                .then((bookmarks) => (questionBookmarks = bookmarks))
+            : (questionBookmarks = []),
+          this.mockExamQuestionFeedback
+            .find({
+              relations: {
+                mockExamQuestion: true,
+                user: true,
+                recommendation: { user: true },
+              },
+              where: {
+                mockExamQuestion: {
+                  id: question.id,
                 },
-              })
-            : []),
-          (questionFeedbacks = await this.mockExamQuestionFeedback.find({
-            relations: {
-              mockExamQuestion: true,
-              user: true,
-              recommendation: { user: true },
-            },
-            where: {
-              mockExamQuestion: {
-                id: question.id,
               },
-            },
-            order: {
-              type: 'ASC',
-            },
-          })),
-          (questionComments = await this.mockExamQuestionComment.find({
-            relations: { question: true, user: true },
-            where: {
-              question: {
-                id: question.id,
+              order: {
+                type: 'ASC',
               },
-            },
-          })),
+            })
+            .then((feedbacks) => (questionFeedbacks = feedbacks)),
+          this.mockExamQuestionComment
+            .find({
+              relations: { question: true, user: true },
+              where: {
+                question: {
+                  id: question.id,
+                },
+              },
+            })
+            .then((comments) => (questionComments = comments)),
         ]);
         const result: MockExamQuestion = {
           ...question,
-          mockExamQuestionBookmark: questionBookmarks.filter(
+          myQuestionState: questionStates.find(
+            (state) => state.question.id === question.id,
+          )?.state,
+          isBookmarked: !!questionBookmarks.find(
             (bookmark) => bookmark.question.id === question.id,
           ),
           mockExamQuestionComment: questionComments.filter(
@@ -317,30 +342,11 @@ export class MockExamQuestionService {
         },
       });
       question = await makeQuestionJoins(question);
-      let isCoAuthor = false;
-      if (user) {
-        const examCoAuthor = await this.examCoAuthor.findOne({
-          where: {
-            exam: {
-              id: question.mockExam.id,
-            },
-            user: {
-              id: user && user.id,
-            },
-          },
-        });
-        if (examCoAuthor) {
-          isCoAuthor = true;
-        }
-      }
-
       return {
         ok: true,
         mockExamQusetion: question,
-        isCoAuthor,
       };
     } catch (e) {
-      console.log(e);
       return {
         ok: false,
         error: '문제를 가져오는데 실패했습니다.',
@@ -966,7 +972,9 @@ export class MockExamQuestionService {
           id: In(ids),
         },
         relations: {
-          mockExamQuestion: true,
+          mockExamQuestion: {
+            user: true,
+          },
         },
       });
       let questions: MockExamQuestion[] = mockExams.flatMap(

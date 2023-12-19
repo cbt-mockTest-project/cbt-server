@@ -189,48 +189,53 @@ export class MockExamQuestionService {
   ): Promise<ReadMockExamQuestionOutput> {
     try {
       const { questionId, examId } = readMockExamQuestionInput;
-      let questionBookmarks: MockExamQuestionBookmark[] = [];
-      let questionFeedbacks: MockExamQuestionFeedback[] = [];
-      let questionComments: MockExamQuestionComment[] = [];
+
       const makeQuestionJoins = async (question: MockExamQuestion) => {
-        await Promise.all([
-          (questionBookmarks = user
-            ? await this.mockExamQuestionBookmark.find({
+        const [questionBookmarks, questionFeedbacks, questionComments] =
+          await Promise.all([
+            user
+              ? this.mockExamQuestionBookmark
+                  .find({
+                    relations: { question: true, user: true },
+                    where: {
+                      question: {
+                        id: question.id,
+                      },
+                      user: {
+                        id: user.id,
+                      },
+                    },
+                  })
+                  .then((res) => res)
+              : [],
+            this.mockExamQuestionFeedback
+              .find({
+                relations: {
+                  mockExamQuestion: true,
+                  user: true,
+                  recommendation: { user: true },
+                },
+                where: {
+                  mockExamQuestion: {
+                    id: question.id,
+                  },
+                },
+                order: {
+                  type: 'ASC',
+                },
+              })
+              .then((res) => res),
+            await this.mockExamQuestionComment
+              .find({
                 relations: { question: true, user: true },
                 where: {
                   question: {
                     id: question.id,
                   },
-                  user: {
-                    id: user.id,
-                  },
                 },
               })
-            : []),
-          (questionFeedbacks = await this.mockExamQuestionFeedback.find({
-            relations: {
-              mockExamQuestion: true,
-              user: true,
-              recommendation: { user: true },
-            },
-            where: {
-              mockExamQuestion: {
-                id: question.id,
-              },
-            },
-            order: {
-              type: 'ASC',
-            },
-          })),
-          (questionComments = await this.mockExamQuestionComment.find({
-            relations: { question: true, user: true },
-            where: {
-              question: {
-                id: question.id,
-              },
-            },
-          })),
-        ]);
+              .then((res) => res),
+          ]);
         const result: MockExamQuestion = {
           ...question,
           mockExamQuestionBookmark: questionBookmarks.filter(
@@ -502,55 +507,64 @@ export class MockExamQuestionService {
     try {
       const { id, bookmarked, ids, states, limit } =
         readMockExamQuestionsByMockExamIdInput;
-      let questionStates: MockExamQuestionState[] = [];
-      let questionBookmarks: MockExamQuestionBookmark[] = [];
-      let questionFeedbacks: MockExamQuestionFeedback[] = [];
-      let questionComments: MockExamQuestionComment[] = [];
 
       const makeQuestionJoins = async (questions: MockExamQuestion[]) => {
         const questionIds = questions.map((question) => question.id);
-        await Promise.all([
-          (questionStates = user
-            ? await this.mockExamQuestionState.find({
-                relations: { question: true, user: true, exam: true },
-                where: {
-                  question: In(questionIds),
-                  user: {
-                    id: user.id,
+        const [
+          questionStates,
+          questionBookmarks,
+          questionFeedbacks,
+          questionComments,
+        ] = await Promise.all([
+          user
+            ? this.mockExamQuestionState
+                .find({
+                  relations: { question: true, user: true, exam: true },
+                  where: {
+                    question: In(questionIds),
+                    user: {
+                      id: user.id,
+                    },
                   },
-                },
-              })
-            : []),
-          (questionBookmarks = user
-            ? await this.mockExamQuestionBookmark.find({
-                relations: { question: true, user: true },
-                where: {
-                  question: In(questionIds),
-                  user: {
-                    id: user.id,
+                })
+                .then((res) => res)
+            : [],
+          user
+            ? this.mockExamQuestionBookmark
+                .find({
+                  relations: { question: true, user: true },
+                  where: {
+                    question: In(questionIds),
+                    user: {
+                      id: user.id,
+                    },
                   },
-                },
-              })
-            : []),
-          (questionFeedbacks = await this.mockExamQuestionFeedback.find({
-            relations: {
-              mockExamQuestion: true,
-              user: true,
-              recommendation: { user: true },
-            },
-            where: {
-              mockExamQuestion: In(questionIds),
-            },
-            order: {
-              type: 'ASC',
-            },
-          })),
-          (questionComments = await this.mockExamQuestionComment.find({
-            relations: { question: true, user: true },
-            where: {
-              question: In(questionIds),
-            },
-          })),
+                })
+                .then((res) => res)
+            : [],
+          this.mockExamQuestionFeedback
+            .find({
+              relations: {
+                mockExamQuestion: true,
+                user: true,
+                recommendation: { user: true },
+              },
+              where: {
+                mockExamQuestion: In(questionIds),
+              },
+              order: {
+                type: 'ASC',
+              },
+            })
+            .then((res) => res),
+          this.mockExamQuestionComment
+            .find({
+              relations: { question: true, user: true },
+              where: {
+                question: In(questionIds),
+              },
+            })
+            .then((res) => res),
         ]);
         const result: MockExamQuestion[] = questions.map((question) => {
           return {

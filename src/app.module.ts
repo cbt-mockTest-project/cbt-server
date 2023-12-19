@@ -88,6 +88,8 @@ import { MockExamBookmarkModule } from './mock-exam-bookmark/mock-exam-bookmark.
 import { MockExamBookmark } from './mock-exam-bookmark/entities/mock-exam-bookmark.entity';
 import { ExamLikeModule } from './exam-like/exam-like.module';
 import { ExamLike } from './exam-like/entities/exam-like.entity';
+import { ExamCategoryBookmarkModule } from './exam-category-bookmark/exam-category-bookmark.module';
+import { ExamCategoryBookmark } from './exam-category-bookmark/entities/exam-category-bookmark';
 
 @Module({
   imports: [
@@ -204,6 +206,7 @@ import { ExamLike } from './exam-like/entities/exam-like.entity';
         ChatbotKey,
         MockExamBookmark,
         ExamLike,
+        ExamCategoryBookmark,
       ],
     }),
     UserModule,
@@ -266,6 +269,7 @@ import { ExamLike } from './exam-like/entities/exam-like.entity';
     DiscountCodeModule,
     MockExamBookmarkModule,
     ExamLikeModule,
+    ExamCategoryBookmarkModule,
   ],
   controllers: [],
   providers: [

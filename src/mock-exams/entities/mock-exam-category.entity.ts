@@ -20,6 +20,7 @@ import { IsEnum } from 'class-validator';
 import { Role } from 'src/users/entities/role.entity';
 import { Partner } from 'src/partners/entities/partners.entity';
 import { ExamViewer } from 'src/exam-viewer/entities/exam-viewer.entity';
+import { ExamCategoryBookmark } from 'src/exam-category-bookmark/entities/exam-category-bookmark';
 
 export enum MockExamCategoryTypes {
   written = 'written',
@@ -87,6 +88,10 @@ export class MockExamCategory extends CoreEntity {
     onDelete: 'SET NULL',
   })
   examCoAuthor: ExamCoAuthor[];
+
+  @OneToMany(() => ExamCategoryBookmark, (bookmark) => bookmark.category)
+  @Field(() => [ExamCategoryBookmark])
+  examCategoryBookmarks: ExamCategoryBookmark[];
 
   @Field(() => [ExamViewer], { nullable: true })
   @OneToMany(() => ExamViewer, (examViewer) => examViewer.examCategory, {

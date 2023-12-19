@@ -10,6 +10,9 @@ export class GetExamCategoriesInput {
 
   @Field(() => Number, { nullable: true, defaultValue: 0 })
   categoryMakerId?: number;
+
+  @Field(() => Boolean, { nullable: true, defaultValue: false })
+  isBookmarked?: boolean;
 }
 
 @ObjectType()

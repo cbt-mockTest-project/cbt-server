@@ -41,6 +41,7 @@ import { MockExamQuestionFeedbackRecommendationService } from './mock-exams-ques
 import { Role } from 'src/users/entities/role.entity';
 import { MockExamBookmark } from 'src/mock-exam-bookmark/entities/mock-exam-bookmark.entity';
 import { ExamLike } from 'src/exam-like/entities/exam-like.entity';
+import { ExamCategoryBookmark } from 'src/exam-category-bookmark/entities/exam-category-bookmark';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { ExamLike } from 'src/exam-like/entities/exam-like.entity';
       MockExamQuestionCommentLike,
       MockExamQuestionBookmark,
       MockExamQuestionMultipleChoice,
+      ExamCategoryBookmark,
       MockExamQuestionFeedbackRecommendation,
       ExamCoAuthor,
       Role,

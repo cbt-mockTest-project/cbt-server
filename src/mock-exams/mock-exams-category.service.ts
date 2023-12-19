@@ -48,6 +48,7 @@ import {
 import { MockExamBookmark } from 'src/mock-exam-bookmark/entities/mock-exam-bookmark.entity';
 import { GetMyExamCategoriesOutput } from './dtos/getMyExamCategories.dto';
 import { ExamLike } from 'src/exam-like/entities/exam-like.entity';
+import { ExamCategoryBookmark } from 'src/exam-category-bookmark/entities/exam-category-bookmark';
 
 @Injectable()
 export class MockExamCategoryService {
@@ -58,61 +59,103 @@ export class MockExamCategoryService {
     private readonly mockExamBookmarks: Repository<MockExamBookmark>,
     @InjectRepository(ExamLike)
     private readonly examLikes: Repository<ExamLike>,
+    @InjectRepository(ExamCategoryBookmark)
+    private readonly examCategoryBookmarks: Repository<ExamCategoryBookmark>,
   ) {}
 
   async getExamCategories(
     getExamCategoriesInput: GetExamCategoriesInput,
     user?: User,
   ): Promise<GetExamCategoriesOutput> {
-    const { examSource, categoryMakerId } = getExamCategoriesInput;
-    const where: FindOptionsWhere<MockExamCategory>[] = [];
-    if (examSource) {
-      where.push({
-        source: examSource,
-        isPublic: true,
-      });
-      if (user) {
-        where.push({
-          source: examSource,
-          isPublic: false,
+    const { examSource, categoryMakerId, isBookmarked } =
+      getExamCategoriesInput;
+
+    if (isBookmarked) {
+      if (!user)
+        return {
+          ok: false,
+          error: '로그인이 필요합니다.',
+        };
+      const bookmarkedCategories = await this.examCategoryBookmarks.find({
+        where: {
           user: {
             id: user.id,
           },
-        });
-      }
+        },
+        relations: {
+          category: {
+            user: true,
+          },
+        },
+        order: {
+          category: {
+            order: 'ASC',
+            created_at: 'DESC',
+          },
+        },
+      });
+
+      const categories = bookmarkedCategories.map(
+        (category) => category.category,
+      );
+      return {
+        ok: true,
+        categories,
+      };
     }
 
-    if (categoryMakerId) {
-      where.push({
-        user: {
-          id: categoryMakerId,
-        },
-        isPublic: true,
-      });
-      if (user?.id === categoryMakerId) {
+    if (!isBookmarked) {
+      const where:
+        | FindOptionsWhere<MockExamCategory>
+        | FindOptionsWhere<MockExamCategory>[] = [];
+      if (examSource) {
+        where.push({
+          source: examSource,
+          isPublic: true,
+        });
+        if (user) {
+          where.push({
+            source: examSource,
+            isPublic: false,
+            user: {
+              id: user.id,
+            },
+          });
+        }
+      }
+
+      if (categoryMakerId) {
         where.push({
           user: {
             id: categoryMakerId,
           },
-          isPublic: false,
+          isPublic: true,
         });
+        if (user?.id === categoryMakerId) {
+          where.push({
+            user: {
+              id: categoryMakerId,
+            },
+            isPublic: false,
+          });
+        }
       }
-    }
 
-    const categories = await this.mockExamCategories.find({
-      where,
-      relations: {
-        user: true,
-      },
-      order: {
-        order: 'ASC',
-        created_at: 'DESC',
-      },
-    });
-    return {
-      ok: true,
-      categories,
-    };
+      const categories = await this.mockExamCategories.find({
+        where,
+        relations: {
+          user: true,
+        },
+        order: {
+          order: 'ASC',
+          created_at: 'DESC',
+        },
+      });
+      return {
+        ok: true,
+        categories,
+      };
+    }
   }
 
   async getMyExamCategories(user: User): Promise<GetMyExamCategoriesOutput> {

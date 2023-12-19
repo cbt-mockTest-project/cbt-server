@@ -1,4 +1,4 @@
-import { CoreOutput } from './../../common/dtos/output.dto';
+import { CoreOutput } from '../../common/dtos/output.dto';
 import { MockExamCategory } from './../entities/mock-exam-category.entity';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 

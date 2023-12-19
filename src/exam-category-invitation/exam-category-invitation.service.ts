@@ -7,7 +7,7 @@ import {
   CreateExamCategoryInvitationOutput,
 } from './dtos/createExamCategoryInvitation.dto';
 import { User } from 'src/users/entities/user.entity';
-import { MockExamCategory } from 'src/mock-exams/entities/mock-exam-category.entity';
+import { MockExamCategory } from 'src/exam-category/entities/mock-exam-category.entity';
 import {
   DeleteExamCategoryInvitationInput,
   DeleteExamCategoryInvitationOutput,

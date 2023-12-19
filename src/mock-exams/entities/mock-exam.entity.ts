@@ -1,6 +1,5 @@
 import { ExamCoAuthor } from './../../exam-co-author/entities/exam-co-author.entity';
 import { User } from 'src/users/entities/user.entity';
-import { MockExamCategory } from './mock-exam-category.entity';
 import { CoreEntity } from './../../common/entities/core.entity';
 import {
   Field,
@@ -16,19 +15,8 @@ import { MockExamHistory } from './mock-exam-history';
 import { ExamViewer } from 'src/exam-viewer/entities/exam-viewer.entity';
 import { MockExamBookmark } from 'src/mock-exam-bookmark/entities/mock-exam-bookmark.entity';
 import { ExamLike } from 'src/exam-like/entities/exam-like.entity';
-
-export enum ExamStatus {
-  UNSET = 'UNSET',
-  REQUEST = 'REQUEST',
-  APPROVED = 'APPROVED',
-  REJECTED = 'REJECTED',
-}
-
-export enum ExamSource {
-  MOUD_CBT = 'MOUD_CBT',
-  USER = 'USER',
-  EHS_MASTER = 'EHS_MASTER',
-}
+import { MockExamCategory } from 'src/exam-category/entities/mock-exam-category.entity';
+import { ExamSource, ExamStatus } from 'src/enums/enum';
 
 registerEnumType(ExamSource, { name: 'ExamSource' });
 registerEnumType(ExamStatus, { name: 'ExamStatus' });

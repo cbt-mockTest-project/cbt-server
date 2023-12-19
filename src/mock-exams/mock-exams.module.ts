@@ -14,13 +14,9 @@ import { MockExamQuestion } from './entities/mock-exam-question.entity';
 import { MockExamQuestionResolver } from './mock-exams-question.resolver';
 import { MockExam } from './entities/mock-exam.entity';
 import { MockExamResolver } from './mock-exams.resolver';
-import {
-  ExamCategoryRole,
-  MockExamCategory,
-} from './entities/mock-exam-category.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { MockExamCategoryService } from './mock-exams-category.service';
-import { MockExamCategoryResolver } from './mock-exams-category.resolver';
+import { MockExamCategoryService } from '../exam-category/mock-exams-category.service';
+import { MockExamCategoryResolver } from '../exam-category/mock-exams-category.resolver';
 import { Module } from '@nestjs/common';
 import { MockExamService } from './mock-exams.service';
 import { MockExamQuestionService } from './mock-exams-question.service';
@@ -42,6 +38,10 @@ import { Role } from 'src/users/entities/role.entity';
 import { MockExamBookmark } from 'src/mock-exam-bookmark/entities/mock-exam-bookmark.entity';
 import { ExamLike } from 'src/exam-like/entities/exam-like.entity';
 import { ExamCategoryBookmark } from 'src/exam-category-bookmark/entities/exam-category-bookmark';
+import {
+  ExamCategoryRole,
+  MockExamCategory,
+} from 'src/exam-category/entities/mock-exam-category.entity';
 
 @Module({
   imports: [

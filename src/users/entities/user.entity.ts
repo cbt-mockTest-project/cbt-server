@@ -1,7 +1,6 @@
 import { ExamCoAuthor } from './../../exam-co-author/entities/exam-co-author.entity';
 import { MockExamHistory } from './../../mock-exams/entities/mock-exam-history';
 import { QuestionCard } from './../../question-card/entities/question-card.entity';
-import { MockExamCategory } from './../../mock-exams/entities/mock-exam-category.entity';
 import { PostComment } from './../../post/entities/postComment.entity';
 import { Post } from './../../post/entities/post.entity';
 import { MockExamQuestionComment } from './../../mock-exams/entities/mock-exam-question-comment.entity';
@@ -46,6 +45,7 @@ import { MockExamBookmark } from 'src/mock-exam-bookmark/entities/mock-exam-book
 import { ExamLike } from 'src/exam-like/entities/exam-like.entity';
 import { ExamCategoryBookmark } from 'src/exam-category-bookmark/entities/exam-category-bookmark';
 import { ExamCategoryInvitation } from 'src/exam-category-invitation/entities/exam-category-invitation.entity';
+import { MockExamCategory } from 'src/exam-category/entities/mock-exam-category.entity';
 
 export enum UserRole {
   CLIENT = 'CLIENT',

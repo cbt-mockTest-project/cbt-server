@@ -31,7 +31,6 @@ import {
   ReadMockExamCategoriesInput,
   ReadMockExamCategoriesOutput,
 } from './dtos/readMockExamCategories.dto';
-import { ExamSource } from './entities/mock-exam.entity';
 import { ReadMockExamCategoryIdsOutput } from './dtos/readMockExamCategoryIds.dto';
 import {
   ReadMockExamCategoryByCategoryIdInput,
@@ -40,15 +39,16 @@ import {
 import {
   SearchMockExamCategoriesInput,
   SearchMockExamCategoriesOutput,
-} from './dtos/searchMockExamCategories.dto';
+} from '../mock-exams/dtos/searchMockExamCategories.dto';
 import {
   GetExamCategoriesInput,
   GetExamCategoriesOutput,
-} from './dtos/getExamCategories.dto';
+} from '../mock-exams/dtos/getExamCategories.dto';
 import { MockExamBookmark } from 'src/mock-exam-bookmark/entities/mock-exam-bookmark.entity';
-import { GetMyExamCategoriesOutput } from './dtos/getMyExamCategories.dto';
+import { GetMyExamCategoriesOutput } from '../mock-exams/dtos/getMyExamCategories.dto';
 import { ExamLike } from 'src/exam-like/entities/exam-like.entity';
 import { ExamCategoryBookmark } from 'src/exam-category-bookmark/entities/exam-category-bookmark';
+import { ExamSource } from 'src/enums/enum';
 
 @Injectable()
 export class MockExamCategoryService {

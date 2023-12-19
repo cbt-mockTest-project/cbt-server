@@ -18,10 +18,7 @@ import { JwtModule } from './jwt/jwt.module';
 import logger from './lib/logger';
 import { LoggingInterceptor } from './logging.interceptor';
 import { MailModule } from './mail/mail.module';
-import {
-  ExamCategoryRole,
-  MockExamCategory,
-} from './mock-exams/entities/mock-exam-category.entity';
+
 import { MockExamHistory } from './mock-exams/entities/mock-exam-history';
 import { MockExamQuestionBookmark } from './mock-exams/entities/mock-exam-question-bookmark.entity';
 import { MockExamQuestionCommentLike } from './mock-exams/entities/mock-exam-question-comment-like.entity';
@@ -92,6 +89,11 @@ import { ExamCategoryBookmarkModule } from './exam-category-bookmark/exam-catego
 import { ExamCategoryBookmark } from './exam-category-bookmark/entities/exam-category-bookmark';
 import { ExamCategoryInvitationModule } from './exam-category-invitation/exam-category-invitation.module';
 import { ExamCategoryInvitation } from './exam-category-invitation/entities/exam-category-invitation.entity';
+import { ExamCategoryModule } from './exam-category/exam-category.module';
+import {
+  ExamCategoryRole,
+  MockExamCategory,
+} from './exam-category/entities/mock-exam-category.entity';
 
 @Module({
   imports: [
@@ -274,6 +276,7 @@ import { ExamCategoryInvitation } from './exam-category-invitation/entities/exam
     ExamLikeModule,
     ExamCategoryBookmarkModule,
     ExamCategoryInvitationModule,
+    ExamCategoryModule,
   ],
   controllers: [],
   providers: [

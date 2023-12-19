@@ -2,7 +2,7 @@ import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { CoreEntity } from 'src/common/entities/core.entity';
 import { Column, Entity, ManyToMany, OneToMany } from 'typeorm';
 import { UserAndRole } from './userAndRole.entity';
-import { MockExamCategory } from 'src/mock-exams/entities/mock-exam-category.entity';
+import { MockExamCategory } from 'src/exam-category/entities/mock-exam-category.entity';
 
 @InputType('RoleInputType', { isAbstract: true })
 @ObjectType()

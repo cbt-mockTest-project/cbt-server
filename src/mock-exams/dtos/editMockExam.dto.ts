@@ -1,4 +1,4 @@
-import { ExamStatus } from './../entities/mock-exam.entity';
+import { ExamStatus } from 'src/enums/enum';
 import { CoreOutput } from '../../common/dtos/output.dto';
 import { MockExam } from '../entities/mock-exam.entity';
 import { Field, InputType, ObjectType, PickType } from '@nestjs/graphql';

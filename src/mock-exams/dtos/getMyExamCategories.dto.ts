@@ -1,6 +1,6 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { CoreOutput } from 'src/common/dtos/output.dto';
-import { MockExamCategory } from '../entities/mock-exam-category.entity';
+import { MockExamCategory } from 'src/exam-category/entities/mock-exam-category.entity';
 
 @InputType()
 export class GetMyExamCategoriesInput {}

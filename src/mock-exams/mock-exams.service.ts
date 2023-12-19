@@ -18,8 +18,7 @@ import {
   DeleteMockExamInput,
   DeleteMockExamOutput,
 } from './dtos/deleteMockExam.dto';
-import { MockExamCategory } from './entities/mock-exam-category.entity';
-import { ExamSource, MockExam } from './entities/mock-exam.entity';
+import { MockExam } from './entities/mock-exam.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Raw, Repository, FindOptionsWhere, Brackets, Not } from 'typeorm';
@@ -47,6 +46,8 @@ import {
   RemoveExamFromCategoryOutput,
 } from './dtos/removeExamFromCategory.dto';
 import { MockExamBookmark } from 'src/mock-exam-bookmark/entities/mock-exam-bookmark.entity';
+import { MockExamCategory } from 'src/exam-category/entities/mock-exam-category.entity';
+import { ExamSource } from 'src/enums/enum';
 
 @Injectable()
 export class MockExamService {

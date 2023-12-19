@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ExamViewer } from './entities/exam-viewer.entity';
 import { MockExam } from 'src/mock-exams/entities/mock-exam.entity';
-import { MockExamCategory } from 'src/mock-exams/entities/mock-exam-category.entity';
 import {
   CreateExamCategoryViewerInput,
   CreateExamCategoryViewerOutput,
@@ -22,6 +21,7 @@ import {
   UpdateExamViewerApproveStateOutput,
 } from './dtos/updateExamViewerApproveState.dto';
 import { GetInvitedExamsOutput } from './dtos/getInvitedExams.dto';
+import { MockExamCategory } from 'src/exam-category/entities/mock-exam-category.entity';
 
 @Injectable()
 export class ExamViewerService {

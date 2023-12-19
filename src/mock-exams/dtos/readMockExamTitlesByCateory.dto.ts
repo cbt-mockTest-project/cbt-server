@@ -1,7 +1,6 @@
 import { CoreOutput } from 'src/common/dtos/output.dto';
-import { MockExamCategory } from '../entities/mock-exam-category.entity';
-import { Field, InputType, ObjectType, PickType } from '@nestjs/graphql';
-import { ExamSource, ExamStatus } from '../entities/mock-exam.entity';
+import { Field, InputType, ObjectType } from '@nestjs/graphql';
+import { ExamSource, ExamStatus } from 'src/enums/enum';
 
 @ObjectType()
 export class ExamTitleAndId {

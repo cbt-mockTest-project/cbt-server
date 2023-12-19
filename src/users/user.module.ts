@@ -16,7 +16,7 @@ import { Role } from './entities/role.entity';
 import {
   ExamCategoryRole,
   MockExamCategory,
-} from 'src/mock-exams/entities/mock-exam-category.entity';
+} from 'src/exam-category/entities/mock-exam-category.entity';
 
 @Module({
   imports: [

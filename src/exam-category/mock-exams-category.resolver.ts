@@ -40,12 +40,12 @@ import {
 import {
   SearchMockExamCategoriesInput,
   SearchMockExamCategoriesOutput,
-} from './dtos/searchMockExamCategories.dto';
+} from '../mock-exams/dtos/searchMockExamCategories.dto';
 import {
   GetExamCategoriesInput,
   GetExamCategoriesOutput,
-} from './dtos/getExamCategories.dto';
-import { GetMyExamCategoriesOutput } from './dtos/getMyExamCategories.dto';
+} from '../mock-exams/dtos/getExamCategories.dto';
+import { GetMyExamCategoriesOutput } from '../mock-exams/dtos/getMyExamCategories.dto';
 
 @Resolver(() => MockExamCategory)
 export class MockExamCategoryResolver {

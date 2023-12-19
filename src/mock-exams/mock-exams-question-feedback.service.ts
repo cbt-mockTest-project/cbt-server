@@ -28,9 +28,9 @@ import {
 } from './dtos/getFeedbacksWithFilter.dto';
 import { QuestionFeedbackRecommendationType } from './entities/mock-exam-question-feedback-recommendation.entity';
 
-import { ExamSource } from './entities/mock-exam.entity';
 import { TelegramService } from 'src/telegram/telegram.service';
-import { MockExamCategory } from './entities/mock-exam-category.entity';
+import { MockExamCategory } from 'src/exam-category/entities/mock-exam-category.entity';
+import { ExamSource } from 'src/enums/enum';
 
 @Injectable()
 export class MockExamQuestionFeedbackSerivce {

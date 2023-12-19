@@ -986,10 +986,8 @@ export class MockExamQuestionService {
        */
       if (user && states) {
         let coreQuestions: MockExamQuestion[] = [];
-        let allQuestions: MockExamQuestion[] = [];
-        let existingQuestionStates: MockExamQuestionState[] = [];
         if (states.includes(QuestionState.CORE)) {
-          await Promise.all([
+          const [allQuestions, existingQuestionStates] = await Promise.all([
             this.mockExamQuestion
               .find({
                 where: {
@@ -997,17 +995,25 @@ export class MockExamQuestionService {
                     id: In(ids),
                   },
                 },
+                relations: {
+                  user: true,
+                },
               })
-              .then((questions) => (allQuestions = questions)),
+              .then((res) => res),
             this.mockExamQuestionState
               .find({
-                relations: { question: true, exam: true },
+                relations: {
+                  question: {
+                    user: true,
+                  },
+                  exam: true,
+                },
                 where: {
                   user: { id: user.id },
                   question: { id: In(questionIds) },
                 },
               })
-              .then((states) => (existingQuestionStates = states)),
+              .then((res) => res),
           ]);
           const existingQuestionStateMap = new Map(
             existingQuestionStates.map((qs) => [qs.question.id, qs]),
@@ -1020,6 +1026,7 @@ export class MockExamQuestionService {
         let questionStatesQuery = this.mockExamQuestionState
           .createQueryBuilder('mockExamQuestionState')
           .leftJoinAndSelect('mockExamQuestionState.question', 'question')
+          .leftJoinAndSelect('question.user', 'user')
           .leftJoinAndSelect('question.mockExam', 'mockExam')
           .where('mockExamQuestionState.user.id = :id', { id: user.id })
           .andWhere('mockExam.id IN (:...ids)', {
@@ -1052,11 +1059,12 @@ export class MockExamQuestionService {
         questions = questions.slice(0, limit);
       }
       questionIds = questions.map((question) => question.id);
-      let questionStates: MockExamQuestionState[] = [];
-      let questionBookmarks: MockExamQuestionBookmark[] = [];
-      let questionFeedbacks: MockExamQuestionFeedback[] = [];
-      let questionComments: MockExamQuestionComment[] = [];
-      await Promise.all([
+      const [
+        questionStates,
+        questionBookmarks,
+        questionFeedbacks,
+        questionComments,
+      ] = await Promise.all([
         user
           ? this.mockExamQuestionState
               .find({
@@ -1068,8 +1076,8 @@ export class MockExamQuestionService {
                   },
                 },
               })
-              .then((states) => (questionStates = states))
-          : (questionStates = []),
+              .then((res) => res)
+          : [],
         user
           ? this.mockExamQuestionBookmark
               .find({
@@ -1081,8 +1089,8 @@ export class MockExamQuestionService {
                   },
                 },
               })
-              .then((bookmarks) => (questionBookmarks = bookmarks))
-          : (questionBookmarks = []),
+              .then((res) => res)
+          : [],
         this.mockExamQuestionFeedback
           .find({
             relations: {
@@ -1097,7 +1105,7 @@ export class MockExamQuestionService {
               type: 'ASC',
             },
           })
-          .then((feedbacks) => (questionFeedbacks = feedbacks)),
+          .then((res) => res),
         this.mockExamQuestionComment
           .find({
             relations: { question: true, user: true },
@@ -1105,9 +1113,8 @@ export class MockExamQuestionService {
               question: In(questionIds),
             },
           })
-          .then((comments) => (questionComments = comments)),
+          .then((res) => res),
       ]);
-
       questions = questions.map((question) => {
         return {
           ...question,
@@ -1180,6 +1187,7 @@ export class MockExamQuestionService {
             ),
         };
       });
+
       return {
         ok: true,
         questions,

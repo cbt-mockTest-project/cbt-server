@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ExamViewer } from './entities/exam-viewer.entity';
-import { MockExam } from 'src/mock-exams/entities/mock-exam.entity';
+import { MockExam } from 'src/exam/entities/mock-exam.entity';
 import {
   CreateExamCategoryViewerInput,
   CreateExamCategoryViewerOutput,

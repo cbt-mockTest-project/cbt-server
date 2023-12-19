@@ -21,7 +21,7 @@ import { Partner } from 'src/partners/entities/partners.entity';
 import { ExamViewer } from 'src/exam-viewer/entities/exam-viewer.entity';
 import { ExamCategoryBookmark } from 'src/exam-category-bookmark/entities/exam-category-bookmark';
 import { ExamCategoryInvitation } from 'src/exam-category-invitation/entities/exam-category-invitation.entity';
-import { MockExam } from 'src/mock-exams/entities/mock-exam.entity';
+import { MockExam } from 'src/exam/entities/mock-exam.entity';
 import { ExamSource } from 'src/enums/enum';
 
 export enum MockExamCategoryTypes {

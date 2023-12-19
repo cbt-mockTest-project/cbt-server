@@ -2,7 +2,7 @@ import { TelegramService } from './../telegram/telegram.service';
 import {
   MockExamQuestion,
   // MockExamImageType,
-} from './../mock-exams/entities/mock-exam-question.entity';
+} from '../exam/entities/mock-exam-question.entity';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Cron, Interval } from '@nestjs/schedule';

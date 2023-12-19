@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Video } from './entities/video.entity';
-import { MockExamQuestion } from 'src/mock-exams/entities/mock-exam-question.entity';
+import { MockExamQuestion } from 'src/exam/entities/mock-exam-question.entity';
 import { VideoService } from './video.service';
 import { VideoResolver } from './video.resolver';
 

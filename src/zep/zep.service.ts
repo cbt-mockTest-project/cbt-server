@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MockExamQuestion } from 'src/mock-exams/entities/mock-exam-question.entity';
+import { MockExamQuestion } from 'src/exam/entities/mock-exam-question.entity';
 import { Repository } from 'typeorm';
 import { GetRandomQuestionOutput } from './dtos/getRandomQuestion.dto';
 

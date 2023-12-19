@@ -1,9 +1,9 @@
 import { ExamCoAuthor } from './../../exam-co-author/entities/exam-co-author.entity';
-import { MockExamHistory } from './../../mock-exams/entities/mock-exam-history';
+import { MockExamHistory } from '../../exam/entities/mock-exam-history';
 import { QuestionCard } from './../../question-card/entities/question-card.entity';
 import { PostComment } from './../../post/entities/postComment.entity';
 import { Post } from './../../post/entities/post.entity';
-import { MockExamQuestionComment } from './../../mock-exams/entities/mock-exam-question-comment.entity';
+import { MockExamQuestionComment } from '../../exam/entities/mock-exam-question-comment.entity';
 import { CoreEntity } from './../../common/entities/core.entity';
 import {
   Field,
@@ -22,17 +22,17 @@ import {
 import * as bcrypt from 'bcrypt';
 import { IsEmail, IsEnum, IsString } from 'class-validator';
 import { InternalServerErrorException } from '@nestjs/common';
-import { MockExamQuestionState } from 'src/mock-exams/entities/mock-exam-question-state.entity';
-import { MockExamQuestionFeedback } from 'src/mock-exams/entities/mock-exam-question-feedback.entity';
+import { MockExamQuestionState } from 'src/exam/entities/mock-exam-question-state.entity';
+import { MockExamQuestionFeedback } from 'src/exam/entities/mock-exam-question-feedback.entity';
 import { Feedback } from './feedback.entity';
-import { MockExamQuestionCommentLike } from 'src/mock-exams/entities/mock-exam-question-comment-like.entity';
+import { MockExamQuestionCommentLike } from 'src/exam/entities/mock-exam-question-comment-like.entity';
 import { Notice } from './notice.entity';
-import { MockExamQuestionBookmark } from 'src/mock-exams/entities/mock-exam-question-bookmark.entity';
+import { MockExamQuestionBookmark } from 'src/exam/entities/mock-exam-question-bookmark.entity';
 import { Visit } from 'src/visit/entities/visit.entity';
-import { MockExam } from 'src/mock-exams/entities/mock-exam.entity';
-import { MockExamQuestion } from 'src/mock-exams/entities/mock-exam-question.entity';
+import { MockExam } from 'src/exam/entities/mock-exam.entity';
+import { MockExamQuestion } from 'src/exam/entities/mock-exam-question.entity';
 import { QuestionCardCategory } from 'src/question-card/entities/question-card-category';
-import { MockExamQuestionFeedbackRecommendation } from 'src/mock-exams/entities/mock-exam-question-feedback-recommendation.entity';
+import { MockExamQuestionFeedbackRecommendation } from 'src/exam/entities/mock-exam-question-feedback-recommendation.entity';
 import { Payment } from 'src/payments/entities/payment.entity';
 import { UserAndRole } from './userAndRole.entity';
 import { Attendance } from 'src/attendance/entities/attendance.entity';
@@ -41,7 +41,7 @@ import { PostData } from 'src/post/entities/postData.entity';
 import { PostFile } from 'src/post/entities/postFile.entity';
 import { ExamViewer } from 'src/exam-viewer/entities/exam-viewer.entity';
 import { DiscountCode } from 'src/discount-code/discount-code.entity';
-import { MockExamBookmark } from 'src/mock-exam-bookmark/entities/mock-exam-bookmark.entity';
+import { MockExamBookmark } from 'src/exam-bookmark/entities/mock-exam-bookmark.entity';
 import { ExamLike } from 'src/exam-like/entities/exam-like.entity';
 import { ExamCategoryBookmark } from 'src/exam-category-bookmark/entities/exam-category-bookmark';
 import { ExamCategoryInvitation } from 'src/exam-category-invitation/entities/exam-category-invitation.entity';

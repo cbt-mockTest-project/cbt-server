@@ -39,13 +39,13 @@ import {
 import {
   SearchMockExamCategoriesInput,
   SearchMockExamCategoriesOutput,
-} from '../mock-exams/dtos/searchMockExamCategories.dto';
+} from '../exam/dtos/searchMockExamCategories.dto';
 import {
   GetExamCategoriesInput,
   GetExamCategoriesOutput,
-} from '../mock-exams/dtos/getExamCategories.dto';
-import { MockExamBookmark } from 'src/mock-exam-bookmark/entities/mock-exam-bookmark.entity';
-import { GetMyExamCategoriesOutput } from '../mock-exams/dtos/getMyExamCategories.dto';
+} from '../exam/dtos/getExamCategories.dto';
+import { MockExamBookmark } from 'src/exam-bookmark/entities/mock-exam-bookmark.entity';
+import { GetMyExamCategoriesOutput } from '../exam/dtos/getMyExamCategories.dto';
 import { ExamLike } from 'src/exam-like/entities/exam-like.entity';
 import { ExamCategoryBookmark } from 'src/exam-category-bookmark/entities/exam-category-bookmark';
 import { ExamSource } from 'src/enums/enum';

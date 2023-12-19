@@ -4,13 +4,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-
 @ObjectType()
-export class CoreEntity {
-  @PrimaryGeneratedColumn()
-  @Field(() => Number)
-  id: number;
-
+export class TimeStampedEntity {
   @CreateDateColumn()
   @Field(() => Date)
   created_at: Date;
@@ -18,4 +13,11 @@ export class CoreEntity {
   @UpdateDateColumn()
   @Field(() => Date)
   updated_at: Date;
+}
+
+@ObjectType()
+export class CoreEntity extends TimeStampedEntity {
+  @PrimaryGeneratedColumn()
+  @Field(() => Number)
+  id: number;
 }

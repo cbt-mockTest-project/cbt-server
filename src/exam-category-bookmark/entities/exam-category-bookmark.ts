@@ -1,4 +1,5 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
+import { TimeStampedEntity } from 'src/common/entities/core.entity';
 import { MockExamCategory } from 'src/mock-exams/entities/mock-exam-category.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
@@ -6,7 +7,7 @@ import { Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 @InputType('ExamCategoryBookmarkInputType', { isAbstract: true })
 @ObjectType()
 @Entity()
-export class ExamCategoryBookmark {
+export class ExamCategoryBookmark extends TimeStampedEntity {
   @PrimaryColumn()
   userId: number;
 

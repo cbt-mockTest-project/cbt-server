@@ -45,6 +45,7 @@ import { DiscountCode } from 'src/discount-code/discount-code.entity';
 import { MockExamBookmark } from 'src/mock-exam-bookmark/entities/mock-exam-bookmark.entity';
 import { ExamLike } from 'src/exam-like/entities/exam-like.entity';
 import { ExamCategoryBookmark } from 'src/exam-category-bookmark/entities/exam-category-bookmark';
+import { ExamCategoryInvitation } from 'src/exam-category-invitation/entities/exam-category-invitation.entity';
 
 export enum UserRole {
   CLIENT = 'CLIENT',
@@ -157,6 +158,13 @@ export class User extends CoreEntity {
   @OneToMany(() => MockExamBookmark, (bookmark) => bookmark.user)
   @Field(() => [MockExamBookmark])
   examBookmarks: MockExamBookmark[];
+
+  @OneToMany(
+    () => ExamCategoryInvitation,
+    (examCategoryInvitations) => examCategoryInvitations.user,
+  )
+  @Field(() => [ExamCategoryInvitation])
+  examCategoryInvitations: ExamCategoryInvitation[];
 
   @OneToMany(() => ExamCategoryBookmark, (bookmark) => bookmark.user)
   @Field(() => [ExamCategoryBookmark])

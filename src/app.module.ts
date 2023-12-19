@@ -90,6 +90,8 @@ import { ExamLikeModule } from './exam-like/exam-like.module';
 import { ExamLike } from './exam-like/entities/exam-like.entity';
 import { ExamCategoryBookmarkModule } from './exam-category-bookmark/exam-category-bookmark.module';
 import { ExamCategoryBookmark } from './exam-category-bookmark/entities/exam-category-bookmark';
+import { ExamCategoryInvitationModule } from './exam-category-invitation/exam-category-invitation.module';
+import { ExamCategoryInvitation } from './exam-category-invitation/entities/exam-category-invitation.entity';
 
 @Module({
   imports: [
@@ -207,6 +209,7 @@ import { ExamCategoryBookmark } from './exam-category-bookmark/entities/exam-cat
         MockExamBookmark,
         ExamLike,
         ExamCategoryBookmark,
+        ExamCategoryInvitation,
       ],
     }),
     UserModule,
@@ -270,6 +273,7 @@ import { ExamCategoryBookmark } from './exam-category-bookmark/entities/exam-cat
     MockExamBookmarkModule,
     ExamLikeModule,
     ExamCategoryBookmarkModule,
+    ExamCategoryInvitationModule,
   ],
   controllers: [],
   providers: [

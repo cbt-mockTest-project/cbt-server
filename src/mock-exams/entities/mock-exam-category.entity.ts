@@ -21,6 +21,7 @@ import { Role } from 'src/users/entities/role.entity';
 import { Partner } from 'src/partners/entities/partners.entity';
 import { ExamViewer } from 'src/exam-viewer/entities/exam-viewer.entity';
 import { ExamCategoryBookmark } from 'src/exam-category-bookmark/entities/exam-category-bookmark';
+import { ExamCategoryInvitation } from 'src/exam-category-invitation/entities/exam-category-invitation.entity';
 
 export enum MockExamCategoryTypes {
   written = 'written',
@@ -92,6 +93,13 @@ export class MockExamCategory extends CoreEntity {
   @OneToMany(() => ExamCategoryBookmark, (bookmark) => bookmark.category)
   @Field(() => [ExamCategoryBookmark])
   examCategoryBookmarks: ExamCategoryBookmark[];
+
+  @OneToMany(
+    () => ExamCategoryInvitation,
+    (examCategoryInvitations) => examCategoryInvitations.category,
+  )
+  @Field(() => [ExamCategoryInvitation])
+  examCategoryInvitations: ExamCategoryInvitation[];
 
   @Field(() => [ExamViewer], { nullable: true })
   @OneToMany(() => ExamViewer, (examViewer) => examViewer.examCategory, {

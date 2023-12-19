@@ -384,11 +384,26 @@ export class MockExamCategoryService {
           },
         },
       });
-      // 로그인 상태일 경우, 북마크 여부, 좋아요 여부를 조회한다.
+      if (category.isPublic) category.hasAccess = true;
+
+      // 로그인 상태일 경우,
       if (user) {
+        // 접근 권한체크
+        const isBookmarkedCategory = await this.examCategoryBookmarks.findOne({
+          where: {
+            user: {
+              id: user.id,
+            },
+            category: {
+              id,
+            },
+          },
+        });
+        if (isBookmarkedCategory) {
+          category.hasAccess = true;
+        }
+
         const mockExamIds = category.mockExam.map((exam) => exam.id);
-        let mockExamBookmarks: MockExamBookmark[] = [];
-        let examLikes: ExamLike[] = [];
         const findOption = {
           where: {
             user: {
@@ -400,11 +415,11 @@ export class MockExamCategoryService {
             exam: true,
           },
         };
-        await Promise.all([
-          this.mockExamBookmarks
-            .find(findOption)
-            .then((res) => (mockExamBookmarks = res)),
-          this.examLikes.find(findOption).then((res) => (examLikes = res)),
+
+        // 북마크 여부, 좋아요 여부를 조회한다.
+        const [mockExamBookmarks, examLikes] = await Promise.all([
+          this.mockExamBookmarks.find(findOption).then((res) => res),
+          this.examLikes.find(findOption).then((res) => res),
         ]);
 
         category.mockExam = category.mockExam.map((exam) => {

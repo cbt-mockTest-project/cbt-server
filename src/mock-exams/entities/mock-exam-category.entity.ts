@@ -116,6 +116,9 @@ export class MockExamCategory extends CoreEntity {
   @Column({ default: false })
   @Field(() => Boolean, { defaultValue: false })
   isPublic: boolean;
+
+  @Field(() => Boolean, { nullable: true, defaultValue: false })
+  hasAccess?: boolean = false;
 }
 
 @Entity()

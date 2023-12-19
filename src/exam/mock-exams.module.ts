@@ -15,8 +15,6 @@ import { MockExamQuestionResolver } from './mock-exams-question.resolver';
 import { MockExam } from './entities/mock-exam.entity';
 import { MockExamResolver } from './mock-exams.resolver';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { MockExamCategoryService } from '../exam-category/mock-exams-category.service';
-import { MockExamCategoryResolver } from '../exam-category/mock-exams-category.resolver';
 import { Module } from '@nestjs/common';
 import { MockExamService } from './mock-exams.service';
 import { MockExamQuestionService } from './mock-exams-question.service';
@@ -67,8 +65,6 @@ import {
     ]),
   ],
   providers: [
-    MockExamCategoryResolver,
-    MockExamCategoryService,
     MockExamResolver,
     MockExamService,
     MockExamQuestionResolver,

@@ -6,6 +6,7 @@ import { ExamLike } from 'src/exam-like/entities/exam-like.entity';
 import { ExamCategoryBookmark } from 'src/exam-category-bookmark/entities/exam-category-bookmark';
 import { MockExamCategoryResolver } from './mock-exams-category.resolver';
 import { MockExamCategoryService } from './mock-exams-category.service';
+import { ExamCategoryBookmarkService } from 'src/exam-category-bookmark/exam-category-bookmark.service';
 
 @Module({
   imports: [
@@ -16,6 +17,10 @@ import { MockExamCategoryService } from './mock-exams-category.service';
       ExamCategoryBookmark,
     ]),
   ],
-  providers: [MockExamCategoryResolver, MockExamCategoryService],
+  providers: [
+    MockExamCategoryResolver,
+    MockExamCategoryService,
+    ExamCategoryBookmarkService,
+  ],
 })
 export class ExamCategoryModule {}

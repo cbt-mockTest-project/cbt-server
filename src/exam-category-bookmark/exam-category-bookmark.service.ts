@@ -31,6 +31,12 @@ export class ExamCategoryBookmarkService {
             user: true,
           },
         },
+        order: {
+          category: {
+            order: 'ASC',
+            created_at: 'DESC',
+          },
+        },
       });
       return {
         ok: true,

@@ -9,7 +9,13 @@ import {
 } from './entities/mock-exam-category.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsWhere, In, IsNull, Repository } from 'typeorm';
+import {
+  FindManyOptions,
+  FindOptionsWhere,
+  In,
+  IsNull,
+  Repository,
+} from 'typeorm';
 import {
   DeleteMockExamCategoryInput,
   DeleteMockExamCategoryOutput,
@@ -49,6 +55,7 @@ import { GetMyExamCategoriesOutput } from '../exam/dtos/getMyExamCategories.dto'
 import { ExamLike } from 'src/exam-like/entities/exam-like.entity';
 import { ExamCategoryBookmark } from 'src/exam-category-bookmark/entities/exam-category-bookmark';
 import { ExamSource } from 'src/enums/enum';
+import { ExamCategoryBookmarkService } from 'src/exam-category-bookmark/exam-category-bookmark.service';
 
 @Injectable()
 export class MockExamCategoryService {
@@ -61,47 +68,24 @@ export class MockExamCategoryService {
     private readonly examLikes: Repository<ExamLike>,
     @InjectRepository(ExamCategoryBookmark)
     private readonly examCategoryBookmarks: Repository<ExamCategoryBookmark>,
+    private readonly examCategoryBookmarkService: ExamCategoryBookmarkService,
   ) {}
 
   async getExamCategories(
     getExamCategoriesInput: GetExamCategoriesInput,
     user?: User,
   ): Promise<GetExamCategoriesOutput> {
-    const { examSource, categoryMakerId, isBookmarked } =
+    const { examSource, categoryMakerId, isBookmarked, limit } =
       getExamCategoriesInput;
-
     if (isBookmarked) {
       if (!user)
         return {
           ok: false,
           error: '로그인이 필요합니다.',
         };
-      const bookmarkedCategories = await this.examCategoryBookmarks.find({
-        where: {
-          user: {
-            id: user.id,
-          },
-        },
-        relations: {
-          category: {
-            user: true,
-          },
-        },
-        order: {
-          category: {
-            order: 'ASC',
-            created_at: 'DESC',
-          },
-        },
-      });
-
-      const categories = bookmarkedCategories.map(
-        (category) => category.category,
+      return this.examCategoryBookmarkService.getMyBookmarkedExamCategories(
+        user,
       );
-      return {
-        ok: true,
-        categories,
-      };
     }
 
     if (!isBookmarked) {
@@ -141,7 +125,7 @@ export class MockExamCategoryService {
         }
       }
 
-      const categories = await this.mockExamCategories.find({
+      const categoryFindOption: FindManyOptions<MockExamCategory> = {
         where,
         relations: {
           user: true,
@@ -150,7 +134,9 @@ export class MockExamCategoryService {
           order: 'ASC',
           created_at: 'DESC',
         },
-      });
+      };
+      if (limit) categoryFindOption.take = limit;
+      const categories = await this.mockExamCategories.find(categoryFindOption);
       return {
         ok: true,
         categories,

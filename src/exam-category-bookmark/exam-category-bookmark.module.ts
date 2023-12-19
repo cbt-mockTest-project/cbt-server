@@ -7,5 +7,6 @@ import { ExamCategoryBookmark } from './entities/exam-category-bookmark';
 @Module({
   imports: [TypeOrmModule.forFeature([ExamCategoryBookmark])],
   providers: [ExamCategoryBookmarkResolver, ExamCategoryBookmarkService],
+  exports: [ExamCategoryBookmarkService],
 })
 export class ExamCategoryBookmarkModule {}

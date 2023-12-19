@@ -385,7 +385,7 @@ export class MockExamCategoryService {
             },
           },
         });
-        if (isBookmarkedCategory) {
+        if (isBookmarkedCategory || category.user.id === user.id) {
           category.hasAccess = true;
         }
 

@@ -179,4 +179,9 @@ export class MockExamQuestionResolver {
       readQuestionsByExamIdsInput,
     );
   }
+
+  @Query(() => CoreOutput)
+  async sync() {
+    return this.mockExamQuestionService.sync();
+  }
 }

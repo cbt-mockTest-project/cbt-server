@@ -1199,4 +1199,38 @@ export class MockExamQuestionService {
       };
     }
   }
+
+  async sync() {
+    try {
+      // questionOrderIds sync
+      const mockExams = await this.mockExam.find();
+      await Promise.all(
+        mockExams.map(async (mockExam) => {
+          const questions = await this.mockExamQuestion.find({
+            where: {
+              mockExam: {
+                id: mockExam.id,
+              },
+            },
+            order: {
+              number: 'ASC',
+            },
+          });
+          const questionOrderIds = questions.map(
+            (question) => question.orderId,
+          );
+          await this.mockExam.update(mockExam.id, {
+            questionOrderIds,
+          });
+        }),
+      );
+      return {
+        ok: true,
+      };
+    } catch {
+      return {
+        ok: false,
+      };
+    }
+  }
 }

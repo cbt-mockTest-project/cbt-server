@@ -122,4 +122,8 @@ export class MockExam extends CoreEntity {
 
   @Field(() => Boolean, { nullable: true, defaultValue: false })
   isLiked?: boolean = false;
+
+  @Column({ type: 'json', default: [] })
+  @Field(() => [String], { defaultValue: [] })
+  questionOrderIds: string[];
 }

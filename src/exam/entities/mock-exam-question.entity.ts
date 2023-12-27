@@ -43,6 +43,10 @@ export class MockExamVideoType {
 @ObjectType()
 @Entity()
 export class MockExamQuestion extends CoreEntity {
+  @Column({ primary: true, default: () => 'uuid_generate_v4()' })
+  @Field(() => String)
+  orderId: string;
+
   @Column()
   @Field(() => String, { nullable: true, defaultValue: '' })
   question?: string;

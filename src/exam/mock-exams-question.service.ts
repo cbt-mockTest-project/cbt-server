@@ -1032,6 +1032,7 @@ export class MockExamQuestionService {
           .andWhere('mockExam.id IN (:...ids)', {
             ids,
           })
+          .andWhere('question.id = question.id')
           .andWhere('mockExamQuestionState.state IN (:...states)', {
             states,
           });
@@ -1039,9 +1040,7 @@ export class MockExamQuestionService {
         if (limit) {
           questionStatesQuery = questionStatesQuery.limit(limit);
         }
-        const questionStates = await questionStatesQuery
-          .orderBy('RANDOM()')
-          .getMany();
+        const questionStates = await questionStatesQuery.getMany();
 
         questions = questionStates.map((state) => state.question);
         if (coreQuestions.length > 0) {
@@ -1053,68 +1052,59 @@ export class MockExamQuestionService {
         questions = shuffleArray(questions);
       }
       if (order === 'normal') {
-        questions = questions.sort((a, b) => a.number - b.number);
+        questions = this.sortQuestions(
+          questions,
+          mockExams.flatMap((mockExam) => mockExam.questionOrderIds),
+        );
       }
       if (limit) {
         questions = questions.slice(0, limit);
       }
       questionIds = questions.map((question) => question.id);
-      const [
-        questionStates,
-        questionBookmarks,
-        questionFeedbacks,
-        questionComments,
-      ] = await Promise.all([
-        user
-          ? this.mockExamQuestionState
-              .find({
-                relations: { question: true },
-                where: {
-                  question: In(questionIds),
-                  user: {
-                    id: user.id,
+      const [questionStates, questionBookmarks, questionFeedbacks] =
+        await Promise.all([
+          user
+            ? this.mockExamQuestionState
+                .find({
+                  relations: { question: true },
+                  where: {
+                    question: In(questionIds),
+                    user: {
+                      id: user.id,
+                    },
                   },
-                },
-              })
-              .then((res) => res)
-          : [],
-        user
-          ? this.mockExamQuestionBookmark
-              .find({
-                relations: { question: true },
-                where: {
-                  question: In(questionIds),
-                  user: {
-                    id: user.id,
+                })
+                .then((res) => res)
+            : [],
+          user
+            ? this.mockExamQuestionBookmark
+                .find({
+                  relations: { question: true },
+                  where: {
+                    question: In(questionIds),
+                    user: {
+                      id: user.id,
+                    },
                   },
-                },
-              })
-              .then((res) => res)
-          : [],
-        this.mockExamQuestionFeedback
-          .find({
-            relations: {
-              mockExamQuestion: true,
-              user: true,
-              recommendation: { user: true },
-            },
-            where: {
-              mockExamQuestion: In(questionIds),
-            },
-            order: {
-              type: 'ASC',
-            },
-          })
-          .then((res) => res),
-        this.mockExamQuestionComment
-          .find({
-            relations: { question: true, user: true },
-            where: {
-              question: In(questionIds),
-            },
-          })
-          .then((res) => res),
-      ]);
+                })
+                .then((res) => res)
+            : [],
+          this.mockExamQuestionFeedback
+            .find({
+              relations: {
+                mockExamQuestion: true,
+                user: true,
+                recommendation: { user: true },
+              },
+              where: {
+                mockExamQuestion: In(questionIds),
+              },
+              order: {
+                type: 'ASC',
+              },
+            })
+            .then((res) => res),
+        ]);
       questions = questions.map((question) => {
         return {
           ...question,
@@ -1126,9 +1116,6 @@ export class MockExamQuestionService {
           )?.state,
           isBookmarked: !!questionBookmarks.find(
             (bookmark) => bookmark.question.id === question.id,
-          ),
-          mockExamQuestionComment: questionComments.filter(
-            (comment) => comment.question.id === question.id,
           ),
           mockExamQuestionFeedback: questionFeedbacks
             .filter(
@@ -1198,6 +1185,20 @@ export class MockExamQuestionService {
         error: '문제를 찾을 수 없습니다.',
       };
     }
+  }
+
+  sortQuestions(
+    questions: MockExamQuestion[],
+    orders: string[],
+  ): MockExamQuestion[] {
+    const questionsMap = new Map<string, MockExamQuestion>();
+    questions.forEach((question) => {
+      questionsMap.set(question.orderId, question);
+    });
+    const sortedQuestions = orders
+      .map((id) => questionsMap.get(id))
+      .filter((card) => card !== undefined) as MockExamQuestion[];
+    return sortedQuestions;
   }
 
   async sync() {

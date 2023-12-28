@@ -722,7 +722,12 @@ export class MockExamService {
         ok: true,
       };
     } catch (e) {
-      console.log(e);
+      if (e.code === '23505') {
+        return {
+          ok: false,
+          error: '시험지 제목이 중복됩니다.',
+        };
+      }
       return {
         ok: false,
         error: '시험지 저장에 실패했습니다.',

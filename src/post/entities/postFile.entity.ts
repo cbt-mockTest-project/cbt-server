@@ -4,7 +4,7 @@ import { Column, Entity, ManyToOne } from 'typeorm';
 import { PostData } from './postData.entity';
 import { User } from 'src/users/entities/user.entity';
 
-@InputType('PostFile', { isAbstract: true })
+@InputType('PostFileInputType', { isAbstract: true })
 @ObjectType()
 @Entity()
 export class PostFile extends CoreEntity {
@@ -24,7 +24,7 @@ export class PostFile extends CoreEntity {
     onDelete: 'CASCADE',
   })
   @Field(() => PostData)
-  postData: PostFile;
+  postData: PostData;
 
   @ManyToOne(() => User, (user) => user.postFile, { onDelete: 'CASCADE' })
   @Field(() => User)

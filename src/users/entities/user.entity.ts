@@ -193,7 +193,7 @@ export class User extends CoreEntity {
   feedback: Feedback[];
 
   @OneToMany(() => Visit, (visit) => visit.user)
-  @Field(() => Visit)
+  @Field(() => [Visit])
   visit: Visit[];
 
   @OneToMany(() => Notice, (notice) => notice.user)

@@ -16,6 +16,7 @@ export enum QuestionFeedbackType {
   PRIVATE = 'PRIVATE',
   REPORT = 'REPORT',
 }
+@InputType('RecommendationCountInputType', { isAbstract: true })
 @ObjectType()
 export class RecommendationCount {
   @Field(() => Number, { defaultValue: 0 })
@@ -25,6 +26,7 @@ export class RecommendationCount {
   bad: number;
 }
 
+@InputType('MyRecommedationStatusInputType', { isAbstract: true })
 @ObjectType()
 export class MyRecommedationStatus {
   @Field(() => Boolean, { defaultValue: false })

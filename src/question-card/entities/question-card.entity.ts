@@ -16,7 +16,7 @@ export class QuestionCard extends CoreEntity {
   @Field(() => String)
   solution: string;
 
-  @Field(() => QuestionCardCategory)
+  @Field(() => QuestionCardCategory, { nullable: true })
   @ManyToOne(
     () => QuestionCardCategory,
     (questionCardCategory) => questionCardCategory.questionCard,

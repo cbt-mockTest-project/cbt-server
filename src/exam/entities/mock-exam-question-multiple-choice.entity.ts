@@ -1,9 +1,11 @@
 import { MockExamQuestion } from './mock-exam-question.entity';
 import { CoreEntity } from '../../common/entities/core.entity';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, ManyToOne, OneToOne } from 'typeorm';
+import { Column, Entity, OneToOne } from 'typeorm';
 
-@InputType('MockExamQuestionMultipleChoiceOption', { isAbstract: true })
+@InputType('MockExamQuestionMultipleChoiceOptionInputType', {
+  isAbstract: true,
+})
 @ObjectType()
 export class MockExamMultipleChoiceOption {
   @Field(() => String, { nullable: true })
@@ -14,7 +16,7 @@ export class MockExamMultipleChoiceOption {
   number: number;
 }
 
-@InputType('MockExamQuestionMultipleChoice', { isAbstract: true })
+@InputType('MockExamQuestionMultipleChoiceInputType', { isAbstract: true })
 @ObjectType()
 @Entity()
 export class MockExamQuestionMultipleChoice extends CoreEntity {

@@ -21,7 +21,7 @@ import {
 import { MockExam } from './entities/mock-exam.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Raw, Repository, FindOptionsWhere, Brackets, Not } from 'typeorm';
+import { Raw, Repository, FindOptionsWhere, Brackets, Not, In } from 'typeorm';
 import {
   CreateMockExamInput,
   CreateMockExamOutput,
@@ -48,6 +48,8 @@ import {
 import { MockExamBookmark } from 'src/exam-bookmark/entities/mock-exam-bookmark.entity';
 import { MockExamCategory } from 'src/exam-category/entities/mock-exam-category.entity';
 import { ExamSource } from 'src/enums/enum';
+import { SaveExamInput, SaveExamOutput } from './dtos/saveExam.dto';
+import { MockExamQuestion } from './entities/mock-exam-question.entity';
 
 @Injectable()
 export class MockExamService {
@@ -60,6 +62,8 @@ export class MockExamService {
     private readonly mockExamCategory: Repository<MockExamCategory>,
     @InjectRepository(MockExamQuestionState)
     private readonly mockExamQuestionState: Repository<MockExamQuestionState>,
+    @InjectRepository(MockExamQuestion)
+    private readonly mockExamQuestion: Repository<MockExamQuestion>,
   ) {}
 
   async createMockExam(
@@ -656,6 +660,72 @@ export class MockExamService {
       return {
         ok: false,
         error: '폴더를 삭제하는데 실패했습니다.',
+      };
+    }
+  }
+
+  async saveExam(
+    user: User,
+    saveExamInput: SaveExamInput,
+  ): Promise<SaveExamOutput> {
+    try {
+      const { title, questionOrderIds, questions, uuid } = saveExamInput;
+      const [prevMockExam, prevQuestions] = await Promise.all([
+        this.mockExam.findOne({
+          where: { uuid },
+        }),
+        this.mockExamQuestion.find({
+          where: {
+            mockExam: {
+              uuid,
+            },
+            orderId: In(questions.map((question) => question.orderId)),
+          },
+        }),
+      ]);
+      const newQuestions = questions.map((question) => {
+        const prevQuestion = prevQuestions.find(
+          (prevQuestion) => prevQuestion.orderId === question.orderId,
+        );
+        if (prevQuestion) {
+          return this.mockExamQuestion.merge(prevQuestion, {
+            ...question,
+            question_img: [
+              {
+                ...prevQuestion.question_img[0],
+                ...(question.question_img && question.question_img[0]),
+              },
+            ],
+            solution_img: [
+              {
+                ...prevQuestion.solution_img[0],
+                ...(question.solution_img && question.solution_img[0]),
+              },
+            ],
+            user,
+          });
+        }
+        return this.mockExamQuestion.create({
+          ...question,
+          user,
+        });
+      });
+      await this.mockExam.save({
+        ...prevMockExam,
+        title,
+        uuid,
+        mockExamQuestion: newQuestions,
+        questionOrderIds,
+      });
+
+      return {
+        ok: true,
+      };
+    } catch (e) {
+      console.log(e);
+      return {
+        ok: false,
+        error: '시험지 저장에 실패했습니다.',
       };
     }
   }

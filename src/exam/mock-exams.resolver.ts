@@ -43,6 +43,7 @@ import {
   RemoveExamFromCategoryInput,
   RemoveExamFromCategoryOutput,
 } from './dtos/removeExamFromCategory.dto';
+import { SaveExamInput, SaveExamOutput } from './dtos/saveExam.dto';
 
 @Resolver(() => MockExam)
 export class MockExamResolver {
@@ -152,5 +153,14 @@ export class MockExamResolver {
       user,
       removeExamFromCategoryInput,
     );
+  }
+
+  @Role(['ANY'])
+  @Mutation(() => SaveExamOutput)
+  async saveExam(
+    @AuthUser() user: User,
+    @Args('input') saveExamInput: SaveExamInput,
+  ): Promise<SaveExamOutput> {
+    return this.mockExamService.saveExam(user, saveExamInput);
   }
 }

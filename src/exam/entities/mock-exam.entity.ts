@@ -25,6 +25,10 @@ registerEnumType(ExamStatus, { name: 'ExamStatus' });
 @ObjectType()
 @Entity()
 export class MockExam extends CoreEntity {
+  @Column({ default: () => 'uuid_generate_v4()', unique: true })
+  @Field(() => String)
+  uuid: string;
+
   @Column({ unique: true })
   @Field(() => String)
   title: string;
@@ -33,7 +37,7 @@ export class MockExam extends CoreEntity {
   @Field(() => String, { nullable: true })
   slug: string;
 
-  @Column()
+  @Column({ default: false })
   @Field(() => Boolean, { defaultValue: false })
   approved: boolean;
 
@@ -57,6 +61,7 @@ export class MockExam extends CoreEntity {
     (mockExamQuestion) => mockExamQuestion.mockExam,
     {
       onDelete: 'SET NULL',
+      cascade: true,
     },
   )
   mockExamQuestion: MockExamQuestion[];

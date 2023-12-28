@@ -43,7 +43,7 @@ export class MockExamVideoType {
 @ObjectType()
 @Entity()
 export class MockExamQuestion extends CoreEntity {
-  @Column({ default: () => 'uuid_generate_v4()' })
+  @Column({ default: () => 'uuid_generate_v4()', unique: true })
   @Field(() => String)
   orderId: string;
 
@@ -55,8 +55,8 @@ export class MockExamQuestion extends CoreEntity {
   @Field(() => String, { nullable: true, defaultValue: '' })
   solution?: string;
 
-  @Column()
-  @Field(() => Boolean)
+  @Column({ default: false })
+  @Field(() => Boolean, { defaultValue: false })
   approved: boolean;
 
   @Column({ default: '' })

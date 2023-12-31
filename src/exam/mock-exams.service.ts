@@ -509,7 +509,10 @@ export class MockExamService {
             },
           },
         });
-        exams = bookmarks.map((bookmark) => bookmark.exam);
+        exams = bookmarks.map((bookmark) => ({
+          ...bookmark.exam,
+          isBookmarked: true,
+        }));
         return {
           ok: true,
           exams,
@@ -740,7 +743,7 @@ export class MockExamService {
         mockExamQuestion: newQuestions,
         questionOrderIds,
         user,
-        mockExamCategory: categoryId ? [{ id: categoryId, user }] : [],
+        ...(categoryId ? { mockExamCategory: [{ id: categoryId, user }] } : {}),
       });
 
       return {

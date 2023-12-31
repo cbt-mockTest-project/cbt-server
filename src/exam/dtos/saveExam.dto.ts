@@ -13,6 +13,9 @@ export class PartialMockExamQuestionInput extends PartialType(
 
 @InputType()
 export class SaveExamInput {
+  @Field(() => Number, { nullable: true })
+  categoryId?: number;
+
   @Field(() => String)
   uuid: string;
 
@@ -30,4 +33,7 @@ export class SaveExamInput {
 }
 
 @ObjectType()
-export class SaveExamOutput extends CoreOutput {}
+export class SaveExamOutput extends CoreOutput {
+  @Field(() => Number, { nullable: true })
+  examId?: number;
+}

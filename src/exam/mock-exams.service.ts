@@ -50,6 +50,8 @@ import { MockExamCategory } from 'src/exam-category/entities/mock-exam-category.
 import { ExamSource } from 'src/enums/enum';
 import { SaveExamInput, SaveExamOutput } from './dtos/saveExam.dto';
 import { MockExamQuestion } from './entities/mock-exam-question.entity';
+import { sortQuestions } from 'src/lib/utils/sortQuestions';
+import { pick } from 'lodash';
 
 @Injectable()
 export class MockExamService {
@@ -270,23 +272,17 @@ export class MockExamService {
       const { id } = readMockExamInput;
       const mockExam = await this.mockExam.findOne({
         where: { id },
-        relations: [
-          'mockExamQuestion',
-          'mockExamQuestion.mockExamQuestionFeedback',
-        ],
-        order: {
-          mockExamQuestion: {
-            number: 'ASC',
-          },
+        relations: {
+          mockExamQuestion: true,
         },
       });
-      const questionNumbers = mockExam.mockExamQuestion.map(
-        (data) => data.number,
+      mockExam.mockExamQuestion = sortQuestions(
+        mockExam.mockExamQuestion,
+        mockExam.questionOrderIds,
       );
       return {
         ok: true,
         mockExam,
-        questionNumbers,
       };
     } catch {
       return {
@@ -669,10 +665,12 @@ export class MockExamService {
     saveExamInput: SaveExamInput,
   ): Promise<SaveExamOutput> {
     try {
-      const { title, questionOrderIds, questions, uuid } = saveExamInput;
-      const [prevMockExam, prevQuestions] = await Promise.all([
+      const { title, questionOrderIds, questions, uuid, categoryId } =
+        saveExamInput;
+      const [prevMockExam, prevQuestions, prevCategory] = await Promise.all([
         this.mockExam.findOne({
           where: { uuid },
+          relations: { user: true },
         }),
         this.mockExamQuestion.find({
           where: {
@@ -682,7 +680,28 @@ export class MockExamService {
             orderId: In(questions.map((question) => question.orderId)),
           },
         }),
+        categoryId
+          ? this.mockExamCategory.findOne({
+              where: { id: categoryId, user: { id: user.id } },
+            })
+          : null,
       ]);
+      if (categoryId) {
+        if (!prevCategory) {
+          return {
+            ok: false,
+            error: '존재하지 않는 폴더입니다.',
+          };
+        }
+      }
+      if (prevMockExam) {
+        if (prevMockExam.user.id !== user.id) {
+          return {
+            ok: false,
+            error: '권한이 없습니다.',
+          };
+        }
+      }
       const newQuestions = questions.map((question) => {
         const prevQuestion = prevQuestions.find(
           (prevQuestion) => prevQuestion.orderId === question.orderId,
@@ -690,18 +709,22 @@ export class MockExamService {
         if (prevQuestion) {
           return this.mockExamQuestion.merge(prevQuestion, {
             ...question,
-            question_img: [
-              {
-                ...prevQuestion.question_img[0],
-                ...(question.question_img && question.question_img[0]),
-              },
-            ],
-            solution_img: [
-              {
-                ...prevQuestion.solution_img[0],
-                ...(question.solution_img && question.solution_img[0]),
-              },
-            ],
+            question_img: question.question_img?.[0]
+              ? [
+                  {
+                    ...prevQuestion.question_img?.[0],
+                    ...pick(question.question_img[0], ['name', 'url', 'uid']),
+                  },
+                ]
+              : [],
+            solution_img: question.solution_img?.[0]
+              ? [
+                  {
+                    ...prevQuestion.solution_img?.[0],
+                    ...pick(question.solution_img[0], ['name', 'url', 'uid']),
+                  },
+                ]
+              : [],
             user,
           });
         }
@@ -710,15 +733,18 @@ export class MockExamService {
           user,
         });
       });
-      await this.mockExam.save({
+      const res = await this.mockExam.save({
         ...prevMockExam,
         title,
         uuid,
         mockExamQuestion: newQuestions,
         questionOrderIds,
+        user,
+        mockExamCategory: categoryId ? [{ id: categoryId, user }] : [],
       });
 
       return {
+        examId: res.id,
         ok: true,
       };
     } catch (e) {

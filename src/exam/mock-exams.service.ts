@@ -736,18 +736,34 @@ export class MockExamService {
           user,
         });
       });
-      const res = await this.mockExam.save({
+      const exam = await this.mockExam.save({
         ...prevMockExam,
         title,
         uuid,
         mockExamQuestion: newQuestions,
         questionOrderIds,
         user,
-        ...(categoryId ? { mockExamCategory: [{ id: categoryId, user }] } : {}),
       });
 
+      const exitingRelation = await this.mockExam
+        .createQueryBuilder()
+        .relation(MockExam, 'mockExamCategory')
+        .of(exam.id)
+        .loadMany();
+      if (exitingRelation.find((relation) => relation.id === categoryId)) {
+        return {
+          examId: exam.id,
+          ok: true,
+        };
+      }
+      await this.mockExam
+        .createQueryBuilder()
+        .relation(MockExam, 'mockExamCategory')
+        .of(exam.id)
+        .add(categoryId);
+
       return {
-        examId: res.id,
+        examId: exam.id,
         ok: true,
       };
     } catch (e) {

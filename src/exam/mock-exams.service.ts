@@ -744,23 +744,24 @@ export class MockExamService {
         questionOrderIds,
         user,
       });
-
-      const exitingRelation = await this.mockExam
-        .createQueryBuilder()
-        .relation(MockExam, 'mockExamCategory')
-        .of(exam.id)
-        .loadMany();
-      if (exitingRelation.find((relation) => relation.id === categoryId)) {
-        return {
-          examId: exam.id,
-          ok: true,
-        };
+      if (categoryId) {
+        const exitingRelation = await this.mockExam
+          .createQueryBuilder()
+          .relation(MockExam, 'mockExamCategory')
+          .of(exam.id)
+          .loadMany();
+        if (exitingRelation.find((relation) => relation.id === categoryId)) {
+          return {
+            examId: exam.id,
+            ok: true,
+          };
+        }
+        await this.mockExam
+          .createQueryBuilder()
+          .relation(MockExam, 'mockExamCategory')
+          .of(exam.id)
+          .add(categoryId);
       }
-      await this.mockExam
-        .createQueryBuilder()
-        .relation(MockExam, 'mockExamCategory')
-        .of(exam.id)
-        .add(categoryId);
 
       return {
         examId: exam.id,

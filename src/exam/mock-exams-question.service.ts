@@ -967,7 +967,8 @@ export class MockExamQuestionService {
     readQuestionsByExamIdsInput: ReadQuestionsByExamIdsInput,
   ): Promise<ReadQuestionsByExamIdsOutput> {
     try {
-      const { order, states, ids, limit } = readQuestionsByExamIdsInput;
+      const { order, states, ids, limit, bookmarked } =
+        readQuestionsByExamIdsInput;
       const mockExams = await this.mockExam.find({
         where: {
           id: In(ids),
@@ -982,6 +983,25 @@ export class MockExamQuestionService {
         (mockExam) => mockExam.mockExamQuestion,
       );
       let questionIds = questions.map((question) => question.id);
+      if (bookmarked) {
+        const questionBookmarks = await this.mockExamQuestionBookmark.find({
+          relations: {
+            question: {
+              user: true,
+            },
+          },
+          where: {
+            question: {
+              id: In(questionIds),
+            },
+            user: {
+              id: user.id,
+            },
+          },
+        });
+        questions = questionBookmarks.map((bookmark) => bookmark.question);
+        questionIds = questions.map((question) => question.id);
+      }
       /**
        * Core상태는 저장되지 않기 때문에 따로 가져와야 한다.
        */

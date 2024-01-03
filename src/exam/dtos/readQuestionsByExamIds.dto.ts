@@ -13,6 +13,8 @@ export class ReadQuestionsByExamIdsInput {
   ids?: number[];
   @Field(() => Number, { nullable: true })
   limit?: number;
+  @Field(() => Boolean, { nullable: true, defaultValue: false })
+  bookmarked?: boolean;
 }
 
 @ObjectType()

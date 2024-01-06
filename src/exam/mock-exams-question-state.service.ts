@@ -189,7 +189,7 @@ export class MockExamQuestionStateService {
     try {
       const questionStates = await this.mockExamQuestionState.find({
         where: {
-          state: Not(QuestionState.CORE),
+          state: Not(In([QuestionState.CORE, QuestionState.MIDDLE])),
           user: {
             id: user.id,
           },

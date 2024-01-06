@@ -128,6 +128,9 @@ export class MockExamCategory extends CoreEntity {
 
   @Field(() => Boolean, { nullable: true, defaultValue: false })
   hasAccess?: boolean = false;
+
+  @Field(() => Boolean, { nullable: true, defaultValue: false })
+  isBookmarked?: boolean = false;
 }
 
 @Entity()

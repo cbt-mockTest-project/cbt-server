@@ -14,6 +14,7 @@ import {
   FindOptionsWhere,
   In,
   IsNull,
+  Like,
   Repository,
 } from 'typeorm';
 import {
@@ -75,8 +76,15 @@ export class MockExamCategoryService {
     getExamCategoriesInput: GetExamCategoriesInput,
     user?: User,
   ): Promise<GetExamCategoriesOutput> {
-    const { examSource, categoryMakerId, isBookmarked, limit } =
-      getExamCategoriesInput;
+    const {
+      examSource,
+      categoryMakerId,
+      isBookmarked,
+      limit,
+      isPublicOnly,
+      page,
+      keyword,
+    } = getExamCategoriesInput;
     if (isBookmarked) {
       if (!user)
         return {
@@ -115,7 +123,7 @@ export class MockExamCategoryService {
           },
           isPublic: true,
         });
-        if (user?.id === categoryMakerId) {
+        if (!isPublicOnly && user?.id === categoryMakerId) {
           where.push({
             user: {
               id: categoryMakerId,
@@ -136,6 +144,14 @@ export class MockExamCategoryService {
         },
       };
       if (limit) categoryFindOption.take = limit;
+      if (page) categoryFindOption.skip = (Number(page) - 1) * Number(limit);
+      if (keyword) {
+        categoryFindOption.where = {
+          ...categoryFindOption.where,
+          isPublic: true,
+          name: Like(`%${keyword}%`),
+        };
+      }
       const categories = await this.mockExamCategories.find(categoryFindOption);
       return {
         ok: true,

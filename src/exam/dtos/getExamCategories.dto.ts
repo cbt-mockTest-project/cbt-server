@@ -16,6 +16,15 @@ export class GetExamCategoriesInput {
 
   @Field(() => Number, { nullable: true, defaultValue: null })
   limit?: number;
+
+  @Field(() => Number, { nullable: true, defaultValue: 0 })
+  page?: number;
+
+  @Field(() => Boolean, { nullable: true, defaultValue: false })
+  isPublicOnly?: boolean;
+
+  @Field(() => String, { nullable: true, defaultValue: '' })
+  keyword?: string;
 }
 
 @ObjectType()

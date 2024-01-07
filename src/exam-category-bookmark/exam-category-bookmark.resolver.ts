@@ -9,6 +9,14 @@ import {
   ToggleExamCategoryBookmarkInput,
   ToggleExamCategoryBookmarkOutput,
 } from './dtos/toggleExamCategoryBookmark.dto';
+import {
+  DeleteExamCategoryBookmarkInput,
+  DeleteExamCategoryBookmarkOutput,
+} from './dtos/deleteExamCategoryBookmark';
+import {
+  GetExamCategorySubscribersInput,
+  GetExamCategorySubscribersOutput,
+} from './dtos/getExamCategorySubscribers.dto';
 
 @Resolver(() => ExamCategoryBookmark)
 export class ExamCategoryBookmarkResolver {
@@ -34,6 +42,32 @@ export class ExamCategoryBookmarkResolver {
     return this.examCategoryBookmarkService.toggleExamCategoryBookmark(
       user,
       toggleExamCategorieBookmarkInput,
+    );
+  }
+
+  @Role(['ANY'])
+  @Mutation(() => DeleteExamCategoryBookmarkOutput)
+  deleteExamCategoryBookmark(
+    @AuthUser() user: User,
+    @Args('input')
+    deleteExamCategoryBookmarkInput: DeleteExamCategoryBookmarkInput,
+  ): Promise<DeleteExamCategoryBookmarkOutput> {
+    return this.examCategoryBookmarkService.deleteExamCategoryBookmark(
+      user,
+      deleteExamCategoryBookmarkInput,
+    );
+  }
+
+  @Role(['ANY'])
+  @Query(() => GetExamCategorySubscribersOutput)
+  getExamCategorySubscribers(
+    @AuthUser() user: User,
+    @Args('input')
+    getExamCategorySubscribersInput: GetExamCategorySubscribersInput,
+  ): Promise<GetExamCategorySubscribersOutput> {
+    return this.examCategoryBookmarkService.getExamCategorySubscribers(
+      user,
+      getExamCategorySubscribersInput,
     );
   }
 }

@@ -8,12 +8,23 @@ import {
   ToggleExamCategoryBookmarkOutput,
 } from './dtos/toggleExamCategoryBookmark.dto';
 import { ExamCategoryBookmark } from './entities/exam-category-bookmark';
+import {
+  DeleteExamCategoryBookmarkInput,
+  DeleteExamCategoryBookmarkOutput,
+} from './dtos/deleteExamCategoryBookmark';
+import { MockExamCategory } from 'src/exam-category/entities/mock-exam-category.entity';
+import {
+  GetExamCategorySubscribersInput,
+  GetExamCategorySubscribersOutput,
+} from './dtos/getExamCategorySubscribers.dto';
 
 @Injectable()
 export class ExamCategoryBookmarkService {
   constructor(
     @InjectRepository(ExamCategoryBookmark)
     private readonly examCategoryBookmark: Repository<ExamCategoryBookmark>,
+    @InjectRepository(MockExamCategory)
+    private readonly mockExamCategory: Repository<MockExamCategory>,
   ) {}
 
   async getMyBookmarkedExamCategories(
@@ -95,6 +106,92 @@ export class ExamCategoryBookmarkService {
       return {
         ok: false,
         error: '북마크를 토글하는데 실패했습니다.',
+      };
+    }
+  }
+
+  async deleteExamCategoryBookmark(
+    user: User,
+    deleteExamCategoryBookmarkInput: DeleteExamCategoryBookmarkInput,
+  ): Promise<DeleteExamCategoryBookmarkOutput> {
+    try {
+      const { userId, categoryId } = deleteExamCategoryBookmarkInput;
+      const category = await this.mockExamCategory.findOne({
+        where: {
+          id: categoryId,
+          user: {
+            id: user.id,
+          },
+        },
+      });
+      if (!category) {
+        return {
+          ok: false,
+          error: '잘못된 접근입니다.',
+        };
+      }
+      await this.examCategoryBookmark.delete({
+        user: {
+          id: userId,
+        },
+        category: {
+          id: categoryId,
+        },
+      });
+      return {
+        ok: true,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: '북마크를 삭제하는데 실패했습니다.',
+      };
+    }
+  }
+
+  async getExamCategorySubscribers(
+    user: User,
+    getExamCategorySubscribers: GetExamCategorySubscribersInput,
+  ): Promise<GetExamCategorySubscribersOutput> {
+    const { categoryId } = getExamCategorySubscribers;
+    try {
+      const category = await this.mockExamCategory.findOne({
+        where: {
+          id: categoryId,
+          user: {
+            id: user.id,
+          },
+        },
+      });
+      if (!category) {
+        return {
+          ok: false,
+          error: '잘못된 접근입니다.',
+        };
+      }
+      const subscribers = await this.examCategoryBookmark.find({
+        where: {
+          category: {
+            id: categoryId,
+          },
+        },
+        relations: {
+          user: true,
+        },
+        order: {
+          user: {
+            nickname: 'ASC',
+          },
+        },
+      });
+      return {
+        ok: true,
+        users: subscribers.map((subscriber) => subscriber.user),
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: '구독자를 가져오는데 실패했습니다.',
       };
     }
   }

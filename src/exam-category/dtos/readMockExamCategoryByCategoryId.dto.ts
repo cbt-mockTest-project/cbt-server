@@ -4,8 +4,10 @@ import { MockExamCategory } from '../entities/mock-exam-category.entity';
 
 @InputType()
 export class ReadMockExamCategoryByCategoryIdInput {
-  @Field(() => Number)
-  id: number;
+  @Field(() => Number, { nullable: true })
+  id?: number;
+  @Field(() => String, { nullable: true })
+  name?: string;
 }
 
 @ObjectType()

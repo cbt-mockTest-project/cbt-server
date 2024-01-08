@@ -57,6 +57,15 @@ import { ExamLike } from 'src/exam-like/entities/exam-like.entity';
 import { ExamCategoryBookmark } from 'src/exam-category-bookmark/entities/exam-category-bookmark';
 import { ExamSource } from 'src/enums/enum';
 import { ExamCategoryBookmarkService } from 'src/exam-category-bookmark/exam-category-bookmark.service';
+import {
+  GetExamCategoryLearningProgressInput,
+  GetExamCategoryLearningProgressOutput,
+} from './dtos/getExamCategoryLearningProgress.dto';
+import {
+  MockExamQuestionState,
+  QuestionState,
+} from 'src/exam/entities/mock-exam-question-state.entity';
+import { ReadMockExamCategoryNamesOutput } from './dtos/readMockExamCategoryNames.dto';
 
 @Injectable()
 export class MockExamCategoryService {
@@ -69,8 +78,68 @@ export class MockExamCategoryService {
     private readonly examLikes: Repository<ExamLike>,
     @InjectRepository(ExamCategoryBookmark)
     private readonly examCategoryBookmarks: Repository<ExamCategoryBookmark>,
+    @InjectRepository(MockExamQuestionState)
+    private readonly mockExamQuestionStates: Repository<MockExamQuestionState>,
     private readonly examCategoryBookmarkService: ExamCategoryBookmarkService,
   ) {}
+
+  async getExamCategoryLearningProgress(
+    user: User,
+    getExamCategoryLearningProgressInput: GetExamCategoryLearningProgressInput,
+  ): Promise<GetExamCategoryLearningProgressOutput> {
+    try {
+      const { categoryId } = getExamCategoryLearningProgressInput;
+      const category = await this.mockExamCategories.findOne({
+        where: {
+          id: categoryId,
+        },
+        relations: {
+          mockExam: {
+            mockExamQuestion: true,
+          },
+        },
+      });
+      if (!category) {
+        return {
+          ok: false,
+          error: '카테고리를 찾을 수 없습니다.',
+        };
+      }
+
+      const mockExamIds = category.mockExam.map((exam) => exam.id);
+      const mockExamQuestionStates = await this.mockExamQuestionStates.find({
+        where: {
+          user: {
+            id: user.id,
+          },
+          exam: In(mockExamIds),
+        },
+      });
+
+      const totalQuestionCount = category.mockExam.reduce(
+        (acc, exam) => acc + exam.mockExamQuestion.length,
+        0,
+      );
+      const highScoreCount = mockExamQuestionStates.filter(
+        (state) => state.state === QuestionState.HIGH,
+      ).length;
+      const lowScoreCount = mockExamQuestionStates.filter(
+        (state) => state.state === QuestionState.ROW,
+      ).length;
+
+      return {
+        ok: true,
+        totalQuestionCount,
+        highScoreCount,
+        lowScoreCount,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '카테고리를 찾을 수 없습니다.',
+      };
+    }
+  }
 
   async getExamCategories(
     getExamCategoriesInput: GetExamCategoriesInput,
@@ -368,10 +437,11 @@ export class MockExamCategoryService {
     readMockExamCategoryByCategoryIdInput: ReadMockExamCategoryByCategoryIdInput,
   ): Promise<ReadMockExamCategoryByCategoryIdOutput> {
     try {
-      const { id } = readMockExamCategoryByCategoryIdInput;
+      const { id, name } = readMockExamCategoryByCategoryIdInput;
       const category = await this.mockExamCategories.findOne({
         where: {
-          id,
+          ...(id ? { id } : {}),
+          ...(name ? { name } : {}),
         },
         relations: {
           user: true,
@@ -537,6 +607,24 @@ export class MockExamCategoryService {
       return {
         ok: true,
         ids,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '카테고리를 찾을 수 없습니다.',
+      };
+    }
+  }
+
+  async readMockExamCategoryNames(): Promise<ReadMockExamCategoryNamesOutput> {
+    try {
+      const categories = await this.mockExamCategories.find({
+        select: ['name'],
+      });
+      const names = categories.map((category) => category.name);
+      return {
+        ok: true,
+        names,
       };
     } catch {
       return {

@@ -46,6 +46,11 @@ import {
   GetExamCategoriesOutput,
 } from '../exam/dtos/getExamCategories.dto';
 import { GetMyExamCategoriesOutput } from '../exam/dtos/getMyExamCategories.dto';
+import {
+  GetExamCategoryLearningProgressInput,
+  GetExamCategoryLearningProgressOutput,
+} from './dtos/getExamCategoryLearningProgress.dto';
+import { ReadMockExamCategoryNamesOutput } from './dtos/readMockExamCategoryNames.dto';
 
 @Resolver(() => MockExamCategory)
 export class MockExamCategoryResolver {
@@ -177,5 +182,23 @@ export class MockExamCategoryResolver {
     @AuthUser() user: User,
   ): Promise<GetMyExamCategoriesOutput> {
     return this.mockExamCategoryService.getMyExamCategories(user);
+  }
+
+  @Role(['ANY'])
+  @Query(() => GetExamCategoryLearningProgressOutput)
+  async getExamCategoryLearningProgress(
+    @AuthUser() user: User,
+    @Args('input')
+    getExamCategoryLearningProgressInput: GetExamCategoryLearningProgressInput,
+  ): Promise<GetExamCategoryLearningProgressOutput> {
+    return this.mockExamCategoryService.getExamCategoryLearningProgress(
+      user,
+      getExamCategoryLearningProgressInput,
+    );
+  }
+
+  @Query(() => ReadMockExamCategoryNamesOutput)
+  async readMockExamCategoryNames(): Promise<ReadMockExamCategoryNamesOutput> {
+    return this.mockExamCategoryService.readMockExamCategoryNames();
   }
 }

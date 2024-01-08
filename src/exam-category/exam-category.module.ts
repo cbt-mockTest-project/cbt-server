@@ -7,12 +7,14 @@ import { ExamCategoryBookmark } from 'src/exam-category-bookmark/entities/exam-c
 import { MockExamCategoryResolver } from './mock-exams-category.resolver';
 import { MockExamCategoryService } from './mock-exams-category.service';
 import { ExamCategoryBookmarkService } from 'src/exam-category-bookmark/exam-category-bookmark.service';
+import { MockExamQuestionState } from 'src/exam/entities/mock-exam-question-state.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       MockExamCategory,
       MockExamBookmark,
+      MockExamQuestionState,
       ExamLike,
       ExamCategoryBookmark,
     ]),

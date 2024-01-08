@@ -43,7 +43,7 @@ export class MockExamQuestionFeedbackResolver {
   }
 
   @Mutation(() => EditMockExamQuestionFeedbackOutput)
-  @Role(['ADMIN'])
+  @Role(['ANY'])
   async editMockExamQuestionFeedback(
     @Args('input')
     editMockExamQuestionFeedbackInput: EditMockExamQuestionFeedbackInput,

@@ -66,6 +66,7 @@ import {
   QuestionState,
 } from 'src/exam/entities/mock-exam-question-state.entity';
 import { ReadMockExamCategoryNamesOutput } from './dtos/readMockExamCategoryNames.dto';
+import { GetMyAllExamCategoriesLearningProgressOutput } from './dtos/getMyAllExamCategoriesLearningProgress.dto';
 
 @Injectable()
 export class MockExamCategoryService {
@@ -82,6 +83,60 @@ export class MockExamCategoryService {
     private readonly mockExamQuestionStates: Repository<MockExamQuestionState>,
     private readonly examCategoryBookmarkService: ExamCategoryBookmarkService,
   ) {}
+
+  async getMyAllExamCategoriesLearningProgress(
+    user: User,
+  ): Promise<GetMyAllExamCategoriesLearningProgressOutput> {
+    try {
+      const categories = await this.mockExamCategories.find({
+        relations: {
+          mockExam: {
+            mockExamQuestion: true,
+          },
+        },
+      });
+      const mockExamIds = categories.reduce((acc, category) => {
+        const ids = category.mockExam.map((exam) => exam.id);
+        return [...acc, ...ids];
+      }, []);
+      const mockExamQuestionStates = await this.mockExamQuestionStates.find({
+        where: {
+          user: {
+            id: user.id,
+          },
+          exam: In(mockExamIds),
+        },
+      });
+
+      const totalQuestionCount = categories.reduce(
+        (acc, category) =>
+          acc +
+          category.mockExam.reduce(
+            (acc, exam) => acc + exam.mockExamQuestion.length,
+            0,
+          ),
+        0,
+      );
+      const highScoreCount = mockExamQuestionStates.filter(
+        (state) => state.state === QuestionState.HIGH,
+      ).length;
+      const lowScoreCount = mockExamQuestionStates.filter(
+        (state) => state.state === QuestionState.ROW,
+      ).length;
+
+      return {
+        ok: true,
+        totalQuestionCount,
+        highScoreCount,
+        lowScoreCount,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '카테고리를 찾을 수 없습니다.',
+      };
+    }
+  }
 
   async getExamCategoryLearningProgress(
     user: User,

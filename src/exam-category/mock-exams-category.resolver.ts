@@ -51,6 +51,7 @@ import {
   GetExamCategoryLearningProgressOutput,
 } from './dtos/getExamCategoryLearningProgress.dto';
 import { ReadMockExamCategoryNamesOutput } from './dtos/readMockExamCategoryNames.dto';
+import { GetMyAllExamCategoriesLearningProgressOutput } from './dtos/getMyAllExamCategoriesLearningProgress.dto';
 
 @Resolver(() => MockExamCategory)
 export class MockExamCategoryResolver {
@@ -194,6 +195,16 @@ export class MockExamCategoryResolver {
     return this.mockExamCategoryService.getExamCategoryLearningProgress(
       user,
       getExamCategoryLearningProgressInput,
+    );
+  }
+
+  @Role(['ANY'])
+  @Query(() => GetMyAllExamCategoriesLearningProgressOutput)
+  async getMyAllExamCategoriesLearningProgress(
+    @AuthUser() user: User,
+  ): Promise<GetMyAllExamCategoriesLearningProgressOutput> {
+    return this.mockExamCategoryService.getMyAllExamCategoriesLearningProgress(
+      user,
     );
   }
 

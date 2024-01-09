@@ -143,7 +143,7 @@ export class MockExamService {
     user: User,
     editMockExamInput: EditMockExamInput,
   ): Promise<EditMockExamOutput> {
-    const { id, title } = editMockExamInput;
+    const { id } = editMockExamInput;
     const prevMockExam = await this.mockExam.findOne({
       where: { id },
       relations: { user: true },
@@ -155,12 +155,6 @@ export class MockExamService {
       };
     }
 
-    if (prevMockExam.approved && title) {
-      return {
-        ok: false,
-        error: '승인된 시험지는 수정할 수 없습니다.',
-      };
-    }
     if (prevMockExam.user.id !== user.id) {
       return {
         ok: false,
@@ -186,12 +180,6 @@ export class MockExamService {
         return {
           ok: false,
           error: '존재하지 않는 시험입니다.',
-        };
-      }
-      if (prevMockExam.approved) {
-        return {
-          ok: false,
-          error: '승인된 시험지는 삭제할 수 없습니다.',
         };
       }
       if (prevMockExam.user.id !== user.id) {
@@ -500,6 +488,7 @@ export class MockExamService {
           relations: {
             exam: {
               user: true,
+              mockExamQuestion: true,
             },
           },
           order: {
@@ -526,6 +515,7 @@ export class MockExamService {
         },
         relations: {
           user: true,
+          mockExamQuestion: true,
         },
         order: {
           order: 'ASC',
@@ -738,6 +728,7 @@ export class MockExamService {
       });
       const exam = await this.mockExam.save({
         ...prevMockExam,
+        ...(!prevMockExam && { approved: true }), // 처음 저장할 때는 바로 승인
         title,
         uuid,
         mockExamQuestion: newQuestions,

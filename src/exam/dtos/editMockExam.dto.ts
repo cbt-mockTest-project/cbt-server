@@ -9,6 +9,8 @@ export class EditMockExamInput extends PickType(MockExam, ['id']) {
   status?: ExamStatus;
   @Field(() => String, { nullable: true })
   title?: string;
+  @Field(() => Boolean, { nullable: true })
+  approved?: boolean;
 }
 
 @ObjectType()

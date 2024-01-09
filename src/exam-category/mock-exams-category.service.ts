@@ -503,6 +503,7 @@ export class MockExamCategoryService {
           user: true,
           mockExam: {
             user: true,
+            mockExamQuestion: true,
           },
         },
         order: {

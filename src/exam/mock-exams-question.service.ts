@@ -936,12 +936,13 @@ export class MockExamQuestionService {
   }
 
   async searchQuestionsByKeyword(
+    user: User,
     searchQuestionsByKeywordInput: SearchQuestionsByKeywordInput,
   ): Promise<SearchQuestionsByKeywordOutput> {
     try {
       const { keyword } = searchQuestionsByKeywordInput;
       const formattedKeyword = `%${keyword.replace(/\s+/g, '').toLowerCase()}%`;
-      const questions = await this.mockExamQuestion
+      let questions = await this.mockExamQuestion
         .createQueryBuilder('question')
         .leftJoinAndSelect('question.mockExam', 'mockExam')
         .where(
@@ -950,6 +951,30 @@ export class MockExamQuestionService {
         )
         .limit(30)
         .getMany();
+      if (user) {
+        const questionBookmarks = await this.mockExamQuestionBookmark.find({
+          relations: { question: true },
+          where: {
+            question: In(questions.map((question) => question.id)),
+            user: {
+              id: user.id,
+            },
+          },
+        });
+        questions = questions.map((question) => {
+          const bookmarkedQuestion = questionBookmarks.find(
+            (bookmark) => bookmark.question.id === question.id,
+          );
+          if (bookmarkedQuestion) {
+            return {
+              ...question,
+              isBookmarked: true,
+            };
+          }
+          return question;
+        });
+      }
+
       return {
         questions,
         ok: true,

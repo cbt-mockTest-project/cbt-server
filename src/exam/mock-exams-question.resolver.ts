@@ -160,9 +160,11 @@ export class MockExamQuestionResolver {
 
   @Query(() => SearchQuestionsByKeywordOutput)
   async searchQuestionsByKeyword(
+    @AuthUser() user: User,
     @Args('input') searchQuestionsByKeywordInput: SearchQuestionsByKeywordInput,
   ): Promise<SearchQuestionsByKeywordOutput> {
     return this.mockExamQuestionService.searchQuestionsByKeyword(
+      user,
       searchQuestionsByKeywordInput,
     );
   }

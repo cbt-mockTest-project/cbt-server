@@ -277,7 +277,28 @@ export class MockExamCategoryService {
           name: Like(`%${keyword}%`),
         };
       }
-      const categories = await this.mockExamCategories.find(categoryFindOption);
+      let categories = await this.mockExamCategories.find(categoryFindOption);
+      if (user) {
+        const categoryIds = categories.map((category) => category.id);
+        const categoryBookmarks = await this.examCategoryBookmarks.find({
+          relations: {
+            category: true,
+          },
+          where: {
+            user: {
+              id: user.id,
+            },
+            category: In(categoryIds),
+          },
+        });
+        categories = categories.map((category) => {
+          const isBookmarked = categoryBookmarks.find(
+            (bookmark) => bookmark.category.id === category.id,
+          );
+          if (isBookmarked) category.isBookmarked = true;
+          return category;
+        });
+      }
       return {
         ok: true,
         categories,

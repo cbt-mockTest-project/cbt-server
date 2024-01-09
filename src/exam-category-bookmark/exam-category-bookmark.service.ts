@@ -40,6 +40,7 @@ export class ExamCategoryBookmarkService {
         relations: {
           category: {
             user: true,
+            mockExam: true,
           },
         },
         order: {
@@ -51,7 +52,10 @@ export class ExamCategoryBookmarkService {
       });
       return {
         ok: true,
-        categories: bookmarks.map((bookmark) => bookmark.category),
+        categories: bookmarks.map((bookmark) => ({
+          ...bookmark.category,
+          isBookmarked: true,
+        })),
       };
     } catch (error) {
       return {

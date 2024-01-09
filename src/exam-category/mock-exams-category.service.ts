@@ -261,6 +261,7 @@ export class MockExamCategoryService {
         where,
         relations: {
           user: true,
+          mockExam: true,
         },
         order: {
           order: 'ASC',

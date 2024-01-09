@@ -948,7 +948,7 @@ export class MockExamQuestionService {
           "(LOWER(REPLACE(question.question, ' ', '')) LIKE :formattedKeyword OR LOWER(REPLACE(question.solution, ' ', '')) LIKE :formattedKeyword) AND mockExam.approved = true",
           { formattedKeyword },
         )
-        .limit(10)
+        .limit(30)
         .getMany();
       return {
         questions,

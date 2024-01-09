@@ -945,6 +945,7 @@ export class MockExamQuestionService {
       let questions = await this.mockExamQuestion
         .createQueryBuilder('question')
         .leftJoinAndSelect('question.mockExam', 'mockExam')
+        .leftJoinAndSelect('question.user', 'user')
         .where(
           "(LOWER(REPLACE(question.question, ' ', '')) LIKE :formattedKeyword OR LOWER(REPLACE(question.solution, ' ', '')) LIKE :formattedKeyword) AND mockExam.approved = true",
           { formattedKeyword },

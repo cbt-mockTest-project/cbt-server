@@ -229,7 +229,7 @@ export class MockExamCategoryService {
           source: examSource,
           isPublic: true,
         });
-        if (user) {
+        if (!isPublicOnly && user) {
           where.push({
             source: examSource,
             isPublic: false,

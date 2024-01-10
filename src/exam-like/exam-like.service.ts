@@ -5,7 +5,7 @@ import { User } from 'src/users/entities/user.entity';
 import {
   ToggleExamLikeInput,
   ToggleExamLikeOutput,
-} from './dtos/toggleExamLike.dto';
+} from './dtos/ToggleExamLike.dto';
 import { ExamLike } from './entities/exam-like.entity';
 
 @Injectable()

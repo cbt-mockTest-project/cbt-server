@@ -61,9 +61,6 @@ export class MockExamQuestionFeedbackSerivce {
         where: {
           mockExam: {
             id: question.mockExam.id,
-            user: {
-              id: user.id,
-            },
           },
         },
       });

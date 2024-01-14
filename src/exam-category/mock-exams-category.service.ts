@@ -545,7 +545,8 @@ export class MockExamCategoryService {
               id: user.id,
             },
             category: {
-              id,
+              ...(id ? { id } : {}),
+              ...(name ? { name } : {}),
             },
           },
         });

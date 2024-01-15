@@ -23,6 +23,7 @@ import { ExamCategoryBookmark } from 'src/exam-category-bookmark/entities/exam-c
 import { ExamCategoryInvitation } from 'src/exam-category-invitation/entities/exam-category-invitation.entity';
 import { MockExam } from 'src/exam/entities/mock-exam.entity';
 import { ExamSource } from 'src/enums/enum';
+import { StudyGroup } from 'src/study-group/entities/studyGroup.entity';
 
 export enum MockExamCategoryTypes {
   written = 'written',
@@ -78,6 +79,13 @@ export class MockExamCategory extends CoreEntity {
   })
   @Field(() => User)
   user: User;
+
+  @ManyToOne(() => StudyGroup, (studyGroup) => studyGroup.mockExamCategories, {
+    onDelete: 'CASCADE',
+    nullable: true,
+  })
+  @Field(() => StudyGroup, { nullable: true })
+  studyGroup: StudyGroup;
 
   @ManyToOne(() => Partner, (partner) => partner.examCategory, {
     onDelete: 'SET NULL',

@@ -94,6 +94,7 @@ import {
   ExamCategoryRole,
   MockExamCategory,
 } from './exam-category/entities/mock-exam-category.entity';
+import { StudyGroupModule } from './study-group/study-group.module';
 
 @Module({
   imports: [
@@ -277,6 +278,7 @@ import {
     ExamCategoryBookmarkModule,
     ExamCategoryInvitationModule,
     ExamCategoryModule,
+    StudyGroupModule,
   ],
   controllers: [],
   providers: [

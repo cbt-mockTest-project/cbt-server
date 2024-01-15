@@ -17,6 +17,7 @@ import {
   Column,
   DeleteDateColumn,
   Entity,
+  ManyToMany,
   OneToMany,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
@@ -46,6 +47,8 @@ import { ExamLike } from 'src/exam-like/entities/exam-like.entity';
 import { ExamCategoryBookmark } from 'src/exam-category-bookmark/entities/exam-category-bookmark';
 import { ExamCategoryInvitation } from 'src/exam-category-invitation/entities/exam-category-invitation.entity';
 import { MockExamCategory } from 'src/exam-category/entities/mock-exam-category.entity';
+import { StudyGroup } from 'src/study-group/entities/studyGroup.entity';
+import { StudyGroupRole } from 'src/study-group/entities/studyGroupRole.entity';
 
 export enum UserRole {
   CLIENT = 'CLIENT',
@@ -223,6 +226,18 @@ export class User extends CoreEntity {
   @OneToMany(() => Attendance, (attendance) => attendance.user)
   @Field(() => [Attendance], { nullable: true })
   attendances: Attendance[];
+
+  @ManyToMany(() => StudyGroup, (studyGroup) => studyGroup.users, {
+    onDelete: 'CASCADE',
+  })
+  @Field(() => [StudyGroup])
+  studyGroups: StudyGroup[];
+
+  @ManyToMany(() => StudyGroupRole, (studyGroupRole) => studyGroupRole.users, {
+    onDelete: 'CASCADE',
+  })
+  @Field(() => [StudyGroupRole])
+  studyGroupRoles: StudyGroupRole[];
 
   @DeleteDateColumn()
   @Field(() => Date)

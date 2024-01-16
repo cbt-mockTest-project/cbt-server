@@ -527,12 +527,6 @@ export class MockExamCategoryService {
             mockExamQuestion: true,
           },
         },
-        order: {
-          mockExam: {
-            order: 'ASC',
-            title: 'DESC',
-          },
-        },
       });
       if (category.isPublic) category.hasAccess = true;
 
@@ -587,6 +581,14 @@ export class MockExamCategoryService {
           return newExam;
         });
       }
+      // 카테고리 내의 시험들을 정렬한다.
+      category.mockExam = category.mockExam.sort((a, b) => {
+        if (a.order === b.order) {
+          if (a.title < b.title) return -1;
+          if (a.title > b.title) return 1;
+        }
+        return a.order - b.order;
+      });
 
       return {
         ok: true,

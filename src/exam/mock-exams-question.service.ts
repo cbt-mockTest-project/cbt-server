@@ -1,6 +1,6 @@
 import { ExamCoAuthor } from '../exam-co-author/entities/exam-co-author.entity';
 /* eslint-disable prefer-const */
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MockExamQuestionBookmark } from 'src/exam/entities/mock-exam-question-bookmark.entity';
 import { User } from 'src/users/entities/user.entity';
@@ -64,6 +64,7 @@ import {
   ReadQuestionsByExamIdsOutput,
 } from './dtos/readQuestionsByExamIds.dto';
 import { sortQuestions } from 'src/lib/utils/sortQuestions';
+import { MockExamCategory } from 'src/exam-category/entities/mock-exam-category.entity';
 
 @Injectable()
 export class MockExamQuestionService {
@@ -80,6 +81,8 @@ export class MockExamQuestionService {
     private readonly mockExamQuestionFeedback: Repository<MockExamQuestionFeedback>,
     @InjectRepository(MockExamQuestionComment)
     private readonly mockExamQuestionComment: Repository<MockExamQuestionComment>,
+    @InjectRepository(MockExamCategory)
+    private readonly mockExamCategory: Repository<MockExamCategory>,
     @InjectRepository(ExamCoAuthor)
     private readonly examCoAuthor: Repository<ExamCoAuthor>,
   ) {}
@@ -1236,28 +1239,15 @@ export class MockExamQuestionService {
 
   async sync() {
     try {
-      // questionOrderIds sync
-      const mockExams = await this.mockExam.find();
-      await Promise.all(
-        mockExams.map(async (mockExam) => {
-          const questions = await this.mockExamQuestion.find({
-            where: {
-              mockExam: {
-                id: mockExam.id,
-              },
-            },
-            order: {
-              number: 'ASC',
-            },
-          });
-          const questionOrderIds = questions.map(
-            (question) => question.orderId,
-          );
-          await this.mockExam.update(mockExam.id, {
-            questionOrderIds,
-          });
-        }),
-      );
+      const categories = await this.mockExamCategory.find({
+        relations: { mockExam: true },
+      });
+      categories.forEach(async (category) => {
+        category.mockExam = category.mockExam.sort((a, b) => a.order - b.order);
+        category.examOrderIds = category.mockExam.map((exam) => exam.id);
+        await this.mockExamCategory.save(category);
+      });
+
       return {
         ok: true,
       };

@@ -1,4 +1,3 @@
-import { MockExamQuestion } from 'src/exam/entities/mock-exam-question.entity';
 import { MockExam } from 'src/exam/entities/mock-exam.entity';
 
 export const sortExams = (

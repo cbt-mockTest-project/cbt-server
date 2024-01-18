@@ -777,6 +777,11 @@ export class MockExamService {
           .relation(MockExam, 'mockExamCategory')
           .of(exam.id)
           .add(categoryId);
+
+        await this.mockExamCategory.save({
+          ...prevCategory,
+          examOrderIds: [exam.id, ...prevCategory.examOrderIds],
+        });
       }
 
       return {

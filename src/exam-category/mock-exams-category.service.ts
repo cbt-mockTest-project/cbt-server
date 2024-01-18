@@ -67,6 +67,7 @@ import {
 } from 'src/exam/entities/mock-exam-question-state.entity';
 import { ReadMockExamCategoryNamesOutput } from './dtos/readMockExamCategoryNames.dto';
 import { GetMyAllExamCategoriesLearningProgressOutput } from './dtos/getMyAllExamCategoriesLearningProgress.dto';
+import { sortExams } from 'src/lib/utils/sortExams';
 
 @Injectable()
 export class MockExamCategoryService {
@@ -582,13 +583,7 @@ export class MockExamCategoryService {
         });
       }
       // 카테고리 내의 시험들을 정렬한다.
-      category.mockExam = category.mockExam.sort((a, b) => {
-        if (a.order === b.order) {
-          if (a.title < b.title) return -1;
-          if (a.title > b.title) return 1;
-        }
-        return a.order - b.order;
-      });
+      category.mockExam = sortExams(category.mockExam, category.examOrderIds);
 
       return {
         ok: true,

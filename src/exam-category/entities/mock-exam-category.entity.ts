@@ -126,6 +126,10 @@ export class MockExamCategory extends CoreEntity {
   @Field(() => Boolean, { defaultValue: false })
   isPublic: boolean;
 
+  @Column({ type: 'json', default: [] })
+  @Field(() => [Number], { defaultValue: [] })
+  examOrderIds: number[];
+
   @Field(() => Boolean, { nullable: true, defaultValue: false })
   hasAccess?: boolean = false;
 

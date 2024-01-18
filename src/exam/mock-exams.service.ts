@@ -538,6 +538,10 @@ export class MockExamService {
     user: User,
     addExamToCategoryInput: AddExamToCategoryInput,
   ): Promise<AddExamToCategoryOutput> {
+    const queryRunner =
+      this.mockExamCategory.manager.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
     try {
       const { examId, categoryId } = addExamToCategoryInput;
       const exam = await this.mockExam.findOne({
@@ -576,19 +580,27 @@ export class MockExamService {
           error: '이미 폴더에 추가되어 있습니다.',
         };
       }
-      await this.mockExam
+
+      await queryRunner.manager
         .createQueryBuilder()
         .relation(MockExam, 'mockExamCategory')
         .of(examId)
         .add(categoryId);
+
+      category.examOrderIds = [examId, ...category.examOrderIds];
+      await queryRunner.manager.save(MockExamCategory, category);
+      await queryRunner.commitTransaction();
       return {
         ok: true,
       };
     } catch (e) {
+      await queryRunner.rollbackTransaction();
       return {
         ok: false,
         error: '폴더를 추가하는데 실패했습니다.',
       };
+    } finally {
+      await queryRunner.release();
     }
   }
 
@@ -596,6 +608,10 @@ export class MockExamService {
     user: User,
     removeExamFromCategoryInput: RemoveExamFromCategoryInput,
   ): Promise<RemoveExamFromCategoryOutput> {
+    const queryRunner =
+      this.mockExamCategory.manager.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
     try {
       const { examId, categoryId } = removeExamFromCategoryInput;
       const exam = await this.mockExam.findOne({
@@ -637,19 +653,28 @@ export class MockExamService {
         };
       }
 
-      await this.mockExam
+      await queryRunner.manager
         .createQueryBuilder()
         .relation(MockExam, 'mockExamCategory')
         .of(examId)
         .remove(categoryId);
+
+      category.examOrderIds = category.examOrderIds.filter(
+        (id) => id !== examId,
+      );
+      await queryRunner.manager.save(MockExamCategory, category);
+      await queryRunner.commitTransaction();
       return {
         ok: true,
       };
     } catch {
+      await queryRunner.rollbackTransaction();
       return {
         ok: false,
         error: '폴더를 삭제하는데 실패했습니다.',
       };
+    } finally {
+      await queryRunner.release();
     }
   }
 

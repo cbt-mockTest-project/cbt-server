@@ -68,6 +68,10 @@ import {
 import { ReadMockExamCategoryNamesOutput } from './dtos/readMockExamCategoryNames.dto';
 import { GetMyAllExamCategoriesLearningProgressOutput } from './dtos/getMyAllExamCategoriesLearningProgress.dto';
 import { sortExams } from 'src/lib/utils/sortExams';
+import {
+  MoveExamOrderInput,
+  MoveExamOrderOutput,
+} from './dtos/moveExamOrder.dto';
 
 @Injectable()
 export class MockExamCategoryService {
@@ -738,6 +742,47 @@ export class MockExamCategoryService {
       return {
         ok: false,
         error: '문제를 찾을 수 없습니다.',
+      };
+    }
+  }
+
+  async moveExamOrder(
+    user: User,
+    moveExamOrderInput: MoveExamOrderInput,
+  ): Promise<MoveExamOrderOutput> {
+    try {
+      const { startIdx, endIdx, categoryId } = moveExamOrderInput;
+      if (startIdx === endIdx) {
+        return {
+          ok: true,
+        };
+      }
+      const category = await this.mockExamCategories.findOne({
+        where: {
+          id: categoryId,
+          user: {
+            id: user.id,
+          },
+        },
+      });
+      if (!category) {
+        return {
+          ok: false,
+          error: '카테고리를 찾을 수 없습니다.',
+        };
+      }
+      const examOrderIds = [...category.examOrderIds];
+      const [removed] = examOrderIds.splice(startIdx, 1);
+      examOrderIds.splice(endIdx, 0, removed);
+      category.examOrderIds = examOrderIds;
+      await this.mockExamCategories.save(category);
+      return {
+        ok: true,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '순서 변경에 실패했습니다.',
       };
     }
   }

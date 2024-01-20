@@ -52,6 +52,7 @@ import { SaveExamInput, SaveExamOutput } from './dtos/saveExam.dto';
 import { MockExamQuestion } from './entities/mock-exam-question.entity';
 import { sortQuestions } from 'src/lib/utils/sortQuestions';
 import { pick } from 'lodash';
+import { RevalidateService } from 'src/revalidate/revalidate.service';
 
 @Injectable()
 export class MockExamService {
@@ -66,6 +67,7 @@ export class MockExamService {
     private readonly mockExamQuestionState: Repository<MockExamQuestionState>,
     @InjectRepository(MockExamQuestion)
     private readonly mockExamQuestion: Repository<MockExamQuestion>,
+    private readonly revalidateService: RevalidateService,
   ) {}
 
   async createMockExam(
@@ -172,10 +174,19 @@ export class MockExamService {
   ): Promise<DeleteMockExamOutput> {
     try {
       const { id } = deleteMockExamInput;
-      const prevMockExam = await this.mockExam.findOne({
-        where: { id },
-        relations: { user: true },
-      });
+      const [prevMockExam, categories] = await Promise.all([
+        this.mockExam.findOne({
+          where: { id },
+          relations: { user: true },
+        }),
+        this.mockExamCategory.find({
+          where: {
+            mockExam: {
+              id,
+            },
+          },
+        }),
+      ]);
       if (!prevMockExam) {
         return {
           ok: false,
@@ -188,6 +199,14 @@ export class MockExamService {
           error: '권한이 없습니다.',
         };
       }
+      if (categories.length > 0) {
+        categories.forEach((category) => {
+          this.revalidateService.revalidate({
+            path: `/category/${category.name}`,
+          });
+        });
+      }
+
       await this.mockExam.delete({ id });
       return { ok: true };
     } catch (e) {
@@ -645,7 +664,9 @@ export class MockExamService {
         .relation(MockExam, 'mockExamCategory')
         .of(examId)
         .loadMany();
-
+      this.revalidateService.revalidate({
+        path: `/category/${category.name}`,
+      });
       if (!exitingRelation.find((relation) => relation.id === categoryId)) {
         return {
           ok: false,
@@ -766,23 +787,33 @@ export class MockExamService {
           .relation(MockExam, 'mockExamCategory')
           .of(exam.id)
           .loadMany();
+        this.revalidateService.revalidate({
+          path: `/exam/solution/${exam.id}`,
+        });
+        this.revalidateService.revalidate({
+          path: `/category/${prevCategory.name}`,
+        });
         if (exitingRelation.find((relation) => relation.id === categoryId)) {
           return {
             examId: exam.id,
             ok: true,
           };
         }
-        await this.mockExam
-          .createQueryBuilder()
-          .relation(MockExam, 'mockExamCategory')
-          .of(exam.id)
-          .add(categoryId);
-
-        await this.mockExamCategory.save({
-          ...prevCategory,
-          examOrderIds: [exam.id, ...prevCategory.examOrderIds],
-        });
       }
+      await this.mockExam
+        .createQueryBuilder()
+        .relation(MockExam, 'mockExamCategory')
+        .of(exam.id)
+        .add(categoryId);
+
+      await this.mockExamCategory.save({
+        ...prevCategory,
+        examOrderIds: [exam.id, ...prevCategory.examOrderIds],
+      });
+
+      this.revalidateService.revalidate({
+        path: `/exam/solution/${exam.id}`,
+      });
 
       return {
         examId: exam.id,

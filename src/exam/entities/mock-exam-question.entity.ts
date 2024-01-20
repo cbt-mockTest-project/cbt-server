@@ -39,6 +39,25 @@ export class MockExamVideoType {
   size: number;
 }
 
+@InputType('MockExamQuestionObjectiveContentInputType', { isAbstract: true })
+@ObjectType()
+export class ObjectiveContent {
+  @Field(() => String)
+  content: string;
+  @Field(() => String)
+  url: string;
+}
+
+@InputType('MockExamQuestionObjectiveInputType', { isAbstract: true })
+@ObjectType()
+export class ObjectiveData {
+  @Field(() => [ObjectiveContent])
+  content: ObjectiveContent[];
+
+  @Field(() => Number)
+  answer: number;
+}
+
 @InputType('MockExamQuestionInputType', { isAbstract: true })
 @ObjectType()
 @Entity()
@@ -62,6 +81,10 @@ export class MockExamQuestion extends CoreEntity {
   @Column({ default: '' })
   @Field(() => String, { nullable: true, defaultValue: '' })
   label?: string;
+
+  @Column({ type: 'json', default: null })
+  @Field(() => ObjectiveData, { nullable: true })
+  objectiveData: ObjectiveData;
 
   @Column({ type: 'json', default: [] })
   @Field(() => [MockExamVideoType], { nullable: true })

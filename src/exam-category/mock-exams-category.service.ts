@@ -72,6 +72,7 @@ import {
   MoveExamOrderInput,
   MoveExamOrderOutput,
 } from './dtos/moveExamOrder.dto';
+import { RevalidateService } from 'src/revalidate/revalidate.service';
 
 @Injectable()
 export class MockExamCategoryService {
@@ -87,6 +88,7 @@ export class MockExamCategoryService {
     @InjectRepository(MockExamQuestionState)
     private readonly mockExamQuestionStates: Repository<MockExamQuestionState>,
     private readonly examCategoryBookmarkService: ExamCategoryBookmarkService,
+    private readonly revalidateService: RevalidateService,
   ) {}
 
   async getMyAllExamCategoriesLearningProgress(
@@ -776,6 +778,9 @@ export class MockExamCategoryService {
       examOrderIds.splice(endIdx, 0, removed);
       category.examOrderIds = examOrderIds;
       await this.mockExamCategories.save(category);
+      this.revalidateService.revalidate({
+        path: `/category/${category.name}`,
+      });
       return {
         ok: true,
       };

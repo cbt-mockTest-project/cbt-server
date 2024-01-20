@@ -40,6 +40,7 @@ import {
   ExamCategoryRole,
   MockExamCategory,
 } from 'src/exam-category/entities/mock-exam-category.entity';
+import { RevalidateModule } from 'src/revalidate/revalidate.module';
 
 @Module({
   imports: [
@@ -85,6 +86,7 @@ import {
     MockExamQuestionFeedbackRecommendationService,
     MockExamHistoryResolver,
     MockExamHistoryService,
+    RevalidateModule,
   ],
   exports: [],
 })

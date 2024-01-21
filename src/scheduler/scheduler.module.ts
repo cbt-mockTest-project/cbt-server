@@ -15,6 +15,7 @@ import { NoticeService } from 'src/users/notice.service';
 import { PaymentService } from 'src/payments/payment.service';
 import { Notice } from 'src/users/entities/notice.entity';
 import { Payment } from 'src/payments/entities/payment.entity';
+import { RevalidateModule } from 'src/revalidate/revalidate.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { Payment } from 'src/payments/entities/payment.entity';
     UserService,
     NoticeService,
     PaymentService,
+    RevalidateModule,
   ],
 })
 export class SchedulerModule {}

@@ -12,6 +12,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { VisitService } from 'src/visit/visit.service';
 import { UserService } from 'src/users/user.service';
+import { RevalidateService } from 'src/revalidate/revalidate.service';
+import { MockExamQuestionService } from 'src/exam/mock-exams-question.service';
 
 @Injectable()
 export class SchedulerService {
@@ -22,42 +24,84 @@ export class SchedulerService {
     private readonly visitService: VisitService,
     private readonly telegramService: TelegramService,
     private readonly userService: UserService,
+    private readonly revalidateService: RevalidateService,
   ) {}
-  // 매일 밤 12시
-  @Cron('0 55 23 * * *', { timeZone: 'Asia/Seoul' })
-  async clearVisit() {
-    if (process.env.NODE_ENV === 'dev') {
-      return;
-    }
+  // // 매일 밤 12시
+  // @Cron('0 55 23 * * *', { timeZone: 'Asia/Seoul' })
+  // async clearVisit() {
+  //   if (process.env.NODE_ENV === 'dev') {
+  //     return;
+  //   }
+  //   try {
+  //     const { totalViewCount, todayViewCount } =
+  //       await this.visitService.createVisitHistory();
+  //     await this.visitService.clearVisit();
+  //     await this.telegramService.sendMessageToTelegram({
+  //       message: `오늘의 방문자수는 ${todayViewCount}명입니다.\n지금까지 총 방문자수는 ${totalViewCount}명입니다.`,
+  //       channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
+  //     });
+  //   } catch {
+  //     await this.telegramService.sendMessageToTelegram({
+  //       message: `방문자수 기록 실패`,
+  //       channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
+  //     });
+  //   }
+  // }
+
+  // 오전 4시
+  @Cron('0 0 4 * * *', { timeZone: 'Asia/Seoul' })
+  @Interval(10000)
+  async revalidateQuestion() {
     try {
-      const { totalViewCount, todayViewCount } =
-        await this.visitService.createVisitHistory();
-      await this.visitService.clearVisit();
-      await this.telegramService.sendMessageToTelegram({
-        message: `오늘의 방문자수는 ${todayViewCount}명입니다.\n지금까지 총 방문자수는 ${totalViewCount}명입니다.`,
+      if (process.env.NODE_ENV === 'dev') {
+        return;
+      }
+
+      async function* generateBatches(questionIds, batchSize) {
+        for (let i = 0; i < questionIds.length; i += batchSize) {
+          yield questionIds.slice(i, i + batchSize);
+        }
+      }
+
+      const res = await this.mockExamQuestions.find();
+      const questionIds = res.map((el) => el.id);
+      const batchSize = 30; // 한 번에 처리할 질문의 수
+      for await (const batch of generateBatches(questionIds, batchSize)) {
+        await Promise.all(
+          batch.map((id) =>
+            this.revalidateService.revalidate({
+              path: `/question/${id}`,
+            }),
+          ),
+        );
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+      }
+      this.telegramService.sendMessageToTelegram({
+        message: `cronjob: revalidate success`,
         channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
       });
     } catch {
-      await this.telegramService.sendMessageToTelegram({
-        message: `방문자수 기록 실패`,
+      this.telegramService.sendMessageToTelegram({
+        message: `cronjob: revalidate error`,
         channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
       });
+      console.log('cronjob: revalidate error');
     }
   }
 
   // 1시간에 1번
-  @Interval(1000 * 60 * 60)
-  async clearFreeTrial() {
-    if (process.env.NODE_ENV === 'dev') {
-      return;
-    }
-    const res = await this.userService.clearFreeTrialRole();
-    // if (res.ok) {
-    //   await this.telegramService.sendMessageToTelegram({
-    //     message: `무료체험권 만료갯수: ${res.count} `,
-    //   });
-    // }
-  }
+  // @Interval(1000 * 60 * 60)
+  // async clearFreeTrial() {
+  //   if (process.env.NODE_ENV === 'dev') {
+  //     return;
+  //   }
+  //   const res = await this.userService.clearFreeTrialRole();
+  //   // if (res.ok) {
+  //   //   await this.telegramService.sendMessageToTelegram({
+  //   //     message: `무료체험권 만료갯수: ${res.count} `,
+  //   //   });
+  //   // }
+  // }
 
   //6시간마다
   // @Cron('0 */5 * * *')

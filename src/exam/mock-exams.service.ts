@@ -793,6 +793,15 @@ export class MockExamService {
         this.revalidateService.revalidate({
           path: `/category/${prevCategory.name}`,
         });
+        await this.mockExam
+          .createQueryBuilder()
+          .relation(MockExam, 'mockExamCategory')
+          .of(exam.id)
+          .add(categoryId);
+        await this.mockExamCategory.save({
+          ...prevCategory,
+          examOrderIds: [exam.id, ...prevCategory.examOrderIds],
+        });
         if (exitingRelation.find((relation) => relation.id === categoryId)) {
           return {
             examId: exam.id,
@@ -800,16 +809,6 @@ export class MockExamService {
           };
         }
       }
-      await this.mockExam
-        .createQueryBuilder()
-        .relation(MockExam, 'mockExamCategory')
-        .of(exam.id)
-        .add(categoryId);
-
-      await this.mockExamCategory.save({
-        ...prevCategory,
-        examOrderIds: [exam.id, ...prevCategory.examOrderIds],
-      });
 
       this.revalidateService.revalidate({
         path: `/exam/solution/${exam.id}`,

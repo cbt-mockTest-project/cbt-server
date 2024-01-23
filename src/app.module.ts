@@ -94,6 +94,8 @@ import {
   ExamCategoryRole,
   MockExamCategory,
 } from './exam-category/entities/mock-exam-category.entity';
+import { SellerModule } from './seller/seller.module';
+import { Seller } from './seller/entities/seller.entity';
 
 @Module({
   imports: [
@@ -212,6 +214,7 @@ import {
         ExamLike,
         ExamCategoryBookmark,
         ExamCategoryInvitation,
+        Seller,
       ],
     }),
     UserModule,
@@ -277,6 +280,7 @@ import {
     ExamCategoryBookmarkModule,
     ExamCategoryInvitationModule,
     ExamCategoryModule,
+    SellerModule,
   ],
   controllers: [],
   providers: [

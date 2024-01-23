@@ -17,7 +17,9 @@ import {
   Column,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
   OneToMany,
+  OneToOne,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { IsEmail, IsEnum, IsString } from 'class-validator';
@@ -46,6 +48,7 @@ import { ExamLike } from 'src/exam-like/entities/exam-like.entity';
 import { ExamCategoryBookmark } from 'src/exam-category-bookmark/entities/exam-category-bookmark';
 import { ExamCategoryInvitation } from 'src/exam-category-invitation/entities/exam-category-invitation.entity';
 import { MockExamCategory } from 'src/exam-category/entities/mock-exam-category.entity';
+import { Seller } from 'src/seller/entities/seller.entity';
 
 export enum UserRole {
   CLIENT = 'CLIENT',
@@ -275,6 +278,14 @@ export class User extends CoreEntity {
   @Field(() => [UserAndRole])
   @OneToMany(() => UserAndRole, (userRole) => userRole.user)
   userRoles: UserAndRole[];
+
+  @OneToOne(() => Seller, (seller) => seller.user, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
+  @JoinColumn()
+  @Field(() => Seller, { nullable: true })
+  seller: Seller;
 
   @BeforeInsert()
   @BeforeUpdate()

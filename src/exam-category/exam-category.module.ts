@@ -9,6 +9,7 @@ import { MockExamCategoryService } from './mock-exams-category.service';
 import { ExamCategoryBookmarkService } from 'src/exam-category-bookmark/exam-category-bookmark.service';
 import { MockExamQuestionState } from 'src/exam/entities/mock-exam-question-state.entity';
 import { RevalidateModule } from 'src/revalidate/revalidate.module';
+import { Seller } from 'src/seller/entities/seller.entity';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { RevalidateModule } from 'src/revalidate/revalidate.module';
       MockExamQuestionState,
       ExamLike,
       ExamCategoryBookmark,
+      Seller,
     ]),
   ],
   providers: [

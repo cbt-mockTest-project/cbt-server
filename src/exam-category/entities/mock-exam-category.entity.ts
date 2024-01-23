@@ -23,6 +23,7 @@ import { ExamCategoryBookmark } from 'src/exam-category-bookmark/entities/exam-c
 import { ExamCategoryInvitation } from 'src/exam-category-invitation/entities/exam-category-invitation.entity';
 import { MockExam } from 'src/exam/entities/mock-exam.entity';
 import { ExamSource } from 'src/enums/enum';
+import { Seller } from 'src/seller/entities/seller.entity';
 
 export enum MockExamCategoryTypes {
   written = 'written',
@@ -84,6 +85,13 @@ export class MockExamCategory extends CoreEntity {
   })
   @Field(() => Partner, { nullable: true })
   partner: Partner;
+
+  @ManyToOne(() => Seller, (seller) => seller.examCategories, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
+  @Field(() => Seller, { nullable: true })
+  seller?: Seller;
 
   @Field(() => [ExamCoAuthor], { nullable: true })
   @OneToMany(() => ExamCoAuthor, (examCoAuthor) => examCoAuthor.examCategory, {

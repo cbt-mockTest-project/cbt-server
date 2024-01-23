@@ -17,6 +17,7 @@ import {
   ExamCategoryRole,
   MockExamCategory,
 } from 'src/exam-category/entities/mock-exam-category.entity';
+import { Seller } from 'src/seller/entities/seller.entity';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import {
       Role,
       ExamCategoryRole,
       MockExamCategory,
+      Seller,
     ]),
   ],
   providers: [

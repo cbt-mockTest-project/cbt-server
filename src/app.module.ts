@@ -96,6 +96,8 @@ import {
 } from './exam-category/entities/mock-exam-category.entity';
 import { SellerModule } from './seller/seller.module';
 import { Seller } from './seller/entities/seller.entity';
+import { CategoryEvaluationModule } from './category-evaluation/category-evaluation.module';
+import { CategoryEvaluation } from './category-evaluation/entities/category-evaluation.entity';
 
 @Module({
   imports: [
@@ -215,6 +217,7 @@ import { Seller } from './seller/entities/seller.entity';
         ExamCategoryBookmark,
         ExamCategoryInvitation,
         Seller,
+        CategoryEvaluation,
       ],
     }),
     UserModule,
@@ -281,6 +284,7 @@ import { Seller } from './seller/entities/seller.entity';
     ExamCategoryInvitationModule,
     ExamCategoryModule,
     SellerModule,
+    CategoryEvaluationModule,
   ],
   controllers: [],
   providers: [

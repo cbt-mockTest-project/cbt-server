@@ -10,6 +10,7 @@ import { ExamCategoryBookmarkService } from 'src/exam-category-bookmark/exam-cat
 import { MockExamQuestionState } from 'src/exam/entities/mock-exam-question-state.entity';
 import { RevalidateModule } from 'src/revalidate/revalidate.module';
 import { Seller } from 'src/seller/entities/seller.entity';
+import { CategoryEvaluation } from 'src/category-evaluation/entities/category-evaluation.entity';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { Seller } from 'src/seller/entities/seller.entity';
       ExamLike,
       ExamCategoryBookmark,
       Seller,
+      CategoryEvaluation,
     ]),
   ],
   providers: [

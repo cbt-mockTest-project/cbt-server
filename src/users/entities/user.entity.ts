@@ -49,6 +49,7 @@ import { ExamCategoryBookmark } from 'src/exam-category-bookmark/entities/exam-c
 import { ExamCategoryInvitation } from 'src/exam-category-invitation/entities/exam-category-invitation.entity';
 import { MockExamCategory } from 'src/exam-category/entities/mock-exam-category.entity';
 import { Seller } from 'src/seller/entities/seller.entity';
+import { CategoryEvaluation } from 'src/category-evaluation/entities/category-evaluation.entity';
 
 export enum UserRole {
   CLIENT = 'CLIENT',
@@ -146,6 +147,13 @@ export class User extends CoreEntity {
   )
   @Field(() => [MockExamQuestionComment])
   mockExamQuestionComment: MockExamQuestionComment[];
+
+  @OneToMany(
+    () => CategoryEvaluation,
+    (categoryEvaluation) => categoryEvaluation.user,
+  )
+  @Field(() => [CategoryEvaluation])
+  categoryEvaluations: CategoryEvaluation[];
 
   @OneToMany(() => PostComment, (postComment) => postComment.user)
   @Field(() => [PostComment])

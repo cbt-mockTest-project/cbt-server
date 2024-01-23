@@ -18,6 +18,7 @@ import {
   MockExamCategory,
 } from 'src/exam-category/entities/mock-exam-category.entity';
 import { Seller } from 'src/seller/entities/seller.entity';
+import { CategoryEvaluation } from 'src/category-evaluation/entities/category-evaluation.entity';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { Seller } from 'src/seller/entities/seller.entity';
       ExamCategoryRole,
       MockExamCategory,
       Seller,
+      CategoryEvaluation,
     ]),
   ],
   providers: [

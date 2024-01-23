@@ -24,6 +24,7 @@ import { ExamCategoryInvitation } from 'src/exam-category-invitation/entities/ex
 import { MockExam } from 'src/exam/entities/mock-exam.entity';
 import { ExamSource } from 'src/enums/enum';
 import { Seller } from 'src/seller/entities/seller.entity';
+import { CategoryEvaluation } from 'src/category-evaluation/entities/category-evaluation.entity';
 
 export enum MockExamCategoryTypes {
   written = 'written',
@@ -79,6 +80,13 @@ export class MockExamCategory extends CoreEntity {
   })
   @Field(() => User)
   user: User;
+
+  @OneToMany(
+    () => CategoryEvaluation,
+    (categoryEvaluation) => categoryEvaluation.category,
+  )
+  @Field(() => [CategoryEvaluation])
+  categoryEvaluations: CategoryEvaluation[];
 
   @ManyToOne(() => Partner, (partner) => partner.examCategory, {
     onDelete: 'SET NULL',

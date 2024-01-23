@@ -71,13 +71,14 @@ export class CategoryEvaluationService {
         feedback,
         isSecret,
         category,
-        user: {
-          id: user.id,
-        },
+        user,
       });
-      await this.categoryEvaluation.save(newCategoryEvaluation);
+      const categoryEvaluation = await this.categoryEvaluation.save(
+        newCategoryEvaluation,
+      );
       return {
         ok: true,
+        categoryEvaluation,
       };
     } catch (error) {
       return {
@@ -164,10 +165,12 @@ export class CategoryEvaluationService {
   }
 
   async getCategoryEvaluation(
+    user: User,
     getCategoryEvaluationInput: GetCategoryEvaluationInput,
   ): Promise<GetCategoryEvaluationOutput> {
     const { categoryId } = getCategoryEvaluationInput;
     try {
+      let isEvaluated = false;
       const categoryEvaluations = await this.categoryEvaluation.find({
         where: {
           category: {
@@ -178,9 +181,18 @@ export class CategoryEvaluationService {
           user: true,
         },
       });
+      if (user) {
+        const existCategoryEvaluation = categoryEvaluations.find(
+          (categoryEvaluation) => categoryEvaluation.user.id === user.id,
+        );
+        if (existCategoryEvaluation) {
+          isEvaluated = true;
+        }
+      }
       return {
         ok: true,
         categoryEvaluations,
+        isEvaluated,
       };
     } catch (error) {
       return {

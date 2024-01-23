@@ -12,4 +12,7 @@ export class GetCategoryEvaluationInput {
 export class GetCategoryEvaluationOutput extends CoreOutput {
   @Field(() => [CategoryEvaluation], { nullable: true })
   categoryEvaluations?: CategoryEvaluation[];
+
+  @Field(() => Boolean, { nullable: true, defaultValue: false })
+  isEvaluated?: boolean;
 }

@@ -65,9 +65,11 @@ export class CategoryEvaluationResolver {
 
   @Query(() => GetCategoryEvaluationOutput)
   async getCategoryEvaluation(
+    @AuthUser() user: User,
     @Args('input') getCategoryEvaluationInput: GetCategoryEvaluationInput,
   ) {
     return this.categoryEvaluationService.getCategoryEvaluation(
+      user,
       getCategoryEvaluationInput,
     );
   }

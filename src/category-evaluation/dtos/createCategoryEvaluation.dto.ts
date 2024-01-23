@@ -12,4 +12,7 @@ export class CreateCategoryEvaluationInput extends PickType(
 }
 
 @ObjectType()
-export class CreateCategoryEvaluationOutput extends CoreOutput {}
+export class CreateCategoryEvaluationOutput extends CoreOutput {
+  @Field(() => CategoryEvaluation, { nullable: true })
+  categoryEvaluation?: CategoryEvaluation;
+}

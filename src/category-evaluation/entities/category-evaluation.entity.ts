@@ -9,7 +9,7 @@ import { Column, Entity, ManyToOne } from 'typeorm';
 @Entity()
 export class CategoryEvaluation extends CoreEntity {
   @Column()
-  @Field(() => Number)
+  @Field(() => Number, { nullable: true })
   score: number;
 
   @Column()
@@ -17,7 +17,7 @@ export class CategoryEvaluation extends CoreEntity {
   feedback?: string;
 
   @Column()
-  @Field(() => Boolean, { defaultValue: false })
+  @Field(() => Boolean, { nullable: true, defaultValue: false })
   isSecret: boolean;
 
   @ManyToOne(

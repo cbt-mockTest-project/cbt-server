@@ -55,4 +55,21 @@ export class SellerService {
       };
     }
   }
+
+  async syncPrice() {
+    const userAndRoles = await this.userAndRoles.find({
+      where: {
+        role: {
+          id: 1,
+        },
+      },
+    });
+    userAndRoles.forEach(async (userAndRole) => {
+      userAndRole.price = 5000;
+      await this.userAndRoles.update(userAndRole.id, userAndRole);
+    });
+    return {
+      ok: true,
+    };
+  }
 }

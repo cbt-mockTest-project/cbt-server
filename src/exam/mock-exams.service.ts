@@ -793,6 +793,7 @@ export class MockExamService {
         this.revalidateService.revalidate({
           path: `/category/${prevCategory.name}`,
         });
+        //10초 지연
         await this.mockExam
           .createQueryBuilder()
           .relation(MockExam, 'mockExamCategory')
@@ -802,6 +803,7 @@ export class MockExamService {
           ...prevCategory,
           examOrderIds: [exam.id, ...prevCategory.examOrderIds],
         });
+        console.log('2');
         if (exitingRelation.find((relation) => relation.id === categoryId)) {
           return {
             examId: exam.id,
@@ -809,10 +811,6 @@ export class MockExamService {
           };
         }
       }
-
-      this.revalidateService.revalidate({
-        path: `/exam/solution/${exam.id}`,
-      });
 
       return {
         examId: exam.id,

@@ -567,6 +567,10 @@ export class UserService {
         };
       }
       const newFeedback = this.feedback.create({ content, user });
+      this.telegramService.sendMessageToTelegram({
+        message: `${user.nickname} 님이 피드백을 보냈습니다.\n\n[내용]\n${content}`,
+        channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
+      });
       this.feedback.save(newFeedback);
       return {
         ok: true,

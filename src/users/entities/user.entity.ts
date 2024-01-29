@@ -295,6 +295,10 @@ export class User extends CoreEntity {
   @Field(() => Seller, { nullable: true })
   seller: Seller;
 
+  @Column({ default: 0 })
+  @Field(() => Number, { defaultValue: 0, nullable: true })
+  solvedProblemCount?: number;
+
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassword(): Promise<void> {

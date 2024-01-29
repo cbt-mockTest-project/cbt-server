@@ -30,6 +30,7 @@ export class MockExamQuestionStateService {
     private readonly mockExamQuestionState: Repository<MockExamQuestionState>,
     @InjectRepository(MockExamQuestion)
     private readonly mockExamQuestion: Repository<MockExamQuestion>,
+    @InjectRepository(User) private readonly user: Repository<User>,
   ) {}
 
   async createOrUpdateMockExamQuestionState(
@@ -53,6 +54,11 @@ export class MockExamQuestionStateService {
           ok: false,
           error: '이전과 값이 동일합니다.',
         };
+      }
+      if (prevState.state === QuestionState.CORE) {
+        this.user.update(user.id, {
+          solvedProblemCount: user.solvedProblemCount + 1,
+        });
       }
       await this.mockExamQuestionState.update(prevState.id, { state });
       return {
@@ -80,6 +86,9 @@ export class MockExamQuestionStateService {
       exam: question.mockExam,
       state,
       user,
+    });
+    this.user.update(user.id, {
+      solvedProblemCount: user.solvedProblemCount + 1,
     });
     await this.mockExamQuestionState.save(newState);
     return {

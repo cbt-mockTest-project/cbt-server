@@ -20,6 +20,10 @@ import {
   GetCategoryEvaluationInput,
   GetCategoryEvaluationOutput,
 } from './dtos/getCategoryEvaluation.dto';
+import {
+  CheckIfCategoryEvaluatedInput,
+  CheckIfCategoryEvaluatedOutput,
+} from './dtos/checkIfCategoryEvaluated.dto';
 
 @Resolver(() => CategoryEvaluation)
 export class CategoryEvaluationResolver {
@@ -71,6 +75,17 @@ export class CategoryEvaluationResolver {
     return this.categoryEvaluationService.getCategoryEvaluation(
       user,
       getCategoryEvaluationInput,
+    );
+  }
+
+  @Mutation(() => CheckIfCategoryEvaluatedOutput)
+  async checkIfCategoryEvaluated(
+    @AuthUser() user: User,
+    @Args('input') checkIfCategoryEvaluatedInput: CheckIfCategoryEvaluatedInput,
+  ) {
+    return this.categoryEvaluationService.checkIfCategoryEvaluated(
+      user,
+      checkIfCategoryEvaluatedInput,
     );
   }
 }

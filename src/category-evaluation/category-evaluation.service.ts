@@ -20,6 +20,10 @@ import {
   GetCategoryEvaluationOutput,
 } from './dtos/getCategoryEvaluation.dto';
 import { MockExamCategory } from 'src/exam-category/entities/mock-exam-category.entity';
+import {
+  CheckIfCategoryEvaluatedInput,
+  CheckIfCategoryEvaluatedOutput,
+} from './dtos/checkIfCategoryEvaluated.dto';
 
 @Injectable()
 export class CategoryEvaluationService {
@@ -195,6 +199,40 @@ export class CategoryEvaluationService {
         isEvaluated,
       };
     } catch (error) {
+      return {
+        ok: false,
+        error: '암기장 평가를 불러올 수 없습니다.',
+      };
+    }
+  }
+
+  async checkIfCategoryEvaluated(
+    user: User,
+    checkIfCategoryEvaluatedInput: CheckIfCategoryEvaluatedInput,
+  ): Promise<CheckIfCategoryEvaluatedOutput> {
+    try {
+      const { categoryId } = checkIfCategoryEvaluatedInput;
+      const existCategoryEvaluation = await this.categoryEvaluation.findOne({
+        where: {
+          user: {
+            id: user.id,
+          },
+          category: {
+            id: categoryId,
+          },
+        },
+      });
+      if (!existCategoryEvaluation) {
+        return {
+          ok: true,
+          isEvaluated: false,
+        };
+      }
+      return {
+        ok: true,
+        isEvaluated: true,
+      };
+    } catch {
       return {
         ok: false,
         error: '암기장 평가를 불러올 수 없습니다.',

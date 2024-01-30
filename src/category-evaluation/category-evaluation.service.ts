@@ -222,12 +222,29 @@ export class CategoryEvaluationService {
           },
         },
       });
+
       if (!existCategoryEvaluation) {
+        const category = await this.mockExamCategory.findOne({
+          where: {
+            id: categoryId,
+            user: {
+              id: user.id,
+            },
+          },
+        });
+        // 본인이 만든 카테고리는 평가한 것으로 간주
+        if (category) {
+          return {
+            ok: true,
+            isEvaluated: true,
+          };
+        }
         return {
           ok: true,
           isEvaluated: false,
         };
       }
+
       return {
         ok: true,
         isEvaluated: true,

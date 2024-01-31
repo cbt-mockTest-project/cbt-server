@@ -269,6 +269,7 @@ export class MockExamCategoryService {
         relations: {
           user: true,
           mockExam: true,
+          categoryEvaluations: true,
         },
         order: {
           order: 'ASC',

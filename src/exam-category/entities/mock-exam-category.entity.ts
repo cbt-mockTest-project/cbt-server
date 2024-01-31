@@ -85,7 +85,7 @@ export class MockExamCategory extends CoreEntity {
     () => CategoryEvaluation,
     (categoryEvaluation) => categoryEvaluation.category,
   )
-  @Field(() => [CategoryEvaluation])
+  @Field(() => [CategoryEvaluation], { defaultValue: [], nullable: true })
   categoryEvaluations: CategoryEvaluation[];
 
   @ManyToOne(() => Partner, (partner) => partner.examCategory, {

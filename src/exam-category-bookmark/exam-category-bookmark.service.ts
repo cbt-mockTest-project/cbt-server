@@ -41,6 +41,7 @@ export class ExamCategoryBookmarkService {
           category: {
             user: true,
             mockExam: true,
+            categoryEvaluations: true,
           },
         },
         order: {

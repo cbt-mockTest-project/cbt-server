@@ -299,6 +299,10 @@ export class User extends CoreEntity {
   @Field(() => Number, { defaultValue: 0, nullable: true })
   solvedProblemCount?: number;
 
+  @Column({ type: 'json', default: [] })
+  @Field(() => [Number], { defaultValue: [] })
+  recentlyStudiedCategory: number[];
+
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassword(): Promise<void> {

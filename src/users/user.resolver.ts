@@ -65,6 +65,10 @@ import {
 } from './dtos/getUserByNicknameOrEmail.dto';
 import { ProxyIp } from 'src/common/decorators/ip.decorator';
 import { GetRolesCountInput, GetRolesCountOutput } from './dtos/getRolesCount';
+import {
+  UpsertRecentlyStudiedCategoryInput,
+  UpsertRecentlyStudiedCategoryOutput,
+} from './dtos/upsertRecentlyStudiedCategory.dto';
 
 @Resolver(() => User)
 export class UserResolver {
@@ -270,6 +274,18 @@ export class UserResolver {
   ): Promise<GetUserByNicknameOrEmailOutput> {
     return this.userService.getUserByNicknamOrEmail(
       getUserByNicknameOrEmailInput,
+    );
+  }
+
+  @Mutation(() => UpsertRecentlyStudiedCategoryOutput)
+  async upsertRecentlyStudiedCategory(
+    @Args('input')
+    upsertRecentlyStudiedCategoryInput: UpsertRecentlyStudiedCategoryInput,
+    @AuthUser() user: User,
+  ): Promise<UpsertRecentlyStudiedCategoryOutput> {
+    return this.userService.upsertRecentlyStudiedCategory(
+      user,
+      upsertRecentlyStudiedCategoryInput,
     );
   }
 }

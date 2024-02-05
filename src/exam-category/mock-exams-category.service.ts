@@ -215,6 +215,7 @@ export class MockExamCategoryService {
       isPublicOnly,
       page,
       keyword,
+      categoryIds,
     } = getExamCategoriesInput;
     if (isBookmarked) {
       if (!user)
@@ -285,6 +286,23 @@ export class MockExamCategoryService {
           name: Like(`%${keyword}%`),
         };
       }
+      if (Array.isArray(categoryIds) && categoryIds.length > 0) {
+        categoryFindOption.where = {
+          ...categoryFindOption.where,
+          id: In(categoryIds),
+        };
+      }
+      if (categoryIds && categoryIds.length === 0) {
+        return {
+          ok: true,
+          categories: [],
+        };
+      }
+      if (
+        Array.isArray(categoryFindOption.where) &&
+        categoryFindOption.where.length === 0
+      )
+        delete categoryFindOption.where;
       let categories = await this.mockExamCategories.find(categoryFindOption);
       if (user) {
         const categoryIds = categories.map((category) => category.id);

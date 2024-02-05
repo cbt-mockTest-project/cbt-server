@@ -14,6 +14,9 @@ export class GetExamCategoriesInput {
   @Field(() => Boolean, { nullable: true, defaultValue: false })
   isBookmarked?: boolean;
 
+  @Field(() => [Number], { nullable: true, defaultValue: null })
+  categoryIds?: number[] | null;
+
   @Field(() => Number, { nullable: true, defaultValue: null })
   limit?: number;
 

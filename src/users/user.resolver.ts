@@ -277,6 +277,7 @@ export class UserResolver {
     );
   }
 
+  @Role(['ANY'])
   @Mutation(() => UpsertRecentlyStudiedCategoryOutput)
   async upsertRecentlyStudiedCategory(
     @Args('input')
@@ -287,5 +288,13 @@ export class UserResolver {
       user,
       upsertRecentlyStudiedCategoryInput,
     );
+  }
+
+  @Role(['ANY'])
+  @Mutation(() => CoreOutput)
+  async resetRecentlyStudiedCategory(
+    @AuthUser() user: User,
+  ): Promise<CoreOutput> {
+    return this.userService.resetRecentlyStudiedCategory(user);
   }
 }

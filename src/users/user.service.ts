@@ -1181,6 +1181,22 @@ export class UserService {
     }
   }
 
+  async resetRecentlyStudiedCategory(user: User): Promise<CoreOutput> {
+    try {
+      this.users.update(user.id, {
+        recentlyStudiedCategory: [],
+      });
+      return {
+        ok: true,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '최근 학습한 카테고리를 초기화할 수 없습니다.',
+      };
+    }
+  }
+
   async syncRole() {
     const users = await this.users.find({
       where: {

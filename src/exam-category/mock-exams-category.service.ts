@@ -476,7 +476,6 @@ export class MockExamCategoryService {
     try {
       const { type, source, partnerId } = readAllMockExamCategoriesInput;
       const where: FindOptionsWhere<MockExamCategory> = {
-        type,
         approved: true,
         partner: IsNull(),
         source,
@@ -503,7 +502,6 @@ export class MockExamCategoryService {
         categories,
       };
     } catch (e) {
-      console.log(e);
       return {
         ok: false,
         error: '카테고리를 찾을 수 없습니다.',

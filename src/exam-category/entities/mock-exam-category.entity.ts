@@ -26,12 +26,18 @@ import { ExamSource } from 'src/enums/enum';
 import { Seller } from 'src/seller/entities/seller.entity';
 import { CategoryEvaluation } from 'src/category-evaluation/entities/category-evaluation.entity';
 
+export enum ExamType {
+  OBJECTIVE = 'OBJECTIVE',
+  SUBJECTIVE = 'SUBJECTIVE',
+}
+
 export enum MockExamCategoryTypes {
   written = 'written',
   practical = 'practical',
 }
 
 registerEnumType(MockExamCategoryTypes, { name: 'MockExamCategoryTypes' });
+registerEnumType(ExamType, { name: 'ExamType' });
 @InputType('MockExamCategoryInputType', { isAbstract: true })
 @ObjectType()
 @Entity()
@@ -67,6 +73,15 @@ export class MockExamCategory extends CoreEntity {
   @Field(() => MockExamCategoryTypes)
   @IsEnum(MockExamCategoryTypes)
   type: MockExamCategoryTypes;
+
+  @Column({
+    type: 'enum',
+    enum: ExamType,
+    default: ExamType.SUBJECTIVE,
+  })
+  @Field(() => ExamType)
+  @IsEnum(ExamType)
+  examType: ExamType;
 
   @Column({
     type: 'boolean',

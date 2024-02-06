@@ -5,7 +5,7 @@ import {
 } from './dtos/createCategory.dto';
 import {
   MockExamCategory,
-  MockExamCategoryTypes,
+  ExamType,
 } from './entities/mock-exam-category.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -469,13 +469,14 @@ export class MockExamCategoryService {
   async readAllMockExamCategories(
     readAllMockExamCategoriesInput: ReadAllMockExamCategoriesInput = {
       source: ExamSource.MOUD_CBT,
-      type: MockExamCategoryTypes.practical,
+      examType: ExamType.SUBJECTIVE,
       partnerId: null,
     },
   ): Promise<ReadAllMockExamCategoriesOutput> {
     try {
-      const { type, source, partnerId } = readAllMockExamCategoriesInput;
+      const { examType, source, partnerId } = readAllMockExamCategoriesInput;
       const where: FindOptionsWhere<MockExamCategory> = {
+        examType,
         approved: true,
         partner: IsNull(),
         source,

@@ -10,3 +10,8 @@ export enum ExamSource {
   USER = 'USER',
   EHS_MASTER = 'EHS_MASTER',
 }
+
+export enum ExamType {
+  OBJECTIVE = 'OBJECTIVE',
+  SUBJECTIVE = 'SUBJECTIVE',
+}

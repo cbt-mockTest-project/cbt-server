@@ -11,7 +11,7 @@ import { ExamSource } from 'src/enums/enum';
 
 @InputType()
 export class ReadAllMockExamCategoriesInput extends PartialType(
-  PickType(MockExamCategory, ['type']),
+  PickType(MockExamCategory, ['examType']),
 ) {
   @Field(() => Number, { nullable: true })
   partnerId?: number;

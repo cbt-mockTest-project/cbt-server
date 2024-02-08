@@ -79,9 +79,9 @@ import {
 } from './dtos/getUserByNicknameOrEmail.dto';
 import { GetRolesCountInput, GetRolesCountOutput } from './dtos/getRolesCount';
 import {
-  UpsertRecentlyStudiedCategoryInput,
-  UpsertRecentlyStudiedCategoryOutput,
-} from './dtos/upsertRecentlyStudiedCategory.dto';
+  UpdateRecentlyStudiedCategoryInput,
+  UpdateRecentlyStudiedCategoryOutput,
+} from './dtos/updateRecentlyStudiedCategory.dto';
 @Injectable()
 export class UserService {
   constructor(
@@ -1154,21 +1154,12 @@ export class UserService {
 
   async upsertRecentlyStudiedCategory(
     user: User,
-    upsertRecentlyStudiedCategory: UpsertRecentlyStudiedCategoryInput,
-  ): Promise<UpsertRecentlyStudiedCategoryOutput> {
+    updateRecentlyStudiedCategory: UpdateRecentlyStudiedCategoryInput,
+  ): Promise<UpdateRecentlyStudiedCategoryOutput> {
     try {
-      const { categoryId } = upsertRecentlyStudiedCategory;
-      const prevRecentlyStudiedCategory = user.recentlyStudiedCategory;
-      if (prevRecentlyStudiedCategory.includes(categoryId)) {
-        // 이미 최근 학습한 카테고리에 존재하면 삭제 후 다시 추가
-        prevRecentlyStudiedCategory.splice(
-          prevRecentlyStudiedCategory.indexOf(categoryId),
-          1,
-        );
-      }
-      prevRecentlyStudiedCategory.unshift(categoryId);
-      this.users.update(user.id, {
-        recentlyStudiedCategory: prevRecentlyStudiedCategory,
+      const { categoryName } = updateRecentlyStudiedCategory;
+      await this.users.update(user.id, {
+        recentlyStudiedCategory: categoryName,
       });
       return {
         ok: true,
@@ -1177,22 +1168,6 @@ export class UserService {
       return {
         ok: false,
         error: '최근 학습한 카테고리를 저장할 수 없습니다.',
-      };
-    }
-  }
-
-  async resetRecentlyStudiedCategory(user: User): Promise<CoreOutput> {
-    try {
-      this.users.update(user.id, {
-        recentlyStudiedCategory: [],
-      });
-      return {
-        ok: true,
-      };
-    } catch {
-      return {
-        ok: false,
-        error: '최근 학습한 카테고리를 초기화할 수 없습니다.',
       };
     }
   }

@@ -66,9 +66,9 @@ import {
 import { ProxyIp } from 'src/common/decorators/ip.decorator';
 import { GetRolesCountInput, GetRolesCountOutput } from './dtos/getRolesCount';
 import {
-  UpsertRecentlyStudiedCategoryInput,
-  UpsertRecentlyStudiedCategoryOutput,
-} from './dtos/upsertRecentlyStudiedCategory.dto';
+  UpdateRecentlyStudiedCategoryInput,
+  UpdateRecentlyStudiedCategoryOutput,
+} from './dtos/updateRecentlyStudiedCategory.dto';
 
 @Resolver(() => User)
 export class UserResolver {
@@ -278,23 +278,15 @@ export class UserResolver {
   }
 
   @Role(['ANY'])
-  @Mutation(() => UpsertRecentlyStudiedCategoryOutput)
-  async upsertRecentlyStudiedCategory(
+  @Mutation(() => UpdateRecentlyStudiedCategoryOutput)
+  async updateRecentlyStudiedCategory(
     @Args('input')
-    upsertRecentlyStudiedCategoryInput: UpsertRecentlyStudiedCategoryInput,
+    updateRecentlyStudiedCategoryInput: UpdateRecentlyStudiedCategoryInput,
     @AuthUser() user: User,
-  ): Promise<UpsertRecentlyStudiedCategoryOutput> {
+  ): Promise<UpdateRecentlyStudiedCategoryOutput> {
     return this.userService.upsertRecentlyStudiedCategory(
       user,
-      upsertRecentlyStudiedCategoryInput,
+      updateRecentlyStudiedCategoryInput,
     );
-  }
-
-  @Role(['ANY'])
-  @Mutation(() => CoreOutput)
-  async resetRecentlyStudiedCategory(
-    @AuthUser() user: User,
-  ): Promise<CoreOutput> {
-    return this.userService.resetRecentlyStudiedCategory(user);
   }
 }

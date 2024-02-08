@@ -299,9 +299,9 @@ export class User extends CoreEntity {
   @Field(() => Number, { defaultValue: 0, nullable: true })
   solvedProblemCount?: number;
 
-  @Column({ type: 'json', default: [] })
-  @Field(() => [Number], { defaultValue: [] })
-  recentlyStudiedCategory: number[];
+  @Column({ default: '' })
+  @Field(() => String, { defaultValue: '' })
+  recentlyStudiedCategory: string;
 
   @BeforeInsert()
   @BeforeUpdate()

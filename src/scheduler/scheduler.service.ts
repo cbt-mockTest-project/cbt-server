@@ -91,7 +91,7 @@ export class SchedulerService {
   }
 
   //3분에 한번
-  @Interval(1000 * 60 * 3)
+  @Interval(1000 * 60 * 1.5)
   async clearFreeTrial() {
     try {
       const clientUrl = this.configService.get('CLIENT_URL');

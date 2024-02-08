@@ -8,6 +8,7 @@ import {
   NaverBlogViewMacroOutput,
 } from './dtos/naverBlogViewMacro.dto';
 import { BlogManageService } from './blogManage.service';
+import { CoreOutput } from 'src/common/dtos/output.dto';
 
 @Resolver()
 export class BlogManageResolver {

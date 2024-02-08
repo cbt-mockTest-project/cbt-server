@@ -47,6 +47,7 @@ import {
   ReadQuestionsByExamIdsInput,
   ReadQuestionsByExamIdsOutput,
 } from './dtos/readQuestionsByExamIds.dto';
+import { QuestionCrawlingInput } from './dtos/questionCrawling.dto';
 
 @Resolver(() => MockExamQuestion)
 export class MockExamQuestionResolver {
@@ -185,5 +186,12 @@ export class MockExamQuestionResolver {
   @Query(() => CoreOutput)
   async sync() {
     return this.mockExamQuestionService.sync();
+  }
+
+  @Mutation(() => CoreOutput)
+  async questionCrawling(
+    @Args('input') questionCrawling: QuestionCrawlingInput,
+  ): Promise<CoreOutput> {
+    return this.mockExamQuestionService.questionCrawling(questionCrawling);
   }
 }

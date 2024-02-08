@@ -14,6 +14,7 @@ import {
   NaverBlogViewMacroInput,
   NaverBlogViewMacroOutput,
 } from './dtos/naverBlogViewMacro.dto';
+import { extractAndRemoveImageTag } from 'src/lib/utils/extractAndRemoveImageTag';
 
 @Injectable()
 export class BlogManageService {

@@ -1,6 +1,8 @@
 import { ExamCoAuthor } from '../exam-co-author/entities/exam-co-author.entity';
 /* eslint-disable prefer-const */
-import { Inject, Injectable } from '@nestjs/common';
+import { v4 as uuidv4 } from 'uuid';
+import * as AWS from 'aws-sdk';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MockExamQuestionBookmark } from 'src/exam/entities/mock-exam-question-bookmark.entity';
 import { User } from 'src/users/entities/user.entity';
@@ -65,10 +67,15 @@ import {
 } from './dtos/readQuestionsByExamIds.dto';
 import { sortQuestions } from 'src/lib/utils/sortQuestions';
 import { MockExamCategory } from 'src/exam-category/entities/mock-exam-category.entity';
+import axios from 'axios';
+import { extractAndRemoveImageTag } from 'src/lib/utils/extractAndRemoveImageTag';
+import { ConfigService } from '@nestjs/config';
+import { QuestionCrawlingInput } from './dtos/questionCrawling.dto';
 
 @Injectable()
 export class MockExamQuestionService {
   constructor(
+    private readonly configService: ConfigService,
     @InjectRepository(MockExamQuestion)
     private readonly mockExamQuestion: Repository<MockExamQuestion>,
     @InjectRepository(MockExam)
@@ -1256,5 +1263,111 @@ export class MockExamQuestionService {
         ok: false,
       };
     }
+  }
+
+  async questionCrawling(questionCrawlingInput: QuestionCrawlingInput) {
+    const { examId } = questionCrawlingInput;
+    const { data } = await axios.get(
+      'https://web-client-api-dot-machuda-api.du.r.appspot.com/pastProblem/list?pastExamId=557',
+    );
+
+    let questionOrderIds = [];
+    await Promise.all(
+      data.response.map(async (el) => {
+        let question = '';
+        let question_img = [];
+        const solution = el.solution;
+        const objectiveData = {
+          answer: el.answer,
+          content: await Promise.all(
+            el.optionList.map(async (el) => {
+              let content = el;
+              let url = '';
+              const { imageUrl, updatedString } = extractAndRemoveImageTag(el);
+              if (imageUrl) {
+                const { data } = await axios.get(imageUrl, {
+                  responseType: 'arraybuffer',
+                });
+                const imageBuffer = Buffer.from(data, 'binary');
+                const BUCKET_NAME = this.configService.get('AWS_BUCKEY_NAME');
+                AWS.config.update({
+                  credentials: {
+                    accessKeyId: this.configService.get('AWS_ACCESS_KEY'),
+                    secretAccessKey: this.configService.get('AWS_SECRET_KEY'),
+                  },
+                });
+                const key = `mock-exam-question/${uuidv4()}.png`;
+                const s3 = new AWS.S3();
+                const params = {
+                  Bucket: BUCKET_NAME,
+                  Key: key,
+                  Body: imageBuffer,
+                  ACL: 'public-read',
+                  ContentType: 'image/png',
+                };
+                await s3.putObject(params).promise();
+
+                content = updatedString;
+                url = `${this.configService.get('CLOUD_FRONT_DOMAIN')}/${key}`;
+              }
+              return { content, url };
+            }),
+          ),
+        };
+
+        const { imageUrl, updatedString } = extractAndRemoveImageTag(el.body);
+        if (imageUrl) {
+          const { data } = await axios.get(imageUrl, {
+            responseType: 'arraybuffer',
+          });
+          const imageBuffer = Buffer.from(data, 'binary');
+          const BUCKET_NAME = this.configService.get('AWS_BUCKEY_NAME');
+          AWS.config.update({
+            credentials: {
+              accessKeyId: this.configService.get('AWS_ACCESS_KEY'),
+              secretAccessKey: this.configService.get('AWS_SECRET_KEY'),
+            },
+          });
+          const key = `mock-exam-question/${uuidv4()}.png`;
+          const s3 = new AWS.S3();
+          const params = {
+            Bucket: BUCKET_NAME,
+            Key: key,
+            Body: imageBuffer,
+            ACL: 'public-read',
+            ContentType: 'image/png',
+          };
+          await s3.putObject(params).promise();
+          const url = `${this.configService.get('CLOUD_FRONT_DOMAIN')}/${key}`;
+          question_img = [
+            {
+              name: '',
+              uid: '',
+              url,
+            },
+          ];
+        }
+        question = updatedString;
+        const orderId = uuidv4();
+        questionOrderIds.push(orderId);
+        const newQuestion = this.mockExamQuestion.create({
+          question,
+          question_img,
+          solution,
+          objectiveData,
+          mockExam: { id: examId },
+          number: 0,
+          user: { id: 1 },
+          orderId,
+        });
+        await this.mockExamQuestion.save(newQuestion);
+      }),
+    );
+    await this.mockExam.update(examId, {
+      questionOrderIds,
+    });
+    return {
+      ok: true,
+    };
   }
 }

@@ -14,6 +14,7 @@ import { VisitService } from 'src/visit/visit.service';
 import { UserService } from 'src/users/user.service';
 import { RevalidateService } from 'src/revalidate/revalidate.service';
 import { MockExamQuestionService } from 'src/exam/mock-exams-question.service';
+import axios from 'axios';
 
 @Injectable()
 export class SchedulerService {
@@ -86,6 +87,20 @@ export class SchedulerService {
         channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
       });
       console.log('cronjob: revalidate error');
+    }
+  }
+
+  //3분에 한번
+  @Interval(1000 * 60 * 3)
+  async clearFreeTrial() {
+    try {
+      const clientUrl = this.configService.get('CLIENT_URL');
+      await axios.get(`${clientUrl}/api/ping`);
+    } catch {
+      this.telegramService.sendMessageToTelegram({
+        message: `cronjob: ping error`,
+        channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
+      });
     }
   }
 

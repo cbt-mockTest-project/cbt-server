@@ -91,11 +91,11 @@ export class SchedulerService {
   }
 
   //3분에 한번
-  @Interval(1000 * 60 * 1.5)
-  async clearFreeTrial() {
+  @Interval(1000 * 60 * 1)
+  async pong() {
     try {
       const clientUrl = this.configService.get('CLIENT_URL');
-      await axios.get(`${clientUrl}/api/ping`);
+      await axios.get(clientUrl);
     } catch {
       this.telegramService.sendMessageToTelegram({
         message: `cronjob: ping error`,

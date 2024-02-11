@@ -94,6 +94,9 @@ export class SchedulerService {
   @Interval(1000 * 60 * 1)
   async pong() {
     try {
+      if (process.env.NODE_ENV === 'dev') {
+        return;
+      }
       const clientUrl = this.configService.get('CLIENT_URL');
       await axios.get(clientUrl);
     } catch {

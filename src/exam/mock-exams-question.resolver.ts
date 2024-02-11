@@ -38,7 +38,10 @@ import {
   ReadMockExamQuestionsByStateInput,
   ReadMockExamQuestionsByStateOutput,
 } from './dtos/readMockExamQuestionsByState.dto';
-import { ReadAllQuestionsOutput } from './dtos/readAllQuestions.dto';
+import {
+  ReadAllQuestionsInput,
+  ReadAllQuestionsOutput,
+} from './dtos/readAllQuestions.dto';
 import {
   SearchQuestionsByKeywordInput,
   SearchQuestionsByKeywordOutput,
@@ -154,8 +157,10 @@ export class MockExamQuestionResolver {
   }
 
   @Query(() => ReadAllQuestionsOutput)
-  async readAllQuestions(): Promise<ReadAllQuestionsOutput> {
-    return this.mockExamQuestionService.readAllQuestions();
+  async readAllQuestions(
+    @Args('input') readAllQuestionsInput: ReadAllQuestionsInput,
+  ): Promise<ReadAllQuestionsOutput> {
+    return this.mockExamQuestionService.readAllQuestions(readAllQuestionsInput);
   }
 
   @Query(() => SearchQuestionsByKeywordOutput)

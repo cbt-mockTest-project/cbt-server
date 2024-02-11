@@ -19,7 +19,10 @@ import {
   EditMockExamQuestionOutput,
 } from './dtos/editMockExamQuestion.dto';
 import { ReadAllMockExamQuestionOutput } from './dtos/readAllMockExamQuestion.dto';
-import { ReadAllQuestionsOutput } from './dtos/readAllQuestions.dto';
+import {
+  ReadAllQuestionsInput,
+  ReadAllQuestionsOutput,
+} from './dtos/readAllQuestions.dto';
 import {
   ReadMockExamQuestionInput,
   ReadMockExamQuestionOutput,
@@ -460,12 +463,14 @@ export class MockExamQuestionService {
       };
     }
   }
-  async readAllQuestions(): Promise<ReadAllQuestionsOutput> {
+  async readAllQuestions(
+    readAllQuestionsInput: ReadAllQuestionsInput,
+  ): Promise<ReadAllQuestionsOutput> {
+    const { page, limit } = readAllQuestionsInput;
     try {
       const questions = await this.mockExamQuestion.find({
-        relations: {
-          mockExamQuestionComment: true,
-        },
+        ...(page ? { skip: (page - 1) * limit } : {}),
+        ...(limit ? { take: limit } : {}),
       });
       return {
         questions,

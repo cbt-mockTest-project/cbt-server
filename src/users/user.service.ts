@@ -121,6 +121,12 @@ export class UserService {
           error: '탈퇴 처리된 회원입니다.',
         };
       }
+      if (exists.nickname === nickname) {
+        return {
+          ok: false,
+          error: '중복된 닉네임이 존재합니다.',
+        };
+      }
       if (exists) {
         return {
           ok: false,

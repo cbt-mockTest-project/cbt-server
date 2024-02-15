@@ -58,6 +58,7 @@ export class MockExamQuestionStateService {
       if (prevState.state === QuestionState.CORE) {
         this.user.update(user.id, {
           solvedProblemCount: user.solvedProblemCount + 1,
+          solveLimit: user.solveLimit - 1,
         });
       }
       await this.mockExamQuestionState.update(prevState.id, { state });
@@ -89,6 +90,7 @@ export class MockExamQuestionStateService {
     });
     this.user.update(user.id, {
       solvedProblemCount: user.solvedProblemCount + 1,
+      solveLimit: user.solveLimit - 1,
     });
     await this.mockExamQuestionState.save(newState);
     return {

@@ -299,6 +299,10 @@ export class User extends CoreEntity {
   @Field(() => Number, { defaultValue: 0, nullable: true })
   solvedProblemCount?: number;
 
+  @Column({ default: 10 })
+  @Field(() => Number, { defaultValue: 10, nullable: true })
+  solveLimit?: number;
+
   @Column({ default: '' })
   @Field(() => String, { defaultValue: '' })
   recentlyStudiedCategory: string;

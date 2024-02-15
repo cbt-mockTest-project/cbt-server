@@ -1178,6 +1178,20 @@ export class UserService {
     }
   }
 
+  async resetSolveLimit(): Promise<CoreOutput> {
+    try {
+      await this.users.update({}, { solveLimit: 10 });
+      return {
+        ok: true,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '제한 횟수를 초기화할 수 없습니다.',
+      };
+    }
+  }
+
   async syncRole() {
     const users = await this.users.find({
       where: {

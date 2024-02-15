@@ -1,19 +1,13 @@
 import { TelegramService } from './../telegram/telegram.service';
-import {
-  MockExamQuestion,
-  // MockExamImageType,
-} from '../exam/entities/mock-exam-question.entity';
+import { MockExamQuestion } from '../exam/entities/mock-exam-question.entity';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Cron, Interval } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
-// import * as AWS from 'aws-sdk';
-// import { findUniqElem } from 'src/utils/utils';
 import { Repository } from 'typeorm';
 import { VisitService } from 'src/visit/visit.service';
 import { UserService } from 'src/users/user.service';
 import { RevalidateService } from 'src/revalidate/revalidate.service';
-import { MockExamQuestionService } from 'src/exam/mock-exams-question.service';
 import axios from 'axios';
 
 @Injectable()
@@ -48,6 +42,34 @@ export class SchedulerService {
   //     });
   //   }
   // }
+
+  @Cron('0 55 23 * * *', { timeZone: 'Asia/Seoul' })
+  async resetSolveLimit() {
+    try {
+      if (process.env.NODE_ENV === 'dev') {
+        return;
+      }
+      const res = await this.userService.resetSolveLimit();
+      if (res.ok) {
+        this.telegramService.sendMessageToTelegram({
+          message: `cronjob: resetSolveLimit success`,
+          channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
+        });
+      }
+      if (!res.ok) {
+        this.telegramService.sendMessageToTelegram({
+          message: `cronjob: resetSolveLimit error`,
+          channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
+        });
+      }
+      return;
+    } catch {
+      this.telegramService.sendMessageToTelegram({
+        message: `cronjob: resetSolveLimit error`,
+        channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
+      });
+    }
+  }
 
   // 오전 4시
   @Cron('0 0 4 * * *', { timeZone: 'Asia/Seoul' })

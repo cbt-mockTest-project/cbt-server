@@ -1,5 +1,7 @@
 import { ExamCoAuthor } from '../exam-co-author/entities/exam-co-author.entity';
 /* eslint-disable prefer-const */
+import * as xml2js from 'xml2js';
+import * as fs from 'fs';
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MockExamQuestionBookmark } from 'src/exam/entities/mock-exam-question-bookmark.entity';
@@ -1244,19 +1246,27 @@ export class MockExamQuestionService {
 
   async sync() {
     try {
-      const categories = await this.mockExamCategory.find({
-        relations: { mockExam: true },
+      const parser = new xml2js.Parser();
+      console.log(__dirname + '/section0.xml');
+      fs.readFile(__dirname + '/section0.xml', function (err, data) {
+        parser.parseString(data, function (err, result) {
+          // console.log(result['hs:sec']['hp:p'][100]['hp:run']);
+          // console.log(result['hs:sec']['hp:p'][100]['hp:run']);
+          // console.log('-------------------');
+          // console.log(result['hs:sec']['hp:p'][100]['hp:run'][0]['hp:t']);
+          console.log(result['hs:sec']['hp:p'].length);
+          result['hs:sec']['hp:p'].forEach((p, index) => {
+            if (index > 400 && index < 500) {
+              console.log(p['hp:run']);
+            }
+          });
+        });
       });
-      categories.forEach(async (category) => {
-        category.mockExam = category.mockExam.sort((a, b) => a.order - b.order);
-        category.examOrderIds = category.mockExam.map((exam) => exam.id);
-        await this.mockExamCategory.save(category);
-      });
-
       return {
         ok: true,
       };
-    } catch {
+    } catch (e) {
+      console.log(e);
       return {
         ok: false,
       };

@@ -17,6 +17,7 @@ import {
   DeletePaymentInput,
   DeletePaymentOutput,
 } from './dtos/deletePayment.dto';
+import { TelegramService } from 'src/telegram/telegram.service';
 
 @Injectable()
 export class PaymentService {
@@ -25,6 +26,7 @@ export class PaymentService {
     private readonly payments: Repository<Payment>,
     @InjectRepository(User)
     private readonly users: Repository<User>,
+    private readonly telegramService: TelegramService,
   ) {}
 
   async getMyPayments(user: User): Promise<GetMyPaymentsOutput> {
@@ -113,7 +115,10 @@ export class PaymentService {
       } else {
         payment = await this.payments.save(newPayment);
       }
-
+      this.telegramService.sendMessageToTelegram({
+        channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
+        message: `새로운 결제가 이루어졌습니다. \n결제자: ${user.nickname}\n결제금액: ${price}원\n상품명: ${productName}\n주문번호: ${orderId}`,
+      });
       return {
         ok: true,
         payment,

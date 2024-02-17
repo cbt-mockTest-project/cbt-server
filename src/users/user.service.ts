@@ -432,7 +432,13 @@ export class UserService {
     editProfileInput: EditProfileInput,
     user: User,
   ): Promise<EditProfileOutput> {
-    const { nickname, password, profileImg } = editProfileInput;
+    const {
+      nickname,
+      password,
+      profileImg,
+      hasBookmarkedBefore,
+      hasSolvedBefore,
+    } = editProfileInput;
     try {
       const currentUser = await this.users.findOne({
         where: { id: user.id },
@@ -482,6 +488,8 @@ export class UserService {
       if (password) user.password = password;
       if (nickname) user.nickname = nickname;
       if (typeof profileImg === 'string') user.profileImg = profileImg;
+      if (hasBookmarkedBefore) user.hasBookmarkedBefore = hasBookmarkedBefore;
+      if (hasSolvedBefore) user.hasSolvedBefore = hasSolvedBefore;
       await this.users.save(user);
       return {
         ok: true,

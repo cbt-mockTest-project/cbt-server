@@ -307,6 +307,14 @@ export class User extends CoreEntity {
   @Field(() => String, { defaultValue: '' })
   recentlyStudiedCategory: string;
 
+  @Column({ default: false })
+  @Field(() => Boolean, { defaultValue: false, nullable: true })
+  hasBookmarkedBefore?: boolean;
+
+  @Column({ default: false })
+  @Field(() => Boolean, { defaultValue: false, nullable: true })
+  hasSolvedBefore?: boolean;
+
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassword(): Promise<void> {

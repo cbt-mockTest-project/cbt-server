@@ -1067,7 +1067,7 @@ export class MockExamQuestionService {
                 },
                 where: {
                   user: { id: user.id },
-                  ...(ids && { question: { id: In(questionIds) } }),
+                  question: { id: In(questionIds) },
                 },
               })
               .then((res) => res),
@@ -1086,13 +1086,19 @@ export class MockExamQuestionService {
           .leftJoinAndSelect('question.user', 'user')
           .leftJoinAndSelect('question.mockExam', 'mockExam')
           .where('mockExamQuestionState.user.id = :id', { id: user.id })
-          .andWhere('mockExam.id IN (:...ids)', {
-            ids,
-          })
           .andWhere('question.id = question.id')
           .andWhere('mockExamQuestionState.state IN (:...states)', {
             states,
           });
+
+        if (ids.length > 0) {
+          questionStatesQuery = questionStatesQuery.andWhere(
+            'mockExam.id IN (:...ids)',
+            {
+              ids,
+            },
+          );
+        }
 
         if (limit) {
           questionStatesQuery = questionStatesQuery.limit(limit);

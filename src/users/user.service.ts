@@ -491,8 +491,13 @@ export class UserService {
       if (typeof profileImg === 'string') user.profileImg = profileImg;
       if (hasBookmarkedBefore) user.hasBookmarkedBefore = hasBookmarkedBefore;
       if (hasSolvedBefore) user.hasSolvedBefore = hasSolvedBefore;
-      if (hasReachedPaymentReminder)
+      if (hasReachedPaymentReminder) {
         user.hasReachedPaymentReminder = hasReachedPaymentReminder;
+        this.telegramService.sendMessageToTelegram({
+          message: `${user.nickname} 님이 결제 리마인더에 도달했습니다.`,
+          channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
+        });
+      }
       await this.users.save(user);
       return {
         ok: true,

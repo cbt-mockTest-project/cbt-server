@@ -9,6 +9,7 @@ export class EditProfileInput extends PickType(PartialType(User), [
   'profileImg',
   'hasBookmarkedBefore',
   'hasSolvedBefore',
+  'hasReachedPaymentReminder',
 ]) {}
 
 @ObjectType()

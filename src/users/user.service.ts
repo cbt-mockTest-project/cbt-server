@@ -438,6 +438,7 @@ export class UserService {
       profileImg,
       hasBookmarkedBefore,
       hasSolvedBefore,
+      hasReachedPaymentReminder,
     } = editProfileInput;
     try {
       const currentUser = await this.users.findOne({
@@ -490,6 +491,8 @@ export class UserService {
       if (typeof profileImg === 'string') user.profileImg = profileImg;
       if (hasBookmarkedBefore) user.hasBookmarkedBefore = hasBookmarkedBefore;
       if (hasSolvedBefore) user.hasSolvedBefore = hasSolvedBefore;
+      if (hasReachedPaymentReminder)
+        user.hasReachedPaymentReminder = hasReachedPaymentReminder;
       await this.users.save(user);
       return {
         ok: true,

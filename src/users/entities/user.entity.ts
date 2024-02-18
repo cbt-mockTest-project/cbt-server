@@ -315,6 +315,10 @@ export class User extends CoreEntity {
   @Field(() => Boolean, { defaultValue: false, nullable: true })
   hasSolvedBefore?: boolean;
 
+  @Column({ default: false })
+  @Field(() => Boolean, { defaultValue: false, nullable: true })
+  hasReachedPaymentReminder?: boolean;
+
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassword(): Promise<void> {

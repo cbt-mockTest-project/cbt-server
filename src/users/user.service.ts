@@ -121,7 +121,8 @@ export class UserService {
           error: '탈퇴 처리된 회원입니다.',
         };
       }
-      if (exists.nickname === nickname) {
+
+      if (exists && exists.nickname === nickname) {
         return {
           ok: false,
           error: '중복된 닉네임이 존재합니다.',
@@ -160,7 +161,8 @@ export class UserService {
       return {
         ok: true,
       };
-    } catch {
+    } catch (e) {
+      console.log(e);
       return {
         ok: false,
         error: '회원가입에 실패했습니다.',

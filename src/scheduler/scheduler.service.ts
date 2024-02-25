@@ -71,6 +71,34 @@ export class SchedulerService {
     }
   }
 
+  @Cron('0 56 23 * * *', { timeZone: 'Asia/Seoul' })
+  async resetRandomExamLimit() {
+    try {
+      if (process.env.NODE_ENV === 'dev') {
+        return;
+      }
+      const res = await this.userService.resetRandomExamLimit();
+      if (res.ok) {
+        this.telegramService.sendMessageToTelegram({
+          message: `cronjob: resetRandomExam success`,
+          channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
+        });
+      }
+      if (!res.ok) {
+        this.telegramService.sendMessageToTelegram({
+          message: `cronjob: resetRandomExam error`,
+          channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
+        });
+      }
+      return;
+    } catch {
+      this.telegramService.sendMessageToTelegram({
+        message: `cronjob: resetRandomExam error`,
+        channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
+      });
+    }
+  }
+
   // 오전 4시
   @Cron('0 0 4 * * *', { timeZone: 'Asia/Seoul' })
   @Interval(10000)

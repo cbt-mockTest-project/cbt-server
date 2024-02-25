@@ -441,6 +441,7 @@ export class UserService {
       hasBookmarkedBefore,
       hasSolvedBefore,
       hasReachedPaymentReminder,
+      randomExamLimit,
     } = editProfileInput;
     try {
       const currentUser = await this.users.findOne({
@@ -499,6 +500,9 @@ export class UserService {
           message: `${user.nickname} 님이 결제 리마인더에 도달했습니다.`,
           channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
         });
+      }
+      if (randomExamLimit) {
+        user.randomExamLimit = randomExamLimit;
       }
       await this.users.save(user);
       return {
@@ -1199,6 +1203,20 @@ export class UserService {
   async resetSolveLimit(): Promise<CoreOutput> {
     try {
       await this.users.update({}, { solveLimit: 10 });
+      return {
+        ok: true,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '제한 횟수를 초기화할 수 없습니다.',
+      };
+    }
+  }
+
+  async resetRandomExamLimit(): Promise<CoreOutput> {
+    try {
+      await this.users.update({}, { randomExamLimit: 3 });
       return {
         ok: true,
       };

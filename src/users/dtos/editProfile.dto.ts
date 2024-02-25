@@ -10,6 +10,7 @@ export class EditProfileInput extends PickType(PartialType(User), [
   'hasBookmarkedBefore',
   'hasSolvedBefore',
   'hasReachedPaymentReminder',
+  'randomExamLimit',
 ]) {}
 
 @ObjectType()

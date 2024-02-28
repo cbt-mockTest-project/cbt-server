@@ -501,7 +501,7 @@ export class UserService {
           channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
         });
       }
-      if (randomExamLimit) {
+      if (typeof randomExamLimit === 'number') {
         user.randomExamLimit = randomExamLimit;
       }
       await this.users.save(user);

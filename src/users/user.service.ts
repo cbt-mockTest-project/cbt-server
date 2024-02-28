@@ -1216,7 +1216,7 @@ export class UserService {
 
   async resetRandomExamLimit(): Promise<CoreOutput> {
     try {
-      await this.users.update({}, { randomExamLimit: 3 });
+      await this.users.update({}, { randomExamLimit: 2 });
       return {
         ok: true,
       };

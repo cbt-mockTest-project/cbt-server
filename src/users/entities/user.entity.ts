@@ -303,9 +303,25 @@ export class User extends CoreEntity {
   @Field(() => Number, { defaultValue: 10, nullable: true })
   solveLimit?: number;
 
+  @Column({ default: 3 })
+  @Field(() => Number, { nullable: true })
+  randomExamLimit?: number;
+
   @Column({ default: '' })
   @Field(() => String, { defaultValue: '' })
   recentlyStudiedCategory: string;
+
+  @Column({ default: false })
+  @Field(() => Boolean, { defaultValue: false, nullable: true })
+  hasBookmarkedBefore?: boolean;
+
+  @Column({ default: false })
+  @Field(() => Boolean, { defaultValue: false, nullable: true })
+  hasSolvedBefore?: boolean;
+
+  @Column({ default: false })
+  @Field(() => Boolean, { defaultValue: false, nullable: true })
+  hasReachedPaymentReminder?: boolean;
 
   @BeforeInsert()
   @BeforeUpdate()

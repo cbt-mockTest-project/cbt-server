@@ -7,6 +7,10 @@ export class EditProfileInput extends PickType(PartialType(User), [
   'nickname',
   'password',
   'profileImg',
+  'hasBookmarkedBefore',
+  'hasSolvedBefore',
+  'hasReachedPaymentReminder',
+  'randomExamLimit',
 ]) {}
 
 @ObjectType()

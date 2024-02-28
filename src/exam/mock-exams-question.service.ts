@@ -1027,9 +1027,11 @@ export class MockExamQuestionService {
             },
           },
           where: {
-            question: {
-              id: In(questionIds),
-            },
+            ...(ids.length > 0 && {
+              question: {
+                id: In(questionIds),
+              },
+            }),
             user: {
               id: user.id,
             },
@@ -1086,13 +1088,19 @@ export class MockExamQuestionService {
           .leftJoinAndSelect('question.user', 'user')
           .leftJoinAndSelect('question.mockExam', 'mockExam')
           .where('mockExamQuestionState.user.id = :id', { id: user.id })
-          .andWhere('mockExam.id IN (:...ids)', {
-            ids,
-          })
           .andWhere('question.id = question.id')
           .andWhere('mockExamQuestionState.state IN (:...states)', {
             states,
           });
+
+        if (ids.length > 0) {
+          questionStatesQuery = questionStatesQuery.andWhere(
+            'mockExam.id IN (:...ids)',
+            {
+              ids,
+            },
+          );
+        }
 
         if (limit) {
           questionStatesQuery = questionStatesQuery.limit(limit);
@@ -1104,11 +1112,10 @@ export class MockExamQuestionService {
           questions = questions.concat(coreQuestions);
         }
       }
-
       if (order === 'random') {
         questions = shuffleArray(questions);
       }
-      if (order === 'normal') {
+      if (order === 'normal' && ids.length > 0) {
         questions = sortQuestions(
           questions,
           mockExams.flatMap((mockExam) => mockExam.questionOrderIds),
@@ -1231,7 +1238,6 @@ export class MockExamQuestionService {
             ),
         };
       });
-
       return {
         ok: true,
         questions,

@@ -121,7 +121,8 @@ export class UserService {
           error: '탈퇴 처리된 회원입니다.',
         };
       }
-      if (exists.nickname === nickname) {
+
+      if (exists && exists.nickname === nickname) {
         return {
           ok: false,
           error: '중복된 닉네임이 존재합니다.',
@@ -160,7 +161,8 @@ export class UserService {
       return {
         ok: true,
       };
-    } catch {
+    } catch (e) {
+      console.log(e);
       return {
         ok: false,
         error: '회원가입에 실패했습니다.',
@@ -432,7 +434,15 @@ export class UserService {
     editProfileInput: EditProfileInput,
     user: User,
   ): Promise<EditProfileOutput> {
-    const { nickname, password, profileImg } = editProfileInput;
+    const {
+      nickname,
+      password,
+      profileImg,
+      hasBookmarkedBefore,
+      hasSolvedBefore,
+      hasReachedPaymentReminder,
+      randomExamLimit,
+    } = editProfileInput;
     try {
       const currentUser = await this.users.findOne({
         where: { id: user.id },
@@ -482,6 +492,18 @@ export class UserService {
       if (password) user.password = password;
       if (nickname) user.nickname = nickname;
       if (typeof profileImg === 'string') user.profileImg = profileImg;
+      if (hasBookmarkedBefore) user.hasBookmarkedBefore = hasBookmarkedBefore;
+      if (hasSolvedBefore) user.hasSolvedBefore = hasSolvedBefore;
+      if (hasReachedPaymentReminder) {
+        user.hasReachedPaymentReminder = hasReachedPaymentReminder;
+        this.telegramService.sendMessageToTelegram({
+          message: `${user.nickname} 님이 결제 리마인더에 도달했습니다.`,
+          channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
+        });
+      }
+      if (randomExamLimit) {
+        user.randomExamLimit = randomExamLimit;
+      }
       await this.users.save(user);
       return {
         ok: true,
@@ -1181,6 +1203,20 @@ export class UserService {
   async resetSolveLimit(): Promise<CoreOutput> {
     try {
       await this.users.update({}, { solveLimit: 10 });
+      return {
+        ok: true,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '제한 횟수를 초기화할 수 없습니다.',
+      };
+    }
+  }
+
+  async resetRandomExamLimit(): Promise<CoreOutput> {
+    try {
+      await this.users.update({}, { randomExamLimit: 3 });
       return {
         ok: true,
       };

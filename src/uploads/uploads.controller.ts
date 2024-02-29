@@ -2,7 +2,9 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Get,
   Post,
+  Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -11,6 +13,7 @@ import * as AWS from 'aws-sdk';
 import { ConfigService } from '@nestjs/config';
 import { UploadInput } from './uploads.dto';
 import { v4 as uuidv4 } from 'uuid';
+import axios from 'axios';
 
 @Controller('uploads')
 export class UploadsController {
@@ -50,6 +53,23 @@ export class UploadsController {
     } catch (e) {
       console.log(e);
     }
+  }
+
+  @Get('base64')
+  async uploadImageBase64(@Query() query: { url: string }) {
+    const response = await axios.get(query.url, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers':
+          'Content-Type, Authorization, X-Requested-With',
+        'Content-Type': 'application/json',
+      },
+      responseType: 'arraybuffer',
+    });
+    // ArrayBuffer를 Base64 문자열로 변환
+    const base64 = Buffer.from(response.data, 'binary').toString('base64');
+    return `data:${response.headers['content-type']};base64,${base64}`;
   }
 
   @Post('/pdf')

@@ -2,6 +2,7 @@ import { ExamCoAuthor } from '../exam-co-author/entities/exam-co-author.entity';
 /* eslint-disable prefer-const */
 import * as xml2js from 'xml2js';
 import * as fs from 'fs';
+import { load } from 'cheerio';
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MockExamQuestionBookmark } from 'src/exam/entities/mock-exam-question-bookmark.entity';
@@ -1252,20 +1253,22 @@ export class MockExamQuestionService {
 
   async sync() {
     try {
-      const parser = new xml2js.Parser();
-      console.log(__dirname + '/section0.xml');
-      fs.readFile(__dirname + '/section0.xml', function (err, data) {
-        parser.parseString(data, function (err, result) {
-          // console.log(result['hs:sec']['hp:p'][100]['hp:run']);
-          // console.log(result['hs:sec']['hp:p'][100]['hp:run']);
-          // console.log('-------------------');
-          // console.log(result['hs:sec']['hp:p'][100]['hp:run'][0]['hp:t']);
-          console.log(result['hs:sec']['hp:p'].length);
-          result['hs:sec']['hp:p'].forEach((p, index) => {
-            if (index > 400 && index < 500) {
-              console.log(p['hp:run']);
-            }
-          });
+      const html = fs.readFileSync(__dirname + '/test.html', 'utf-8');
+      const $ = load(html);
+      const body = $('#hvpage3')
+        .find('.hcD')
+        .filter((i, el) => {
+          return $(el).attr('style') === 'left:20mm;top:10mm;';
+        });
+
+      body.children().each((i, el) => {
+        const section = $(el);
+        if (section.attr('class') === 'hcS') {
+          // 중앙 라인
+          return;
+        }
+        section.children().each((i, el) => {
+          console.log($(el).text());
         });
       });
       return {

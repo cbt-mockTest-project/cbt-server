@@ -442,6 +442,7 @@ export class UserService {
       hasSolvedBefore,
       hasReachedPaymentReminder,
       randomExamLimit,
+      printLimit,
     } = editProfileInput;
     try {
       const currentUser = await this.users.findOne({
@@ -503,6 +504,9 @@ export class UserService {
       }
       if (typeof randomExamLimit === 'number') {
         user.randomExamLimit = randomExamLimit;
+      }
+      if (typeof printLimit === 'number') {
+        user.printLimit = printLimit;
       }
       await this.users.save(user);
       return {

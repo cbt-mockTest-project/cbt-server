@@ -307,6 +307,10 @@ export class User extends CoreEntity {
   @Field(() => Number, { nullable: true })
   randomExamLimit?: number;
 
+  @Column({ default: 1 })
+  @Field(() => Number, { nullable: true })
+  printLimit?: number;
+
   @Column({ default: '' })
   @Field(() => String, { defaultValue: '' })
   recentlyStudiedCategory: string;

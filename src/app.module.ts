@@ -98,6 +98,7 @@ import { SellerModule } from './seller/seller.module';
 import { Seller } from './seller/entities/seller.entity';
 import { CategoryEvaluationModule } from './category-evaluation/category-evaluation.module';
 import { CategoryEvaluation } from './category-evaluation/entities/category-evaluation.entity';
+import { DashBoardModule } from './dash-board/dash-board.module';
 
 @Module({
   imports: [
@@ -238,6 +239,7 @@ import { CategoryEvaluation } from './category-evaluation/entities/category-eval
           ? process.env.CLIENT_URL
           : process.env.PRODUCT_CLIENT_URL,
     }),
+    DashBoardModule,
     AuthModule,
     ExamCoAuthorModule,
     MockExamsModule,

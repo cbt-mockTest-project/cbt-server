@@ -1,17 +1,10 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const UserAgent = require('user-agents');
 import { Injectable } from '@nestjs/common';
 import { load } from 'cheerio';
 import axios from 'axios';
 import { GetSearchRankInput } from './dtos/get-search-rank.dto';
 import { GetSearchAvailabilityInput } from './dtos/get-search-availability';
 import { GetBlogPostsResponse } from 'src/types/dash-board';
-import { NaverBlogViewMacroInput } from './dtos/naver-blog-view-macro.dto';
-import * as webdriver from 'selenium-webdriver';
-import * as chrome from 'selenium-webdriver/chrome';
-import { By } from 'selenium-webdriver';
-import { shuffle } from 'lodash';
-import { delay } from 'src/lib/utils/util';
 
 @Injectable()
 export class DashBoardService {
@@ -148,131 +141,6 @@ export class DashBoardService {
       return {
         ok: false,
         error: '서버 에러',
-      };
-    }
-  }
-
-  async naverBlogViewMacro(naverBlogViewMacroInput: NaverBlogViewMacroInput) {
-    const { blogId, viewCount } = naverBlogViewMacroInput;
-    const chromeOptions = new chrome.Options();
-    // chromeOptions.addArguments('--headless');
-    chromeOptions.addArguments('--disable-gpu');
-    chromeOptions.addArguments('--no-sandbox');
-    const driver = await new webdriver.Builder()
-      .withCapabilities(webdriver.Capabilities.chrome())
-      .setChromeOptions(chromeOptions)
-      .build();
-    await driver.manage().setTimeouts({
-      implicit: 3000, // 3초
-      pageLoad: 60000, // 60초
-      script: 60000, // 60초
-    });
-    try {
-      const pages = [1, 2, 3, 4, 5];
-      const postArrayList = await Promise.all(
-        pages.map(async (page) => {
-          const getPostsEndPoint = `https://m.blog.naver.com/api/blogs/${blogId}/post-list?categoryNo=0&itemCount=${30}&page=${page}`;
-          const { data } = await axios.get<GetBlogPostsResponse>(
-            getPostsEndPoint,
-            {
-              headers: {
-                referer: `https://m.blog.naver.com/${blogId}?tab=1`,
-              },
-            },
-          );
-          return data;
-        }),
-      );
-      let posts = postArrayList.flatMap((post) => post.result.items);
-      console.log(posts.length);
-      posts = shuffle(posts);
-      if (!posts.length)
-        return {
-          ok: false,
-          error: '블로그 포스트가 없습니다.',
-        };
-      let currentViewCount = 0;
-      while (currentViewCount <= Number(viewCount)) {
-        for await (const post of posts) {
-          const naverLinkList = ['https://naver.com', 'https://m.naver.com'];
-          const currentNaverLink =
-            Math.random() <= 0.7 ? naverLinkList[1] : naverLinkList[0]; // 70% 확률로 모바일 링크
-          if (currentNaverLink === 'https://naver.com') {
-            await driver.get('https://naver.com');
-            const userAgent = new UserAgent({ deviceCategory: 'desktop' });
-            const pcAgent = userAgent.toString();
-            console.log('pcAgent', pcAgent);
-            await driver.executeScript(
-              `window.navigator.__defineGetter__('userAgent', function(){return '${pcAgent}';})`,
-            );
-            await driver.executeScript(
-              `document.cookie = 'NNB=; domain=.naver.com; expires=Thu, 01Jan 1999 00:00:10 GMT;'`,
-            );
-            await driver.findElement(By.className('search_input'));
-            await driver.executeScript(
-              `document.querySelector('.search_input').value = '"${post.titleWithInspectMessage}"';`,
-            );
-            await driver.findElement(By.id('search-btn')).click();
-            await driver.findElement(By.linkText('블로그')).click();
-            const title = await driver.findElements(
-              By.linkText(post.titleWithInspectMessage),
-            );
-            if (title.length) {
-              currentViewCount++;
-              title[0].click();
-              await delay(5000);
-              const handles = await driver.getAllWindowHandles();
-              await driver.switchTo().window(handles[1]);
-              // delay 60초 ~ 120초 사이로 랜덤
-              await delay(Math.floor(Math.random() * 60000) + 60000);
-              await driver.close();
-              await delay(500);
-              await driver.switchTo().window(handles[0]);
-            }
-          }
-          if (currentNaverLink === 'https://m.naver.com') {
-            await driver.get('https://m.naver.com');
-            const userAgent = new UserAgent({
-              deviceCategory: 'mobile',
-            });
-            const mobileAgent = userAgent.toString();
-            console.log('mobileAgent', mobileAgent);
-            await driver.executeScript(
-              `window.navigator.__defineGetter__('userAgent', function(){return '${mobileAgent}';})`,
-            );
-            await driver.executeScript(
-              `document.cookie = 'NNB=; domain=.naver.com; expires=Thu, 01Jan 1999 00:00:10 GMT;'`,
-            );
-            await driver.findElement(By.id('MM_SEARCH_FAKE')).click();
-            await driver.findElement(By.className('sch_input'));
-            await driver.executeScript(
-              `document.querySelector('.sch_input').value = '"${post.titleWithInspectMessage}"';`,
-            );
-            await driver.findElement(By.className('MM_SEARCH_SUBMIT')).click();
-            await driver.findElement(By.linkText('블로그')).click();
-            const title = await driver.findElements(
-              By.linkText(post.titleWithInspectMessage),
-            );
-            if (title.length) {
-              currentViewCount++;
-              title[0].click();
-              // delay 60초 ~ 120초 사이로 랜덤
-              await delay(Math.floor(Math.random() * 60000) + 60000);
-            }
-          }
-          if (currentViewCount >= Number(viewCount)) break;
-        }
-        posts = shuffle(posts);
-      }
-      await driver.quit();
-      return {
-        ok: true,
-      };
-    } catch (e) {
-      await driver.quit();
-      console.log(e);
-      return {
-        ok: false,
       };
     }
   }

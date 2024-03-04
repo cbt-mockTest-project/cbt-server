@@ -37,7 +37,10 @@ export class DashBoardService {
           if (naverPostOffSet !== 100) {
             naverBlogSearchRank++;
           }
-
+          if (naverBlogSearchRank > 100) {
+            naverBlogSearchRank = 0;
+            naverPostOffSet = 100;
+          }
           const userBox = $(el).find(
             naverBlogSearchClassMap.postBox.children.userBox.class,
           );
@@ -68,6 +71,10 @@ export class DashBoardService {
         postBoxList.each((i, el) => {
           if (daumPostPage !== 10) {
             daumBlogSearchRank++;
+          }
+          if (daumBlogSearchRank > 100) {
+            daumBlogSearchRank = 0;
+            daumPostPage = 10;
           }
 
           const foundPostLink = $(el)

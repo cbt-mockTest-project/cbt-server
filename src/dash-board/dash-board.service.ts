@@ -5,6 +5,7 @@ import axios from 'axios';
 import { GetSearchRankInput } from './dtos/get-search-rank.dto';
 import { GetSearchAvailabilityInput } from './dtos/get-search-availability';
 import { GetBlogPostsResponse } from 'src/types/dash-board';
+import { GetNaverBlogVisitorCountInput } from './dtos/get-naver-blog-visitior-count.dto';
 
 @Injectable()
 export class DashBoardService {
@@ -150,6 +151,40 @@ export class DashBoardService {
       return {
         ok: false,
         error: '서버 에러',
+      };
+    }
+  }
+
+  async getNaverBlogVisitorCount(
+    getNaverBlogVisitorCountInput: GetNaverBlogVisitorCountInput,
+  ) {
+    try {
+      const { blogId } = getNaverBlogVisitorCountInput;
+      const { data } = await axios.get(
+        `https://blog.naver.com/NVisitorgp4Ajax.nhn?blogId=${blogId}`,
+      );
+      const visitorCountList = [];
+      const $ = load(data);
+      $('visitorcnt').each((i, el) => {
+        const visitorCount = {
+          date:
+            $(el).attr('id').slice(2, 4) +
+            '-' +
+            $(el).attr('id').slice(4, 6) +
+            '-' +
+            $(el).attr('id').slice(6, 8),
+          visitor: $(el).attr('cnt'),
+        };
+        visitorCountList.unshift(visitorCount);
+      });
+      return {
+        ok: true,
+        visitorCountList,
+      };
+    } catch (e) {
+      console.log(e);
+      return {
+        ok: false,
       };
     }
   }

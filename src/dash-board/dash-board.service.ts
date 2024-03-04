@@ -99,7 +99,6 @@ export class DashBoardService {
       console.log(e);
     }
   }
-
   async getSearchAvailability(
     getSearchAvailabilityInput: GetSearchAvailabilityInput,
   ) {
@@ -129,6 +128,9 @@ export class DashBoardService {
             isSearchAvailability = true;
           }
           return {
+            link: `https://m.blog.naver.com/${blogId}/${post.logNo}`,
+            commentCount: post.commentCnt,
+            likeCount: post.sympathyCnt,
             title: post.titleWithInspectMessage,
             logNo: post.logNo,
             isSearchAvailability,

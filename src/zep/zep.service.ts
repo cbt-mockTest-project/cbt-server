@@ -25,9 +25,14 @@ export class ZepService {
       });
       const randomQuestion =
         questions[Math.floor(Math.random() * questions.length)];
+      console.log(randomQuestion);
       return {
         ok: true,
-        question: randomQuestion,
+        question: {
+          ...randomQuestion,
+          question: transformHtmlString(randomQuestion.question),
+          solution: transformHtmlString(randomQuestion.solution),
+        },
       };
     } catch {
       return {
@@ -36,4 +41,19 @@ export class ZepService {
       };
     }
   }
+}
+
+function transformHtmlString(htmlStr: string) {
+  // 정규 표현식을 사용하여 <p> 태그로 감싸진 내용을 찾습니다.
+  const regex = /<p>(.*?)<\/p>/g;
+
+  // 모든 <p>...</p> 세그먼트를 찾아 처리합니다.
+  const transformedStr = htmlStr.replace(regex, (match, p1) => {
+    // HTML 태그를 제거합니다.
+    const withoutTags = p1.replace(/<[^>]+>/g, '');
+    // 개행 문자를 추가합니다.
+    return withoutTags + '\n';
+  });
+
+  return transformedStr;
 }

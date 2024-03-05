@@ -28,10 +28,10 @@ jobs:
           node-version: 16
 
       - name: Install Dependencies
-        run: yarn
+        run: npm install
 
       - name: Build Project
-        run: yarn build
+        run: npm run build
 
       - name: Configure AWS
         uses: aws-actions/configure-aws-credentials@v1
@@ -76,5 +76,5 @@ jobs:
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
           script: |
             cd /home/ubuntu/cbt-server
-            yarn
-            yarn cross-env NODE_ENV=prod pm2 start ecosystem.config.js
+            npm install
+            npm run cross-env NODE_ENV=prod pm2 start ecosystem.config.js

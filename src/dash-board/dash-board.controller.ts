@@ -3,6 +3,7 @@ import { DashBoardService } from './dash-board.service';
 import { GetSearchRankInput } from './dtos/get-search-rank.dto';
 import { GetSearchAvailabilityInput } from './dtos/get-search-availability';
 import { GetNaverBlogVisitorCountInput } from './dtos/get-naver-blog-visitior-count.dto';
+import { GetMacroHistoryInput } from './dtos/get-macro.history';
 
 @Controller('dash-board')
 export class DashBoardController {
@@ -29,5 +30,10 @@ export class DashBoardController {
     return this.dashBoardService.getNaverBlogVisitorCount(
       getNaverBlogVisitorCountInput,
     );
+  }
+
+  @Get('macro-history')
+  getMacroHistory(@Query() getMacroHistoryInput: GetMacroHistoryInput) {
+    return this.dashBoardService.getMacroHistory(getMacroHistoryInput);
   }
 }

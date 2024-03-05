@@ -1,4 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
+import { JWT } from 'google-auth-library';
+import { GoogleSpreadsheet } from 'google-spreadsheet';
 import { Injectable } from '@nestjs/common';
 import { load } from 'cheerio';
 import axios from 'axios';
@@ -6,6 +8,8 @@ import { GetSearchRankInput } from './dtos/get-search-rank.dto';
 import { GetSearchAvailabilityInput } from './dtos/get-search-availability';
 import { GetBlogPostsResponse } from 'src/types/dash-board';
 import { GetNaverBlogVisitorCountInput } from './dtos/get-naver-blog-visitior-count.dto';
+import { format } from 'date-fns';
+import { GetMacroHistoryInput } from './dtos/get-macro.history';
 
 @Injectable()
 export class DashBoardService {
@@ -186,6 +190,64 @@ export class DashBoardService {
       return {
         ok: false,
       };
+    }
+  }
+
+  async getMacroHistory(getMacroHistoryInput: GetMacroHistoryInput) {
+    try {
+      const getGoogleSheet = async () => {
+        try {
+          const formattedKey = process.env.GOOGLE_PRIVATE_KEY?.replace(
+            /\\n/g,
+            '\n',
+          );
+          const serviceAccountAuth = new JWT({
+            key: formattedKey,
+            email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+            scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+          });
+          const doc = new GoogleSpreadsheet(
+            process.env.GOOGLE_SHEET_ID || '',
+            serviceAccountAuth,
+          );
+          await doc.loadInfo();
+          return doc;
+        } catch (error) {
+          console.log(error);
+        }
+      };
+
+      const { blogId, page } = getMacroHistoryInput;
+      const doc = await getGoogleSheet();
+      const sheet = doc.sheetsByIndex[0];
+      let rows = await sheet.getRows();
+      const dayString = format(
+        new Date(Date.now() - 5 * (Number(page) - 1) * 24 * 60 * 60 * 1000),
+        'yy-MM-dd',
+      );
+      const fiveDaysAgo = format(
+        new Date(Date.now() - 5 * Number(page) * 24 * 60 * 60 * 1000),
+        'yy-MM-dd',
+      );
+      rows = rows.filter(
+        (row) =>
+          row.get('date') > fiveDaysAgo &&
+          row.get('date') <= dayString &&
+          row.get('blogId') === blogId,
+      );
+      const result = [];
+      rows.forEach((row) => {
+        result.push({
+          date: row.get('date'),
+          count: row.get('count'),
+        });
+      });
+      return {
+        result,
+        ok: true,
+      };
+    } catch (e) {
+      console.log(e);
     }
   }
 }

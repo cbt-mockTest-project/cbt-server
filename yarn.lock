@@ -2605,9 +2605,9 @@ available-typed-arrays@^1.0.6, available-typed-arrays@^1.0.7:
     possible-typed-array-names "^1.0.0"
 
 aws-sdk@^2.1235.0:
-  version "2.1570.0"
-  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.1570.0.tgz#9de4e9ea95d794c2f5235a6beaaeab92edf07c57"
-  integrity sha512-WySdibC3YOPCFcXNSevX7cGp6Nc0Ksv7m6aaz6YoqSrmSn7mZhkWaVXqfd14nsjJuyEbEgX+gAiZaahyvkUYJw==
+  version "2.1571.0"
+  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.1571.0.tgz#900055174094f621d9e1a21b84a7093fa4d9992a"
+  integrity sha512-Hixs1aD+7IwsP/Bkb7StFCrOC9ejmw8zBv8xVqEtEughRX6AF8bLKFRoJRbD4V6TrM+gPGpCqoFlpa84HLHkSA==
   dependencies:
     buffer "4.9.2"
     events "1.1.1"
@@ -3885,9 +3885,9 @@ ejs@^3.1.9:
     jake "^10.8.5"
 
 electron-to-chromium@^1.4.668:
-  version "1.4.692"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.692.tgz#82139d20585a4b2318a02066af7593a3e6bec993"
-  integrity sha512-d5rZRka9n2Y3MkWRN74IoAsxR0HK3yaAt7T50e3iT9VZmCCQDT3geXUO5ZRMhDToa1pkCeQXuNo+0g+NfDOVPA==
+  version "1.4.693"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.693.tgz#001bb5dcb57ba404366ec39e1957d11886fc8a93"
+  integrity sha512-/if4Ueg0GUQlhCrW2ZlXwDAm40ipuKo+OgeHInlL8sbjt+hzISxZK949fZeJaVsheamrzANXvw1zQTvbxTvSHw==
 
 emitter-listener@^1.1.1:
   version "1.1.2"

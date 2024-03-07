@@ -82,6 +82,7 @@ import {
   UpdateRecentlyStudiedCategoryInput,
   UpdateRecentlyStudiedCategoryOutput,
 } from './dtos/updateRecentlyStudiedCategory.dto';
+import { format } from 'date-fns';
 @Injectable()
 export class UserService {
   constructor(
@@ -522,7 +523,13 @@ export class UserService {
 
   async deleteUser(user: User): Promise<CoreOutput> {
     try {
-      this.users.delete({ id: user.id });
+      await this.users.delete({ id: user.id });
+      this.telegramService.sendMessageToTelegram({
+        channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
+        message: `가입일자: ${format(user.created_at, 'yy-mm-dd')}\n${
+          user.nickname
+        } 님이 탈퇴하셨습니다.`,
+      });
       return {
         ok: true,
       };

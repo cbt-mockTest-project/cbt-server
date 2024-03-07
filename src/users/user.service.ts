@@ -522,7 +522,7 @@ export class UserService {
 
   async deleteUser(user: User): Promise<CoreOutput> {
     try {
-      this.users.softDelete({ id: user.id });
+      this.users.delete({ id: user.id });
       return {
         ok: true,
       };

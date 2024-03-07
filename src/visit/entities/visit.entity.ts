@@ -7,7 +7,10 @@ import { User } from 'src/users/entities/user.entity';
 @ObjectType()
 @Entity()
 export class Visit extends CoreEntity {
-  @ManyToOne(() => User, (user) => user.visit, { nullable: true })
+  @ManyToOne(() => User, (user) => user.visit, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
   @Field(() => User)
   user?: User;
 }

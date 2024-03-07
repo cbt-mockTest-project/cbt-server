@@ -237,7 +237,7 @@ export class DashBoardService {
       );
       const result = [];
       rows.forEach((row) => {
-        result.push({
+        result.unshift({
           date: row.get('date'),
           count: row.get('count'),
         });

@@ -1267,9 +1267,22 @@ export class UserService {
     upsertRecentlyStudiedExamsInput: UpsertRecentlyStudiedExamsInput,
   ): Promise<UpsertRecentlyStudiedExamsOutput> {
     try {
+      const { categoryId, questionIndex } = upsertRecentlyStudiedExamsInput;
+      let recentlyStudiedExams = user.recentlyStudiedExams;
+      if (!questionIndex) {
+        recentlyStudiedExams = recentlyStudiedExams.filter(
+          (data) => data.categoryId !== categoryId,
+        );
+      }
+      if (questionIndex) {
+        recentlyStudiedExams = recentlyStudiedExams.map((data) =>
+          data.categoryId === categoryId ? { ...data, questionIndex } : data,
+        );
+      }
       await this.users.update(user.id, {
-        recentlyStudiedExams: upsertRecentlyStudiedExamsInput,
+        recentlyStudiedExams,
       });
+
       return {
         ok: true,
       };
@@ -1284,7 +1297,7 @@ export class UserService {
   async deleteRecentlyStudiedExams(user: User): Promise<CoreOutput> {
     try {
       await this.users.update(user.id, {
-        recentlyStudiedExams: null,
+        recentlyStudiedExams: [],
       });
       return {
         ok: true,

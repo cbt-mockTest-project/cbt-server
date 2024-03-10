@@ -57,6 +57,8 @@ export class RecentlyStudiedExams {
   @Field(() => [Number])
   examIds: number[];
   @Field(() => Number)
+  categoryId: number;
+  @Field(() => Number)
   questionIndex: number;
 }
 
@@ -324,9 +326,9 @@ export class User extends CoreEntity {
   @Field(() => String, { defaultValue: '' })
   recentlyStudiedCategory: string;
 
-  @Column({ type: 'json', default: null })
-  @Field(() => RecentlyStudiedExams, { nullable: true })
-  recentlyStudiedExams: RecentlyStudiedExams;
+  @Column({ type: 'json', default: [] })
+  @Field(() => [RecentlyStudiedExams], { nullable: true })
+  recentlyStudiedExams: RecentlyStudiedExams[];
 
   @Column({ default: false })
   @Field(() => Boolean, { defaultValue: false, nullable: true })

@@ -83,6 +83,10 @@ import {
   UpdateRecentlyStudiedCategoryOutput,
 } from './dtos/updateRecentlyStudiedCategory.dto';
 import { format } from 'date-fns';
+import {
+  UpsertRecentlyStudiedExamsInput,
+  UpsertRecentlyStudiedExamsOutput,
+} from './dtos/upsertRecentlyStudiedExams.dto';
 @Injectable()
 export class UserService {
   constructor(
@@ -1256,5 +1260,40 @@ export class UserService {
     return {
       ok: true,
     };
+  }
+
+  async upsertRecentlyStudiedExams(
+    user: User,
+    upsertRecentlyStudiedExamsInput: UpsertRecentlyStudiedExamsInput,
+  ): Promise<UpsertRecentlyStudiedExamsOutput> {
+    try {
+      await this.users.update(user.id, {
+        recentlyStudiedExams: upsertRecentlyStudiedExamsInput,
+      });
+      return {
+        ok: true,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '최근 학습한 문제를 저장할 수 없습니다.',
+      };
+    }
+  }
+
+  async deleteRecentlyStudiedExams(user: User): Promise<CoreOutput> {
+    try {
+      await this.users.update(user.id, {
+        recentlyStudiedExams: null,
+      });
+      return {
+        ok: true,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '최근 학습한 문제를 삭제할 수 없습니다.',
+      };
+    }
   }
 }

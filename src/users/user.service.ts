@@ -1267,7 +1267,8 @@ export class UserService {
     upsertRecentlyStudiedExamsInput: UpsertRecentlyStudiedExamsInput,
   ): Promise<UpsertRecentlyStudiedExamsOutput> {
     try {
-      const { categoryId, questionIndex } = upsertRecentlyStudiedExamsInput;
+      const { categoryId, questionIndex, examIds } =
+        upsertRecentlyStudiedExamsInput;
       let recentlyStudiedExams = user.recentlyStudiedExams;
       if (!questionIndex) {
         recentlyStudiedExams = recentlyStudiedExams.filter(
@@ -1275,9 +1276,19 @@ export class UserService {
         );
       }
       if (questionIndex) {
-        recentlyStudiedExams = recentlyStudiedExams.map((data) =>
-          data.categoryId === categoryId ? { ...data, questionIndex } : data,
+        const existed = recentlyStudiedExams.find(
+          (data) => data.categoryId === categoryId,
         );
+        if (!existed) {
+          recentlyStudiedExams.push({ categoryId, questionIndex, examIds });
+        }
+        if (existed) {
+          recentlyStudiedExams = recentlyStudiedExams.map((data) =>
+            data.categoryId === categoryId
+              ? { ...data, questionIndex, examIds }
+              : data,
+          );
+        }
       }
       await this.users.update(user.id, {
         recentlyStudiedExams,

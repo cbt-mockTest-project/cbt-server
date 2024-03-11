@@ -143,6 +143,18 @@ export class MockExamQuestion extends CoreEntity {
   @Field(() => Number)
   number: number;
 
+  @Column({ default: 0 })
+  @Field(() => Number, { defaultValue: 0 })
+  highScore?: number;
+
+  @Column({ default: 0 })
+  @Field(() => Number, { defaultValue: 0 })
+  middleScore?: number;
+
+  @Column({ default: 0 })
+  @Field(() => Number, { defaultValue: 0 })
+  lowScore?: number;
+
   @Field(() => [MockExamQuestionBookmark])
   @OneToMany(
     () => MockExamQuestionBookmark,

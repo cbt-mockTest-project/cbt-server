@@ -83,6 +83,10 @@ import {
   UpdateRecentlyStudiedCategoryOutput,
 } from './dtos/updateRecentlyStudiedCategory.dto';
 import { format } from 'date-fns';
+import {
+  UpsertRecentlyStudiedExamsInput,
+  UpsertRecentlyStudiedExamsOutput,
+} from './dtos/upsertRecentlyStudiedExams.dto';
 @Injectable()
 export class UserService {
   constructor(
@@ -1256,5 +1260,64 @@ export class UserService {
     return {
       ok: true,
     };
+  }
+
+  async upsertRecentlyStudiedExams(
+    user: User,
+    upsertRecentlyStudiedExamsInput: UpsertRecentlyStudiedExamsInput,
+  ): Promise<UpsertRecentlyStudiedExamsOutput> {
+    try {
+      const { categoryId, questionIndex, examIds } =
+        upsertRecentlyStudiedExamsInput;
+      let recentlyStudiedExams = user.recentlyStudiedExams;
+      if (!questionIndex) {
+        recentlyStudiedExams = recentlyStudiedExams.filter(
+          (data) => data.categoryId !== categoryId,
+        );
+      }
+      if (questionIndex) {
+        const existed = recentlyStudiedExams.find(
+          (data) => data.categoryId === categoryId,
+        );
+        if (!existed) {
+          recentlyStudiedExams.push({ categoryId, questionIndex, examIds });
+        }
+        if (existed) {
+          recentlyStudiedExams = recentlyStudiedExams.map((data) =>
+            data.categoryId === categoryId
+              ? { ...data, questionIndex, examIds }
+              : data,
+          );
+        }
+      }
+      await this.users.update(user.id, {
+        recentlyStudiedExams,
+      });
+
+      return {
+        ok: true,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '최근 학습한 문제를 저장할 수 없습니다.',
+      };
+    }
+  }
+
+  async deleteRecentlyStudiedExams(user: User): Promise<CoreOutput> {
+    try {
+      await this.users.update(user.id, {
+        recentlyStudiedExams: [],
+      });
+      return {
+        ok: true,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '최근 학습한 문제를 삭제할 수 없습니다.',
+      };
+    }
   }
 }

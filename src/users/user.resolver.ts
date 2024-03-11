@@ -69,6 +69,10 @@ import {
   UpdateRecentlyStudiedCategoryInput,
   UpdateRecentlyStudiedCategoryOutput,
 } from './dtos/updateRecentlyStudiedCategory.dto';
+import {
+  UpsertRecentlyStudiedExamsInput,
+  UpsertRecentlyStudiedExamsOutput,
+} from './dtos/upsertRecentlyStudiedExams.dto';
 
 @Resolver(() => User)
 export class UserResolver {
@@ -287,6 +291,27 @@ export class UserResolver {
     return this.userService.upsertRecentlyStudiedCategory(
       user,
       updateRecentlyStudiedCategoryInput,
+    );
+  }
+
+  @Role(['ANY'])
+  @Mutation(() => CoreOutput)
+  async deleteRecentlyStudiedExams(
+    @AuthUser() user: User,
+  ): Promise<CoreOutput> {
+    return this.userService.deleteRecentlyStudiedExams(user);
+  }
+
+  @Role(['ANY'])
+  @Mutation(() => UpsertRecentlyStudiedExamsOutput)
+  async upsertRecentlyStudiedExams(
+    @AuthUser() user: User,
+    @Args('input')
+    upsertRecentlyStudiedExamsInput: UpsertRecentlyStudiedExamsInput,
+  ): Promise<UpsertRecentlyStudiedExamsOutput> {
+    return this.userService.upsertRecentlyStudiedExams(
+      user,
+      upsertRecentlyStudiedExamsInput,
     );
   }
 }

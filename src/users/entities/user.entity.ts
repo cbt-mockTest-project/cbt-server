@@ -51,6 +51,17 @@ import { MockExamCategory } from 'src/exam-category/entities/mock-exam-category.
 import { Seller } from 'src/seller/entities/seller.entity';
 import { CategoryEvaluation } from 'src/category-evaluation/entities/category-evaluation.entity';
 
+@InputType('RecentlyStudiedExamsInputType', { isAbstract: true })
+@ObjectType()
+export class RecentlyStudiedExams {
+  @Field(() => [Number])
+  examIds: number[];
+  @Field(() => Number)
+  categoryId: number;
+  @Field(() => Number)
+  questionIndex: number;
+}
+
 export enum UserRole {
   CLIENT = 'CLIENT',
   CLIENT_BASIC = 'CLIENT_BASIC',
@@ -314,6 +325,10 @@ export class User extends CoreEntity {
   @Column({ default: '' })
   @Field(() => String, { defaultValue: '' })
   recentlyStudiedCategory: string;
+
+  @Column({ type: 'json', default: [] })
+  @Field(() => [RecentlyStudiedExams], { nullable: true })
+  recentlyStudiedExams: RecentlyStudiedExams[];
 
   @Column({ default: false })
   @Field(() => Boolean, { defaultValue: false, nullable: true })

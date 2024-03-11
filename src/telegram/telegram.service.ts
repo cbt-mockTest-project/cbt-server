@@ -38,10 +38,10 @@ export class TelegramService {
     sendMessageToAlramChannelOfTelegramInput: SendMessageToAlramChannelOfTelegramInput,
   ): Promise<SendMessageToAlramChannelOfTelegramOutput> {
     try {
-      const { message } = sendMessageToAlramChannelOfTelegramInput;
-      const bot = new TelegramBot(this.options.token);
+      // const { message } = sendMessageToAlramChannelOfTelegramInput;
+      // const bot = new TelegramBot(this.options.token);
 
-      bot.sendMessage(this.options.alramChannelId, message);
+      // bot.sendMessage(this.options.alramChannelId, message);
       return {
         ok: true,
       };

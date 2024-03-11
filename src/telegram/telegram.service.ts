@@ -19,10 +19,10 @@ export class TelegramService {
     sendMessageToTelegramInput: sendMessageToTelegramInput,
   ): Promise<sendMessageToTelegramOutput> {
     try {
-      const { message, channelId } = sendMessageToTelegramInput;
-      const bot = new TelegramBot(this.options.token);
+      // const { message, channelId } = sendMessageToTelegramInput;
+      // const bot = new TelegramBot(this.options.token);
 
-      bot.sendMessage(channelId, message);
+      // bot.sendMessage(channelId, message);
       return {
         ok: true,
       };

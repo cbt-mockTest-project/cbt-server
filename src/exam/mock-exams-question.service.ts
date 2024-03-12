@@ -68,6 +68,7 @@ import {
 } from './dtos/readQuestionsByExamIds.dto';
 import { sortQuestions } from 'src/lib/utils/sortQuestions';
 import { MockExamCategory } from 'src/exam-category/entities/mock-exam-category.entity';
+import { ExamSource } from 'src/enums/enum';
 
 @Injectable()
 export class MockExamQuestionService {
@@ -1016,6 +1017,7 @@ export class MockExamQuestionService {
       let questions: MockExamQuestion[] = mockExams.flatMap(
         (mockExam) => mockExam.mockExamQuestion,
       );
+      console.log(1);
       let questionIds = questions.map((question) => question.id);
       if (bookmarked) {
         const questionBookmarks = await this.mockExamQuestionBookmark.find({
@@ -1185,7 +1187,7 @@ export class MockExamQuestionService {
                 feedback.mockExamQuestion.id === question.id &&
                 (feedback.type !== QuestionFeedbackType.PRIVATE ||
                   (feedback.type === QuestionFeedbackType.PRIVATE &&
-                    feedback.user.id === user?.id)),
+                    feedback.user?.id === user?.id)),
             )
             .map((feedback) => {
               const goodCount = feedback.recommendation.filter(
@@ -1241,6 +1243,7 @@ export class MockExamQuestionService {
         questions,
       };
     } catch (e) {
+      console.log(e);
       return {
         ok: false,
         error: '문제를 찾을 수 없습니다.',
@@ -1251,13 +1254,60 @@ export class MockExamQuestionService {
   async sync() {
     try {
       const categories = await this.mockExamCategory.find({
+        where: {
+          source: ExamSource.MOUD_CBT,
+          isPublic: true,
+        },
         relations: { mockExam: true },
       });
-      categories.forEach(async (category) => {
-        category.mockExam = category.mockExam.sort((a, b) => a.order - b.order);
-        category.examOrderIds = category.mockExam.map((exam) => exam.id);
-        await this.mockExamCategory.save(category);
+      const mockExams = categories.flatMap((category) => category.mockExam);
+      const examIds = mockExams.map((exam) => exam.id);
+      const questions = await this.mockExamQuestion.find({
+        where: {
+          mockExam: {
+            id: In(examIds),
+          },
+        },
       });
+      const results = await this.mockExamQuestionState
+        .createQueryBuilder('questionState')
+        .select('questionState.questionId', 'questionId')
+        .addSelect('questionState.state', 'state')
+        .addSelect('COUNT(questionState.id)', 'count')
+        .where('questionState.question.id IN (:...questionIds)', {
+          questionIds: questions.map((q) => q.id),
+        })
+        .groupBy('questionState.questionId')
+        .addGroupBy('questionState.state')
+        .getRawMany();
+      let questionStateMap = new Map();
+      results.forEach((result) => {
+        if (!questionStateMap.has(result.questionId)) {
+          questionStateMap.set(result.questionId, {
+            highScore: 0,
+            middleScore: 0,
+            lowScore: 0,
+          });
+        }
+        let state = questionStateMap.get(result.questionId);
+        if (result.state === QuestionState.HIGH)
+          state.highScore = parseInt(result.count);
+        else if (result.state === QuestionState.MIDDLE)
+          state.middleScore = parseInt(result.count);
+        else if (result.state === QuestionState.ROW)
+          state.lowScore = parseInt(result.count);
+      });
+      await Promise.all(
+        questions.map(async (question) => {
+          const stateScores = questionStateMap.get(question.id);
+          if (stateScores) {
+            question.highScore = stateScores.highScore;
+            question.middleScore = stateScores.middleScore;
+            question.lowScore = stateScores.lowScore;
+            await this.mockExamQuestion.save(question);
+          }
+        }),
+      );
 
       return {
         ok: true,

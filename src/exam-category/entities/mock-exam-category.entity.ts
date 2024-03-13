@@ -25,6 +25,7 @@ import { MockExam } from 'src/exam/entities/mock-exam.entity';
 import { ExamSource } from 'src/enums/enum';
 import { Seller } from 'src/seller/entities/seller.entity';
 import { CategoryEvaluation } from 'src/category-evaluation/entities/category-evaluation.entity';
+import { Quiz } from 'src/quiz/entities/quiz.entity';
 
 export enum ExamType {
   OBJECTIVE = 'OBJECTIVE',
@@ -102,6 +103,10 @@ export class MockExamCategory extends CoreEntity {
   )
   @Field(() => [CategoryEvaluation], { defaultValue: [], nullable: true })
   categoryEvaluations: CategoryEvaluation[];
+
+  @Field(() => [Quiz])
+  @OneToMany(() => Quiz, (quiz) => quiz.category)
+  quiz: Quiz[];
 
   @ManyToOne(() => Partner, (partner) => partner.examCategory, {
     onDelete: 'SET NULL',

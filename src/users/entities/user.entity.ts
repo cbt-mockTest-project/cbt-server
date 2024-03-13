@@ -50,6 +50,8 @@ import { ExamCategoryInvitation } from 'src/exam-category-invitation/entities/ex
 import { MockExamCategory } from 'src/exam-category/entities/mock-exam-category.entity';
 import { Seller } from 'src/seller/entities/seller.entity';
 import { CategoryEvaluation } from 'src/category-evaluation/entities/category-evaluation.entity';
+import { QuizComment } from 'src/quiz/entities/quizComment.entity';
+import { QuizCommentLike } from 'src/quiz/entities/quizCommentLike.entity';
 
 @InputType('RecentlyStudiedExamsInputType', { isAbstract: true })
 @ObjectType()
@@ -293,6 +295,14 @@ export class User extends CoreEntity {
     (feedbackRecommendation) => feedbackRecommendation.user,
   )
   feedbackRecommendation: MockExamQuestionFeedbackRecommendation[];
+
+  @OneToMany(() => QuizComment, (quizComment) => quizComment.user)
+  @Field(() => [QuizComment])
+  quizComment: QuizComment[];
+
+  @OneToMany(() => QuizCommentLike, (quizCommentLike) => quizCommentLike.user)
+  @Field(() => [QuizCommentLike])
+  quizCommentLike: QuizCommentLike[];
 
   @Field(() => [UserAndRole])
   @OneToMany(() => UserAndRole, (userRole) => userRole.user)

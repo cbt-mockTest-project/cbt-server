@@ -17,6 +17,7 @@ import { MockExamBookmark } from 'src/exam-bookmark/entities/mock-exam-bookmark.
 import { ExamLike } from 'src/exam-like/entities/exam-like.entity';
 import { MockExamCategory } from 'src/exam-category/entities/mock-exam-category.entity';
 import { ExamSource, ExamStatus } from 'src/enums/enum';
+import { Quiz } from 'src/quiz/entities/quiz.entity';
 
 registerEnumType(ExamSource, { name: 'ExamSource' });
 registerEnumType(ExamStatus, { name: 'ExamStatus' });
@@ -65,6 +66,10 @@ export class MockExam extends CoreEntity {
     },
   )
   mockExamQuestion: MockExamQuestion[];
+
+  @Field(() => [Quiz])
+  @OneToMany(() => Quiz, (quiz) => quiz.category)
+  quiz: Quiz[];
 
   @Field(() => [MockExamQuestion])
   @OneToMany(

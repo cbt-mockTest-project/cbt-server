@@ -11,6 +11,7 @@ import { MockExamQuestionState } from 'src/exam/entities/mock-exam-question-stat
 import { RevalidateModule } from 'src/revalidate/revalidate.module';
 import { Seller } from 'src/seller/entities/seller.entity';
 import { CategoryEvaluation } from 'src/category-evaluation/entities/category-evaluation.entity';
+import { Quiz } from 'src/quiz/entities/quiz.entity';
 
 @Module({
   imports: [

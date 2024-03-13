@@ -99,6 +99,10 @@ import { Seller } from './seller/entities/seller.entity';
 import { CategoryEvaluationModule } from './category-evaluation/category-evaluation.module';
 import { CategoryEvaluation } from './category-evaluation/entities/category-evaluation.entity';
 import { DashBoardModule } from './dash-board/dash-board.module';
+import { QuizModule } from './quiz/quiz.module';
+import { Quiz } from './quiz/entities/quiz.entity';
+import { QuizComment } from './quiz/entities/quizComment.entity';
+import { QuizCommentLike } from './quiz/entities/quizCommentLike.entity';
 
 @Module({
   imports: [
@@ -219,6 +223,9 @@ import { DashBoardModule } from './dash-board/dash-board.module';
         ExamCategoryInvitation,
         Seller,
         CategoryEvaluation,
+        Quiz,
+        QuizComment,
+        QuizCommentLike,
       ],
     }),
     UserModule,
@@ -287,6 +294,7 @@ import { DashBoardModule } from './dash-board/dash-board.module';
     ExamCategoryModule,
     SellerModule,
     CategoryEvaluationModule,
+    QuizModule,
   ],
   controllers: [],
   providers: [

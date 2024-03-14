@@ -46,7 +46,6 @@ export class VisitService {
     }
   }
 
-  // @deprecated 예정
   async readVisitCount(): Promise<ReadVisitCountOutput> {
     try {
       const count = await this.visit.count();

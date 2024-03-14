@@ -22,26 +22,20 @@ export class SchedulerService {
     private readonly revalidateService: RevalidateService,
   ) {}
   // // 매일 밤 12시
-  // @Cron('0 55 23 * * *', { timeZone: 'Asia/Seoul' })
-  // async clearVisit() {
-  //   if (process.env.NODE_ENV === 'dev') {
-  //     return;
-  //   }
-  //   try {
-  //     const { totalViewCount, todayViewCount } =
-  //       await this.visitService.createVisitHistory();
-  //     await this.visitService.clearVisit();
-  //     await this.telegramService.sendMessageToTelegram({
-  //       message: `오늘의 방문자수는 ${todayViewCount}명입니다.\n지금까지 총 방문자수는 ${totalViewCount}명입니다.`,
-  //       channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
-  //     });
-  //   } catch {
-  //     await this.telegramService.sendMessageToTelegram({
-  //       message: `방문자수 기록 실패`,
-  //       channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
-  //     });
-  //   }
-  // }
+  @Cron('0 59 23 * * *', { timeZone: 'Asia/Seoul' })
+  async clearVisit() {
+    if (process.env.NODE_ENV === 'dev') {
+      return;
+    }
+    try {
+      await this.visitService.clearVisit();
+    } catch {
+      await this.telegramService.sendMessageToTelegram({
+        message: `방문자수 초기화 실패`,
+        channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
+      });
+    }
+  }
 
   @Cron('0 55 23 * * *', { timeZone: 'Asia/Seoul' })
   async resetSolveLimit() {

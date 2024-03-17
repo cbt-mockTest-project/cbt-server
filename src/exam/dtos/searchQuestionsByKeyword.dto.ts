@@ -6,6 +6,8 @@ import { MockExamQuestion } from '../entities/mock-exam-question.entity';
 export class SearchQuestionsByKeywordInput {
   @Field(() => String)
   keyword: string;
+  @Field(() => [Number], { defaultValue: [] })
+  examIds: number[];
 }
 
 @ObjectType()

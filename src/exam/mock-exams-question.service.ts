@@ -949,9 +949,9 @@ export class MockExamQuestionService {
     searchQuestionsByKeywordInput: SearchQuestionsByKeywordInput,
   ): Promise<SearchQuestionsByKeywordOutput> {
     try {
-      const { keyword } = searchQuestionsByKeywordInput;
+      const { keyword, examIds } = searchQuestionsByKeywordInput;
       const formattedKeyword = `%${keyword.replace(/\s+/g, '').toLowerCase()}%`;
-      let questions = await this.mockExamQuestion
+      let searchQuestionsByKeywordQuery = this.mockExamQuestion
         .createQueryBuilder('question')
         .leftJoinAndSelect('question.mockExam', 'mockExam')
         .leftJoinAndSelect('question.user', 'user')
@@ -959,8 +959,14 @@ export class MockExamQuestionService {
           "(LOWER(REPLACE(question.question, ' ', '')) LIKE :formattedKeyword OR LOWER(REPLACE(question.solution, ' ', '')) LIKE :formattedKeyword) AND mockExam.approved = true",
           { formattedKeyword },
         )
-        .limit(30)
-        .getMany();
+        .limit(30);
+      if (examIds.length > 0) {
+        searchQuestionsByKeywordQuery = searchQuestionsByKeywordQuery.andWhere(
+          'mockExam.id IN (:...examIds)',
+          { examIds },
+        );
+      }
+      let questions = await searchQuestionsByKeywordQuery.getMany();
       if (user) {
         const questionBookmarks = await this.mockExamQuestionBookmark.find({
           relations: { question: true },
@@ -1253,62 +1259,18 @@ export class MockExamQuestionService {
 
   async sync() {
     try {
-      const categories = await this.mockExamCategory.find({
-        where: {
-          source: ExamSource.MOUD_CBT,
-          isPublic: true,
-        },
-        relations: { mockExam: true },
-      });
-      const mockExams = categories.flatMap((category) => category.mockExam);
-      const examIds = mockExams.map((exam) => exam.id);
       const questions = await this.mockExamQuestion.find({
         where: {
           mockExam: {
-            id: In(examIds),
+            id: In([690, 691, 682, 683, 709, 688, 678, 689, 681]),
           },
         },
       });
-      const results = await this.mockExamQuestionState
-        .createQueryBuilder('questionState')
-        .select('questionState.questionId', 'questionId')
-        .addSelect('questionState.state', 'state')
-        .addSelect('COUNT(questionState.id)', 'count')
-        .where('questionState.question.id IN (:...questionIds)', {
-          questionIds: questions.map((q) => q.id),
-        })
-        .groupBy('questionState.questionId')
-        .addGroupBy('questionState.state')
-        .getRawMany();
-      let questionStateMap = new Map();
-      results.forEach((result) => {
-        if (!questionStateMap.has(result.questionId)) {
-          questionStateMap.set(result.questionId, {
-            highScore: 0,
-            middleScore: 0,
-            lowScore: 0,
-          });
-        }
-        let state = questionStateMap.get(result.questionId);
-        if (result.state === QuestionState.HIGH)
-          state.highScore = parseInt(result.count);
-        else if (result.state === QuestionState.MIDDLE)
-          state.middleScore = parseInt(result.count);
-        else if (result.state === QuestionState.ROW)
-          state.lowScore = parseInt(result.count);
+      questions.forEach((question) => {
+        question.question = question.question.replace(/\n/g, '<br/>');
+        question.solution = question.solution.replace(/\n/g, '<br/>');
+        this.mockExamQuestion.save(question);
       });
-      await Promise.all(
-        questions.map(async (question) => {
-          const stateScores = questionStateMap.get(question.id);
-          if (stateScores) {
-            question.highScore = stateScores.highScore;
-            question.middleScore = stateScores.middleScore;
-            question.lowScore = stateScores.lowScore;
-            await this.mockExamQuestion.save(question);
-          }
-        }),
-      );
-
       return {
         ok: true,
       };

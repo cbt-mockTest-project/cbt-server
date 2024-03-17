@@ -232,39 +232,40 @@ export class MockExamCategoryService {
       const where:
         | FindOptionsWhere<MockExamCategory>
         | FindOptionsWhere<MockExamCategory>[] = [];
-      if (examSource) {
-        where.push({
-          source: examSource,
-          isPublic: true,
-        });
-        if (!isPublicOnly && user) {
+      if (user?.role !== UserRole.ADMIN) {
+        if (examSource) {
           where.push({
             source: examSource,
-            isPublic: false,
-            user: {
-              id: user.id,
-            },
+            isPublic: true,
           });
+          if (!isPublicOnly && user) {
+            where.push({
+              source: examSource,
+              isPublic: false,
+              user: {
+                id: user.id,
+              },
+            });
+          }
         }
-      }
 
-      if (categoryMakerId) {
-        where.push({
-          user: {
-            id: categoryMakerId,
-          },
-          isPublic: true,
-        });
-        if (!isPublicOnly && user?.id === categoryMakerId) {
+        if (categoryMakerId) {
           where.push({
             user: {
               id: categoryMakerId,
             },
-            isPublic: false,
+            isPublic: true,
           });
+          if (!isPublicOnly && user?.id === categoryMakerId) {
+            where.push({
+              user: {
+                id: categoryMakerId,
+              },
+              isPublic: false,
+            });
+          }
         }
       }
-
       const categoryFindOption: FindManyOptions<MockExamCategory> = {
         where,
         relations: {

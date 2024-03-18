@@ -324,7 +324,7 @@ export class User extends CoreEntity {
   @Field(() => Number, { defaultValue: 10, nullable: true })
   solveLimit?: number;
 
-  @Column({ default: 2 })
+  @Column({ default: 1 })
   @Field(() => Number, { nullable: true })
   randomExamLimit?: number;
 

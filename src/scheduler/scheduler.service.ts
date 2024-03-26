@@ -95,41 +95,39 @@ export class SchedulerService {
   // 오전 4시
   @Cron('0 0 4 * * *', { timeZone: 'Asia/Seoul' })
   async revalidateQuestion() {
-    try {
-      if (process.env.NODE_ENV === 'dev') {
-        return;
-      }
-
-      async function* generateBatches(questionIds, batchSize) {
-        for (let i = 0; i < questionIds.length; i += batchSize) {
-          yield questionIds.slice(i, i + batchSize);
-        }
-      }
-
-      const res = await this.mockExamQuestions.find();
-      const questionIds = res.map((el) => el.id);
-      const batchSize = 30; // 한 번에 처리할 질문의 수
-      for await (const batch of generateBatches(questionIds, batchSize)) {
-        await Promise.all(
-          batch.map((id) =>
-            this.revalidateService.revalidate({
-              path: `/question/${id}`,
-            }),
-          ),
-        );
-        await new Promise((resolve) => setTimeout(resolve, 5000));
-      }
-      this.telegramService.sendMessageToTelegram({
-        message: `cronjob: revalidate success`,
-        channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
-      });
-    } catch {
-      this.telegramService.sendMessageToTelegram({
-        message: `cronjob: revalidate error`,
-        channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
-      });
-      console.log('cronjob: revalidate error');
-    }
+    // try {
+    //   if (process.env.NODE_ENV === 'dev') {
+    //     return;
+    //   }
+    //   async function* generateBatches(questionIds, batchSize) {
+    //     for (let i = 0; i < questionIds.length; i += batchSize) {
+    //       yield questionIds.slice(i, i + batchSize);
+    //     }
+    //   }
+    //   const res = await this.mockExamQuestions.find();
+    //   const questionIds = res.map((el) => el.id);
+    //   const batchSize = 30; // 한 번에 처리할 질문의 수
+    //   for await (const batch of generateBatches(questionIds, batchSize)) {
+    //     await Promise.all(
+    //       batch.map((id) =>
+    //         this.revalidateService.revalidate({
+    //           path: `/question/${id}`,
+    //         }),
+    //       ),
+    //     );
+    //     await new Promise((resolve) => setTimeout(resolve, 5000));
+    //   }
+    //   this.telegramService.sendMessageToTelegram({
+    //     message: `cronjob: revalidate success`,
+    //     channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
+    //   });
+    // } catch {
+    //   this.telegramService.sendMessageToTelegram({
+    //     message: `cronjob: revalidate error`,
+    //     channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
+    //   });
+    //   console.log('cronjob: revalidate error');
+    // }
   }
 
   //3분에 한번

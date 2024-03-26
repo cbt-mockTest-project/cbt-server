@@ -135,21 +135,21 @@ export class SchedulerService {
   }
 
   //3분에 한번
-  @Interval(1000 * 60 * 1)
-  async pong() {
-    try {
-      if (process.env.NODE_ENV === 'dev') {
-        return;
-      }
-      const clientUrl = this.configService.get('CLIENT_URL');
-      await axios.get(clientUrl);
-    } catch {
-      this.telegramService.sendMessageToTelegram({
-        message: `cronjob: ping error`,
-        channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
-      });
-    }
-  }
+  // @Interval(1000 * 60 * 1)
+  // async pong() {
+  //   try {
+  //     if (process.env.NODE_ENV === 'dev') {
+  //       return;
+  //     }
+  //     const clientUrl = this.configService.get('CLIENT_URL');
+  //     await axios.get(clientUrl);
+  //   } catch {
+  //     this.telegramService.sendMessageToTelegram({
+  //       message: `cronjob: ping error`,
+  //       channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
+  //     });
+  //   }
+  // }
 
   // 1시간에 1번
   // @Interval(1000 * 60 * 60)

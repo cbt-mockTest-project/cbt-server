@@ -8,7 +8,6 @@ import { Repository } from 'typeorm';
 import { VisitService } from 'src/visit/visit.service';
 import { UserService } from 'src/users/user.service';
 import { RevalidateService } from 'src/revalidate/revalidate.service';
-import axios from 'axios';
 
 @Injectable()
 export class SchedulerService {
@@ -95,7 +94,6 @@ export class SchedulerService {
 
   // 오전 4시
   @Cron('0 0 4 * * *', { timeZone: 'Asia/Seoul' })
-  @Interval(10000)
   async revalidateQuestion() {
     try {
       if (process.env.NODE_ENV === 'dev') {

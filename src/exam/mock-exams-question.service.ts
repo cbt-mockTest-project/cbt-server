@@ -472,6 +472,7 @@ export class MockExamQuestionService {
       const questions = await this.mockExamQuestion.find({
         ...(page ? { skip: (page - 1) * limit } : {}),
         ...(limit ? { take: limit } : {}),
+        order: { id: 'ASC' },
       });
       return {
         questions,

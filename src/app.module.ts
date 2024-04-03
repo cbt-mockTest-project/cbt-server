@@ -103,6 +103,7 @@ import { QuizModule } from './quiz/quiz.module';
 import { Quiz } from './quiz/entities/quiz.entity';
 import { QuizComment } from './quiz/entities/quizComment.entity';
 import { QuizCommentLike } from './quiz/entities/quizCommentLike.entity';
+import { CoupangModule } from './coupang/coupang.module';
 
 @Module({
   imports: [
@@ -254,6 +255,7 @@ import { QuizCommentLike } from './quiz/entities/quizCommentLike.entity';
     SchedulerModule,
     MailModule,
     RootModule,
+    CoupangModule,
     VisitModule,
     MailerModule.forRoot({
       transport: `smtps://${process.env.EMAIL_AUTH_EMAIL}:${process.env.EMAIL_AUTH_PASSWORD}@${process.env.EMAIL_HOST}`,

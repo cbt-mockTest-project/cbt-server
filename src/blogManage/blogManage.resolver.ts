@@ -8,6 +8,10 @@ import {
   NaverBlogViewMacroOutput,
 } from './dtos/naverBlogViewMacro.dto';
 import { BlogManageService } from './blogManage.service';
+import {
+  GetKewordSearchCountInput,
+  GetKewordSearchCountOutput,
+} from './dtos/getKewordSearchCount.dto';
 
 @Resolver()
 export class BlogManageResolver {
@@ -26,5 +30,15 @@ export class BlogManageResolver {
     naverBlogViewMacroInput: NaverBlogViewMacroInput,
   ): Promise<NaverBlogViewMacroOutput> {
     return this.blogManageService.naverBlogViewMacro(naverBlogViewMacroInput);
+  }
+
+  @Query(() => GetKewordSearchCountOutput)
+  async getKewordSearchCount(
+    @Args('input')
+    getKewordSearchCountInput: GetKewordSearchCountInput,
+  ): Promise<GetKewordSearchCountOutput> {
+    return this.blogManageService.getKewordSearchCount(
+      getKewordSearchCountInput,
+    );
   }
 }

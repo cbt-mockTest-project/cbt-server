@@ -14,6 +14,11 @@ import {
   NaverBlogViewMacroInput,
   NaverBlogViewMacroOutput,
 } from './dtos/naverBlogViewMacro.dto';
+import {
+  GetKewordSearchCountInput,
+  GetKewordSearchCountOutput,
+  NaverKeywordSearchCount,
+} from './dtos/getKewordSearchCount.dto';
 
 @Injectable()
 export class BlogManageService {
@@ -222,6 +227,33 @@ export class BlogManageService {
         message: '블로그 매크로 실패',
         channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
       });
+      return {
+        ok: false,
+      };
+    }
+  }
+  async getKewordSearchCount(
+    getKewordSearchCountInput: GetKewordSearchCountInput,
+  ): Promise<GetKewordSearchCountOutput> {
+    try {
+      console.log(process.env.NAVER_SEARCHAD_API_KEY);
+      const { keyword } = getKewordSearchCountInput;
+      const endPoint = `https://manage.searchad.naver.com/keywordstool?format=json&hintKeywords=${encodeURIComponent(
+        keyword,
+      )}`;
+      const { data } = await axios.get<{
+        keywordList: NaverKeywordSearchCount[];
+      }>(endPoint, {
+        headers: {
+          authorization: 'Bearer ' + process.env.NAVER_SEARCHAD_API_KEY,
+        },
+      });
+      return {
+        ok: true,
+        keywordList: data.keywordList,
+      };
+    } catch (e) {
+      console.log(e);
       return {
         ok: false,
       };

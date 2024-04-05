@@ -11,14 +11,13 @@ import * as Joi from 'joi';
 import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
 import { CommonModule } from './common/common.module';
-import { BlogManageModule } from './blogManage/blogManage.module';
+import { BlogManageModule } from './blogManage/blog-manage.module';
 import { ExamCoAuthor } from './exam-co-author/entities/exam-co-author.entity';
 import { ExamCoAuthorModule } from './exam-co-author/exam-co-author.module';
 import { JwtModule } from './jwt/jwt.module';
 import logger from './lib/logger';
 import { LoggingInterceptor } from './logging.interceptor';
 import { MailModule } from './mail/mail.module';
-
 import { MockExamHistory } from './exam/entities/mock-exam-history';
 import { MockExamQuestionBookmark } from './exam/entities/mock-exam-question-bookmark.entity';
 import { MockExamQuestionCommentLike } from './exam/entities/mock-exam-question-comment-like.entity';
@@ -103,6 +102,7 @@ import { QuizModule } from './quiz/quiz.module';
 import { Quiz } from './quiz/entities/quiz.entity';
 import { QuizComment } from './quiz/entities/quizComment.entity';
 import { QuizCommentLike } from './quiz/entities/quizCommentLike.entity';
+import { NaverBlog } from './blogManage/entities/naver-blog.entity';
 
 @Module({
   imports: [
@@ -173,6 +173,7 @@ import { QuizCommentLike } from './quiz/entities/quizCommentLike.entity';
       synchronize: process.env.NODE_ENV !== 'prod',
       logging: false,
       entities: [
+        NaverBlog,
         ExamCoAuthor,
         QuestionCard,
         QuestionCardCategory,

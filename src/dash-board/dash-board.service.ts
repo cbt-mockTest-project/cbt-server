@@ -16,7 +16,6 @@ export class DashBoardService {
   async getSearchdRank(getSearchRankInput: GetSearchRankInput) {
     try {
       const { keyword, blogId } = getSearchRankInput;
-
       let naverPostOffSet = 1;
       let daumPostPage = 1;
 

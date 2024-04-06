@@ -8,6 +8,7 @@ import { Repository } from 'typeorm';
 import { VisitService } from 'src/visit/visit.service';
 import { UserService } from 'src/users/user.service';
 import { RevalidateService } from 'src/revalidate/revalidate.service';
+import { BlogManageService } from 'src/blogManage/blog-manage.service';
 
 @Injectable()
 export class SchedulerService {
@@ -19,7 +20,24 @@ export class SchedulerService {
     private readonly telegramService: TelegramService,
     private readonly userService: UserService,
     private readonly revalidateService: RevalidateService,
+    private readonly blogManageSevice: BlogManageService,
   ) {}
+  //  30분 마다
+  @Interval(1000 * 60 * 30)
+  async updateRefreshToken() {
+    try {
+      if (process.env.NODE_ENV === 'dev') {
+        return;
+      }
+      await this.blogManageSevice.getRefreshtoken();
+    } catch {
+      this.telegramService.sendMessageToTelegram({
+        message: `cronjob: updateRefreshToken error`,
+        channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
+      });
+    }
+  }
+
   // // 매일 밤 12시
   @Cron('0 59 23 * * *', { timeZone: 'Asia/Seoul' })
   async clearVisit() {

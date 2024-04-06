@@ -253,12 +253,22 @@ export class BlogManageService {
       };
     }
   }
-
-  async getRefreshtoken(refreshToken: string) {
+  async getRefreshtoken() {
     try {
+      const refreshToken = await this.blogStorage.findOne({
+        where: {
+          key: 'refreshToken',
+        },
+      });
+
       const { data } = await axios.put<{ token: string; refreshToken: string }>(
-        `https://atower.searchad.naver.com/auth/local/extend?refreshToken=${refreshToken}`,
+        `https://atower.searchad.naver.com/auth/local/extend?refreshToken=${refreshToken.value}`,
       );
+      if (refreshToken.value !== data.refreshToken) {
+        await this.blogStorage.update('refreshToken', {
+          value: data.refreshToken,
+        });
+      }
       return data;
     } catch (e) {
       console.log(e);
@@ -269,12 +279,7 @@ export class BlogManageService {
     getKeywordSearchCountInput: GetKeywordSearchCountInput,
   ): Promise<GetKeywordSearchCountOutput> {
     try {
-      const refreshToken = await this.blogStorage.findOne({
-        where: {
-          key: 'refreshToken',
-        },
-      });
-      const token = await this.getRefreshtoken(refreshToken.value);
+      const token = await this.getRefreshtoken();
       const { keyword } = getKeywordSearchCountInput;
       const endPoint = `https://manage.searchad.naver.com/keywordstool?format=json&hintKeywords=${encodeURIComponent(
         keyword.replace(/ /g, '').trim(),

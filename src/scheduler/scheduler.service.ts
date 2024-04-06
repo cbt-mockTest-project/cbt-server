@@ -23,20 +23,20 @@ export class SchedulerService {
     private readonly blogManageSevice: BlogManageService,
   ) {}
   //  30분 마다
-  @Interval(1000 * 60 * 30)
-  async updateRefreshToken() {
-    try {
-      if (process.env.NODE_ENV === 'dev') {
-        return;
-      }
-      await this.blogManageSevice.getRefreshtoken();
-    } catch {
-      this.telegramService.sendMessageToTelegram({
-        message: `cronjob: updateRefreshToken error`,
-        channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
-      });
-    }
-  }
+  // @Interval(1000 * 60 * 30)
+  // async updateRefreshToken() {
+  //   try {
+  //     if (process.env.NODE_ENV === 'dev') {
+  //       return;
+  //     }
+  //     await this.blogManageSevice.getRefreshtoken();
+  //   } catch {
+  //     this.telegramService.sendMessageToTelegram({
+  //       message: `cronjob: updateRefreshToken error`,
+  //       channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
+  //     });
+  //   }
+  // }
 
   // // 매일 밤 12시
   @Cron('0 59 23 * * *', { timeZone: 'Asia/Seoul' })

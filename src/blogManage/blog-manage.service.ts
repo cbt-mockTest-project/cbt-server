@@ -36,6 +36,12 @@ import {
   GetSearchRankInput,
   GetSearchRankOutput,
 } from './dtos/get-search-rank.dto';
+import {
+  BlogInfo,
+  BlogVisitor,
+  GetBlogInfoInput,
+  GetBlogInfoOutput,
+} from './dtos/get-blog-info.dto';
 
 @Injectable()
 export class BlogManageService {
@@ -260,10 +266,14 @@ export class BlogManageService {
           key: 'refreshToken',
         },
       });
-
-      const { data } = await axios.put<{ token: string; refreshToken: string }>(
-        `https://atower.searchad.naver.com/auth/local/extend?refreshToken=${refreshToken.value}`,
-      );
+      const { data } = await axios.post<{
+        token: string;
+        refreshToken: string;
+      }>(`https://searchad.naver.com/auth/local/naver-cookie`, undefined, {
+        headers: {
+          cookie: `NID_AUT=${process.env.NID_AUT};NID_SES=${process.env.NID_SES};`,
+        },
+      });
       if (refreshToken.value !== data.refreshToken) {
         await this.blogStorage.update('refreshToken', {
           value: data.refreshToken,
@@ -493,6 +503,64 @@ export class BlogManageService {
       };
     } catch (e) {
       console.log(e);
+      return {
+        ok: false,
+      };
+    }
+  }
+
+  async getBlogVisitiorCount(blogId: string) {
+    try {
+      const { data } = await axios.get(
+        `https://blog.naver.com/NVisitorgp4Ajax.nhn?blogId=${blogId}`,
+      );
+      const visitorCountList: BlogVisitor[] = [];
+      const $ = load(data);
+      $('visitorcnt').each((i, el) => {
+        const visitorCount = {
+          date:
+            $(el).attr('id').slice(2, 4) +
+            '-' +
+            $(el).attr('id').slice(4, 6) +
+            '-' +
+            $(el).attr('id').slice(6, 8),
+          visitor: $(el).attr('cnt'),
+        };
+        visitorCountList.unshift(visitorCount);
+      });
+      return visitorCountList;
+    } catch {
+      return [];
+    }
+  }
+
+  async getInfluencerUrl(blogId: string) {
+    const influencerEndPoint = `https://in.naver.com/${blogId}`;
+    try {
+      await axios.get(influencerEndPoint);
+      return influencerEndPoint;
+    } catch {
+      return '';
+    }
+  }
+
+  async getBlogInfo(
+    getBlogInfoInput: GetBlogInfoInput,
+  ): Promise<GetBlogInfoOutput> {
+    try {
+      const { blogId } = getBlogInfoInput;
+      const blogInfo: BlogInfo = {
+        influencerUrl: '',
+      };
+      const influencerUrl = await this.getInfluencerUrl(blogId);
+      const blogVisitor = await this.getBlogVisitiorCount(blogId);
+      blogInfo.influencerUrl = influencerUrl;
+      blogInfo.blogVisitor = blogVisitor;
+      return {
+        blogInfo,
+        ok: true,
+      };
+    } catch (e) {
       return {
         ok: false,
       };

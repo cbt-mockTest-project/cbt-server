@@ -33,4 +33,6 @@ export class NaverPostInfo {
   titleWithInspectMessage: string;
   @Field(() => Boolean)
   isSearchAvailability: boolean;
+  @Field(() => Number)
+  thumbnailCount: number;
 }

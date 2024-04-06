@@ -16,6 +16,18 @@ export class BlogInfo {
 
   @Field(() => [BlogVisitor], { nullable: true, defaultValue: [] })
   blogVisitor?: BlogVisitor[];
+
+  @Field(() => Number)
+  subscriberCount: number;
+
+  @Field(() => String)
+  blogName: string;
+
+  @Field(() => String)
+  blogDirectoryName: string;
+
+  @Field(() => Number)
+  totalVisitorCount: number;
 }
 
 @InputType()

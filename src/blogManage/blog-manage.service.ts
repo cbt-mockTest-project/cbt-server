@@ -42,6 +42,10 @@ import {
   GetBlogInfoInput,
   GetBlogInfoOutput,
 } from './dtos/get-blog-info.dto';
+import {
+  GetBlogInfoFromNaverInput,
+  NaverBlogInfo,
+} from './dtos/get-blog-info-from-naver.dto';
 
 @Injectable()
 export class BlogManageService {
@@ -321,7 +325,8 @@ export class BlogManageService {
     getSearchAvailabilityInput: GetSearchAvailabilityInput,
   ): Promise<GetSearchAvailabilityOutput> {
     try {
-      const { blogId, itemCount, page } = getSearchAvailabilityInput;
+      const { itemCount, page } = getSearchAvailabilityInput;
+      const blogId = this.extractBlogId(getSearchAvailabilityInput.blogId);
       const getPostsEndPoint = `https://m.blog.naver.com/api/blogs/${blogId}/post-list?categoryNo=0&itemCount=${itemCount}&page=${page}`;
 
       const { data } = await axios.get<{
@@ -339,7 +344,6 @@ export class BlogManageService {
           error: '블로그 포스트를 가져올 수 없습니다.',
         };
       }
-
       const searchAvailabilityInfos = await Promise.all(
         data.result.items.map(async (post) => {
           let isSearchAvailability = false;
@@ -355,6 +359,7 @@ export class BlogManageService {
             sympathyCnt: post.sympathyCnt,
             titleWithInspectMessage: post.titleWithInspectMessage,
             logNo: post.logNo,
+            thumbnailCount: post.thumbnailCount,
             isSearchAvailability,
           };
         }),
@@ -380,7 +385,7 @@ export class BlogManageService {
     getBlogCategoryListInput: GetBlogCategoryListInput,
   ): Promise<GetBlogCategoryListOutput> {
     try {
-      const { blogId } = getBlogCategoryListInput;
+      const blogId = this.extractBlogId(getBlogCategoryListInput.blogId);
       const endPoint = `https://m.blog.naver.com/api/blogs/${blogId}/category-list`;
       const { data } = await axios.get<{
         isSuccess: boolean;
@@ -391,7 +396,6 @@ export class BlogManageService {
         },
       });
 
-      console.log(data);
       if (!data.isSuccess) {
         return {
           ok: false,
@@ -416,7 +420,8 @@ export class BlogManageService {
     getSearchRankInput: GetSearchRankInput,
   ): Promise<GetSearchRankOutput> {
     try {
-      const { keyword, blogId } = getSearchRankInput;
+      const { keyword } = getSearchRankInput;
+      const blogId = this.extractBlogId(getSearchRankInput.blogId);
       let naverPostOffSet = 1;
       let daumPostPage = 1;
 
@@ -544,18 +549,58 @@ export class BlogManageService {
     }
   }
 
+  async getBlogInfoFromNaver(
+    getBlogInfoFromNaverInput: GetBlogInfoFromNaverInput,
+  ) {
+    const blogId = this.extractBlogId(getBlogInfoFromNaverInput.blogId);
+    try {
+      const { data } = await axios.get(
+        `
+        https://m.blog.naver.com/rego/BlogInfo.naver?blogId=${blogId}`,
+        {
+          headers: {
+            referer: `https://m.blog.naver.com/${blogId}`,
+            accept: 'application/json',
+          },
+        },
+      );
+      const parsedData = JSON.parse(
+        JSON.stringify(data.replace(`)]}',`, '').trim()),
+      );
+      return JSON.parse(parsedData).result as NaverBlogInfo;
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
+  }
+
   async getBlogInfo(
     getBlogInfoInput: GetBlogInfoInput,
   ): Promise<GetBlogInfoOutput> {
     try {
-      const { blogId } = getBlogInfoInput;
+      const blogId = this.extractBlogId(getBlogInfoInput.blogId);
       const blogInfo: BlogInfo = {
         influencerUrl: '',
+        blogVisitor: [],
+        subscriberCount: 0,
+        totalVisitorCount: 0,
+        blogName: '',
+        blogDirectoryName: '',
       };
-      const influencerUrl = await this.getInfluencerUrl(blogId);
-      const blogVisitor = await this.getBlogVisitiorCount(blogId);
+      const [influencerUrl, blogVisitor, naverBlogInfo] = await Promise.all([
+        this.getInfluencerUrl(blogId),
+        this.getBlogVisitiorCount(blogId),
+        this.getBlogInfoFromNaver({ blogId }),
+      ]);
       blogInfo.influencerUrl = influencerUrl;
       blogInfo.blogVisitor = blogVisitor;
+      if (naverBlogInfo) {
+        blogInfo.blogName = naverBlogInfo.blogName;
+        blogInfo.blogDirectoryName = naverBlogInfo.blogDirectoryName;
+        blogInfo.subscriberCount = naverBlogInfo.subscriberCount;
+        blogInfo.totalVisitorCount = naverBlogInfo.totalVisitorCount;
+      }
+
       return {
         blogInfo,
         ok: true,
@@ -565,6 +610,12 @@ export class BlogManageService {
         ok: false,
       };
     }
+  }
+
+  extractBlogId(urlOrId: string) {
+    // URL에서 호스트 이름 다음에 오는 첫 번째 경로 세그먼트를 blogId로 간주합니다.
+    const match = urlOrId.match(/blog\.naver\.com\/([^\/\?]+)\/?/);
+    return match ? match[1] : urlOrId;
   }
 }
 

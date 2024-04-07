@@ -10,9 +10,16 @@ import { GetBlogPostsResponse } from 'src/types/dash-board';
 import { GetNaverBlogVisitorCountInput } from './dtos/get-naver-blog-visitior-count.dto';
 import { format } from 'date-fns';
 import { GetMacroHistoryInput } from './dtos/get-macro.history';
+import { InjectRepository } from '@nestjs/typeorm';
+import { NaverBlog } from 'src/blogManage/entities/naver-blog.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class DashBoardService {
+  constructor(
+    @InjectRepository(NaverBlog)
+    private readonly blogStorage: Repository<NaverBlog>,
+  ) {}
   async getSearchdRank(getSearchRankInput: GetSearchRankInput) {
     try {
       const { keyword, blogId } = getSearchRankInput;
@@ -157,7 +164,6 @@ export class DashBoardService {
       };
     }
   }
-
   async getNaverBlogVisitorCount(
     getNaverBlogVisitorCountInput: GetNaverBlogVisitorCountInput,
   ) {
@@ -191,7 +197,6 @@ export class DashBoardService {
       };
     }
   }
-
   async getMacroHistory(getMacroHistoryInput: GetMacroHistoryInput) {
     try {
       const getGoogleSheet = async () => {
@@ -245,6 +250,24 @@ export class DashBoardService {
         result,
         ok: true,
       };
+    } catch (e) {
+      console.log(e);
+    }
+  }
+  async saveNaverAuth(NID_SES: string, NID_AUT: string) {
+    try {
+      await this.blogStorage.save(
+        this.blogStorage.create({
+          key: 'NID_SES',
+          value: NID_SES,
+        }),
+      );
+      await this.blogStorage.save(
+        this.blogStorage.create({
+          key: 'NID_AUT',
+          value: NID_AUT,
+        }),
+      );
     } catch (e) {
       console.log(e);
     }

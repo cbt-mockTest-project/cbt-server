@@ -265,9 +265,14 @@ export class BlogManageService {
   }
   async getRefreshtoken() {
     try {
-      const refreshToken = await this.blogStorage.findOne({
+      const NID_SES = await this.blogStorage.findOne({
         where: {
-          key: 'refreshToken',
+          key: 'NID_SES',
+        },
+      });
+      const NID_AUT = await this.blogStorage.findOne({
+        where: {
+          key: 'NID_AUT',
         },
       });
       const { data } = await axios.post<{
@@ -275,14 +280,9 @@ export class BlogManageService {
         refreshToken: string;
       }>(`https://searchad.naver.com/auth/local/naver-cookie`, undefined, {
         headers: {
-          cookie: `NID_AUT=${process.env.NID_AUT};NID_SES=${process.env.NID_SES};`,
+          cookie: `NID_AUT=${NID_AUT.value};NID_SES=${NID_SES.value};`,
         },
       });
-      if (refreshToken.value !== data.refreshToken) {
-        await this.blogStorage.update('refreshToken', {
-          value: data.refreshToken,
-        });
-      }
       return data;
     } catch (e) {
       console.log(e);
@@ -600,7 +600,6 @@ export class BlogManageService {
         blogInfo.subscriberCount = naverBlogInfo.subscriberCount;
         blogInfo.totalVisitorCount = naverBlogInfo.totalVisitorCount;
       }
-
       return {
         blogInfo,
         ok: true,

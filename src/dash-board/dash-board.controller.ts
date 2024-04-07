@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { DashBoardService } from './dash-board.service';
 import { GetSearchRankInput } from './dtos/get-search-rank.dto';
 import { GetSearchAvailabilityInput } from './dtos/get-search-availability';
@@ -35,5 +35,10 @@ export class DashBoardController {
   @Get('macro-history')
   getMacroHistory(@Query() getMacroHistoryInput: GetMacroHistoryInput) {
     return this.dashBoardService.getMacroHistory(getMacroHistoryInput);
+  }
+
+  @Post('save-naver-auth')
+  saveNaverAuth(@Body() body: { NID_AUT: string; NID_SES: string }) {
+    return this.dashBoardService.saveNaverAuth(body.NID_SES, body.NID_AUT);
   }
 }

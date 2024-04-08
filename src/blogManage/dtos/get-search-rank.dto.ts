@@ -16,7 +16,10 @@ export class GetSearchRankOutput extends CoreOutput {
   naverBlogSearchRank?: number;
 
   @Field(() => Number, { nullable: true, defaultValue: 0 })
-  daumBlogSearchRank?: number;
+  naverSmartSearchRank?: number;
+
+  @Field(() => String, { nullable: true, defaultValue: '' })
+  naverSmartSearchTitle?: string;
 
   @Field(() => String, { nullable: true })
   postLink?: string;

@@ -423,21 +423,58 @@ export class BlogManageService {
       const { keyword } = getSearchRankInput;
       const blogId = this.extractBlogId(getSearchRankInput.blogId);
       let naverPostOffSet = 1;
-      let daumPostPage = 1;
-
       let naverBlogSearchRank = 0;
-      let daumBlogSearchRank = 0;
+      let naverSmartSearchRank = 0;
+      let naverSmartSearchTitle = '';
       let postLink = '';
 
       const naverBlogSearchLink = (start: number) =>
         `https://search.naver.com/search.naver?ssc=tab.blog.all&query=${encodeURIComponent(
           keyword,
         )}&start=${start}`;
-      const daumBlogSearchLink = (page: number) =>
-        `https://m.search.daum.net/search?p=${page}&q=${encodeURIComponent(
-          keyword,
-        )}&col=blog&w=fusion&DA=TWC`;
+      const naverBasicSearchLink = `https://m.search.naver.com/search.naver?sm=mtb_hty.top&where=m&ssc=tab.m.all&9&query=${encodeURIComponent(
+        keyword,
+      )}`;
+      const { data } = await axios.get(naverBasicSearchLink);
+      const $ = load(data);
+      $('a.name').each((i, el) => {
+        if ($(el).attr('href').split('/')[3] === blogId) {
+          naverSmartSearchTitle = $(el)
+            .parents('.api_subject_bx')
+            .find('.title')
+            .text();
+          let rankCount = 0;
+          $(el)
+            .parents('.api_subject_bx')
+            .find('ul')
+            .find('a.name')
+            .each((i, el) => {
+              rankCount++;
+              if ($(el).attr('href').includes(blogId)) {
+                naverSmartSearchRank = rankCount;
+              }
+            });
+        }
+      });
 
+      $('a.fds-thumb-anchor').each((i, el) => {
+        if ($(el).attr('href').split('/')[3].split('?')[0] === blogId) {
+          naverSmartSearchTitle = $(el)
+            .parents('.api_subject_bx')
+            .find('.fds-comps-header-headline')
+            .text();
+          let rankCount = 0;
+          $(el)
+            .parents('.api_subject_bx')
+            .find('a.fds-thumb-anchor')
+            .each((i, el) => {
+              rankCount++;
+              if ($(el).attr('href').includes(blogId)) {
+                naverSmartSearchRank = rankCount;
+              }
+            });
+        }
+      });
       while (naverPostOffSet < 100) {
         const { data } = await axios.get(naverBlogSearchLink(naverPostOffSet));
         const $ = load(data);
@@ -473,37 +510,11 @@ export class BlogManageService {
         naverPostOffSet += 30;
       }
 
-      while (daumPostPage < 10) {
-        const { data } = await axios.get(daumBlogSearchLink(daumPostPage));
-        const $ = load(data);
-        const postBoxList = $(daumBlogSearchClassMap.postBox.tag);
-        if (!postBoxList.text()) break;
-        postBoxList.each((i, el) => {
-          if (daumPostPage !== 10) {
-            daumBlogSearchRank++;
-          }
-          if (daumBlogSearchRank > 100) {
-            daumBlogSearchRank = 0;
-            daumPostPage = 10;
-          }
-
-          const foundPostLink = $(el)
-            .find(daumBlogSearchClassMap.postBox.children.header.tag)
-            .html()
-            .match(/data-link="([^"]+)"/)[1]
-            .replace('m.', '');
-
-          if (foundPostLink.split('/')[3] === blogId) {
-            daumPostPage = 10; // 반복 종료 트리거
-            postLink = foundPostLink;
-          }
-        });
-        daumPostPage++;
-      }
       return {
         ok: true,
         naverBlogSearchRank,
-        daumBlogSearchRank,
+        naverSmartSearchTitle,
+        naverSmartSearchRank,
         postLink,
       };
     } catch (e) {

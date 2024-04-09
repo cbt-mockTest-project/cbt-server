@@ -46,6 +46,10 @@ import {
   GetBlogInfoFromNaverInput,
   NaverBlogInfo,
 } from './dtos/get-blog-info-from-naver.dto';
+import {
+  GetBlogPostDetailInput,
+  GetBlogPostDetailOutput,
+} from './dtos/get-blog-post-detail.dto';
 
 @Injectable()
 export class BlogManageService {
@@ -321,6 +325,25 @@ export class BlogManageService {
     }
   }
 
+  async getBlogPostDetail(
+    getBlogPostDetailInput: GetBlogPostDetailInput,
+  ): Promise<GetBlogPostDetailOutput> {
+    const { postId, blogId } = getBlogPostDetailInput;
+    const { data } = await axios.get(
+      `https://m.blog.naver.com/${blogId}/${postId}`,
+    );
+    const textClass = '.se-text-paragraph';
+    const $ = load(data);
+    let textLength = 0;
+    $(textClass).each((i, el) => {
+      textLength += $(el).text().replace(/ /g, '').length;
+    });
+    return {
+      textLength,
+      ok: true,
+    };
+  }
+
   async getSearchAvailability(
     getSearchAvailabilityInput: GetSearchAvailabilityInput,
   ): Promise<GetSearchAvailabilityOutput> {
@@ -337,7 +360,6 @@ export class BlogManageService {
           referer: `https://m.blog.naver.com/${blogId}?tab=1`,
         },
       });
-
       if (!data.isSuccess) {
         return {
           ok: false,
@@ -350,6 +372,10 @@ export class BlogManageService {
           const { data } = await axios.get<string>(
             naverBlogSearchLink(`"${post.titleWithInspectMessage}"`),
           );
+          const { textLength } = await this.getBlogPostDetail({
+            blogId,
+            postId: String(post.logNo),
+          });
           if (data.includes(blogId)) {
             isSearchAvailability = true;
           }
@@ -360,6 +386,7 @@ export class BlogManageService {
             titleWithInspectMessage: post.titleWithInspectMessage,
             logNo: post.logNo,
             thumbnailCount: post.thumbnailCount,
+            textLength,
             isSearchAvailability,
           };
         }),

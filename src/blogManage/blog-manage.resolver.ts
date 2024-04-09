@@ -25,6 +25,10 @@ import {
   GetSearchRankOutput,
 } from './dtos/get-search-rank.dto';
 import { GetBlogInfoInput, GetBlogInfoOutput } from './dtos/get-blog-info.dto';
+import {
+  GetBlogPostDetailInput,
+  GetBlogPostDetailOutput,
+} from './dtos/get-blog-post-detail.dto';
 
 @Resolver()
 export class BlogManageResolver {
@@ -84,5 +88,12 @@ export class BlogManageResolver {
     @Args('input') getBlogInfoInput: GetBlogInfoInput,
   ): Promise<GetBlogInfoOutput> {
     return this.blogManageService.getBlogInfo(getBlogInfoInput);
+  }
+
+  @Query(() => GetBlogPostDetailOutput)
+  async getBlogPostDetail(
+    @Args('input') getPostDetailInfoInput: GetBlogPostDetailInput,
+  ): Promise<GetBlogPostDetailOutput> {
+    return this.blogManageService.getBlogPostDetail(getPostDetailInfoInput);
   }
 }

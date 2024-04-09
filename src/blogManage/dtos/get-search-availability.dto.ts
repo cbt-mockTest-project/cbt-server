@@ -35,4 +35,6 @@ export class NaverPostInfo {
   isSearchAvailability: boolean;
   @Field(() => Number)
   thumbnailCount: number;
+  @Field(() => Number)
+  textLength: number;
 }

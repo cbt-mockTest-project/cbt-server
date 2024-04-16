@@ -41,6 +41,7 @@ import {
   BlogVisitor,
   GetBlogInfoInput,
   GetBlogInfoOutput,
+  InfluencerInfo,
 } from './dtos/get-blog-info.dto';
 import {
   GetBlogInfoFromNaverInput,
@@ -50,6 +51,7 @@ import {
   GetBlogPostDetailInput,
   GetBlogPostDetailOutput,
 } from './dtos/get-blog-post-detail.dto';
+import { InfluencerInfoOrigin } from './interfaces/get-influencer-info';
 
 @Injectable()
 export class BlogManageService {
@@ -579,13 +581,18 @@ export class BlogManageService {
     }
   }
 
-  async getInfluencerUrl(blogId: string) {
-    const influencerEndPoint = `https://in.naver.com/${blogId}`;
+  async getInfluencerInfo(
+    blogId: string,
+  ): Promise<InfluencerInfoOrigin | null> {
+    const influencerEndPoint = `https://gw.in.naver.com/home/api/v1/space-by-channel?serviceId=${blogId}&serviceType=NBLOG`;
     try {
-      await axios.get(influencerEndPoint);
-      return influencerEndPoint;
-    } catch {
-      return '';
+      const { data } = await axios.get<InfluencerInfoOrigin>(
+        influencerEndPoint,
+      );
+      return data;
+    } catch (e) {
+      console.log(e);
+      return null;
     }
   }
 
@@ -620,19 +627,29 @@ export class BlogManageService {
     try {
       const blogId = this.extractBlogId(getBlogInfoInput.blogId);
       const blogInfo: BlogInfo = {
-        influencerUrl: '',
+        influencerInfo: null,
         blogVisitor: [],
         subscriberCount: 0,
         totalVisitorCount: 0,
         blogName: '',
         blogDirectoryName: '',
       };
-      const [influencerUrl, blogVisitor, naverBlogInfo] = await Promise.all([
-        this.getInfluencerUrl(blogId),
+      const [influencerInfo, blogVisitor, naverBlogInfo] = await Promise.all([
+        this.getInfluencerInfo(blogId),
         this.getBlogVisitiorCount(blogId),
         this.getBlogInfoFromNaver({ blogId }),
       ]);
-      blogInfo.influencerUrl = influencerUrl;
+      if (influencerInfo) {
+        const formattedInfluencerInfo: InfluencerInfo = {
+          nickName: influencerInfo.profile.nickName,
+          keyword: influencerInfo.myKeyword.keyword,
+          subscriberCount: influencerInfo.stats.subscriberCount,
+          introduction: influencerInfo.profile.introduction,
+          category: influencerInfo.myKeyword.category,
+          url: `https://in.naver.com/${influencerInfo.urlId}`,
+        };
+        blogInfo.influencerInfo = formattedInfluencerInfo;
+      }
       blogInfo.blogVisitor = blogVisitor;
       if (naverBlogInfo) {
         blogInfo.blogName = naverBlogInfo.blogName;

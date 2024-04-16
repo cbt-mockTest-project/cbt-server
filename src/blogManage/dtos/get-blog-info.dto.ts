@@ -10,9 +10,30 @@ export class BlogVisitor {
 }
 
 @ObjectType()
-export class BlogInfo {
+export class InfluencerInfo {
   @Field(() => String)
-  influencerUrl: string;
+  nickName: string;
+
+  @Field(() => String)
+  keyword: string;
+
+  @Field(() => Number)
+  subscriberCount: number;
+
+  @Field(() => String)
+  introduction: string;
+
+  @Field(() => String)
+  category: string;
+
+  @Field(() => String)
+  url: string;
+}
+
+@ObjectType()
+export class BlogInfo {
+  @Field(() => InfluencerInfo, { nullable: true })
+  influencerInfo: InfluencerInfo | null;
 
   @Field(() => [BlogVisitor], { nullable: true, defaultValue: [] })
   blogVisitor?: BlogVisitor[];

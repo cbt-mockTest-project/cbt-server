@@ -108,12 +108,29 @@ export class MockExamQuestionFeedbackSerivce {
     try {
       const { id, content, type } = editMockExamQuestionFeedbackInput;
       const prevFeedback = await this.mockExamQuestionFeedback.findOne({
-        where: { id, user: { id: user.id } },
+        where: { id },
+        relations: {
+          user: true,
+          mockExamQuestion: {
+            user: true,
+          },
+        },
       });
+
       if (!prevFeedback) {
         return {
           ok: false,
           error: '존재하지 않는 피드백입니다.',
+        };
+      }
+      // 문제 제작자는 수정가능
+      if (
+        prevFeedback.user.id !== user.id &&
+        prevFeedback.mockExamQuestion.user.id !== user.id
+      ) {
+        return {
+          ok: false,
+          error: '권한이 없습니다.',
         };
       }
       prevFeedback.content = content;
@@ -138,10 +155,14 @@ export class MockExamQuestionFeedbackSerivce {
       const { id } = deleteMockExamQuestionFeedbackInput;
       const feedback = await this.mockExamQuestionFeedback.findOne({
         where: { id },
-        relations: { user: true },
+        relations: { user: true, mockExamQuestion: { user: true } },
       });
       // 자신의 글이 아니면 삭제불가, 롤이 어드민이면 무조건 삭제가능
-      if (feedback.user.id !== user.id && user.role !== UserRole.ADMIN) {
+      if (
+        feedback.user.id !== user.id &&
+        user.role !== UserRole.ADMIN &&
+        user.id !== feedback.mockExamQuestion.user.id
+      ) {
         return { ok: false, error: '권한이 없습니다.' };
       }
       if (!feedback) {

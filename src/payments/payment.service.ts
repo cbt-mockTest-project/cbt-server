@@ -117,7 +117,11 @@ export class PaymentService {
       }
       this.telegramService.sendMessageToTelegram({
         channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
-        message: `새로운 결제가 이루어졌습니다. \n결제자: ${user.nickname}\n결제금액: ${price}원\n상품명: ${productName}\n주문번호: ${orderId}`,
+        message: `새로운 결제가 이루어졌습니다. \n결제자: ${
+          user.nickname
+        }\n결제금액: ${price}원\n상품명: ${productName}\n최근학습:${
+          user.recentlyStudiedCategory || ''
+        }`,
       });
       return {
         ok: true,

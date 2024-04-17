@@ -502,10 +502,10 @@ export class UserService {
       if (hasSolvedBefore) user.hasSolvedBefore = hasSolvedBefore;
       if (hasReachedPaymentReminder) {
         user.hasReachedPaymentReminder = hasReachedPaymentReminder;
-        this.telegramService.sendMessageToTelegram({
-          message: `${user.nickname} 님이 결제 리마인더에 도달했습니다.`,
-          channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
-        });
+        // this.telegramService.sendMessageToTelegram({
+        //   message: `${user.nickname} 님이 결제 리마인더에 도달했습니다.`,
+        //   channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
+        // });
       }
       if (typeof randomExamLimit === 'number') {
         user.randomExamLimit = randomExamLimit;

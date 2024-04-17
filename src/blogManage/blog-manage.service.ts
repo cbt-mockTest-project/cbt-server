@@ -72,7 +72,6 @@ export class BlogManageService {
       const naverPostFlickerThumbClass = '.thumb._cross_trigger';
       const naverPostThumbClass = '.thumb.api_get';
       const naverwhereArray = ['view', 'blog'];
-      const daumwhereArray = ['view', 'blog'];
       const rank: SearchCounts = {
         naver: { all: 0, blog: 0, url: '' },
         daum: { all: 0, blog: 0, url: '' },
@@ -130,46 +129,8 @@ export class BlogManageService {
           startNum += 30;
         }
       });
-      const exploreDaum = daumwhereArray.map(async (where) => {
-        const daumUrl = (page: number) =>
-          `https://m.search.daum.net/search?p=${page}&q=${encodeURIComponent(
-            keyword,
-          )}&col=${where}&w=fusion&DA=TWC`;
-        let page = 0;
-        let index = 1;
-        let finished = false;
-        while (page < 10) {
-          page++;
-          const res = await axios.get(daumUrl(page), {
-            headers: { 'Accept-Encoding': 'gzip,deflate,compress' },
-          });
-          const $ = load(res.data);
-          $('c-card').each(function (i, elem) {
-            const postBlogName = $(
-              $(this).html().replace('<c-frag>', '').replace('</c-frag>', ''),
-            )
-              .find('c-frag')
-              .html()
-              .replace(/ /g, '');
-            if (postBlogName.indexOf(blogName.replace(/ /g, '')) > -1) {
-              finished = true;
-              return false;
-            }
-            index++;
-          });
-          if (finished) {
-            rank.daum.url = daumUrl(page);
-            if (where === 'view') {
-              rank.daum.all = index;
-            }
-            if (where === 'blog') {
-              rank.daum.blog = index;
-            }
-            break;
-          }
-        }
-      });
-      await Promise.all([...exploreNaver, ...exploreDaum]);
+
+      await Promise.all([...exploreNaver]);
 
       return {
         ok: true,
@@ -371,17 +332,30 @@ export class BlogManageService {
       const searchAvailabilityInfos = await Promise.all(
         data.result.items.map(async (post) => {
           let isSearchAvailability = false;
-          const { data } = await axios.get<string>(
-            naverBlogSearchLink(
-              `"${removeEmojis(post.titleWithInspectMessage)}"`,
+          const { data } = await axios.get(
+            naverPostSearchForSearchAvailability(
+              `"${removeEmojis(post.titleWithInspectMessage).replace(
+                /"/g,
+                "'",
+              )}"`,
             ),
           );
+
           const { textLength } = await this.getBlogPostDetail({
             blogId,
             postId: String(post.logNo),
           });
-          if (data.includes(blogId)) {
+          if (data.contents.includes(blogId)) {
             isSearchAvailability = true;
+          } else {
+            const { data } = await axios.get(
+              naverPostSearchForSearchAvailability(
+                `"${removeEmojis(post.titleWithInspectMessage)}"`,
+              ),
+            );
+            if (data.contents.includes(blogId)) {
+              isSearchAvailability = true;
+            }
           }
           return {
             link: `https://m.blog.naver.com/${blogId}/${post.logNo}`,
@@ -675,8 +649,8 @@ export class BlogManageService {
   }
 }
 
-const naverBlogSearchLink = (keyword: string) =>
-  `https://m.blog.naver.com/SectionPostSearch.naver?orderType=sim&searchValue=${encodeURIComponent(
+const naverPostSearchForSearchAvailability = (keyword: string) =>
+  `https://s.search.naver.com/p/review/47/search.naver?ssc=tab.blog.all&api_type=4&query=${encodeURIComponent(
     keyword,
   )}`;
 

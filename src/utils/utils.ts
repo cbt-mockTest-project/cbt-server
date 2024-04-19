@@ -50,3 +50,14 @@ export const isIntrospectionQuery = (
 
 export const ellipsisText = (string: string, count: number) =>
   string.slice(0, count) + '...';
+
+export const escapeRegExp = (text: string): string => {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+};
+
+export const countWordInText = (text: string, word: string): number => {
+  const escapedWord = escapeRegExp(word);
+  const regex = new RegExp(`${escapedWord}`, 'gi');
+  const matches = text.match(regex);
+  return matches ? matches.length : 0;
+};

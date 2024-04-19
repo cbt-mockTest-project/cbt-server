@@ -52,6 +52,9 @@ import {
   GetBlogPostDetailOutput,
 } from './dtos/get-blog-post-detail.dto';
 import { InfluencerInfoOrigin } from './interfaces/get-influencer-info';
+import { PostMorphemeAnalysisResponse } from './interfaces/post-morpheme-analysis';
+import { countWordInText } from 'src/utils/utils';
+import { format } from 'date-fns';
 
 @Injectable()
 export class BlogManageService {
@@ -288,20 +291,127 @@ export class BlogManageService {
     }
   }
 
+  getBlogPostAPI = (blogId: string, postId: string) =>
+    axios.get<string>(`https://m.blog.naver.com/${blogId}/${postId}`);
+
+  postMorphemeAnalysis = (text: string) =>
+    axios.post<PostMorphemeAnalysisResponse>(
+      'http://aiopen.etri.re.kr:8000/WiseNLU_spoken',
+      {
+        request_id: 'reserved field',
+        argument: {
+          text: text,
+          analysis_code: 'morp',
+        },
+      },
+      {
+        headers: {
+          Authorization: process.env.MORPHEME_AUTH_KEY,
+        },
+      },
+    );
+
+  getLikeCountAPI = (blogId: string, postId: string) =>
+    axios.get<{ result: { totalCount: number; postAddDate: number } }>(
+      `https://m.blog.naver.com/api/blogs/${blogId}/posts/${postId}/sympathy-users?blogId=${blogId}&logNo=${postId}`,
+      {
+        headers: {
+          referer: `https://m.blog.naver.com/${blogId}/${postId}`,
+        },
+      },
+    );
+
   async getBlogPostDetail(
     getBlogPostDetailInput: GetBlogPostDetailInput,
   ): Promise<GetBlogPostDetailOutput> {
     const { postId, blogId } = getBlogPostDetailInput;
-    const { data } = await axios.get(
-      `https://m.blog.naver.com/${blogId}/${postId}`,
-    );
+    const { data } = await this.getBlogPostAPI(blogId, postId);
+    const { data: getLikeData } = await this.getLikeCountAPI(blogId, postId);
+
+    const mainClass = '.se-main-container';
     const textClass = '.se-text-paragraph';
+    const tagClass = '.__se-hash-tag';
+    const titleClass = '.se-title-text';
+    const commentAndLikeBox = '.section_w';
+    const imageClass = '.se-image-resource';
+    const likeCount = getLikeData.result.totalCount;
+    const postAddDate = format(
+      new Date(getLikeData.result.postAddDate),
+      'yy.MM.dd',
+    );
     const $ = load(data);
     let textLength = 0;
+    let imageCount = 0;
+    let commentCount = 0;
+    let text = '';
+    let title = '';
+    const linkSet = new Set<string>();
+    const tagList = [];
+    $(commentAndLikeBox).each((i, el) => {
+      $(el)
+        .find('.btn_reply em')
+        .each((i, el) => {
+          commentCount = Number($(el).text());
+        });
+    });
+    $(titleClass).each((i, el) => {
+      title = $(el).text();
+    });
+    $(mainClass)
+      .find(imageClass)
+      .each((i, el) => {
+        imageCount++;
+      });
+    $(mainClass)
+      .find('a')
+      .each((i, el) => {
+        if ($(el).attr('href') === '#') return;
+        linkSet.add($(el).attr('href'));
+      });
+    $(tagClass).each((i, el) => {
+      tagList.push($(el).text());
+    });
     $(textClass).each((i, el) => {
+      text += $(el).text() + '\n';
       textLength += $(el).text().replace(/ /g, '').length;
     });
+
+    const { data: morphemeData } = await this.postMorphemeAnalysis(text);
+    let morphemeList = [];
+    morphemeData.return_object.sentence.forEach((sentence) => {
+      sentence.word.map((word) => {
+        morphemeList.push({
+          word: word.text,
+          count: countWordInText(text, word.text),
+        });
+      });
+    });
+    morphemeList = morphemeList.sort((a, b) => b.count - a.count);
+    const uniqueMorphemeList = morphemeList
+      .filter(
+        (morpheme, index, self) =>
+          index ===
+          self.findIndex(
+            (t) =>
+              t.word === morpheme.word &&
+              t.word.length > 1 &&
+              t.count === morpheme.count &&
+              /^[가-힣a-zA-Z]*$/.test(t.word),
+          ),
+      )
+      .slice(0, 10);
+    const linkList = Array.from(linkSet);
+
     return {
+      postAddDate,
+      imageCount,
+      commentCount,
+      title,
+      likeCount,
+      uniqueMorphemeList,
+      linkList,
+      tagList,
+      text,
       textLength,
       ok: true,
     };
@@ -341,7 +451,7 @@ export class BlogManageService {
             ),
           );
 
-          const { textLength } = await this.getBlogPostDetail({
+          const { textLength, imageCount } = await this.getBlogPostDetail({
             blogId,
             postId: String(post.logNo),
           });
@@ -363,7 +473,7 @@ export class BlogManageService {
             sympathyCnt: post.sympathyCnt,
             titleWithInspectMessage: post.titleWithInspectMessage,
             logNo: post.logNo,
-            thumbnailCount: post.thumbnailCount,
+            thumbnailCount: imageCount,
             textLength,
             isSearchAvailability,
           };
@@ -565,7 +675,6 @@ export class BlogManageService {
       );
       return data;
     } catch (e) {
-      console.log(e);
       return null;
     }
   }

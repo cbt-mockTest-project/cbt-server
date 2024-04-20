@@ -722,7 +722,9 @@ export class MockExamCategoryService {
       const categories = await this.mockExamCategories.find({
         select: ['name'],
       });
-      const names = categories.map((category) => category.name);
+      const names = categories
+        .filter((category) => category.isPublic)
+        .map((category) => category.name);
       return {
         ok: true,
         names,

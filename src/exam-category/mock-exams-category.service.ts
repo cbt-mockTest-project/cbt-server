@@ -720,7 +720,7 @@ export class MockExamCategoryService {
   async readMockExamCategoryNames(): Promise<ReadMockExamCategoryNamesOutput> {
     try {
       const categories = await this.mockExamCategories.find({
-        select: ['name'],
+        select: ['name', 'isPublic'],
       });
       const names = categories
         .filter((category) => category.isPublic)

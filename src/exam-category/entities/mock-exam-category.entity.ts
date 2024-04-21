@@ -26,6 +26,7 @@ import { ExamSource } from 'src/enums/enum';
 import { Seller } from 'src/seller/entities/seller.entity';
 import { CategoryEvaluation } from 'src/category-evaluation/entities/category-evaluation.entity';
 import { Quiz } from 'src/quiz/entities/quiz.entity';
+import { CategoryInvitationLink } from 'src/category-invitation-link/entities/category-invitation-link.entity';
 
 export enum ExamType {
   OBJECTIVE = 'OBJECTIVE',
@@ -137,6 +138,13 @@ export class MockExamCategory extends CoreEntity {
   )
   @Field(() => [ExamCategoryInvitation])
   examCategoryInvitations: ExamCategoryInvitation[];
+
+  @OneToMany(
+    () => CategoryInvitationLink,
+    (categoryInvitationLinks) => categoryInvitationLinks.category,
+  )
+  @Field(() => [CategoryInvitationLink])
+  categoryInvitationLinks: CategoryInvitationLink[];
 
   @Field(() => [ExamViewer], { nullable: true })
   @OneToMany(() => ExamViewer, (examViewer) => examViewer.examCategory, {

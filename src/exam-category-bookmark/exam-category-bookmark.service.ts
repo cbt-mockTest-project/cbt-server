@@ -17,6 +17,10 @@ import {
   GetExamCategorySubscribersInput,
   GetExamCategorySubscribersOutput,
 } from './dtos/getExamCategorySubscribers.dto';
+import {
+  CreateExamCategoryBookmarkInput,
+  CreateExamCategoryBookmarkOutput,
+} from './dtos/createExamCategoryBookmark.dto';
 
 @Injectable()
 export class ExamCategoryBookmarkService {
@@ -199,5 +203,25 @@ export class ExamCategoryBookmarkService {
         error: '구독자를 가져오는데 실패했습니다.',
       };
     }
+  }
+
+  async createExamCategoryBookmark(
+    user: User,
+    createExamCategoryBookmark: CreateExamCategoryBookmarkInput,
+  ): Promise<CreateExamCategoryBookmarkOutput> {
+    const { categoryId } = createExamCategoryBookmark;
+    await this.examCategoryBookmark.save(
+      this.examCategoryBookmark.create({
+        category: {
+          id: categoryId,
+        },
+        user: {
+          id: user.id,
+        },
+      }),
+    );
+    return {
+      ok: true,
+    };
   }
 }

@@ -103,6 +103,8 @@ import { Quiz } from './quiz/entities/quiz.entity';
 import { QuizComment } from './quiz/entities/quizComment.entity';
 import { QuizCommentLike } from './quiz/entities/quizCommentLike.entity';
 import { NaverBlog } from './blogManage/entities/naver-blog.entity';
+import { CategoryInvitationLink } from './category-invitation-link/entities/category-invitation-link.entity';
+import { CategoryInvitationLinkModule } from './category-invitation-link/category-invitation-link.module';
 
 @Module({
   imports: [
@@ -227,6 +229,7 @@ import { NaverBlog } from './blogManage/entities/naver-blog.entity';
         Quiz,
         QuizComment,
         QuizCommentLike,
+        CategoryInvitationLink,
       ],
     }),
     UserModule,
@@ -256,6 +259,7 @@ import { NaverBlog } from './blogManage/entities/naver-blog.entity';
     MailModule,
     RootModule,
     VisitModule,
+    CategoryInvitationLinkModule,
     MailerModule.forRoot({
       transport: `smtps://${process.env.EMAIL_AUTH_EMAIL}:${process.env.EMAIL_AUTH_PASSWORD}@${process.env.EMAIL_HOST}`,
       defaults: {

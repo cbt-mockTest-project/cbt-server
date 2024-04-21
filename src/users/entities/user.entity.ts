@@ -52,6 +52,7 @@ import { Seller } from 'src/seller/entities/seller.entity';
 import { CategoryEvaluation } from 'src/category-evaluation/entities/category-evaluation.entity';
 import { QuizComment } from 'src/quiz/entities/quizComment.entity';
 import { QuizCommentLike } from 'src/quiz/entities/quizCommentLike.entity';
+import { CategoryInvitationLink } from 'src/category-invitation-link/entities/category-invitation-link.entity';
 
 @InputType('RecentlyStudiedExamsInputType', { isAbstract: true })
 @ObjectType()
@@ -190,6 +191,13 @@ export class User extends CoreEntity {
   )
   @Field(() => [ExamCategoryInvitation])
   examCategoryInvitations: ExamCategoryInvitation[];
+
+  @OneToMany(
+    () => CategoryInvitationLink,
+    (categoryInvitationLinks) => categoryInvitationLinks.user,
+  )
+  @Field(() => [CategoryInvitationLink])
+  categoryInvitationLinks: CategoryInvitationLink[];
 
   @OneToMany(() => ExamCategoryBookmark, (bookmark) => bookmark.user)
   @Field(() => [ExamCategoryBookmark])

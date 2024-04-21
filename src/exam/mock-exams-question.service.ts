@@ -3,7 +3,7 @@ import { ExamCoAuthor } from '../exam-co-author/entities/exam-co-author.entity';
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MockExamQuestionBookmark } from 'src/exam/entities/mock-exam-question-bookmark.entity';
-import { User } from 'src/users/entities/user.entity';
+import { User, UserRole } from 'src/users/entities/user.entity';
 import { shuffleArray } from 'src/utils/utils';
 import { FindOptionsWhere, In, Not, Repository } from 'typeorm';
 import {
@@ -380,18 +380,10 @@ export class MockExamQuestionService {
           error: '존재하지 않는 문제입니다.',
         };
       }
-      const coAuthor = await this.examCoAuthor.findOne({
-        where: {
-          user: {
-            id: user.id,
-          },
-          exam: {
-            id: prevMockExamQuestion.mockExam.id,
-          },
-        },
-      });
-      const isCoAuthor = coAuthor ? true : false;
-      const isOwner = prevMockExamQuestion.user.id === user.id || isCoAuthor;
+
+      const isOwner =
+        prevMockExamQuestion.user.id === user.id ||
+        user.role === UserRole.ADMIN;
       if (!isOwner) {
         return {
           ok: false,

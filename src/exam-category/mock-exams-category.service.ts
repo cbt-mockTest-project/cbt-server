@@ -326,6 +326,9 @@ export class MockExamCategoryService {
           return category;
         });
       }
+      categories = categories.filter(
+        (category) => category.mockExam.length > 0,
+      );
       return {
         ok: true,
         categories,

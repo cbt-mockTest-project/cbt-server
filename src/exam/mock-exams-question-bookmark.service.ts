@@ -121,6 +121,7 @@ export class MockExamQuestionBookmarkSerivce {
       });
       const titleAndId = deduplication(
         bookmarks
+          .filter((bookmark) => bookmark.question.mockExam)
           .map((bookmark) => {
             const { title, id } = bookmark.question.mockExam;
             return { title, id };
@@ -128,7 +129,8 @@ export class MockExamQuestionBookmarkSerivce {
           .sort((a, b) => (a.title > b.title ? 1 : -1)),
       );
       return { ok: true, titleAndId };
-    } catch {
+    } catch (e) {
+      console.log(e);
       return { ok: false, error: '시험 리스트를 불러올 수 없습니다.' };
     }
   }

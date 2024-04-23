@@ -73,6 +73,7 @@ import {
   MoveExamOrderOutput,
 } from './dtos/moveExamOrder.dto';
 import { RevalidateService } from 'src/revalidate/revalidate.service';
+import { MockExamQuestion } from 'src/exam/entities/mock-exam-question.entity';
 
 @Injectable()
 export class MockExamCategoryService {
@@ -87,6 +88,8 @@ export class MockExamCategoryService {
     private readonly examCategoryBookmarks: Repository<ExamCategoryBookmark>,
     @InjectRepository(MockExamQuestionState)
     private readonly mockExamQuestionStates: Repository<MockExamQuestionState>,
+    @InjectRepository(MockExamQuestion)
+    private readonly mockExamQuestions: Repository<MockExamQuestion>,
     private readonly examCategoryBookmarkService: ExamCategoryBookmarkService,
     private readonly revalidateService: RevalidateService,
   ) {}
@@ -156,9 +159,7 @@ export class MockExamCategoryService {
           id: categoryId,
         },
         relations: {
-          mockExam: {
-            mockExamQuestion: true,
-          },
+          mockExam: true,
         },
       });
       if (!category) {
@@ -167,21 +168,23 @@ export class MockExamCategoryService {
           error: '카테고리를 찾을 수 없습니다.',
         };
       }
-
       const mockExamIds = category.mockExam.map((exam) => exam.id);
-      const mockExamQuestionStates = await this.mockExamQuestionStates.find({
-        where: {
-          user: {
-            id: user.id,
+      const [mockExamQuestionStates, totalQuestionCount] = await Promise.all([
+        this.mockExamQuestionStates.find({
+          where: {
+            user: {
+              id: user.id,
+            },
+            exam: In(mockExamIds),
           },
-          exam: In(mockExamIds),
-        },
-      });
+        }),
+        this.mockExamQuestions.count({
+          where: {
+            mockExam: In(mockExamIds),
+          },
+        }),
+      ]);
 
-      const totalQuestionCount = category.mockExam.reduce(
-        (acc, exam) => acc + exam.mockExamQuestion.length,
-        0,
-      );
       const highScoreCount = mockExamQuestionStates.filter(
         (state) => state.state === QuestionState.HIGH,
       ).length;
@@ -553,10 +556,29 @@ export class MockExamCategoryService {
           user: true,
           mockExam: {
             user: true,
-            mockExamQuestion: true,
+            // mockExamQuestion: true,
           },
         },
       });
+      const mockExamIds = category.mockExam.map((exam) => exam.id);
+      const mockExamQuestion = await this.mockExamQuestions.find({
+        where: {
+          mockExam: In(mockExamIds),
+        },
+        relations: {
+          mockExam: true,
+        },
+      });
+      category.mockExam = category.mockExam.map((exam) => {
+        const questions = mockExamQuestion.filter(
+          (question) => question.mockExam.id === exam.id,
+        );
+        return {
+          ...exam,
+          mockExamQuestion: questions,
+        };
+      });
+
       if (category.isPublic) category.hasAccess = true;
 
       // 로그인 상태일 경우,

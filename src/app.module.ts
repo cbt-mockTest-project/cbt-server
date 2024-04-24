@@ -133,6 +133,8 @@ import { Seceders } from './seceders/entities/seceders.entity';
       installSubscriptionHandlers: true,
       autoSchemaFile: true,
       sortSchema: true, //default: false
+      debug: process.env.NODE_ENV === 'dev',
+      playground: process.env.NODE_ENV === 'dev',
       formatError(error) {
         logger.error(
           `GraphQL Validation Error: ${JSON.stringify(error, null, 2)}`,

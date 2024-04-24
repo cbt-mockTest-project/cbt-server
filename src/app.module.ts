@@ -105,6 +105,8 @@ import { QuizCommentLike } from './quiz/entities/quizCommentLike.entity';
 import { NaverBlog } from './blogManage/entities/naver-blog.entity';
 import { CategoryInvitationLink } from './category-invitation-link/entities/category-invitation-link.entity';
 import { CategoryInvitationLinkModule } from './category-invitation-link/category-invitation-link.module';
+import { SecedersModule } from './seceders/seceders.module';
+import { Seceders } from './seceders/entities/seceders.entity';
 
 @Module({
   imports: [
@@ -230,6 +232,7 @@ import { CategoryInvitationLinkModule } from './category-invitation-link/categor
         QuizComment,
         QuizCommentLike,
         CategoryInvitationLink,
+        Seceders,
       ],
     }),
     UserModule,
@@ -300,6 +303,7 @@ import { CategoryInvitationLinkModule } from './category-invitation-link/categor
     SellerModule,
     CategoryEvaluationModule,
     QuizModule,
+    SecedersModule,
   ],
   controllers: [],
   providers: [

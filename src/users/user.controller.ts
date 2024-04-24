@@ -12,7 +12,7 @@ export class UserController {
       const result = await this.userService.kakaoLogin(req, res);
       if (result.error) {
         res.redirect(
-          `${process.env.CLIENT_REDIRECT_URI}/login?message=${result.error}`,
+          `${process.env.CLIENT_REDIRECT_URI}/auth?message=${result.error}`,
         );
       } else {
         res.redirect(
@@ -35,7 +35,7 @@ export class UserController {
       const result = await this.userService.googleLogin(req, res);
       if (result.error) {
         res.redirect(
-          `${process.env.CLIENT_REDIRECT_URI}/login?message=${result.error}`,
+          `${process.env.CLIENT_REDIRECT_URI}/auth?message=${result.error}`,
         );
       } else {
         res.redirect(

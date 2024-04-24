@@ -87,6 +87,7 @@ import {
   UpsertRecentlyStudiedExamsInput,
   UpsertRecentlyStudiedExamsOutput,
 } from './dtos/upsertRecentlyStudiedExams.dto';
+import { SecedersService } from 'src/seceders/seceders.service';
 @Injectable()
 export class UserService {
   constructor(
@@ -104,6 +105,7 @@ export class UserService {
     private readonly telegramService: TelegramService,
     private readonly noticeService: NoticeService,
     private readonly paymentService: PaymentService,
+    private readonly secedersService: SecedersService,
   ) {}
 
   async register(registerInput: RegisterInput): Promise<RegisterOutput> {
@@ -185,6 +187,13 @@ export class UserService {
         where: { email },
         withDeleted: true,
       });
+      const isSeceder = await this.secedersService.getSeceder({ email });
+      if (isSeceder.ok) {
+        return {
+          ok: false,
+          error: '탈퇴 처리된 계정입니다.',
+        };
+      }
       if (user && user.deletedAt) {
         return {
           ok: false,
@@ -231,6 +240,13 @@ export class UserService {
         where: { email },
         withDeleted: true,
       });
+      const isSeceder = await this.secedersService.getSeceder({ email });
+      if (isSeceder.ok) {
+        return {
+          ok: false,
+          error: '탈퇴 처리된 계정입니다.',
+        };
+      }
       if (user && user.deletedAt) {
         return {
           ok: false,
@@ -337,6 +353,13 @@ export class UserService {
         select: ['id', 'password', 'deletedAt'],
         withDeleted: true,
       });
+      const isSeceder = await this.secedersService.getSeceder({ email });
+      if (isSeceder.ok) {
+        return {
+          ok: false,
+          error: '탈퇴 처리된 계정입니다.',
+        };
+      }
       if (user && user.deletedAt) {
         return {
           ok: false,
@@ -527,6 +550,9 @@ export class UserService {
 
   async deleteUser(user: User): Promise<CoreOutput> {
     try {
+      await this.secedersService.createSeceder({
+        email: user.email,
+      });
       await this.users.delete({ id: user.id });
       this.telegramService.sendMessageToTelegram({
         channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
@@ -672,6 +698,13 @@ export class UserService {
       where: { email },
       withDeleted: true,
     });
+    const isSeceder = await this.secedersService.getSeceder({ email });
+    if (isSeceder.ok) {
+      return {
+        ok: false,
+        error: '탈퇴 처리된 계정입니다.',
+      };
+    }
     if (user && user.deletedAt) {
       return {
         ok: false,
@@ -763,6 +796,13 @@ export class UserService {
       where: { email },
       withDeleted: true,
     });
+    const isSeceder = await this.secedersService.getSeceder({ email });
+    if (isSeceder.ok) {
+      return {
+        ok: false,
+        error: '탈퇴 처리된 계정입니다.',
+      };
+    }
     if (user && user.deletedAt) {
       return {
         ok: false,

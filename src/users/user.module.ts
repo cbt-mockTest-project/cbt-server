@@ -19,6 +19,8 @@ import {
 } from 'src/exam-category/entities/mock-exam-category.entity';
 import { Seller } from 'src/seller/entities/seller.entity';
 import { CategoryEvaluation } from 'src/category-evaluation/entities/category-evaluation.entity';
+import { Seceders } from 'src/seceders/entities/seceders.entity';
+import { SecedersService } from 'src/seceders/seceders.service';
 
 @Module({
   imports: [
@@ -34,6 +36,7 @@ import { CategoryEvaluation } from 'src/category-evaluation/entities/category-ev
       MockExamCategory,
       Seller,
       CategoryEvaluation,
+      Seceders,
     ]),
   ],
   providers: [
@@ -42,6 +45,7 @@ import { CategoryEvaluation } from 'src/category-evaluation/entities/category-ev
     NoticeResolver,
     NoticeService,
     PaymentService,
+    SecedersService,
   ],
   exports: [UserService, NoticeService],
   controllers: [UserController],

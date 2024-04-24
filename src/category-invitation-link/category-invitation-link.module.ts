@@ -7,6 +7,7 @@ import { CategoryInvitationLinkResolver } from './category-invitation-link.resol
 import { CategoryInvitationLinkService } from './category-invitation-link.service';
 import { ExamCategoryBookmarkService } from 'src/exam-category-bookmark/exam-category-bookmark.service';
 import { ExamCategoryBookmark } from 'src/exam-category-bookmark/entities/exam-category-bookmark';
+import { CategoryEvaluation } from 'src/category-evaluation/entities/category-evaluation.entity';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { ExamCategoryBookmark } from 'src/exam-category-bookmark/entities/exam-c
       MockExamCategory,
       User,
       ExamCategoryBookmark,
+      CategoryEvaluation,
     ]),
   ],
   providers: [

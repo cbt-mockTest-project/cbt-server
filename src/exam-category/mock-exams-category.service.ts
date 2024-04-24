@@ -74,6 +74,7 @@ import {
 } from './dtos/moveExamOrder.dto';
 import { RevalidateService } from 'src/revalidate/revalidate.service';
 import { MockExamQuestion } from 'src/exam/entities/mock-exam-question.entity';
+import { CategoryEvaluation } from 'src/category-evaluation/entities/category-evaluation.entity';
 
 @Injectable()
 export class MockExamCategoryService {
@@ -90,6 +91,8 @@ export class MockExamCategoryService {
     private readonly mockExamQuestionStates: Repository<MockExamQuestionState>,
     @InjectRepository(MockExamQuestion)
     private readonly mockExamQuestions: Repository<MockExamQuestion>,
+    @InjectRepository(CategoryEvaluation)
+    private readonly categoryEvaluations: Repository<CategoryEvaluation>,
     private readonly examCategoryBookmarkService: ExamCategoryBookmarkService,
     private readonly revalidateService: RevalidateService,
   ) {}
@@ -230,7 +233,6 @@ export class MockExamCategoryService {
         user,
       );
     }
-
     if (!isBookmarked) {
       const where:
         | FindOptionsWhere<MockExamCategory>
@@ -274,7 +276,6 @@ export class MockExamCategoryService {
         relations: {
           user: true,
           mockExam: true,
-          categoryEvaluations: true,
         },
         order: {
           order: 'ASC',
@@ -332,6 +333,21 @@ export class MockExamCategoryService {
       categories = categories.filter(
         (category) => category.mockExam.length > 0,
       );
+      const categoryEvaluations = await this.categoryEvaluations.find({
+        where: {
+          category: In(categories.map((category) => category.id)),
+        },
+        relations: {
+          category: true,
+        },
+      });
+      categories = categories.map((category) => {
+        const evaluation = categoryEvaluations.filter(
+          (evaluation) => evaluation.category.id === category.id,
+        );
+        if (evaluation) category.categoryEvaluations = evaluation;
+        return category;
+      });
       return {
         ok: true,
         categories,
@@ -355,6 +371,7 @@ export class MockExamCategoryService {
           created_at: 'DESC',
         },
       });
+
       return {
         ok: true,
         categories,

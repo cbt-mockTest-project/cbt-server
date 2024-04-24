@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { GetMyBookmarkedExamCategoriesOutput } from './dtos/getMyBookmarkedExamCategories.dto';
 import {
@@ -21,6 +21,7 @@ import {
   CreateExamCategoryBookmarkInput,
   CreateExamCategoryBookmarkOutput,
 } from './dtos/createExamCategoryBookmark.dto';
+import { CategoryEvaluation } from 'src/category-evaluation/entities/category-evaluation.entity';
 
 @Injectable()
 export class ExamCategoryBookmarkService {
@@ -29,6 +30,8 @@ export class ExamCategoryBookmarkService {
     private readonly examCategoryBookmark: Repository<ExamCategoryBookmark>,
     @InjectRepository(MockExamCategory)
     private readonly mockExamCategory: Repository<MockExamCategory>,
+    @InjectRepository(CategoryEvaluation)
+    private readonly categoryEvaluations: Repository<CategoryEvaluation>,
   ) {}
 
   async getMyBookmarkedExamCategories(
@@ -45,7 +48,6 @@ export class ExamCategoryBookmarkService {
           category: {
             user: true,
             mockExam: true,
-            categoryEvaluations: true,
           },
         },
         order: {
@@ -55,12 +57,28 @@ export class ExamCategoryBookmarkService {
           },
         },
       });
+      let categories = bookmarks.map((bookmark) => ({
+        ...bookmark.category,
+        isBookmarked: true,
+      }));
+      const categoryEvaluations = await this.categoryEvaluations.find({
+        where: {
+          category: In(categories.map((category) => category.id)),
+        },
+        relations: {
+          category: true,
+        },
+      });
+      categories = categories.map((category) => {
+        const evaluation = categoryEvaluations.filter(
+          (evaluation) => evaluation.category.id === category.id,
+        );
+        if (evaluation) category.categoryEvaluations = evaluation;
+        return category;
+      });
       return {
         ok: true,
-        categories: bookmarks.map((bookmark) => ({
-          ...bookmark.category,
-          isBookmarked: true,
-        })),
+        categories,
       };
     } catch (error) {
       return {

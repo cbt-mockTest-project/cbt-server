@@ -53,6 +53,8 @@ import { CategoryEvaluation } from 'src/category-evaluation/entities/category-ev
 import { QuizComment } from 'src/quiz/entities/quizComment.entity';
 import { QuizCommentLike } from 'src/quiz/entities/quizCommentLike.entity';
 import { CategoryInvitationLink } from 'src/category-invitation-link/entities/category-invitation-link.entity';
+import { Item } from 'src/item/entities/item.entity';
+import { ItemSalesHistory } from 'src/item/entities/item-sales-history.entity';
 
 @InputType('RecentlyStudiedExamsInputType', { isAbstract: true })
 @ObjectType()
@@ -207,6 +209,10 @@ export class User extends CoreEntity {
   @Field(() => [ExamLike])
   examLikes: ExamLike[];
 
+  @OneToMany(() => Item, (item) => item.user)
+  @Field(() => [Item])
+  items: Item[];
+
   @OneToMany(
     () => MockExamQuestionCommentLike,
     (mockExamQuestionCommentLike) => mockExamQuestionCommentLike.user,
@@ -236,6 +242,10 @@ export class User extends CoreEntity {
   @OneToMany(() => Payment, (payment) => payment.user)
   @Field(() => [Payment])
   payments: Payment[];
+
+  @OneToMany(() => ItemSalesHistory, (payment) => payment.buyer)
+  @Field(() => [ItemSalesHistory])
+  itemSalesHistories: Payment[];
 
   @OneToMany(() => Post, (post) => post.user)
   @Field(() => [Post], { nullable: true })

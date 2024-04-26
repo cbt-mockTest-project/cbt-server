@@ -107,6 +107,9 @@ import { CategoryInvitationLink } from './category-invitation-link/entities/cate
 import { CategoryInvitationLinkModule } from './category-invitation-link/category-invitation-link.module';
 import { SecedersModule } from './seceders/seceders.module';
 import { Seceders } from './seceders/entities/seceders.entity';
+import { Item } from './item/entities/item.entity';
+import { ItemModule } from './item/item.module';
+import { ItemSalesHistory } from './item/entities/item-sales-history.entity';
 
 @Module({
   imports: [
@@ -235,6 +238,8 @@ import { Seceders } from './seceders/entities/seceders.entity';
         QuizCommentLike,
         CategoryInvitationLink,
         Seceders,
+        Item,
+        ItemSalesHistory,
       ],
     }),
     UserModule,
@@ -264,6 +269,7 @@ import { Seceders } from './seceders/entities/seceders.entity';
     MailModule,
     RootModule,
     VisitModule,
+    ItemModule,
     CategoryInvitationLinkModule,
     MailerModule.forRoot({
       transport: `smtps://${process.env.EMAIL_AUTH_EMAIL}:${process.env.EMAIL_AUTH_PASSWORD}@${process.env.EMAIL_HOST}`,

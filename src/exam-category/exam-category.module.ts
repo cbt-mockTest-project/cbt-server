@@ -11,8 +11,8 @@ import { MockExamQuestionState } from 'src/exam/entities/mock-exam-question-stat
 import { RevalidateModule } from 'src/revalidate/revalidate.module';
 import { Seller } from 'src/seller/entities/seller.entity';
 import { CategoryEvaluation } from 'src/category-evaluation/entities/category-evaluation.entity';
-import { Quiz } from 'src/quiz/entities/quiz.entity';
 import { MockExamQuestion } from 'src/exam/entities/mock-exam-question.entity';
+import { Item } from 'src/item/entities/item.entity';
 
 @Module({
   imports: [
@@ -25,6 +25,7 @@ import { MockExamQuestion } from 'src/exam/entities/mock-exam-question.entity';
       ExamCategoryBookmark,
       Seller,
       CategoryEvaluation,
+      Item,
     ]),
   ],
   providers: [

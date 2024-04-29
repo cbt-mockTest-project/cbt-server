@@ -113,6 +113,11 @@ export class ItemService {
   async getItems(getItemsInput: GetItemsInput): Promise<GetItemsOutput> {
     const { page, limit, search } = getItemsInput;
     const formattedSearch = `%${search?.replace(/\s+/g, '').toLowerCase()}%`;
+    const totalCount = await this.items.count({
+      where: {
+        state: ItemStateEnum.APPROVED,
+      },
+    });
     const query = this.items
       .createQueryBuilder('item')
       .skip((page - 1) * limit)
@@ -128,6 +133,7 @@ export class ItemService {
     return {
       ok: true,
       items,
+      totalCount,
     };
   }
 

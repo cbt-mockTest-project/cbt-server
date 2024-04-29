@@ -27,6 +27,20 @@ export class ThumbnailTemplate {
   @Field(() => String)
   description: string;
 }
+@InputType('ItemFileInputType', { isAbstract: true })
+@ObjectType()
+export class ItemFileType {
+  @Field(() => String)
+  name: string;
+  @Field(() => String)
+  type: string;
+  @Field(() => Number)
+  size: number;
+  @Field(() => String)
+  uid: string;
+  @Field(() => String)
+  url: string;
+}
 
 @InputType('ItemInputType', { isAbstract: true })
 @ObjectType()
@@ -44,9 +58,9 @@ export class Item extends CoreEntity {
   @Field(() => ThumbnailTemplate, { nullable: true })
   thumbnailTemplate?: ThumbnailTemplate;
 
-  @Column()
-  @Field(() => String)
-  filePath: string;
+  @Column({ nullable: true, type: 'json', default: null })
+  @Field(() => ItemFileType, { nullable: true })
+  file: ItemFileType;
 
   @Column()
   @Field(() => String)

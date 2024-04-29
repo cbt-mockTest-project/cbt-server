@@ -1252,18 +1252,6 @@ export class MockExamQuestionService {
 
   async sync() {
     try {
-      const questions = await this.mockExamQuestion.find({
-        where: {
-          mockExam: {
-            id: In([690, 691, 682, 683, 709, 688, 678, 689, 681]),
-          },
-        },
-      });
-      questions.forEach((question) => {
-        question.question = question.question.replace(/\n/g, '<br/>');
-        question.solution = question.solution.replace(/\n/g, '<br/>');
-        this.mockExamQuestion.save(question);
-      });
       return {
         ok: true,
       };

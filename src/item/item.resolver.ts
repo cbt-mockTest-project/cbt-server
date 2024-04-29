@@ -1,4 +1,4 @@
-import { Args, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { Item } from './entities/item.entity';
 import { ItemService } from './item.service';
 import { CreateItemInput, CreateItemOutput } from './dtos/createItem.dto';
@@ -10,12 +10,13 @@ import { GetItemsForOwnerOutput } from './dtos/getItemsForOwner.dto';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { Role } from 'src/auth/role.decorators';
 import { User } from 'src/users/entities/user.entity';
-import { GetItemsInput } from './dtos/getItems.dto';
+import { GetItemsInput, GetItemsOutput } from './dtos/getItems.dto';
 import { GetItemInput } from './dtos/getItem.dto';
 @Resolver(() => Item)
 export class ItemResolver {
   constructor(private readonly itemService: ItemService) {}
 
+  @Mutation(() => CreateItemOutput)
   @Role(['ANY'])
   async createItem(
     @Args('input') createItemInput: CreateItemInput,
@@ -24,6 +25,7 @@ export class ItemResolver {
     return this.itemService.createItem(createItemInput, user);
   }
 
+  @Mutation(() => UpdateItemOutput)
   @Role(['ANY'])
   async updateItem(
     @AuthUser() user: User,
@@ -32,6 +34,7 @@ export class ItemResolver {
     return this.itemService.updateItem(user, updateItemInput);
   }
 
+  @Mutation(() => DeleteItemOutput)
   @Role(['ANY'])
   async deleteItem(
     @AuthUser() user: User,
@@ -40,14 +43,17 @@ export class ItemResolver {
     return this.itemService.deleteItem(user, deleteItemInput);
   }
 
+  @Query(() => GetItemsOutput)
   async getItems(@Args('input') getItemsInput: GetItemsInput) {
     return this.itemService.getItems(getItemsInput);
   }
 
+  @Query(() => Item)
   async getItem(@Args('input') getItemInput: GetItemInput) {
     return this.itemService.getItem(getItemInput);
   }
 
+  @Query(() => GetItemsForOwnerOutput)
   @Role(['ANY'])
   async getItemsForOwner(
     @AuthUser() user: User,
@@ -55,6 +61,7 @@ export class ItemResolver {
     return this.itemService.getItemsForOwner(user);
   }
 
+  @Mutation(() => ApproveItemOutput)
   @Role(['ADMIN'])
   async approveItem(
     @AuthUser() user: User,
@@ -63,6 +70,7 @@ export class ItemResolver {
     return this.itemService.approveItem(user, approveItemInput);
   }
 
+  @Mutation(() => RejectItemOutput)
   @Role(['ADMIN'])
   async rejectItem(
     @AuthUser() user: User,

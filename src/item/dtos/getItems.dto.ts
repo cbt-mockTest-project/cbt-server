@@ -18,4 +18,6 @@ export class GetItemsInput {
 export class GetItemsOutput extends CoreOutput {
   @Field(() => [Item], { nullable: true, defaultValue: [] })
   items?: Item[];
+  @Field(() => Number, { nullable: true, defaultValue: 0 })
+  totalCount?: number;
 }

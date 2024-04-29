@@ -6,7 +6,7 @@ import { Item } from '../entities/item.entity';
 export class CreateItemInput extends PickType(Item, [
   'price',
   'thumbnail',
-  'filePath',
+  'file',
   'title',
   'description',
 ]) {}

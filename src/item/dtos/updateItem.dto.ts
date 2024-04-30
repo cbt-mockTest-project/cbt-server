@@ -4,7 +4,15 @@ import { Item } from '../entities/item.entity';
 
 @InputType()
 export class UpdateItemInput extends PartialType(
-  PickType(Item, ['price', 'thumbnail', 'file', 'title', 'description', 'id']),
+  PickType(Item, [
+    'price',
+    'thumbnail',
+    'file',
+    'title',
+    'description',
+    'id',
+    'contents',
+  ]),
 ) {}
 
 @ObjectType()

@@ -70,6 +70,10 @@ export class Item extends CoreEntity {
   @Field(() => String)
   description: string;
 
+  @Column()
+  @Field(() => String)
+  contents: string;
+
   @Field(() => ItemStateEnum)
   @Column({
     type: 'enum',

@@ -9,6 +9,7 @@ export class CreateItemInput extends PickType(Item, [
   'file',
   'title',
   'description',
+  'contents',
 ]) {}
 
 @ObjectType()

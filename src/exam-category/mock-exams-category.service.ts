@@ -330,9 +330,7 @@ export class MockExamCategoryService {
           return category;
         });
       }
-      categories = categories.filter(
-        (category) => category.mockExam.length > 0,
-      );
+
       const categoryEvaluations = await this.categoryEvaluations.find({
         where: {
           category: In(categories.map((category) => category.id)),

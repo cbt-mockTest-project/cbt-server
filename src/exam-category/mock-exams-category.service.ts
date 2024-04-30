@@ -213,16 +213,8 @@ export class MockExamCategoryService {
     getExamCategoriesInput: GetExamCategoriesInput,
     user?: User,
   ): Promise<GetExamCategoriesOutput> {
-    const {
-      examSource,
-      categoryMakerId,
-      isBookmarked,
-      limit,
-      isPublicOnly,
-      page,
-      keyword,
-      categoryIds,
-    } = getExamCategoriesInput;
+    const { examSource, isBookmarked, limit, page, categoryMakerId } =
+      getExamCategoriesInput;
     if (isBookmarked) {
       if (!user)
         return {
@@ -234,81 +226,48 @@ export class MockExamCategoryService {
       );
     }
     if (!isBookmarked) {
-      const where:
-        | FindOptionsWhere<MockExamCategory>
-        | FindOptionsWhere<MockExamCategory>[] = [];
-      if (user?.role !== UserRole.ADMIN) {
-        if (examSource) {
-          where.push({
+      const categoryQuery = this.mockExamCategories
+        .createQueryBuilder('category')
+        .leftJoinAndSelect('category.user', 'user')
+        .leftJoinAndSelect('category.mockExam', 'mockExam');
+      // examSource가 있는 경우, 공개된 시험 카테고리를 검색
+      if (examSource) {
+        categoryQuery.andWhere(
+          'category.source = :source AND category.isPublic = :isPublic',
+          {
             source: examSource,
             isPublic: true,
-          });
-          if (!isPublicOnly && user) {
-            where.push({
-              source: examSource,
-              isPublic: false,
-              user: {
-                id: user.id,
-              },
-            });
-          }
-        }
-
-        if (categoryMakerId) {
-          where.push({
-            user: {
-              id: categoryMakerId,
-            },
+          },
+        );
+      }
+      // categoryMakerId가 있는 경우, 해당 유저가 만든 카테고리를 검색
+      if (categoryMakerId) {
+        categoryQuery.andWhere('user.id = :categoryMakerId', {
+          categoryMakerId,
+        });
+        if (!user || user.id !== categoryMakerId) {
+          categoryQuery.andWhere('category.isPublic = :isPublic', {
             isPublic: true,
           });
-          if (!isPublicOnly && user?.id === categoryMakerId) {
-            where.push({
-              user: {
-                id: categoryMakerId,
-              },
-              isPublic: false,
-            });
-          }
         }
       }
-      const categoryFindOption: FindManyOptions<MockExamCategory> = {
-        where,
-        relations: {
-          user: true,
-          mockExam: true,
-        },
-        order: {
-          order: 'ASC',
-          created_at: 'DESC',
-        },
-      };
-      if (limit) categoryFindOption.take = limit;
-      if (page) categoryFindOption.skip = (Number(page) - 1) * Number(limit);
-      if (keyword) {
-        categoryFindOption.where = {
-          ...categoryFindOption.where,
-          isPublic: true,
-          name: Like(`%${keyword}%`),
-        };
+
+      categoryQuery
+        .orderBy('category.order', 'ASC')
+        .addOrderBy('category.created_at', 'DESC');
+
+      // categoryMakerId가 없는 경우, 시험지가 1개 이상 있는 카테고리만 검색
+      if (!categoryMakerId) {
+        categoryQuery.andWhere('mockExam.id IS NOT NULL');
       }
-      if (Array.isArray(categoryIds) && categoryIds.length > 0) {
-        categoryFindOption.where = {
-          ...categoryFindOption.where,
-          id: In(categoryIds),
-        };
+      if (limit) {
+        categoryQuery.take(limit);
       }
-      if (categoryIds && categoryIds.length === 0) {
-        return {
-          ok: true,
-          categories: [],
-        };
+      if (page) {
+        categoryQuery.skip((Number(page) - 1) * Number(limit));
       }
-      if (
-        Array.isArray(categoryFindOption.where) &&
-        categoryFindOption.where.length === 0
-      )
-        delete categoryFindOption.where;
-      let categories = await this.mockExamCategories.find(categoryFindOption);
+
+      let categories = await categoryQuery.getMany();
       if (user) {
         const categoryIds = categories.map((category) => category.id);
         const categoryBookmarks = await this.examCategoryBookmarks.find({
@@ -330,9 +289,6 @@ export class MockExamCategoryService {
           return category;
         });
       }
-      categories = categories.filter(
-        (category) => category.mockExam.length > 0,
-      );
       const categoryEvaluations = await this.categoryEvaluations.find({
         where: {
           category: In(categories.map((category) => category.id)),
@@ -391,16 +347,18 @@ export class MockExamCategoryService {
     try {
       const { name, isPublic, description } = createMockExamCategoryInput;
       const exists = await this.mockExamCategories.findOne({
-        where: { name },
+        where: [{ name }, { urlSlug: name }],
       });
       if (exists) {
         return {
           ok: false,
-          error: '이미 존재하는 카테고리 입니다.',
+          error: '폴더 제목이 중복됩니다.',
         };
       }
+
       const newCategory = this.mockExamCategories.create({
         name: createMockExamCategoryInput.name,
+        urlSlug: createMockExamCategoryInput.name,
         user,
         approved: false,
         isPublic,
@@ -416,7 +374,7 @@ export class MockExamCategoryService {
     } catch {
       return {
         ok: false,
-        error: '카테고리를 생성할 수 없습니다.',
+        error: '폴더를 생성할 수 없습니다.',
       };
     }
   }
@@ -563,11 +521,12 @@ export class MockExamCategoryService {
     readMockExamCategoryByCategoryIdInput: ReadMockExamCategoryByCategoryIdInput,
   ): Promise<ReadMockExamCategoryByCategoryIdOutput> {
     try {
-      const { id, name } = readMockExamCategoryByCategoryIdInput;
+      const { id, name, urlSlug } = readMockExamCategoryByCategoryIdInput;
       const category = await this.mockExamCategories.findOne({
         where: {
           ...(id ? { id } : {}),
           ...(name ? { name } : {}),
+          ...(urlSlug ? { urlSlug } : {}),
         },
         relations: {
           user: true,
@@ -762,14 +721,19 @@ export class MockExamCategoryService {
   async readMockExamCategoryNames(): Promise<ReadMockExamCategoryNamesOutput> {
     try {
       const categories = await this.mockExamCategories.find({
-        select: ['name', 'isPublic'],
+        select: ['name', 'isPublic', 'urlSlug'],
       });
       const names = categories
         .filter((category) => category.isPublic)
         .map((category) => category.name);
+      const urlSlugs = categories
+        .filter((category) => category.isPublic)
+        .map((category) => category.urlSlug);
+
       return {
         ok: true,
         names,
+        urlSlugs,
       };
     } catch {
       return {

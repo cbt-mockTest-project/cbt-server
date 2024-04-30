@@ -49,6 +49,10 @@ export class MockExamCategory extends CoreEntity {
   @Field(() => String)
   name: string;
 
+  @Column({ unique: true })
+  @Field(() => String)
+  urlSlug: string;
+
   @Column({ default: '' })
   @Field(() => String, { defaultValue: '' })
   description?: string;

@@ -8,6 +8,8 @@ export class ReadMockExamCategoryByCategoryIdInput {
   id?: number;
   @Field(() => String, { nullable: true })
   name?: string;
+  @Field(() => String, { nullable: true })
+  urlSlug?: string;
 }
 
 @ObjectType()

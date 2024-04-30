@@ -347,14 +347,15 @@ export class MockExamCategoryService {
     try {
       const { name, isPublic, description } = createMockExamCategoryInput;
       const exists = await this.mockExamCategories.findOne({
-        where: { name },
+        where: [{ name }, { urlSlug: name }],
       });
       if (exists) {
         return {
           ok: false,
-          error: '이미 존재하는 카테고리 입니다.',
+          error: '폴더 제목이 중복됩니다.',
         };
       }
+
       const newCategory = this.mockExamCategories.create({
         name: createMockExamCategoryInput.name,
         urlSlug: createMockExamCategoryInput.name,
@@ -373,7 +374,7 @@ export class MockExamCategoryService {
     } catch {
       return {
         ok: false,
-        error: '카테고리를 생성할 수 없습니다.',
+        error: '폴더를 생성할 수 없습니다.',
       };
     }
   }

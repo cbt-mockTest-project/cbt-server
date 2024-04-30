@@ -48,7 +48,7 @@ export class MockExamCategory extends CoreEntity {
   @Field(() => String)
   name: string;
 
-  @Column({ nullable: true })
+  @Column({ unique: true })
   @Field(() => String)
   urlSlug: string;
 

@@ -11,4 +11,6 @@ export class ApproveCategoryInvitationLinkInput {
 export class ApproveCategoryInvitationLinkOutput extends CoreOutput {
   @Field(() => String, { nullable: true })
   categoryName?: string;
+  @Field(() => String, { nullable: true })
+  urlSlug?: string;
 }

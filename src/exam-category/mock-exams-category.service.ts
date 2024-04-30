@@ -357,6 +357,7 @@ export class MockExamCategoryService {
       }
       const newCategory = this.mockExamCategories.create({
         name: createMockExamCategoryInput.name,
+        urlSlug: createMockExamCategoryInput.name,
         user,
         approved: false,
         isPublic,
@@ -519,11 +520,12 @@ export class MockExamCategoryService {
     readMockExamCategoryByCategoryIdInput: ReadMockExamCategoryByCategoryIdInput,
   ): Promise<ReadMockExamCategoryByCategoryIdOutput> {
     try {
-      const { id, name } = readMockExamCategoryByCategoryIdInput;
+      const { id, name, urlSlug } = readMockExamCategoryByCategoryIdInput;
       const category = await this.mockExamCategories.findOne({
         where: {
           ...(id ? { id } : {}),
           ...(name ? { name } : {}),
+          ...(urlSlug ? { urlSlug } : {}),
         },
         relations: {
           user: true,
@@ -718,14 +720,19 @@ export class MockExamCategoryService {
   async readMockExamCategoryNames(): Promise<ReadMockExamCategoryNamesOutput> {
     try {
       const categories = await this.mockExamCategories.find({
-        select: ['name', 'isPublic'],
+        select: ['name', 'isPublic', 'urlSlug'],
       });
       const names = categories
         .filter((category) => category.isPublic)
         .map((category) => category.name);
+      const urlSlugs = categories
+        .filter((category) => category.isPublic)
+        .map((category) => category.urlSlug);
+
       return {
         ok: true,
         names,
+        urlSlugs,
       };
     } catch {
       return {

@@ -8,4 +8,6 @@ export class ReadMockExamCategoryNamesInput {}
 export class ReadMockExamCategoryNamesOutput extends CoreOutput {
   @Field(() => [String], { nullable: true })
   names?: string[];
+  @Field(() => [String], { nullable: true })
+  urlSlugs?: string[];
 }

@@ -19,14 +19,6 @@ export enum ItemStateEnum {
 
 registerEnumType(ItemStateEnum, { name: 'ItemStateEnum' });
 
-@InputType('ThumbnailTemplateInputType', { isAbstract: true })
-@ObjectType()
-export class ThumbnailTemplate {
-  @Field(() => String)
-  title: string;
-  @Field(() => String)
-  description: string;
-}
 @InputType('ItemFileInputType', { isAbstract: true })
 @ObjectType()
 export class ItemFileType {
@@ -38,8 +30,6 @@ export class ItemFileType {
   size: number;
   @Field(() => String)
   uid: string;
-  @Field(() => String)
-  url: string;
 }
 
 @InputType('ItemInputType', { isAbstract: true })
@@ -53,10 +43,6 @@ export class Item extends CoreEntity {
   @Field(() => String, { nullable: true, defaultValue: null })
   @Column({ nullable: true, default: null })
   thumbnail?: string;
-
-  @Column({ nullable: true, type: 'json', default: null })
-  @Field(() => ThumbnailTemplate, { nullable: true })
-  thumbnailTemplate?: ThumbnailTemplate;
 
   @Column({ nullable: true, type: 'json', default: null })
   @Field(() => ItemFileType, { nullable: true })

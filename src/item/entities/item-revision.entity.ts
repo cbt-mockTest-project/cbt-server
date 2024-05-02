@@ -40,6 +40,10 @@ export class ItemRevision extends CoreEntity {
   @Field(() => String)
   title: string;
 
+  @Column({ unique: true })
+  @Field(() => String)
+  urlSlug: string;
+
   @Column()
   @Field(() => String)
   description: string;

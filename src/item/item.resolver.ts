@@ -16,6 +16,10 @@ import {
   RequestDeleteItemInput,
   RequestDeleteItemOutput,
 } from './dtos/requestDeleteItem.dto';
+import {
+  GetItemRevisionInput,
+  GetItemRevisionOutput,
+} from './dtos/getItemRevision.dto';
 @Resolver(() => Item)
 export class ItemResolver {
   constructor(private readonly itemService: ItemService) {}
@@ -55,6 +59,15 @@ export class ItemResolver {
   @Query(() => Item)
   async getItem(@Args('input') getItemInput: GetItemInput) {
     return this.itemService.getItem(getItemInput);
+  }
+
+  @Role(['ANY'])
+  @Query(() => GetItemRevisionOutput)
+  async getItemRevision(
+    @AuthUser() user: User,
+    @Args('input') getItemRevisionInput: GetItemRevisionInput,
+  ) {
+    return this.itemService.getItemRevision(user, getItemRevisionInput);
   }
 
   @Query(() => GetItemsForOwnerOutput)

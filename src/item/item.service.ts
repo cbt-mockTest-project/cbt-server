@@ -20,6 +20,10 @@ import {
   RequestDeleteItemInput,
   RequestDeleteItemOutput,
 } from './dtos/requestDeleteItem.dto';
+import {
+  GetItemRevisionInput,
+  GetItemRevisionOutput,
+} from './dtos/getItemRevision.dto';
 
 @Injectable()
 export class ItemService {
@@ -46,14 +50,24 @@ export class ItemService {
         createItemData.category = { id: categoryId };
       }
       const newItem = this.items.create(createItemData);
+      let item: Item;
       if (newItem.price === 0) {
         newItem.state = ItemStateEnum.APPROVED;
-        await this.items.save(newItem);
+        item = await this.items.save(newItem);
       }
       if (newItem.price > 0) {
-        const newItemRevision = omit(newItem, ['state']);
-        await this.itemRevisions.save(newItemRevision);
+        newItem.state = ItemStateEnum.PENDING;
+        item = await this.items.save(newItem);
       }
+      const newItemRevision = omit(newItem, ['id', 'state']);
+      await this.itemRevisions.save({
+        ...newItemRevision,
+        state:
+          newItemRevision.price === 0
+            ? ItemRevisionStateEnum.APPROVED
+            : ItemRevisionStateEnum.PENDING,
+        item: { id: item.id },
+      });
       return { ok: true };
     } catch {
       return { ok: false, error: 'Could not create item' };
@@ -66,6 +80,7 @@ export class ItemService {
   ): Promise<UpdateItemOutput> {
     try {
       const { categoryId, ...itemData } = updateItemInput;
+
       const item = await this.items.findOne({
         where: { id: updateItemInput.id },
         relations: {
@@ -76,6 +91,7 @@ export class ItemService {
       if (!item) {
         return { ok: false, error: 'Item not found' };
       }
+      const isFree = item.price === 0 && itemData.price === 0;
       if (item.user.id !== user.id && user.role !== UserRole.ADMIN) {
         return { ok: false, error: 'You are not authorized' };
       }
@@ -86,36 +102,37 @@ export class ItemService {
       if (categoryId) {
         updateItemData.category = { id: categoryId };
       }
-      if (item.price > 0 || (item.price === 0 && itemData.price > 0)) {
-        const existingItemRevision = await this.itemRevisions.findOne({
-          where: {
-            item: {
-              id: updateItemInput.id,
-            },
-          },
-        });
-        const newItemRevision = {
-          ...omit(item, ['state', 'id']),
-          ...updateItemData,
+      const existingItemRevision = await this.itemRevisions.findOne({
+        where: {
           item: {
             id: updateItemInput.id,
           },
-        };
+        },
+      });
+      const newItemRevision = {
+        ...omit(item, ['state', 'id']),
+        ...updateItemData,
+        item: {
+          id: updateItemInput.id,
+        },
+      };
+      if (!existingItemRevision) {
+        return { ok: false, error: 'ItemRevision not found' };
+      }
 
-        if (existingItemRevision) {
-          await this.itemRevisions.save({
-            ...existingItemRevision,
-            ...newItemRevision,
-            id: existingItemRevision.id,
-            state: ItemRevisionStateEnum.PENDING,
-          });
-        } else {
-          await this.itemRevisions.save({
-            ...newItemRevision,
-            state: ItemRevisionStateEnum.PENDING,
-          });
-        }
-      } else {
+      if (existingItemRevision) {
+        await this.itemRevisions.save({
+          ...existingItemRevision,
+          ...newItemRevision,
+          id: existingItemRevision.id,
+          state: isFree
+            ? ItemRevisionStateEnum.APPROVED
+            : ItemRevisionStateEnum.PENDING,
+        });
+      }
+
+      //  무료일 경우 바로 업데이트
+      if (isFree) {
         await this.items.save({ ...item, ...updateItemData });
       }
 
@@ -168,6 +185,31 @@ export class ItemService {
     }
   }
 
+  async getItemRevision(
+    user: User,
+    getItemRevisionInput: GetItemRevisionInput,
+  ): Promise<GetItemRevisionOutput> {
+    try {
+      const itemRevision = await this.itemRevisions.findOne({
+        where: { id: getItemRevisionInput.id },
+        relations: {
+          user: true,
+          item: true,
+          category: true,
+        },
+      });
+      if (!itemRevision) {
+        return { ok: false, error: 'Item not found' };
+      }
+      if (itemRevision.user.id !== user.id && user.role !== UserRole.ADMIN) {
+        return { ok: false, error: 'You are not authorized' };
+      }
+      return { ok: true, itemRevision };
+    } catch {
+      return { ok: false, error: 'Could not get item' };
+    }
+  }
+
   async getItems(getItemsInput: GetItemsInput): Promise<GetItemsOutput> {
     const { page, limit, search } = getItemsInput;
     const formattedSearch = `%${search?.replace(/\s+/g, '').toLowerCase()}%`;
@@ -178,6 +220,7 @@ export class ItemService {
     });
     const query = this.items
       .createQueryBuilder('item')
+      .leftJoinAndSelect('item.user', 'user')
       .skip((page - 1) * limit)
       .where('item.state = :state', { state: ItemStateEnum.APPROVED })
       .take(limit);
@@ -221,7 +264,7 @@ export class ItemService {
       }
       const itemRevision = await this.itemRevisions.findOne({
         where: { id: approveItemInput.id },
-        relations: { item: true, user: true },
+        relations: { item: true, user: true, category: true },
       });
       if (!itemRevision) {
         return { ok: false, error: 'ItemRevision not found' };
@@ -238,8 +281,8 @@ export class ItemService {
       }
 
       await queryRunner.manager.save(Item, newItem);
-      await queryRunner.manager.delete(ItemRevision, {
-        id: approveItemInput.id,
+      await queryRunner.manager.update(ItemRevision, itemRevision.id, {
+        state: ItemRevisionStateEnum.APPROVED,
       });
       await queryRunner.commitTransaction();
       return {

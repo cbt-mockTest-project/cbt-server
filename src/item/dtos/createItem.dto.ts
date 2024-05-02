@@ -1,4 +1,4 @@
-import { InputType, ObjectType, PickType } from '@nestjs/graphql';
+import { Field, InputType, ObjectType, PickType } from '@nestjs/graphql';
 import { CoreOutput } from 'src/common/dtos/output.dto';
 import { Item } from '../entities/item.entity';
 
@@ -10,7 +10,10 @@ export class CreateItemInput extends PickType(Item, [
   'title',
   'description',
   'contents',
-]) {}
+]) {
+  @Field(() => Number, { nullable: true })
+  categoryId?: number;
+}
 
 @ObjectType()
 export class CreateItemOutput extends CoreOutput {}

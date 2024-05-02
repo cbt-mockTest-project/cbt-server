@@ -12,6 +12,10 @@ import { Role } from 'src/auth/role.decorators';
 import { User } from 'src/users/entities/user.entity';
 import { GetItemsInput, GetItemsOutput } from './dtos/getItems.dto';
 import { GetItemInput } from './dtos/getItem.dto';
+import {
+  RequestDeleteItemInput,
+  RequestDeleteItemOutput,
+} from './dtos/requestDeleteItem.dto';
 @Resolver(() => Item)
 export class ItemResolver {
   constructor(private readonly itemService: ItemService) {}
@@ -77,5 +81,14 @@ export class ItemResolver {
     @Args('input') rejectItemInput: RejectItemInput,
   ) {
     return this.itemService.rejectItem(user, rejectItemInput);
+  }
+
+  @Mutation(() => RequestDeleteItemOutput)
+  @Role(['ANY'])
+  async requestDeleteItem(
+    @AuthUser() user: User,
+    @Args('input') requestDeleteItemInput: RequestDeleteItemInput,
+  ) {
+    return this.itemService.requestDeleteItem(user, requestDeleteItemInput);
   }
 }

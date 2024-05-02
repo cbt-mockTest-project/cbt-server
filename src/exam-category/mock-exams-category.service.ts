@@ -9,14 +9,7 @@ import {
 } from './entities/mock-exam-category.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  FindManyOptions,
-  FindOptionsWhere,
-  In,
-  IsNull,
-  Like,
-  Repository,
-} from 'typeorm';
+import { FindOptionsWhere, In, IsNull, Repository } from 'typeorm';
 import {
   DeleteMockExamCategoryInput,
   DeleteMockExamCategoryOutput,

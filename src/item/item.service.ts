@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeepPartial, Repository } from 'typeorm';
 import { Item, ItemStateEnum } from './entities/item.entity';
 import { CreateItemInput, CreateItemOutput } from './dtos/createItem.dto';
 import { UpdateItemInput, UpdateItemOutput } from './dtos/updateItem.dto';
@@ -11,11 +11,22 @@ import { GetItemsInput, GetItemsOutput } from './dtos/getItems.dto';
 import { ApproveItemInput, ApproveItemOutput } from './dtos/approveItem.dto';
 import { RejectItemInput, RejectItemOutput } from './dtos/rejectItem.dto';
 import { GetItemsForOwnerOutput } from './dtos/getItemsForOwner.dto';
+import {
+  ItemRevision,
+  ItemRevisionStateEnum,
+} from './entities/item-revision.entity';
+import { omit } from 'lodash';
+import {
+  RequestDeleteItemInput,
+  RequestDeleteItemOutput,
+} from './dtos/requestDeleteItem.dto';
 
 @Injectable()
 export class ItemService {
   constructor(
     @InjectRepository(Item) private readonly items: Repository<Item>,
+    @InjectRepository(ItemRevision)
+    private readonly itemRevisions: Repository<ItemRevision>,
   ) {}
 
   async createItem(
@@ -23,17 +34,26 @@ export class ItemService {
     user: User,
   ): Promise<CreateItemOutput> {
     try {
+      const { categoryId, ...itemData } = createItemInput;
       if (!user) {
         return { ok: false, error: 'User not found' };
       }
-      const newItem = this.items.create({ ...createItemInput, user });
+      const createItemData: DeepPartial<Item> = {
+        ...itemData,
+        user,
+      };
+      if (categoryId) {
+        createItemData.category = { id: categoryId };
+      }
+      const newItem = this.items.create(createItemData);
       if (newItem.price === 0) {
         newItem.state = ItemStateEnum.APPROVED;
+        await this.items.save(newItem);
       }
       if (newItem.price > 0) {
-        newItem.state = ItemStateEnum.PENDING;
+        const newItemRevision = omit(newItem, ['state']);
+        await this.itemRevisions.save(newItemRevision);
       }
-      await this.items.save(newItem);
       return { ok: true };
     } catch {
       return { ok: false, error: 'Could not create item' };
@@ -45,10 +65,12 @@ export class ItemService {
     updateItemInput: UpdateItemInput,
   ): Promise<UpdateItemOutput> {
     try {
+      const { categoryId, ...itemData } = updateItemInput;
       const item = await this.items.findOne({
         where: { id: updateItemInput.id },
         relations: {
           user: true,
+          category: true,
         },
       });
       if (!item) {
@@ -57,13 +79,49 @@ export class ItemService {
       if (item.user.id !== user.id && user.role !== UserRole.ADMIN) {
         return { ok: false, error: 'You are not authorized' };
       }
-      // 무료아이템 -> 유료아이템으로 업데이트 시, 상태를 PENDING으로 변경
-      if (item.price === 0 && updateItemInput.price > 0) {
-        updateItemInput.state = ItemStateEnum.PENDING;
+      const updateItemData: DeepPartial<Item> = {
+        ...itemData,
+        user,
+      };
+      if (categoryId) {
+        updateItemData.category = { id: categoryId };
       }
-      await this.items.save({ ...item, ...updateItemInput });
+      if (item.price > 0 || (item.price === 0 && itemData.price > 0)) {
+        const existingItemRevision = await this.itemRevisions.findOne({
+          where: {
+            item: {
+              id: updateItemInput.id,
+            },
+          },
+        });
+        const newItemRevision = {
+          ...omit(item, ['state', 'id']),
+          ...updateItemData,
+          item: {
+            id: updateItemInput.id,
+          },
+        };
+
+        if (existingItemRevision) {
+          await this.itemRevisions.save({
+            ...existingItemRevision,
+            ...newItemRevision,
+            id: existingItemRevision.id,
+            state: ItemRevisionStateEnum.PENDING,
+          });
+        } else {
+          await this.itemRevisions.save({
+            ...newItemRevision,
+            state: ItemRevisionStateEnum.PENDING,
+          });
+        }
+      } else {
+        await this.items.save({ ...item, ...updateItemData });
+      }
+
       return { ok: true };
-    } catch {
+    } catch (e) {
+      console.log(e);
       return { ok: false, error: 'Could not update item' };
     }
   }
@@ -156,19 +214,42 @@ export class ItemService {
     user: User,
     approveItemInput: ApproveItemInput,
   ): Promise<ApproveItemOutput> {
+    const queryRunner = this.items.manager.connection.createQueryRunner();
     try {
       if (user.role !== UserRole.ADMIN) {
         return { ok: false, error: 'You are not authorized' };
       }
-      const item = await this.items.findOne({
+      const itemRevision = await this.itemRevisions.findOne({
         where: { id: approveItemInput.id },
+        relations: { item: true, user: true },
       });
-      if (!item) {
-        return { ok: false, error: 'Item not found' };
+      if (!itemRevision) {
+        return { ok: false, error: 'ItemRevision not found' };
       }
-      await this.items.save({ ...item, state: ItemStateEnum.APPROVED });
-    } catch {
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+
+      const newItem: DeepPartial<Item> = {
+        ...omit(itemRevision, 'id'),
+        state: ItemStateEnum.APPROVED,
+      };
+      if (itemRevision.item) {
+        newItem.id = itemRevision.item.id;
+      }
+
+      await queryRunner.manager.save(Item, newItem);
+      await queryRunner.manager.delete(ItemRevision, {
+        id: approveItemInput.id,
+      });
+      await queryRunner.commitTransaction();
+      return {
+        ok: true,
+      };
+    } catch (e) {
+      await queryRunner.rollbackTransaction();
       return { ok: false, error: 'Could not approve item' };
+    } finally {
+      await queryRunner.release();
     }
   }
 
@@ -180,15 +261,62 @@ export class ItemService {
       if (user.role !== UserRole.ADMIN) {
         return { ok: false, error: 'You are not authorized' };
       }
-      const item = await this.items.findOne({
+      const item = await this.itemRevisions.findOne({
         where: { id: rejectItemInput.id },
       });
       if (!item) {
         return { ok: false, error: 'Item not found' };
       }
-      await this.items.save({ ...item, state: ItemStateEnum.REJECTED });
+      await this.itemRevisions.save({
+        ...item,
+        state: ItemRevisionStateEnum.REJECTED,
+      });
     } catch {
       return { ok: false, error: 'Could not reject item' };
+    }
+  }
+
+  async requestDeleteItem(
+    user: User,
+    requestDeleteItemInput: RequestDeleteItemInput,
+  ): Promise<RequestDeleteItemOutput> {
+    try {
+      const item = await this.items.findOne({
+        where: { id: requestDeleteItemInput.itemId },
+        relations: {
+          user: true,
+          category: true,
+        },
+      });
+      if (!item) {
+        return { ok: false, error: 'Item not found' };
+      }
+      if (item.user.id !== user.id && user.role !== UserRole.ADMIN) {
+        return { ok: false, error: 'You are not authorized' };
+      }
+      const itemRevision = await this.itemRevisions.findOne({
+        where: {
+          item: {
+            id: item.id,
+          },
+        },
+      });
+      if (!itemRevision) {
+        await this.itemRevisions.save({
+          ...omit(item, 'id'),
+          state: ItemRevisionStateEnum.REQUEST_DELETION,
+          item: {
+            id: item.id,
+          },
+        });
+      } else {
+        await this.itemRevisions.update(itemRevision.id, {
+          state: ItemRevisionStateEnum.REQUEST_DELETION,
+        });
+      }
+      return { ok: true };
+    } catch {
+      return { ok: false, error: 'Could not request delete item' };
     }
   }
 }

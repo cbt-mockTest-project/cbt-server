@@ -1,4 +1,10 @@
-import { InputType, ObjectType, PartialType, PickType } from '@nestjs/graphql';
+import {
+  Field,
+  InputType,
+  ObjectType,
+  PartialType,
+  PickType,
+} from '@nestjs/graphql';
 import { CoreOutput } from 'src/common/dtos/output.dto';
 import { Item } from '../entities/item.entity';
 
@@ -13,7 +19,10 @@ export class UpdateItemInput extends PartialType(
     'id',
     'contents',
   ]),
-) {}
+) {
+  @Field((type) => Number, { nullable: true })
+  categoryId?: number;
+}
 
 @ObjectType()
 export class UpdateItemOutput extends CoreOutput {}

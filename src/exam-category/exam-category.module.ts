@@ -13,6 +13,7 @@ import { Seller } from 'src/seller/entities/seller.entity';
 import { CategoryEvaluation } from 'src/category-evaluation/entities/category-evaluation.entity';
 import { MockExamQuestion } from 'src/exam/entities/mock-exam-question.entity';
 import { Item } from 'src/item/entities/item.entity';
+import { ItemRevision } from 'src/item/entities/item-revision.entity';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { Item } from 'src/item/entities/item.entity';
       Seller,
       CategoryEvaluation,
       Item,
+      ItemRevision,
     ]),
   ],
   providers: [

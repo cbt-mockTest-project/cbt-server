@@ -55,6 +55,7 @@ import { QuizCommentLike } from 'src/quiz/entities/quizCommentLike.entity';
 import { CategoryInvitationLink } from 'src/category-invitation-link/entities/category-invitation-link.entity';
 import { Item } from 'src/item/entities/item.entity';
 import { ItemSalesHistory } from 'src/item/entities/item-sales-history.entity';
+import { ItemRevision } from 'src/item/entities/item-revision.entity';
 
 @InputType('RecentlyStudiedExamsInputType', { isAbstract: true })
 @ObjectType()
@@ -212,6 +213,10 @@ export class User extends CoreEntity {
   @OneToMany(() => Item, (item) => item.user)
   @Field(() => [Item])
   items: Item[];
+
+  @OneToMany(() => ItemRevision, (item) => item.user)
+  @Field(() => [ItemRevision])
+  itemRevisions: ItemRevision[];
 
   @OneToMany(
     () => MockExamQuestionCommentLike,

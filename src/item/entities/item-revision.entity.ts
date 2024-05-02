@@ -4,46 +4,26 @@ import {
   ObjectType,
   registerEnumType,
 } from '@nestjs/graphql';
-import { IsEnum } from 'class-validator';
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 import { CoreEntity } from 'src/common/entities/core.entity';
-import { MockExamCategory } from 'src/exam-category/entities/mock-exam-category.entity';
+import { Item, ItemFileType } from './item.entity';
+import { IsEnum } from 'class-validator';
 import { User } from 'src/users/entities/user.entity';
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
-  OneToOne,
-} from 'typeorm';
-import { ItemSalesHistory } from './item-sales-history.entity';
-import { ItemRevision } from './item-revision.entity';
+import { MockExamCategory } from 'src/exam-category/entities/mock-exam-category.entity';
 
-export enum ItemStateEnum {
+export enum ItemRevisionStateEnum {
   APPROVED = 'APPROVED',
   REJECTED = 'REJECTED',
   PENDING = 'PENDING',
+  REQUEST_DELETION = 'REQUEST_DELETION',
 }
 
-registerEnumType(ItemStateEnum, { name: 'ItemStateEnum' });
+registerEnumType(ItemRevisionStateEnum, { name: 'ItemRevisionStateEnum' });
 
-@InputType('ItemFileInputType', { isAbstract: true })
-@ObjectType()
-export class ItemFileType {
-  @Field(() => String)
-  name: string;
-  @Field(() => String)
-  type: string;
-  @Field(() => Number)
-  size: number;
-  @Field(() => String)
-  uid: string;
-}
-
-@InputType('ItemInputType', { isAbstract: true })
+@InputType('ItemRevisionInputType', { isAbstract: true })
 @ObjectType()
 @Entity()
-export class Item extends CoreEntity {
+export class ItemRevision extends CoreEntity {
   @Field(() => Number)
   @Column()
   price: number;
@@ -68,14 +48,14 @@ export class Item extends CoreEntity {
   @Field(() => String)
   contents: string;
 
-  @Field(() => ItemStateEnum)
+  @Field(() => ItemRevisionStateEnum)
   @Column({
     type: 'enum',
-    enum: ItemStateEnum,
-    default: ItemStateEnum.PENDING,
+    enum: ItemRevisionStateEnum,
+    default: ItemRevisionStateEnum.PENDING,
   })
-  @IsEnum(ItemStateEnum)
-  state: ItemStateEnum;
+  @IsEnum(ItemRevisionStateEnum)
+  state: ItemRevisionStateEnum;
 
   @ManyToOne(() => User, (user) => user.items, { onDelete: 'CASCADE' })
   @Field(() => User)
@@ -88,10 +68,8 @@ export class Item extends CoreEntity {
   @Field(() => MockExamCategory, { nullable: true })
   category?: User;
 
-  @OneToMany(
-    () => ItemSalesHistory,
-    (itemSalesHistory) => itemSalesHistory.item,
-  )
-  @Field(() => [ItemSalesHistory])
-  itemSalesHistory: ItemSalesHistory[];
+  @JoinColumn()
+  @OneToOne(() => Item)
+  @Field(() => Item)
+  item: Item;
 }

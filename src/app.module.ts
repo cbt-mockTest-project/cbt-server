@@ -110,6 +110,7 @@ import { Seceders } from './seceders/entities/seceders.entity';
 import { Item } from './item/entities/item.entity';
 import { ItemModule } from './item/item.module';
 import { ItemSalesHistory } from './item/entities/item-sales-history.entity';
+import { ItemRevision } from './item/entities/item-revision.entity';
 
 @Module({
   imports: [
@@ -137,7 +138,9 @@ import { ItemSalesHistory } from './item/entities/item-sales-history.entity';
       autoSchemaFile: true,
       sortSchema: true, //default: false
       debug: process.env.NODE_ENV === 'dev',
-      playground: process.env.NODE_ENV === 'dev',
+      playground: {
+        cdnUrl: 'https://gcore.jsdelivr.net/npm',
+      },
       formatError(error) {
         logger.error(
           `GraphQL Validation Error: ${JSON.stringify(error, null, 2)}`,
@@ -239,6 +242,7 @@ import { ItemSalesHistory } from './item/entities/item-sales-history.entity';
         CategoryInvitationLink,
         Seceders,
         Item,
+        ItemRevision,
         ItemSalesHistory,
       ],
     }),

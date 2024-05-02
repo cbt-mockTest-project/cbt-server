@@ -14,22 +14,8 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.use(json({ limit: '50mb' }));
   app.use(urlencoded({ limit: '50mb', extended: true }));
-  // const redisService = app.get(RedisService);
-  // const redisIoAdapter = new RedisIoAdapter(redisService);
-  // await redisIoAdapter.connectToRedis();
-  // app.useWebSocketAdapter(redisIoAdapter);
+
   await app.listen(80);
-
-  // const cleanup = async (signal) => {
-  //   server.close(() => {
-  //     redisService.disconnect(); // Redis 연결 종료 메소드를 추가해야 합니다.
-  //     process.exit(0);
-  //   });
-  // };
-
-  // process.on('SIGINT', cleanup);
-  // process.on('SIGTERM', cleanup);
-  // process.on('uncaughtException', cleanup);
 
   console.log('go to graphql : http://localhost:80/graphql');
 }

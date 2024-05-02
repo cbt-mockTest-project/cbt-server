@@ -39,6 +39,13 @@ export class ItemService {
   ): Promise<CreateItemOutput> {
     try {
       const { categoryId, ...itemData } = createItemInput;
+      // 중복된 타이틀이 있는지 확인
+      const exists = await this.items.findOne({
+        where: [{ title: itemData.title }, { urlSlug: itemData.title }],
+      });
+      if (exists) {
+        return { ok: false, error: '제목이 중복됩니다.' };
+      }
       if (!user) {
         return { ok: false, error: 'User not found' };
       }
@@ -80,6 +87,9 @@ export class ItemService {
   ): Promise<UpdateItemOutput> {
     try {
       const { categoryId, ...itemData } = updateItemInput;
+      const exists = await this.items.findOne({
+        where: [{ title: itemData.title }, { urlSlug: itemData.title }],
+      });
 
       const item = await this.items.findOne({
         where: { id: updateItemInput.id },
@@ -90,6 +100,9 @@ export class ItemService {
       });
       if (!item) {
         return { ok: false, error: 'Item not found' };
+      }
+      if (exists && exists.id !== item.id) {
+        return { ok: false, error: '제목이 중복됩니다.' };
       }
       const isFree = item.price === 0 && itemData.price === 0;
       if (item.user.id !== user.id && user.role !== UserRole.ADMIN) {

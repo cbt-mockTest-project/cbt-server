@@ -10,6 +10,7 @@ export class CreateItemInput extends PickType(Item, [
   'title',
   'description',
   'contents',
+  'urlSlug',
 ]) {
   @Field(() => Number, { nullable: true })
   categoryId?: number;

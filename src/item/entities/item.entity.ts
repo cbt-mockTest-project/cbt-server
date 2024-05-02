@@ -8,16 +8,8 @@ import { IsEnum } from 'class-validator';
 import { CoreEntity } from 'src/common/entities/core.entity';
 import { MockExamCategory } from 'src/exam-category/entities/mock-exam-category.entity';
 import { User } from 'src/users/entities/user.entity';
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
-  OneToOne,
-} from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { ItemSalesHistory } from './item-sales-history.entity';
-import { ItemRevision } from './item-revision.entity';
 
 export enum ItemStateEnum {
   APPROVED = 'APPROVED',
@@ -56,9 +48,13 @@ export class Item extends CoreEntity {
   @Field(() => ItemFileType, { nullable: true })
   file: ItemFileType;
 
-  @Column()
+  @Column({ unique: true })
   @Field(() => String)
   title: string;
+
+  @Column({ unique: true })
+  @Field(() => String)
+  urlSlug: string;
 
   @Column()
   @Field(() => String)

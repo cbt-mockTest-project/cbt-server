@@ -30,6 +30,12 @@ export class ItemFileType {
   size: number;
   @Field(() => String)
   uid: string;
+  @Field(() => Number, { nullable: true, defaultValue: 0 })
+  page?: number;
+  @Field(() => [String], { nullable: true, defaultValue: [] })
+  previewImages?: string[];
+  @Field(() => Number, { nullable: true, defaultValue: 0 })
+  previewImagesCount?: number;
 }
 
 @InputType('ItemInputType', { isAbstract: true })

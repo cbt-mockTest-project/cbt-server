@@ -11,7 +11,7 @@ import { AuthUser } from 'src/auth/auth-user.decorator';
 import { Role } from 'src/auth/role.decorators';
 import { User } from 'src/users/entities/user.entity';
 import { GetItemsInput, GetItemsOutput } from './dtos/getItems.dto';
-import { GetItemInput } from './dtos/getItem.dto';
+import { GetItemInput, GetItemOutput } from './dtos/getItem.dto';
 import {
   RequestDeleteItemInput,
   RequestDeleteItemOutput,
@@ -20,6 +20,7 @@ import {
   GetItemRevisionInput,
   GetItemRevisionOutput,
 } from './dtos/getItemRevision.dto';
+import { GetApprovedItemIdsAndsSlugsOutput } from './dtos/getApprovedItemIdsAndSlugs.dto';
 @Resolver(() => Item)
 export class ItemResolver {
   constructor(private readonly itemService: ItemService) {}
@@ -56,7 +57,7 @@ export class ItemResolver {
     return this.itemService.getItems(getItemsInput);
   }
 
-  @Query(() => Item)
+  @Query(() => GetItemOutput)
   async getItem(@Args('input') getItemInput: GetItemInput) {
     return this.itemService.getItem(getItemInput);
   }
@@ -103,5 +104,10 @@ export class ItemResolver {
     @Args('input') requestDeleteItemInput: RequestDeleteItemInput,
   ) {
     return this.itemService.requestDeleteItem(user, requestDeleteItemInput);
+  }
+
+  @Query(() => GetApprovedItemIdsAndsSlugsOutput)
+  async getApprovedItemIdsAndsSlugs() {
+    return this.itemService.getApprovedItemIdsAndsSlugs();
   }
 }

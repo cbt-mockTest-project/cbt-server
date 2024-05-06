@@ -4,8 +4,10 @@ import { Item } from '../entities/item.entity';
 
 @InputType()
 export class GetItemInput {
-  @Field(() => Number)
-  id: number;
+  @Field(() => Number, { nullable: true })
+  id?: number;
+  @Field(() => String, { nullable: true })
+  urlSlug?: string;
 }
 
 @ObjectType()

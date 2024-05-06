@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeepPartial, Repository } from 'typeorm';
+import { DeepPartial, FindOptionsWhere, Repository } from 'typeorm';
 import { Item, ItemStateEnum } from './entities/item.entity';
 import { CreateItemInput, CreateItemOutput } from './dtos/createItem.dto';
 import { UpdateItemInput, UpdateItemOutput } from './dtos/updateItem.dto';
@@ -24,6 +24,7 @@ import {
   GetItemRevisionInput,
   GetItemRevisionOutput,
 } from './dtos/getItemRevision.dto';
+import { GetApprovedItemIdsAndsSlugsOutput } from './dtos/getApprovedItemIdsAndSlugs.dto';
 
 @Injectable()
 export class ItemService {
@@ -186,8 +187,20 @@ export class ItemService {
 
   async getItem(getItemInput: GetItemInput): Promise<GetItemOutput> {
     try {
+      const { id, urlSlug } = getItemInput;
+      const where: FindOptionsWhere<Item> = {};
+      if (id) {
+        where.id = id;
+      }
+      if (urlSlug) {
+        where.urlSlug = urlSlug;
+      }
       const item = await this.items.findOne({
-        where: { id: getItemInput.id },
+        where,
+        relations: {
+          user: true,
+          category: true,
+        },
       });
       if (!item) {
         return { ok: false, error: 'Item not found' };
@@ -258,6 +271,10 @@ export class ItemService {
           user: {
             id: user.id,
           },
+        },
+        relations: {
+          user: true,
+          category: true,
         },
       });
       return { ok: true, items };
@@ -373,6 +390,22 @@ export class ItemService {
       return { ok: true };
     } catch {
       return { ok: false, error: 'Could not request delete item' };
+    }
+  }
+
+  async getApprovedItemIdsAndsSlugs(): Promise<GetApprovedItemIdsAndsSlugsOutput> {
+    try {
+      const items = await this.items.find({
+        where: { state: ItemStateEnum.APPROVED },
+        select: ['id', 'urlSlug'],
+      });
+      return {
+        ok: true,
+        ids: items.map((item) => item.id),
+        slugs: items.map((item) => item.urlSlug),
+      };
+    } catch {
+      return { ok: false, error: 'Could not get approved item ids' };
     }
   }
 }

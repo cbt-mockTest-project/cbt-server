@@ -1,6 +1,6 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { CoreOutput } from 'src/common/dtos/output.dto';
-import { ItemRevision } from '../entities/item-revision.entity';
+import { ItemRevision } from '../../entities/item-revision.entity';
 
 @InputType()
 export class GetItemRevisionInput {

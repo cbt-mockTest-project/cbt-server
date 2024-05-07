@@ -1,26 +1,29 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { Item } from './entities/item.entity';
 import { ItemService } from './item.service';
-import { CreateItemInput, CreateItemOutput } from './dtos/createItem.dto';
-import { UpdateItemInput, UpdateItemOutput } from './dtos/updateItem.dto';
-import { DeleteItemInput, DeleteItemOutput } from './dtos/deleteItem.dto';
-import { ApproveItemInput, ApproveItemOutput } from './dtos/approveItem.dto';
-import { RejectItemInput, RejectItemOutput } from './dtos/rejectItem.dto';
-import { GetItemsForOwnerOutput } from './dtos/getItemsForOwner.dto';
+import { CreateItemInput, CreateItemOutput } from './dtos/item/createItem.dto';
+import { UpdateItemInput, UpdateItemOutput } from './dtos/item/updateItem.dto';
+import { DeleteItemInput, DeleteItemOutput } from './dtos/item/deleteItem.dto';
+import {
+  ApproveItemInput,
+  ApproveItemOutput,
+} from './dtos/item/approveItem.dto';
+import { RejectItemInput, RejectItemOutput } from './dtos/item/rejectItem.dto';
+import { GetItemsForOwnerOutput } from './dtos/item/getItemsForOwner.dto';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { Role } from 'src/auth/role.decorators';
 import { User } from 'src/users/entities/user.entity';
-import { GetItemsInput, GetItemsOutput } from './dtos/getItems.dto';
-import { GetItemInput, GetItemOutput } from './dtos/getItem.dto';
+import { GetItemsInput, GetItemsOutput } from './dtos/item/getItems.dto';
+import { GetItemInput, GetItemOutput } from './dtos/item/getItem.dto';
 import {
   RequestDeleteItemInput,
   RequestDeleteItemOutput,
-} from './dtos/requestDeleteItem.dto';
+} from './dtos/item/requestDeleteItem.dto';
 import {
   GetItemRevisionInput,
   GetItemRevisionOutput,
-} from './dtos/getItemRevision.dto';
-import { GetApprovedItemIdsAndsSlugsOutput } from './dtos/getApprovedItemIdsAndSlugs.dto';
+} from './dtos/item/getItemRevision.dto';
+import { GetApprovedItemIdsAndsSlugsOutput } from './dtos/item/getApprovedItemIdsAndSlugs.dto';
 @Resolver(() => Item)
 export class ItemResolver {
   constructor(private readonly itemService: ItemService) {}

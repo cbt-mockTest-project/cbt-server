@@ -2,15 +2,18 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, FindOptionsWhere, Repository } from 'typeorm';
 import { Item, ItemStateEnum } from './entities/item.entity';
-import { CreateItemInput, CreateItemOutput } from './dtos/createItem.dto';
-import { UpdateItemInput, UpdateItemOutput } from './dtos/updateItem.dto';
-import { DeleteItemInput, DeleteItemOutput } from './dtos/deleteItem.dto';
+import { CreateItemInput, CreateItemOutput } from './dtos/item/createItem.dto';
+import { UpdateItemInput, UpdateItemOutput } from './dtos/item/updateItem.dto';
+import { DeleteItemInput, DeleteItemOutput } from './dtos/item/deleteItem.dto';
 import { User, UserRole } from 'src/users/entities/user.entity';
-import { GetItemInput, GetItemOutput } from './dtos/getItem.dto';
-import { GetItemsInput, GetItemsOutput } from './dtos/getItems.dto';
-import { ApproveItemInput, ApproveItemOutput } from './dtos/approveItem.dto';
-import { RejectItemInput, RejectItemOutput } from './dtos/rejectItem.dto';
-import { GetItemsForOwnerOutput } from './dtos/getItemsForOwner.dto';
+import { GetItemInput, GetItemOutput } from './dtos/item/getItem.dto';
+import { GetItemsInput, GetItemsOutput } from './dtos/item/getItems.dto';
+import {
+  ApproveItemInput,
+  ApproveItemOutput,
+} from './dtos/item/approveItem.dto';
+import { RejectItemInput, RejectItemOutput } from './dtos/item/rejectItem.dto';
+import { GetItemsForOwnerOutput } from './dtos/item/getItemsForOwner.dto';
 import {
   ItemRevision,
   ItemRevisionStateEnum,
@@ -19,12 +22,12 @@ import { omit } from 'lodash';
 import {
   RequestDeleteItemInput,
   RequestDeleteItemOutput,
-} from './dtos/requestDeleteItem.dto';
+} from './dtos/item/requestDeleteItem.dto';
 import {
   GetItemRevisionInput,
   GetItemRevisionOutput,
-} from './dtos/getItemRevision.dto';
-import { GetApprovedItemIdsAndsSlugsOutput } from './dtos/getApprovedItemIdsAndSlugs.dto';
+} from './dtos/item/getItemRevision.dto';
+import { GetApprovedItemIdsAndsSlugsOutput } from './dtos/item/getApprovedItemIdsAndSlugs.dto';
 
 @Injectable()
 export class ItemService {

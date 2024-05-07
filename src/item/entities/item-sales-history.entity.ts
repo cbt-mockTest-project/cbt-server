@@ -3,6 +3,7 @@ import { CoreEntity } from 'src/common/entities/core.entity';
 import { Entity, ManyToOne, Column } from 'typeorm';
 import { Item } from './item.entity';
 import { User } from 'src/users/entities/user.entity';
+import { Payment } from 'src/payments/entities/payment.entity';
 
 @InputType('ItemSalesHistoryInputType', { isAbstract: true })
 @ObjectType()
@@ -21,7 +22,9 @@ export class ItemSalesHistory extends CoreEntity {
   @Field(() => User, { nullable: true })
   buyer?: User;
 
-  @Column()
-  @Field(() => Number)
-  price: number;
+  @ManyToOne(() => Payment, (payment) => payment.itemSalesHistories, {
+    nullable: true,
+  })
+  @Field(() => Payment, { nullable: true })
+  payment?: Payment;
 }

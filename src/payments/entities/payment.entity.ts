@@ -1,7 +1,8 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { CoreEntity } from 'src/common/entities/core.entity';
+import { ItemSalesHistory } from 'src/item/entities/item-sales-history.entity';
 import { User } from 'src/users/entities/user.entity';
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 
 @InputType('PayInputType', { isAbstract: true })
 @ObjectType()
@@ -30,4 +31,11 @@ export class Payment extends CoreEntity {
   @ManyToOne(() => User, (user) => user.payments, { onDelete: 'CASCADE' })
   @Field(() => User)
   user: User;
+
+  @OneToMany(
+    () => ItemSalesHistory,
+    (itemSalesHistory) => itemSalesHistory.payment,
+  )
+  @Field(() => [ItemSalesHistory])
+  itemSalesHistories: ItemSalesHistory[];
 }

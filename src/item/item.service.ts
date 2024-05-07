@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeepPartial, FindOptionsWhere, Repository } from 'typeorm';
+import { DeepPartial, FindOptionsWhere, In, Repository } from 'typeorm';
 import { Item, ItemStateEnum } from './entities/item.entity';
 import { CreateItemInput, CreateItemOutput } from './dtos/item/createItem.dto';
 import { UpdateItemInput, UpdateItemOutput } from './dtos/item/updateItem.dto';
@@ -28,6 +28,10 @@ import {
   GetItemRevisionOutput,
 } from './dtos/item/getItemRevision.dto';
 import { GetApprovedItemIdsAndsSlugsOutput } from './dtos/item/getApprovedItemIdsAndSlugs.dto';
+import {
+  GetItemRevisionsInput,
+  GetItemRevisionsOutput,
+} from './dtos/item/getItemRevisions.dto';
 
 @Injectable()
 export class ItemService {
@@ -283,6 +287,32 @@ export class ItemService {
       return { ok: true, items };
     } catch {
       return { ok: false, error: 'Could not get items' };
+    }
+  }
+
+  async getItemRevisions(
+    getItemRevisionsInput: GetItemRevisionsInput,
+    user: User,
+  ): Promise<GetItemRevisionsOutput> {
+    const { states } = getItemRevisionsInput;
+    try {
+      const where: FindOptionsWhere<ItemRevision> = {
+        user: {
+          id: user.id,
+        },
+      };
+      if (states && states.length > 0) {
+        where.state = In(states);
+      }
+      const itemRevisions = await this.itemRevisions.find({
+        where,
+        relations: {
+          user: true,
+        },
+      });
+      return { ok: true, itemRevisions };
+    } catch {
+      return { ok: false, error: 'Could not get item revisions' };
     }
   }
 

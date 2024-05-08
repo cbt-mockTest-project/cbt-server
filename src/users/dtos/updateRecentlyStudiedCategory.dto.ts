@@ -3,8 +3,11 @@ import { CoreOutput } from 'src/common/dtos/output.dto';
 
 @InputType()
 export class UpdateRecentlyStudiedCategoryInput {
-  @Field(() => String)
-  categoryName: string;
+  @Field(() => String, { nullable: true, defaultValue: '' })
+  categoryName?: string;
+
+  @Field(() => String, { nullable: true, defaultValue: '' })
+  categorySlug?: string;
 }
 
 @ObjectType()

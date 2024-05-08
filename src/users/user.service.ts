@@ -1240,9 +1240,9 @@ export class UserService {
     updateRecentlyStudiedCategory: UpdateRecentlyStudiedCategoryInput,
   ): Promise<UpdateRecentlyStudiedCategoryOutput> {
     try {
-      const { categoryName } = updateRecentlyStudiedCategory;
+      const { categoryName, categorySlug } = updateRecentlyStudiedCategory;
       await this.users.update(user.id, {
-        recentlyStudiedCategory: categoryName,
+        recentlyStudiedCategory: categorySlug || categoryName,
       });
       return {
         ok: true,

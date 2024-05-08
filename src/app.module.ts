@@ -107,6 +107,9 @@ import { CategoryInvitationLink } from './category-invitation-link/entities/cate
 import { CategoryInvitationLinkModule } from './category-invitation-link/category-invitation-link.module';
 import { SecedersModule } from './seceders/seceders.module';
 import { Seceders } from './seceders/entities/seceders.entity';
+import { PointBalance } from './point/entities/point-balance.entity';
+import { PointTransaction } from './point/entities/point-transaction.entity';
+import { PointModule } from './point/point.module';
 
 @Module({
   imports: [
@@ -235,6 +238,8 @@ import { Seceders } from './seceders/entities/seceders.entity';
         QuizCommentLike,
         CategoryInvitationLink,
         Seceders,
+        PointTransaction,
+        PointBalance,
       ],
     }),
     UserModule,
@@ -306,6 +311,7 @@ import { Seceders } from './seceders/entities/seceders.entity';
     CategoryEvaluationModule,
     QuizModule,
     SecedersModule,
+    PointModule,
   ],
   controllers: [],
   providers: [

@@ -53,6 +53,8 @@ import { CategoryEvaluation } from 'src/category-evaluation/entities/category-ev
 import { QuizComment } from 'src/quiz/entities/quizComment.entity';
 import { QuizCommentLike } from 'src/quiz/entities/quizCommentLike.entity';
 import { CategoryInvitationLink } from 'src/category-invitation-link/entities/category-invitation-link.entity';
+import { PointTransaction } from 'src/point/entities/point-transaction.entity';
+import { PointBalance } from 'src/point/entities/point-balance.entity';
 
 @InputType('RecentlyStudiedExamsInputType', { isAbstract: true })
 @ObjectType()
@@ -256,6 +258,17 @@ export class User extends CoreEntity {
   @OneToMany(() => Attendance, (attendance) => attendance.user)
   @Field(() => [Attendance], { nullable: true })
   attendances: Attendance[];
+
+  @OneToMany(
+    () => PointTransaction,
+    (pointTransaction) => pointTransaction.user,
+  )
+  @Field(() => [PointTransaction], { nullable: true })
+  pointTransactions: PointTransaction[];
+
+  @OneToOne(() => PointBalance, (pointBalance) => pointBalance.user)
+  @Field(() => PointBalance, { nullable: true })
+  pointBalance: PointBalance;
 
   @DeleteDateColumn()
   @Field(() => Date)

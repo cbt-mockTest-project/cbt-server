@@ -110,6 +110,8 @@ import { Seceders } from './seceders/entities/seceders.entity';
 import { PointBalance } from './point/entities/point-balance.entity';
 import { PointTransaction } from './point/entities/point-transaction.entity';
 import { PointModule } from './point/point.module';
+import { RevenueRequestForm } from './revenue-request-form/entites/revenue-request-form.entity';
+import { RevenueRequestFormModule } from './revenue-request-form/revenue-request-form.module';
 
 @Module({
   imports: [
@@ -240,6 +242,7 @@ import { PointModule } from './point/point.module';
         Seceders,
         PointTransaction,
         PointBalance,
+        RevenueRequestForm,
       ],
     }),
     UserModule,
@@ -269,6 +272,7 @@ import { PointModule } from './point/point.module';
     MailModule,
     RootModule,
     VisitModule,
+    RevenueRequestFormModule,
     CategoryInvitationLinkModule,
     MailerModule.forRoot({
       transport: `smtps://${process.env.EMAIL_AUTH_EMAIL}:${process.env.EMAIL_AUTH_PASSWORD}@${process.env.EMAIL_HOST}`,

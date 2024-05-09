@@ -14,6 +14,7 @@ import {
   ManyToMany,
   ManyToOne,
   OneToMany,
+  OneToOne,
 } from 'typeorm';
 import { IsEnum } from 'class-validator';
 import { Role } from 'src/users/entities/role.entity';
@@ -27,6 +28,7 @@ import { Seller } from 'src/seller/entities/seller.entity';
 import { CategoryEvaluation } from 'src/category-evaluation/entities/category-evaluation.entity';
 import { Quiz } from 'src/quiz/entities/quiz.entity';
 import { CategoryInvitationLink } from 'src/category-invitation-link/entities/category-invitation-link.entity';
+import { RevenueRequestForm } from 'src/revenue-request-form/entites/revenue-request-form.entity';
 
 export enum ExamType {
   OBJECTIVE = 'OBJECTIVE',
@@ -183,6 +185,13 @@ export class MockExamCategory extends CoreEntity {
 
   @Field(() => Boolean, { nullable: true, defaultValue: false })
   isBookmarked?: boolean = false;
+
+  @OneToOne(
+    () => RevenueRequestForm,
+    (revenueRequestForm) => revenueRequestForm.category,
+  )
+  @Field(() => RevenueRequestForm, { nullable: true })
+  revenueRequestForm?: RevenueRequestForm;
 }
 
 @Entity()

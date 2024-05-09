@@ -530,6 +530,7 @@ export class MockExamCategoryService {
         },
         relations: {
           user: true,
+          revenueRequestForm: true,
           mockExam: {
             user: true,
             // mockExamQuestion: true,

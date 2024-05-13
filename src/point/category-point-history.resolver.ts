@@ -1,4 +1,4 @@
-import { Args, Resolver } from '@nestjs/graphql';
+import { Args, Query, Resolver } from '@nestjs/graphql';
 import { CategoryPointHistory } from './entities/category-point-history.entity';
 import { CategoryPointHistoryService } from './category-point-history.service';
 import {
@@ -15,6 +15,7 @@ export class CategoryPointHistoryResolver {
     private readonly categoryPointHistoryService: CategoryPointHistoryService,
   ) {}
 
+  @Query(() => GetCategoryPointHistoriesOutput)
   @Role(['ANY'])
   async getCategoryPointHistories(
     @AuthUser() user: User,

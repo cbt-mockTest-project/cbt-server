@@ -40,6 +40,18 @@ export class CategoryPointHistoryService {
     }
 
     try {
+      const category = await this.category.findOne({
+        where: {
+          id: categoryId,
+        },
+        relations: {
+          user: true,
+        },
+      });
+      if (!category) {
+        await queryRunner.rollbackTransaction();
+        return { ok: false, error: 'Category not found' };
+      }
       const newCategoryPointHistory = this.categoryPointHistory.create({
         category: {
           id: categoryId,
@@ -50,7 +62,7 @@ export class CategoryPointHistoryService {
       });
       await queryRunner.manager.save(newCategoryPointHistory);
       const result = await this.pointTransactionService.createPointTransaction(
-        user,
+        category.user,
         {
           point,
           type,
@@ -93,6 +105,9 @@ export class CategoryPointHistoryService {
       const category = await this.category.findOne({
         where: {
           id: categoryId,
+          user: {
+            id: user.id,
+          },
         },
       });
       if (!category) {
@@ -106,6 +121,7 @@ export class CategoryPointHistoryService {
         },
         relations: {
           pointTransaction: true,
+          buyer: true,
         },
         order: {
           created_at: 'DESC',
@@ -116,6 +132,5 @@ export class CategoryPointHistoryService {
     } catch {
       return { ok: false, error: 'Cannot get category point histories' };
     }
-    return { ok: true };
   }
 }

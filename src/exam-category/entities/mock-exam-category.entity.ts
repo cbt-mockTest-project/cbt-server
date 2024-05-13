@@ -29,6 +29,7 @@ import { CategoryEvaluation } from 'src/category-evaluation/entities/category-ev
 import { Quiz } from 'src/quiz/entities/quiz.entity';
 import { CategoryInvitationLink } from 'src/category-invitation-link/entities/category-invitation-link.entity';
 import { RevenueRequestForm } from 'src/revenue-request-form/entites/revenue-request-form.entity';
+import { CategoryPointHistory } from 'src/point/entities/category-point-history.entity';
 
 export enum ExamType {
   OBJECTIVE = 'OBJECTIVE',
@@ -110,6 +111,13 @@ export class MockExamCategory extends CoreEntity {
   )
   @Field(() => [CategoryEvaluation], { defaultValue: [], nullable: true })
   categoryEvaluations: CategoryEvaluation[];
+
+  @OneToMany(
+    () => CategoryPointHistory,
+    (categoryPointHistory) => categoryPointHistory.category,
+  )
+  @Field(() => [CategoryPointHistory], { defaultValue: [], nullable: true })
+  categoryPointHistories: CategoryPointHistory[];
 
   @Field(() => [Quiz])
   @OneToMany(() => Quiz, (quiz) => quiz.category)

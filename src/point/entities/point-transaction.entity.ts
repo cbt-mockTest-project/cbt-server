@@ -6,7 +6,8 @@ import {
 } from '@nestjs/graphql';
 import { CoreEntity } from 'src/common/entities/core.entity';
 import { User } from 'src/users/entities/user.entity';
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToOne } from 'typeorm';
+import { CategoryPointHistory } from './category-point-history.entity';
 
 export enum TransactionType {
   ACCUMULATION = 'ACCUMULATION',
@@ -40,4 +41,10 @@ export class PointTransaction extends CoreEntity {
   })
   @Field(() => User)
   user: User;
+
+  @OneToOne(
+    () => CategoryPointHistory,
+    (categoryPointHistory) => categoryPointHistory.pointTransaction,
+  )
+  categoryPointHistory: CategoryPointHistory;
 }

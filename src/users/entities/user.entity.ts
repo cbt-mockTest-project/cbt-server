@@ -55,6 +55,7 @@ import { QuizCommentLike } from 'src/quiz/entities/quizCommentLike.entity';
 import { CategoryInvitationLink } from 'src/category-invitation-link/entities/category-invitation-link.entity';
 import { PointTransaction } from 'src/point/entities/point-transaction.entity';
 import { PointBalance } from 'src/point/entities/point-balance.entity';
+import { CategoryPointHistory } from 'src/point/entities/category-point-history.entity';
 
 @InputType('RecentlyStudiedExamsInputType', { isAbstract: true })
 @ObjectType()
@@ -156,6 +157,13 @@ export class User extends CoreEntity {
   )
   @Field(() => [MockExamCategory])
   mockExamCategory: MockExamCategory[];
+
+  @OneToMany(
+    () => CategoryPointHistory,
+    (categoryPointHistory) => categoryPointHistory.buyer,
+  )
+  @Field(() => [CategoryPointHistory], { defaultValue: [], nullable: true })
+  categoryPointHistories: CategoryPointHistory[];
 
   @OneToMany(
     () => MockExamQuestionComment,

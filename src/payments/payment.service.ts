@@ -18,6 +18,7 @@ import {
   DeletePaymentOutput,
 } from './dtos/deletePayment.dto';
 import { TelegramService } from 'src/telegram/telegram.service';
+import { CategoryPointHistoryService } from 'src/point/category-point-history.service';
 
 @Injectable()
 export class PaymentService {
@@ -27,6 +28,7 @@ export class PaymentService {
     @InjectRepository(User)
     private readonly users: Repository<User>,
     private readonly telegramService: TelegramService,
+    private readonly categoryPointHistoryService: CategoryPointHistoryService,
   ) {}
 
   async getMyPayments(user: User): Promise<GetMyPaymentsOutput> {
@@ -91,10 +93,24 @@ export class PaymentService {
   async createPayment(
     createPaymentInput: CreatePaymentInput,
     user: User,
-    queryRunner?: QueryRunner,
+    queryRunnerOfParent?: QueryRunner,
   ): Promise<CreatePaymentOutput> {
+    const queryRunner =
+      queryRunnerOfParent ||
+      this.payments.manager.connection.createQueryRunner();
+    if (!queryRunnerOfParent) {
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+    }
+
     try {
-      const { orderId, productName, receiptId, price } = createPaymentInput;
+      const {
+        orderId,
+        productName,
+        receiptId,
+        price,
+        createCategoryPointHistoryInput,
+      } = createPaymentInput;
       Bootpay.setConfiguration({
         application_id: process.env.BOOTPAY_APPLICATION_KEY,
         private_key: process.env.BOOTPAY_PRIVATE_KEY,
@@ -109,12 +125,9 @@ export class PaymentService {
         user,
         receiptUrl: receipt_url,
       });
-      let payment: Payment;
-      if (queryRunner) {
-        payment = await queryRunner.manager.save(newPayment);
-      } else {
-        payment = await this.payments.save(newPayment);
-      }
+
+      const payment = await queryRunner.manager.save(newPayment);
+
       this.telegramService.sendMessageToTelegram({
         channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
         message: `새로운 결제가 이루어졌습니다. \n결제자: ${
@@ -123,14 +136,29 @@ export class PaymentService {
           user.recentlyStudiedCategory || ''
         }`,
       });
+      if (createCategoryPointHistoryInput) {
+        const createCategoryPointHistoryResponse =
+          await this.categoryPointHistoryService.createCategoryPointHistory(
+            createCategoryPointHistoryInput,
+            user,
+            queryRunner,
+          );
+        if (!createCategoryPointHistoryResponse.ok) {
+          return {
+            ok: false,
+            error: createCategoryPointHistoryResponse.error,
+          };
+        }
+      }
+      if (!queryRunnerOfParent) {
+        await queryRunner.commitTransaction();
+      }
       return {
         ok: true,
         payment,
       };
     } catch (error) {
-      if (queryRunner) {
-        await queryRunner.rollbackTransaction();
-      }
+      await queryRunner.rollbackTransaction();
       return {
         ok: false,
         error: 'Could not create payment',

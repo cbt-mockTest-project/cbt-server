@@ -112,6 +112,7 @@ import { PointTransaction } from './point/entities/point-transaction.entity';
 import { PointModule } from './point/point.module';
 import { RevenueRequestForm } from './revenue-request-form/entites/revenue-request-form.entity';
 import { RevenueRequestFormModule } from './revenue-request-form/revenue-request-form.module';
+import { CategoryPointHistory } from './point/entities/category-point-history.entity';
 
 @Module({
   imports: [
@@ -243,6 +244,7 @@ import { RevenueRequestFormModule } from './revenue-request-form/revenue-request
         PointTransaction,
         PointBalance,
         RevenueRequestForm,
+        CategoryPointHistory,
       ],
     }),
     UserModule,

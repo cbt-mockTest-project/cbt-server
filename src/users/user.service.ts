@@ -70,8 +70,7 @@ import {
   DeleteUserRoleOutput,
 } from './dtos/deleteUserRole.dto';
 import { CreateFreeTrialRoleOutput } from './dtos/createFreeTrialRole.dto';
-import * as momentTimezone from 'moment-timezone';
-import { ClearFreeTrialRoleOutput } from './dtos/clearFreeTrialRole.dto';
+import * as moment from 'moment-timezone';
 import { GetRoleCountInput, GetRoleCountOutput } from './dtos/getRoleCount';
 import {
   GetUserByNicknameOrEmailInput,
@@ -1155,33 +1154,37 @@ export class UserService {
     }
   }
 
-  async clearFreeTrialRole(): Promise<ClearFreeTrialRoleOutput> {
-    const userAndRoles = await this.userAndRole.find({
-      where: {
-        role: {
-          id: 3,
-        },
-      },
-    });
-    // 생성된지 1일이 경과된 무료체험 권한 삭제
-    const filteredUserAndRoles = userAndRoles.filter((userAndRole) => {
-      const { created_at } = userAndRole;
-      const differenceInHours = momentTimezone(new Date()).diff(
-        momentTimezone(created_at),
-        'hours',
-      );
-      return differenceInHours > 24 + 9;
-    });
+  // 3개월 이상된 베이직 플랜 지우기
+  async clearBasicRole(): Promise<CoreOutput> {
+    // 현재 날짜로부터 2개월 27일 전을 계산
+    const threeMonthsTwoDaysAgo = moment()
+      .subtract(2, 'months')
+      .subtract(27, 'days')
+      .toDate();
+    const afterFebruaryFirst = moment('2024-02-01').toDate();
+    const userAndRoles = await this.userAndRole
+      .createQueryBuilder('userAndRole')
+      .leftJoinAndSelect('userAndRole.role', 'role')
+      .where('userAndRole.created_at > :afterFebruaryFirst', {
+        afterFebruaryFirst,
+      })
+      .andWhere('userAndRole.created_at < :threeMonthsTwoDaysAgo', {
+        threeMonthsTwoDaysAgo,
+      })
+      .andWhere('role.id = :roleId', { roleId: 1 })
+      .orderBy('userAndRole.created_at', 'ASC')
+      .getMany();
     try {
-      await this.userAndRole.remove(filteredUserAndRoles);
+      await this.userAndRole.remove(
+        userAndRoles.filter((userAndRole) => userAndRole.role.id === 1),
+      );
       return {
         ok: true,
-        count: filteredUserAndRoles.length,
       };
     } catch {
       return {
         ok: false,
-        error: '무료체험 권한 삭제에 실패했습니다.',
+        error: '베이직 플랜 삭제에 실패했습니다.',
       };
     }
   }

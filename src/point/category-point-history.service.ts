@@ -8,12 +8,19 @@ import {
 } from './dtos/category-point-history/create-category-point-history.dto';
 import { User } from 'src/users/entities/user.entity';
 import { PointTransactionService } from './point-transaction.service';
+import {
+  GetCategoryPointHistoriesInput,
+  GetCategoryPointHistoriesOutput,
+} from './dtos/category-point-history/get-category-point-histories.dto';
+import { MockExamCategory } from 'src/exam-category/entities/mock-exam-category.entity';
 
 @Injectable()
 export class CategoryPointHistoryService {
   constructor(
     @InjectRepository(CategoryPointHistory)
     private readonly categoryPointHistory: Repository<CategoryPointHistory>,
+    @InjectRepository(MockExamCategory)
+    private readonly category: Repository<MockExamCategory>,
     private readonly pointTransactionService: PointTransactionService,
   ) {}
 
@@ -73,6 +80,41 @@ export class CategoryPointHistoryService {
       if (!queryRunnerOfParent) {
         await queryRunner.release();
       }
+    }
+    return { ok: true };
+  }
+
+  async getCategoryPointHistories(
+    user: User,
+    getCategoryPointHistoriesInput: GetCategoryPointHistoriesInput,
+  ): Promise<GetCategoryPointHistoriesOutput> {
+    const { categoryId } = getCategoryPointHistoriesInput;
+    try {
+      const category = await this.category.findOne({
+        where: {
+          id: categoryId,
+        },
+      });
+      if (!category) {
+        return { ok: false, error: 'Category not found' };
+      }
+      const categoryPointHistories = await this.categoryPointHistory.find({
+        where: {
+          category: {
+            id: categoryId,
+          },
+        },
+        relations: {
+          pointTransaction: true,
+        },
+        order: {
+          created_at: 'DESC',
+        },
+      });
+      categoryPointHistories;
+      return { ok: true, categoryPointHistories };
+    } catch {
+      return { ok: false, error: 'Cannot get category point histories' };
     }
     return { ok: true };
   }

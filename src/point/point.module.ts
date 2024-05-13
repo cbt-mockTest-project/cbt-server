@@ -8,6 +8,7 @@ import { PointBalanceService } from './point-balance.service';
 import { PointBalanceResolver } from './point-balance.resolver';
 import { CategoryPointHistory } from './entities/category-point-history.entity';
 import { CategoryPointHistoryService } from './category-point-history.service';
+import { MockExamCategory } from 'src/exam-category/entities/mock-exam-category.entity';
 
 @Global()
 @Module({
@@ -16,6 +17,7 @@ import { CategoryPointHistoryService } from './category-point-history.service';
       PointTransaction,
       PointBalance,
       CategoryPointHistory,
+      MockExamCategory,
     ]),
   ],
   providers: [

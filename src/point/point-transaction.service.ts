@@ -8,6 +8,7 @@ import {
 } from './dtos/point-transaction/create-point-transaction.dto';
 import { User } from 'src/users/entities/user.entity';
 import { PointBalance } from './entities/point-balance.entity';
+import { GetPointTransactionsOutput } from './dtos/point-transaction/get-point-transactions.dto';
 
 @Injectable()
 export class PointTransactionService {
@@ -75,6 +76,20 @@ export class PointTransactionService {
       if (!queryRunnerOfParent) {
         await queryRunner.release();
       }
+    }
+  }
+  async getPointTransactions(user: User): Promise<GetPointTransactionsOutput> {
+    try {
+      const pointTransactions = await this.pointTransactions.find({
+        where: {
+          user: {
+            id: user.id,
+          },
+        },
+      });
+      return { ok: true, pointTransactions };
+    } catch {
+      return { ok: false, error: 'Cannot get point transactions' };
     }
   }
 }

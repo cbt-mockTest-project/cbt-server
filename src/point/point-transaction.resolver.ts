@@ -8,6 +8,7 @@ import {
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { User } from 'src/users/entities/user.entity';
 import { Role } from 'src/auth/role.decorators';
+import { GetPointTransactionsOutput } from './dtos/point-transaction/get-point-transactions.dto';
 
 @Resolver(() => PointTransaction)
 export class PointTransactionResolver {
@@ -25,5 +26,11 @@ export class PointTransactionResolver {
       user,
       createPointTransactionInput,
     );
+  }
+
+  @Role(['ANY'])
+  @Query(() => GetPointTransactionsOutput)
+  async getPointTransactions(@AuthUser() user: User) {
+    return this.pointTransactionService.getPointTransactions(user);
   }
 }

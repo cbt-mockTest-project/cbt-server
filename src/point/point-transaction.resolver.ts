@@ -9,6 +9,14 @@ import { AuthUser } from 'src/auth/auth-user.decorator';
 import { User } from 'src/users/entities/user.entity';
 import { Role } from 'src/auth/role.decorators';
 import { GetPointTransactionsOutput } from './dtos/point-transaction/get-point-transactions.dto';
+import {
+  CreatePointTransactionForAdminInput,
+  CreatePointTransactionForAdminOutput,
+} from './dtos/point-transaction/create-point-transaction-for-admin.dto';
+import {
+  GetPointTransactionsForAdminInput,
+  GetPointTransactionsForAdminOutput,
+} from './dtos/point-transaction/get-point-transactions-for-admin.dto';
 
 @Resolver(() => PointTransaction)
 export class PointTransactionResolver {
@@ -32,5 +40,27 @@ export class PointTransactionResolver {
   @Query(() => GetPointTransactionsOutput)
   async getPointTransactions(@AuthUser() user: User) {
     return this.pointTransactionService.getPointTransactions(user);
+  }
+
+  @Role(['ADMIN'])
+  @Mutation(() => CreatePointTransactionForAdminOutput)
+  async createPointTransactionForAdmin(
+    @Args('input')
+    createPointTransactionForAdminInput: CreatePointTransactionForAdminInput,
+  ) {
+    return this.pointTransactionService.createPointTransactionForAdmin(
+      createPointTransactionForAdminInput,
+    );
+  }
+
+  @Role(['ADMIN'])
+  @Query(() => GetPointTransactionsForAdminOutput)
+  async getPointTransactionsForAdmin(
+    @Args('input')
+    getPointTransactionsForAdminInput: GetPointTransactionsForAdminInput,
+  ) {
+    return this.pointTransactionService.getPointTransactionsForAdmin(
+      getPointTransactionsForAdminInput,
+    );
   }
 }

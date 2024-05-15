@@ -55,6 +55,7 @@ export class SettlementRequestService {
               계좌번호: ${newSettlementRequest.accountNumber}
               은행명: ${newSettlementRequest.bankName}
               금액: ${newSettlementRequest.amount}
+              이메일: ${user.email}
             `,
         channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
       });

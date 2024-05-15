@@ -56,6 +56,7 @@ import { CategoryInvitationLink } from 'src/category-invitation-link/entities/ca
 import { PointTransaction } from 'src/point/entities/point-transaction.entity';
 import { PointBalance } from 'src/point/entities/point-balance.entity';
 import { CategoryPointHistory } from 'src/point/entities/category-point-history.entity';
+import { SettlementRequest } from 'src/point/entities/settlement-request.entity';
 
 @InputType('RecentlyStudiedExamsInputType', { isAbstract: true })
 @ObjectType()
@@ -234,6 +235,13 @@ export class User extends CoreEntity {
   @OneToMany(() => Feedback, (feedback) => feedback.user)
   @Field(() => [Feedback])
   feedback: Feedback[];
+
+  @OneToMany(
+    () => SettlementRequest,
+    (settlementRequests) => settlementRequests.user,
+  )
+  @Field(() => [SettlementRequest])
+  settlementRequests: SettlementRequest[];
 
   @OneToMany(() => Visit, (visit) => visit.user)
   @Field(() => [Visit])

@@ -94,6 +94,9 @@ export class PointTransactionService {
             id: user.id,
           },
         },
+        order: {
+          created_at: 'DESC',
+        },
       });
       return { ok: true, pointTransactions };
     } catch {
@@ -174,6 +177,9 @@ export class PointTransactionService {
           user: {
             email,
           },
+        },
+        order: {
+          created_at: 'DESC',
         },
       });
       return { ok: true, pointTransactions };

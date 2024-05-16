@@ -24,6 +24,8 @@ import {
   CheckIfCategoryEvaluatedInput,
   CheckIfCategoryEvaluatedOutput,
 } from './dtos/checkIfCategoryEvaluated.dto';
+import { CategoryPointHistoryService } from 'src/point/category-point-history.service';
+import { TransactionType } from 'src/point/entities/point-transaction.entity';
 
 @Injectable()
 export class CategoryEvaluationService {
@@ -32,6 +34,7 @@ export class CategoryEvaluationService {
     private readonly categoryEvaluation: Repository<CategoryEvaluation>,
     @InjectRepository(MockExamCategory)
     private readonly mockExamCategory: Repository<MockExamCategory>,
+    private readonly categoryPointHistoryService: CategoryPointHistoryService,
   ) {}
 
   async createCategoryEvaluation(
@@ -70,6 +73,19 @@ export class CategoryEvaluationService {
           error: '존재하지 않는 암기장입니다.',
         };
       }
+      if (!category.pointEarningUserIds.includes(user.id)) {
+        category.pointEarningUserIds.push(user.id);
+        await this.mockExamCategory.save(category);
+        await this.categoryPointHistoryService.createCategoryPointHistory(
+          {
+            categoryId,
+            point: 300,
+            type: TransactionType.ACCUMULATION,
+            description: '암기장 리뷰 보상',
+          },
+          user,
+        );
+      }
       const newCategoryEvaluation = this.categoryEvaluation.create({
         score,
         feedback,
@@ -77,6 +93,7 @@ export class CategoryEvaluationService {
         category,
         user,
       });
+
       const categoryEvaluation = await this.categoryEvaluation.save(
         newCategoryEvaluation,
       );

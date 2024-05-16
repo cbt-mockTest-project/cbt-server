@@ -200,6 +200,11 @@ export class MockExamCategory extends CoreEntity {
   )
   @Field(() => RevenueRequestForm, { nullable: true })
   revenueRequestForm?: RevenueRequestForm;
+
+  // 평가를 통해 한번이라도 포인트를 적립해준 유저들의 id를 저장
+  @Column({ type: 'json', default: [] })
+  @Field(() => [Number], { defaultValue: [], nullable: true })
+  pointEarningUserIds?: number[];
 }
 
 @Entity()

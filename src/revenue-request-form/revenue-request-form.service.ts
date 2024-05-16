@@ -107,6 +107,11 @@ export class RevenueRequestFormService {
   async getRevenueRequestForms(): Promise<GetRevenueRequestFormsOutput> {
     try {
       const revenueRequestForms = await this.revenueRequestForms.find({
+        relations: {
+          category: {
+            user: true,
+          },
+        },
         order: {
           created_at: 'DESC',
         },

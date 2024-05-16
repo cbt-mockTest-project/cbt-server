@@ -18,6 +18,8 @@ import {
   UpdateSettlementRequestOutput,
 } from './dtos/settlement-request/update-settlement-request.dto';
 import { GetMySettlementRequestsOutput } from './dtos/settlement-request/get-my-settlement-requests.dto';
+import { PointTransactionService } from './point-transaction.service';
+import { TransactionType } from './entities/point-transaction.entity';
 
 @Injectable()
 export class SettlementRequestService {
@@ -25,6 +27,7 @@ export class SettlementRequestService {
     @InjectRepository(SettlementRequest)
     private readonly settlementRequest: Repository<SettlementRequest>,
     private readonly telegramService: TelegramService,
+    private readonly pointTransactionService: PointTransactionService,
   ) {}
 
   async createSettlementRequest(
@@ -72,6 +75,9 @@ export class SettlementRequestService {
         relations: {
           user: true,
         },
+        order: {
+          created_at: 'DESC',
+        },
       });
       return { ok: true, settlementRequests };
     } catch {
@@ -88,9 +94,23 @@ export class SettlementRequestService {
         where: {
           id,
         },
+        relations: {
+          user: true,
+        },
       });
       if (!settlementRequest) {
         return { ok: false, error: 'Settlement request not found' };
+      }
+      // 정산 승인시, 포안트 차감
+      if (status === SettlementRequestStatus.Approved) {
+        await this.pointTransactionService.createPointTransaction(
+          settlementRequest.user,
+          {
+            point: -settlementRequest.amount,
+            type: TransactionType.WITHDRAW,
+            description: '포인트 출금',
+          },
+        );
       }
       await this.settlementRequest.save({
         id: settlementRequest.id,
@@ -111,8 +131,12 @@ export class SettlementRequestService {
           user: {
             id: user.id,
           },
+          status: SettlementRequestStatus.Pending,
         },
       });
+      if (!settlementRequest) {
+        return { ok: false, error: 'Settlement request not found' };
+      }
       return { ok: true, settlementRequest };
     } catch {
       return { ok: false, error: 'Cannot get my settlement request' };
@@ -128,6 +152,9 @@ export class SettlementRequestService {
           user: {
             id: user.id,
           },
+        },
+        order: {
+          created_at: 'DESC',
         },
       });
       return { ok: true, settlementRequests };

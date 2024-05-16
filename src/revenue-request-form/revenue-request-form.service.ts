@@ -11,6 +11,11 @@ import {
 } from './dtos/create-revenue-request-form.dto';
 import { MockExamCategory } from 'src/exam-category/entities/mock-exam-category.entity';
 import { User } from 'src/users/entities/user.entity';
+import {
+  UpdateRevenueRequestFormInput,
+  UpdateRevenueRequestFormOutput,
+} from './dtos/update-revenue-request-form.dto';
+import { GetRevenueRequestFormsOutput } from './dtos/get-revenue-request-forms.dto';
 
 @Injectable()
 export class RevenueRequestFormService {
@@ -65,5 +70,53 @@ export class RevenueRequestFormService {
       category,
     });
     return { ok: true, revenueRequestForm };
+  }
+
+  async updateRevenueRequestForm(
+    updateRevenueRequestFormInput: UpdateRevenueRequestFormInput,
+  ): Promise<UpdateRevenueRequestFormOutput> {
+    try {
+      const { id, status, reason } = updateRevenueRequestFormInput;
+      const revenueRequestForm = await this.revenueRequestForms.findOne({
+        where: {
+          id,
+        },
+      });
+      if (!revenueRequestForm) {
+        return {
+          ok: false,
+          error: '존재하지 않는 수익 신청서입니다.',
+        };
+      }
+      if (status) {
+        revenueRequestForm.status = status;
+      }
+      if (reason) {
+        revenueRequestForm.reason = reason;
+      }
+      await this.revenueRequestForms.save(revenueRequestForm);
+      return { ok: true };
+    } catch {
+      return {
+        ok: false,
+        error: '수익 신청서를 업데이트할 수 없습니다.',
+      };
+    }
+  }
+
+  async getRevenueRequestForms(): Promise<GetRevenueRequestFormsOutput> {
+    try {
+      const revenueRequestForms = await this.revenueRequestForms.find({
+        order: {
+          created_at: 'DESC',
+        },
+      });
+      return { ok: true, revenueRequestForms };
+    } catch {
+      return {
+        ok: false,
+        error: '수익 신청서를 불러올 수 없습니다.',
+      };
+    }
   }
 }

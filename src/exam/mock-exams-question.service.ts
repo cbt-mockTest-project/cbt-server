@@ -1,5 +1,5 @@
-import { ExamCoAuthor } from '../exam-co-author/entities/exam-co-author.entity';
 /* eslint-disable prefer-const */
+import { ExamCoAuthor } from '../exam-co-author/entities/exam-co-author.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MockExamQuestionBookmark } from 'src/exam/entities/mock-exam-question-bookmark.entity';
@@ -1253,11 +1253,12 @@ export class MockExamQuestionService {
 
   async sync() {
     try {
-      const date = moment('2024-01-01').toDate();
-      // date 이전 값 삭제
-      await this.mockExamQuestionState.delete({
-        created_at: LessThan(date),
-      });
+      // question state 삭제
+      // const date = moment('2024-01-01').toDate();
+      // // date 이전 값 삭제
+      // await this.mockExamQuestionState.delete({
+      //   created_at: LessThan(date),
+      // });
 
       return {
         ok: true,

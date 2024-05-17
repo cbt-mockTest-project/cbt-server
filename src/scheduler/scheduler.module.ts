@@ -16,6 +16,9 @@ import { PaymentService } from 'src/payments/payment.service';
 import { Notice } from 'src/users/entities/notice.entity';
 import { Payment } from 'src/payments/entities/payment.entity';
 import { RevalidateModule } from 'src/revalidate/revalidate.module';
+import { MockExamQuestionFeedbackSerivce } from 'src/exam/mock-exams-question-feedback.service';
+import { MockExamQuestionFeedback } from 'src/exam/entities/mock-exam-question-feedback.entity';
+import { MockExamCategory } from 'src/exam-category/entities/mock-exam-category.entity';
 
 @Module({
   imports: [
@@ -30,6 +33,8 @@ import { RevalidateModule } from 'src/revalidate/revalidate.module';
       Role,
       Notice,
       Payment,
+      MockExamQuestionFeedback,
+      MockExamCategory,
     ]),
   ],
   providers: [
@@ -39,6 +44,7 @@ import { RevalidateModule } from 'src/revalidate/revalidate.module';
     NoticeService,
     PaymentService,
     RevalidateModule,
+    MockExamQuestionFeedbackSerivce,
   ],
 })
 export class SchedulerModule {}

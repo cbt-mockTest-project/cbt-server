@@ -320,4 +320,48 @@ export class MockExamQuestionFeedbackSerivce {
       };
     }
   }
+  // recommendation.type === 'BAD' 인 요소를 3개 이상 가진 feedback private로 변경
+  async hideNegativeFeedbacks() {
+    try {
+      const subQuery = this.mockExamQuestionFeedback
+        .createQueryBuilder('subFeedback')
+        .leftJoin('subFeedback.recommendation', 'subRecommendation')
+        .select('subFeedback.id')
+        .groupBy('subFeedback.id')
+        .having('COUNT(subRecommendation.id) >= 3')
+        .where('subRecommendation.type = :type', {
+          type: QuestionFeedbackRecommendationType.BAD,
+        });
+
+      const feedbacks = await this.mockExamQuestionFeedback
+        .createQueryBuilder('feedback')
+        .leftJoinAndSelect('feedback.recommendation', 'recommendation')
+        .leftJoinAndSelect('feedback.mockExamQuestion', 'question')
+        .where(`feedback.id IN (${subQuery.getQuery()})`)
+        .setParameters(subQuery.getParameters())
+        .getMany();
+
+      await Promise.all(
+        feedbacks.map(async (feedbacks) => {
+          this.mockExamQuestionFeedback.update(
+            {
+              id: feedbacks.id,
+            },
+            {
+              type: QuestionFeedbackType.PRIVATE,
+            },
+          );
+        }),
+      );
+      return {
+        ok: true,
+      };
+    } catch (e) {
+      console.log(e);
+      return {
+        ok: false,
+        error: '피드백을 숨길 수 없습니다.',
+      };
+    }
+  }
 }

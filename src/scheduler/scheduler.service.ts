@@ -9,6 +9,7 @@ import { VisitService } from 'src/visit/visit.service';
 import { UserService } from 'src/users/user.service';
 import { RevalidateService } from 'src/revalidate/revalidate.service';
 import { BlogManageService } from 'src/blogManage/blog-manage.service';
+import { MockExamQuestionFeedbackSerivce } from 'src/exam/mock-exams-question-feedback.service';
 
 @Injectable()
 export class SchedulerService {
@@ -21,6 +22,7 @@ export class SchedulerService {
     private readonly userService: UserService,
     private readonly revalidateService: RevalidateService,
     private readonly blogManageSevice: BlogManageService,
+    private readonly mockExamQuestionFeedbackService: MockExamQuestionFeedbackSerivce,
   ) {}
 
   // // 매일 밤 12시
@@ -84,6 +86,26 @@ export class SchedulerService {
   //   }
   // }
 
+  // 새벽 3시
+  @Cron('0 0 3 * * *', { timeZone: 'Asia/Seoul' })
+  async hideNegativeFeedbacks() {
+    try {
+      if (process.env.NODE_ENV === 'dev') {
+        return;
+      }
+      // recommendation.type === 'BAD' 인 요소를 3개 이상 가진 feedback private로 변경
+      await this.mockExamQuestionFeedbackService.hideNegativeFeedbacks();
+      this.telegramService.sendMessageToTelegram({
+        message: `cronjob: hideNegativeFeedbacks success`,
+        channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
+      });
+    } catch {
+      this.telegramService.sendMessageToTelegram({
+        message: `cronjob: hideNegativeFeedbacks error`,
+        channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
+      });
+    }
+  }
   // 새벽 4시
   @Cron('0 0 4 * * *', { timeZone: 'Asia/Seoul' })
   async clearBasicPlan() {

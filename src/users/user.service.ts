@@ -87,6 +87,7 @@ import {
   UpsertRecentlyStudiedExamsOutput,
 } from './dtos/upsertRecentlyStudiedExams.dto';
 import { SecedersService } from 'src/seceders/seceders.service';
+import { CategoryPointHistoryService } from 'src/point/category-point-history.service';
 @Injectable()
 export class UserService {
   constructor(
@@ -105,6 +106,7 @@ export class UserService {
     private readonly noticeService: NoticeService,
     private readonly paymentService: PaymentService,
     private readonly secedersService: SecedersService,
+    private readonly categoryPointHistoryService: CategoryPointHistoryService,
   ) {}
 
   async register(registerInput: RegisterInput): Promise<RegisterOutput> {
@@ -1021,14 +1023,39 @@ export class UserService {
     const queryRunner = this.users.manager.connection.createQueryRunner();
     await queryRunner.startTransaction();
     try {
-      const { changeClientRoleInput, createPaymentInput } =
-        changeClientRoleAndCreatePaymentInput;
+      const {
+        changeClientRoleInput,
+        createPaymentInput,
+        createCategoryPointHistoryInput,
+      } = changeClientRoleAndCreatePaymentInput;
       await this.changeClientRole(changeClientRoleInput, user, queryRunner);
       const createPaymentResponse = await this.paymentService.createPayment(
         createPaymentInput,
         user,
         queryRunner,
       );
+      if (!createPaymentResponse.ok) {
+        return {
+          ok: false,
+          error: createPaymentResponse.error,
+        };
+      }
+      // 유저 카테고리에서 결제가 발생했을 경우
+      if (createCategoryPointHistoryInput) {
+        const createCategoryPointHistoryResponse =
+          await this.categoryPointHistoryService.createCategoryPointHistory(
+            createCategoryPointHistoryInput,
+            user,
+            queryRunner,
+          );
+        if (!createCategoryPointHistoryResponse.ok) {
+          return {
+            ok: false,
+            error: createCategoryPointHistoryResponse.error,
+          };
+        }
+      }
+
       await queryRunner.commitTransaction();
       return {
         ok: true,

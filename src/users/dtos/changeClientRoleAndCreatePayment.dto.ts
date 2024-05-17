@@ -2,6 +2,7 @@ import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { CreatePaymentInput } from 'src/payments/dtos/createPayment.dto';
 import { ChangeClientRoleInput } from './changeClientRole.dto';
 import { CoreOutput } from 'src/common/dtos/output.dto';
+import { CreateCategoryPointHistoryInput } from 'src/point/dtos/category-point-history/create-category-point-history.dto';
 
 @InputType()
 export class ChangeClientRoleAndCreatePaymentInput {
@@ -9,6 +10,8 @@ export class ChangeClientRoleAndCreatePaymentInput {
   createPaymentInput: CreatePaymentInput;
   @Field(() => ChangeClientRoleInput)
   changeClientRoleInput: ChangeClientRoleInput;
+  @Field(() => CreateCategoryPointHistoryInput, { nullable: true })
+  createCategoryPointHistoryInput?: CreateCategoryPointHistoryInput;
 }
 
 @ObjectType()

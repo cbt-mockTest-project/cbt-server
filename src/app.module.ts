@@ -107,6 +107,13 @@ import { CategoryInvitationLink } from './category-invitation-link/entities/cate
 import { CategoryInvitationLinkModule } from './category-invitation-link/category-invitation-link.module';
 import { SecedersModule } from './seceders/seceders.module';
 import { Seceders } from './seceders/entities/seceders.entity';
+import { PointBalance } from './point/entities/point-balance.entity';
+import { PointTransaction } from './point/entities/point-transaction.entity';
+import { PointModule } from './point/point.module';
+import { RevenueRequestForm } from './revenue-request-form/entites/revenue-request-form.entity';
+import { RevenueRequestFormModule } from './revenue-request-form/revenue-request-form.module';
+import { CategoryPointHistory } from './point/entities/category-point-history.entity';
+import { SettlementRequest } from './point/entities/settlement-request.entity';
 
 @Module({
   imports: [
@@ -235,6 +242,11 @@ import { Seceders } from './seceders/entities/seceders.entity';
         QuizCommentLike,
         CategoryInvitationLink,
         Seceders,
+        PointTransaction,
+        PointBalance,
+        RevenueRequestForm,
+        CategoryPointHistory,
+        SettlementRequest,
       ],
     }),
     UserModule,
@@ -264,6 +276,7 @@ import { Seceders } from './seceders/entities/seceders.entity';
     MailModule,
     RootModule,
     VisitModule,
+    RevenueRequestFormModule,
     CategoryInvitationLinkModule,
     MailerModule.forRoot({
       transport: `smtps://${process.env.EMAIL_AUTH_EMAIL}:${process.env.EMAIL_AUTH_PASSWORD}@${process.env.EMAIL_HOST}`,
@@ -306,6 +319,7 @@ import { Seceders } from './seceders/entities/seceders.entity';
     CategoryEvaluationModule,
     QuizModule,
     SecedersModule,
+    PointModule,
   ],
   controllers: [],
   providers: [

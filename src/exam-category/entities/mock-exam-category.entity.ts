@@ -14,6 +14,7 @@ import {
   ManyToMany,
   ManyToOne,
   OneToMany,
+  OneToOne,
 } from 'typeorm';
 import { IsEnum } from 'class-validator';
 import { Role } from 'src/users/entities/role.entity';
@@ -27,6 +28,8 @@ import { Seller } from 'src/seller/entities/seller.entity';
 import { CategoryEvaluation } from 'src/category-evaluation/entities/category-evaluation.entity';
 import { Quiz } from 'src/quiz/entities/quiz.entity';
 import { CategoryInvitationLink } from 'src/category-invitation-link/entities/category-invitation-link.entity';
+import { RevenueRequestForm } from 'src/revenue-request-form/entites/revenue-request-form.entity';
+import { CategoryPointHistory } from 'src/point/entities/category-point-history.entity';
 
 export enum ExamType {
   OBJECTIVE = 'OBJECTIVE',
@@ -109,6 +112,13 @@ export class MockExamCategory extends CoreEntity {
   @Field(() => [CategoryEvaluation], { defaultValue: [], nullable: true })
   categoryEvaluations: CategoryEvaluation[];
 
+  @OneToMany(
+    () => CategoryPointHistory,
+    (categoryPointHistory) => categoryPointHistory.category,
+  )
+  @Field(() => [CategoryPointHistory], { defaultValue: [], nullable: true })
+  categoryPointHistories: CategoryPointHistory[];
+
   @Field(() => [Quiz])
   @OneToMany(() => Quiz, (quiz) => quiz.category)
   quiz: Quiz[];
@@ -183,6 +193,18 @@ export class MockExamCategory extends CoreEntity {
 
   @Field(() => Boolean, { nullable: true, defaultValue: false })
   isBookmarked?: boolean = false;
+
+  @OneToOne(
+    () => RevenueRequestForm,
+    (revenueRequestForm) => revenueRequestForm.category,
+  )
+  @Field(() => RevenueRequestForm, { nullable: true })
+  revenueRequestForm?: RevenueRequestForm;
+
+  // 평가를 통해 한번이라도 포인트를 적립해준 유저들의 id를 저장
+  @Column({ type: 'json', default: [] })
+  @Field(() => [Number], { defaultValue: [], nullable: true })
+  pointEarningUserIds?: number[];
 }
 
 @Entity()

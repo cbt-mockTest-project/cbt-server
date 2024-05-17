@@ -53,6 +53,10 @@ import { CategoryEvaluation } from 'src/category-evaluation/entities/category-ev
 import { QuizComment } from 'src/quiz/entities/quizComment.entity';
 import { QuizCommentLike } from 'src/quiz/entities/quizCommentLike.entity';
 import { CategoryInvitationLink } from 'src/category-invitation-link/entities/category-invitation-link.entity';
+import { PointTransaction } from 'src/point/entities/point-transaction.entity';
+import { PointBalance } from 'src/point/entities/point-balance.entity';
+import { CategoryPointHistory } from 'src/point/entities/category-point-history.entity';
+import { SettlementRequest } from 'src/point/entities/settlement-request.entity';
 
 @InputType('RecentlyStudiedExamsInputType', { isAbstract: true })
 @ObjectType()
@@ -156,6 +160,13 @@ export class User extends CoreEntity {
   mockExamCategory: MockExamCategory[];
 
   @OneToMany(
+    () => CategoryPointHistory,
+    (categoryPointHistory) => categoryPointHistory.buyer,
+  )
+  @Field(() => [CategoryPointHistory], { defaultValue: [], nullable: true })
+  categoryPointHistories: CategoryPointHistory[];
+
+  @OneToMany(
     () => MockExamQuestionComment,
     (mockExamQuestionComment) => mockExamQuestionComment.user,
   )
@@ -225,6 +236,13 @@ export class User extends CoreEntity {
   @Field(() => [Feedback])
   feedback: Feedback[];
 
+  @OneToMany(
+    () => SettlementRequest,
+    (settlementRequests) => settlementRequests.user,
+  )
+  @Field(() => [SettlementRequest])
+  settlementRequests: SettlementRequest[];
+
   @OneToMany(() => Visit, (visit) => visit.user)
   @Field(() => [Visit])
   visit: Visit[];
@@ -256,6 +274,17 @@ export class User extends CoreEntity {
   @OneToMany(() => Attendance, (attendance) => attendance.user)
   @Field(() => [Attendance], { nullable: true })
   attendances: Attendance[];
+
+  @OneToMany(
+    () => PointTransaction,
+    (pointTransaction) => pointTransaction.user,
+  )
+  @Field(() => [PointTransaction], { nullable: true })
+  pointTransactions: PointTransaction[];
+
+  @OneToOne(() => PointBalance, (pointBalance) => pointBalance.user)
+  @Field(() => PointBalance, { nullable: true })
+  pointBalance: PointBalance;
 
   @DeleteDateColumn()
   @Field(() => Date)

@@ -15,6 +15,7 @@ import {
   In,
   IsNull,
   Like,
+  Not,
   Repository,
 } from 'typeorm';
 import {
@@ -430,10 +431,23 @@ export class MockExamCategoryService {
       where: { id },
       relations: { user: true },
     });
+
     if (!prevCategory) {
       return {
         ok: false,
         error: '존재하지 않는 카테고리입니다.',
+      };
+    }
+    const duplicated = await this.mockExamCategories.findOne({
+      where: [
+        { name: editMockExamCategoryInput.name, id: Not(id) },
+        { urlSlug: editMockExamCategoryInput.name, id: Not(id) },
+      ],
+    });
+    if (duplicated) {
+      return {
+        ok: false,
+        error: '폴더 제목이 중복됩니다.',
       };
     }
     if (user.id !== prevCategory.user.id) {

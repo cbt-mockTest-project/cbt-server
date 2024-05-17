@@ -16,6 +16,7 @@ import {
   UpdateRevenueRequestFormOutput,
 } from './dtos/update-revenue-request-form.dto';
 import { GetRevenueRequestFormsOutput } from './dtos/get-revenue-request-forms.dto';
+import { TelegramService } from 'src/telegram/telegram.service';
 
 @Injectable()
 export class RevenueRequestFormService {
@@ -24,6 +25,7 @@ export class RevenueRequestFormService {
     private readonly revenueRequestForms: Repository<RevenueRequestForm>,
     @InjectRepository(MockExamCategory)
     private readonly mockExamCategories: Repository<MockExamCategory>,
+    private readonly telegramService: TelegramService,
   ) {}
 
   async createRevenueRequestForm(
@@ -68,6 +70,14 @@ export class RevenueRequestFormService {
       ...category.revenueRequestForm,
       status: RevenueRequestFormStatus.PENDING,
       category,
+    });
+    await this.telegramService.sendMessageToTelegram({
+      message: `
+        수익창출 신청이 들어왔습니다.
+        암기장 이름: ${category.name}
+        이메일: ${user.email}
+      `,
+      channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
     });
     return { ok: true, revenueRequestForm };
   }

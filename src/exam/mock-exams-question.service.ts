@@ -1,11 +1,11 @@
 import { ExamCoAuthor } from '../exam-co-author/entities/exam-co-author.entity';
 /* eslint-disable prefer-const */
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MockExamQuestionBookmark } from 'src/exam/entities/mock-exam-question-bookmark.entity';
 import { User, UserRole } from 'src/users/entities/user.entity';
 import { shuffleArray } from 'src/utils/utils';
-import { FindOptionsWhere, In, Not, Repository } from 'typeorm';
+import { FindOptionsWhere, In, LessThan, Not, Repository } from 'typeorm';
 import {
   CreateMockExamQuestionInput,
   CreateMockExamQuestionOutput,
@@ -69,6 +69,7 @@ import {
 import { sortQuestions } from 'src/lib/utils/sortQuestions';
 import { MockExamCategory } from 'src/exam-category/entities/mock-exam-category.entity';
 import { ExamSource } from 'src/enums/enum';
+import * as moment from 'moment-timezone';
 
 @Injectable()
 export class MockExamQuestionService {
@@ -1252,15 +1253,17 @@ export class MockExamQuestionService {
 
   async sync() {
     try {
-      const categories = this.mockExamCategory.find();
-      (await categories).forEach(async (category) => {
-        const { id, name } = category;
-        await this.mockExamCategory.update(id, { urlSlug: name.trim() });
+      const date = moment('2024-01-01').toDate();
+      // date 이전 값 삭제
+      await this.mockExamQuestionState.delete({
+        created_at: LessThan(date),
       });
+
       return {
         ok: true,
       };
-    } catch {
+    } catch (e) {
+      console.log(e);
       return {
         ok: false,
       };

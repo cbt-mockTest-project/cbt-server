@@ -442,7 +442,10 @@ export class MockExamCategoryService {
         error: '권한이 없습니다.',
       };
     }
-    await this.mockExamCategories.save([editMockExamCategoryInput]);
+    await this.mockExamCategories.save({ ...editMockExamCategoryInput });
+    this.revalidateService.revalidate({
+      path: `/category/${prevCategory.urlSlug}`,
+    });
     return {
       ok: true,
     };

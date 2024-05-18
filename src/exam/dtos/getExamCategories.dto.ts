@@ -28,6 +28,9 @@ export class GetExamCategoriesInput {
 
   @Field(() => String, { nullable: true, defaultValue: '' })
   keyword?: string;
+
+  @Field(() => Boolean, { nullable: true })
+  isPick?: boolean;
 }
 
 @ObjectType()

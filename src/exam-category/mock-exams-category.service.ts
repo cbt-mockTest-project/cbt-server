@@ -214,7 +214,7 @@ export class MockExamCategoryService {
     getExamCategoriesInput: GetExamCategoriesInput,
     user?: User,
   ): Promise<GetExamCategoriesOutput> {
-    const { examSource, isBookmarked, limit, page, categoryMakerId } =
+    const { examSource, isBookmarked, limit, page, categoryMakerId, isPick } =
       getExamCategoriesInput;
     if (isBookmarked) {
       if (!user)
@@ -240,6 +240,16 @@ export class MockExamCategoryService {
             isPublic: true,
           },
         );
+      }
+      if (isPick) {
+        categoryQuery.andWhere('category.isPick = :isPick', {
+          isPick: true,
+        });
+      }
+      if (isPick === false) {
+        categoryQuery.andWhere('category.isPick = :isPick', {
+          isPick: false,
+        });
       }
       // categoryMakerId가 있는 경우, 해당 유저가 만든 카테고리를 검색
       if (categoryMakerId) {

@@ -205,6 +205,10 @@ export class MockExamCategory extends CoreEntity {
   @Column({ type: 'json', default: [] })
   @Field(() => [Number], { defaultValue: [], nullable: true })
   pointEarningUserIds?: number[];
+
+  @Field(() => Boolean, { nullable: true, defaultValue: false })
+  @Column({ default: false })
+  isPick?: boolean;
 }
 
 @Entity()

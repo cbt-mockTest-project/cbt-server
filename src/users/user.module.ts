@@ -21,6 +21,8 @@ import { Seller } from 'src/seller/entities/seller.entity';
 import { CategoryEvaluation } from 'src/category-evaluation/entities/category-evaluation.entity';
 import { Seceders } from 'src/seceders/entities/seceders.entity';
 import { SecedersService } from 'src/seceders/seceders.service';
+import { Item } from 'src/item/entities/item.entity';
+import { ItemRevision } from 'src/item/entities/item-revision.entity';
 
 @Module({
   imports: [
@@ -37,6 +39,8 @@ import { SecedersService } from 'src/seceders/seceders.service';
       Seller,
       CategoryEvaluation,
       Seceders,
+      Item,
+      ItemRevision,
     ]),
   ],
   providers: [

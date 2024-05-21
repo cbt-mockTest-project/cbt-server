@@ -30,6 +30,8 @@ import { Quiz } from 'src/quiz/entities/quiz.entity';
 import { CategoryInvitationLink } from 'src/category-invitation-link/entities/category-invitation-link.entity';
 import { RevenueRequestForm } from 'src/revenue-request-form/entites/revenue-request-form.entity';
 import { CategoryPointHistory } from 'src/point/entities/category-point-history.entity';
+import { Item } from 'src/item/entities/item.entity';
+import { ItemRevision } from 'src/item/entities/item-revision.entity';
 
 export enum ExamType {
   OBJECTIVE = 'OBJECTIVE',
@@ -165,6 +167,14 @@ export class MockExamCategory extends CoreEntity {
     onDelete: 'SET NULL',
   })
   examViewer: ExamViewer[];
+
+  @OneToMany(() => Item, (item) => item.category)
+  @Field(() => [Item])
+  items: Item[];
+
+  @OneToMany(() => ItemRevision, (item) => item.user)
+  @Field(() => [ItemRevision])
+  itemRevisions: ItemRevision[];
 
   @ManyToMany(() => Role, (role) => role.mockExamCategories)
   @JoinTable({ name: 'ExamCategoryRole' })

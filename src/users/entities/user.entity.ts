@@ -57,6 +57,9 @@ import { PointTransaction } from 'src/point/entities/point-transaction.entity';
 import { PointBalance } from 'src/point/entities/point-balance.entity';
 import { CategoryPointHistory } from 'src/point/entities/category-point-history.entity';
 import { SettlementRequest } from 'src/point/entities/settlement-request.entity';
+import { Item } from 'src/item/entities/item.entity';
+import { ItemSalesHistory } from 'src/item/entities/item-sales-history.entity';
+import { ItemRevision } from 'src/item/entities/item-revision.entity';
 
 @InputType('RecentlyStudiedExamsInputType', { isAbstract: true })
 @ObjectType()
@@ -218,6 +221,14 @@ export class User extends CoreEntity {
   @Field(() => [ExamLike])
   examLikes: ExamLike[];
 
+  @OneToMany(() => Item, (item) => item.user)
+  @Field(() => [Item])
+  items: Item[];
+
+  @OneToMany(() => ItemRevision, (item) => item.user)
+  @Field(() => [ItemRevision])
+  itemRevisions: ItemRevision[];
+
   @OneToMany(
     () => MockExamQuestionCommentLike,
     (mockExamQuestionCommentLike) => mockExamQuestionCommentLike.user,
@@ -254,6 +265,10 @@ export class User extends CoreEntity {
   @OneToMany(() => Payment, (payment) => payment.user)
   @Field(() => [Payment])
   payments: Payment[];
+
+  @OneToMany(() => ItemSalesHistory, (payment) => payment.buyer)
+  @Field(() => [ItemSalesHistory])
+  itemSalesHistories: Payment[];
 
   @OneToMany(() => Post, (post) => post.user)
   @Field(() => [Post], { nullable: true })

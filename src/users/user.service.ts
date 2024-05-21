@@ -88,6 +88,12 @@ import {
 } from './dtos/upsertRecentlyStudiedExams.dto';
 import { SecedersService } from 'src/seceders/seceders.service';
 import { CategoryPointHistoryService } from 'src/point/category-point-history.service';
+import {
+  GetPresignedUrlInput,
+  GetPresignedUrlOutput,
+} from './dtos/getPresignedUrl.dto';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 @Injectable()
 export class UserService {
   constructor(
@@ -1387,6 +1393,42 @@ export class UserService {
       return {
         ok: false,
         error: '최근 학습한 문제를 삭제할 수 없습니다.',
+      };
+    }
+  }
+
+  async getPresignedUrl(
+    getPresignedUrlInput: GetPresignedUrlInput,
+  ): Promise<GetPresignedUrlOutput> {
+    try {
+      const { path } = getPresignedUrlInput;
+      const client = new S3Client({
+        region: 'ap-northeast-2',
+        credentials: {
+          accessKeyId: process.env.AWS_ACCESS_KEY,
+          secretAccessKey: process.env.AWS_SECRET_KEY,
+        },
+      });
+      const bucketName = process.env.AWS_BUCKEY_NAME;
+      const objectKey = path + '/' + uuidv4(); //
+      console.log(objectKey);
+      const command = new PutObjectCommand({
+        Bucket: bucketName,
+        Key: objectKey,
+      });
+      const presignedUrl = await getSignedUrl(client, command, {
+        expiresIn: 3600,
+      });
+      return {
+        ok: true,
+        presignedUrl,
+        fileUrl: `${process.env.CLOUD_FRONT_DOMAIN}/${objectKey}`,
+      };
+    } catch (e) {
+      console.log(e);
+      return {
+        ok: false,
+        error: '업로드 URL을 가져올 수 없습니다.',
       };
     }
   }

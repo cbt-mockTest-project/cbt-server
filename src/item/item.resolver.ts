@@ -1,0 +1,116 @@
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Item } from './entities/item.entity';
+import { ItemService } from './item.service';
+import { CreateItemInput, CreateItemOutput } from './dtos/item/createItem.dto';
+import { UpdateItemInput, UpdateItemOutput } from './dtos/item/updateItem.dto';
+import { DeleteItemInput, DeleteItemOutput } from './dtos/item/deleteItem.dto';
+import {
+  ApproveItemInput,
+  ApproveItemOutput,
+} from './dtos/item/approveItem.dto';
+import { RejectItemInput, RejectItemOutput } from './dtos/item/rejectItem.dto';
+import { GetItemsForOwnerOutput } from './dtos/item/getItemsForOwner.dto';
+import { AuthUser } from 'src/auth/auth-user.decorator';
+import { Role } from 'src/auth/role.decorators';
+import { User } from 'src/users/entities/user.entity';
+import { GetItemsInput, GetItemsOutput } from './dtos/item/getItems.dto';
+import { GetItemInput, GetItemOutput } from './dtos/item/getItem.dto';
+import {
+  RequestDeleteItemInput,
+  RequestDeleteItemOutput,
+} from './dtos/item/requestDeleteItem.dto';
+import {
+  GetItemRevisionInput,
+  GetItemRevisionOutput,
+} from './dtos/item/getItemRevision.dto';
+import { GetApprovedItemIdsAndsSlugsOutput } from './dtos/item/getApprovedItemIdsAndSlugs.dto';
+@Resolver(() => Item)
+export class ItemResolver {
+  constructor(private readonly itemService: ItemService) {}
+
+  @Mutation(() => CreateItemOutput)
+  @Role(['ANY'])
+  async createItem(
+    @Args('input') createItemInput: CreateItemInput,
+    @AuthUser() user: User,
+  ) {
+    return this.itemService.createItem(createItemInput, user);
+  }
+
+  @Mutation(() => UpdateItemOutput)
+  @Role(['ANY'])
+  async updateItem(
+    @AuthUser() user: User,
+    @Args('input') updateItemInput: UpdateItemInput,
+  ) {
+    return this.itemService.updateItem(user, updateItemInput);
+  }
+
+  @Mutation(() => DeleteItemOutput)
+  @Role(['ANY'])
+  async deleteItem(
+    @AuthUser() user: User,
+    @Args('input') deleteItemInput: DeleteItemInput,
+  ) {
+    return this.itemService.deleteItem(user, deleteItemInput);
+  }
+
+  @Query(() => GetItemsOutput)
+  async getItems(@Args('input') getItemsInput: GetItemsInput) {
+    return this.itemService.getItems(getItemsInput);
+  }
+
+  @Query(() => GetItemOutput)
+  async getItem(@Args('input') getItemInput: GetItemInput) {
+    return this.itemService.getItem(getItemInput);
+  }
+
+  @Role(['ANY'])
+  @Query(() => GetItemRevisionOutput)
+  async getItemRevision(
+    @AuthUser() user: User,
+    @Args('input') getItemRevisionInput: GetItemRevisionInput,
+  ) {
+    return this.itemService.getItemRevision(user, getItemRevisionInput);
+  }
+
+  @Query(() => GetItemsForOwnerOutput)
+  @Role(['ANY'])
+  async getItemsForOwner(
+    @AuthUser() user: User,
+  ): Promise<GetItemsForOwnerOutput> {
+    return this.itemService.getItemsForOwner(user);
+  }
+
+  @Mutation(() => ApproveItemOutput)
+  @Role(['ADMIN'])
+  async approveItem(
+    @AuthUser() user: User,
+    @Args('input') approveItemInput: ApproveItemInput,
+  ) {
+    return this.itemService.approveItem(user, approveItemInput);
+  }
+
+  @Mutation(() => RejectItemOutput)
+  @Role(['ADMIN'])
+  async rejectItem(
+    @AuthUser() user: User,
+    @Args('input') rejectItemInput: RejectItemInput,
+  ) {
+    return this.itemService.rejectItem(user, rejectItemInput);
+  }
+
+  @Mutation(() => RequestDeleteItemOutput)
+  @Role(['ANY'])
+  async requestDeleteItem(
+    @AuthUser() user: User,
+    @Args('input') requestDeleteItemInput: RequestDeleteItemInput,
+  ) {
+    return this.itemService.requestDeleteItem(user, requestDeleteItemInput);
+  }
+
+  @Query(() => GetApprovedItemIdsAndsSlugsOutput)
+  async getApprovedItemIdsAndsSlugs() {
+    return this.itemService.getApprovedItemIdsAndsSlugs();
+  }
+}

@@ -73,6 +73,10 @@ import {
   UpsertRecentlyStudiedExamsInput,
   UpsertRecentlyStudiedExamsOutput,
 } from './dtos/upsertRecentlyStudiedExams.dto';
+import {
+  GetPresignedUrlInput,
+  GetPresignedUrlOutput,
+} from './dtos/getPresignedUrl.dto';
 
 @Resolver(() => User)
 export class UserResolver {
@@ -313,5 +317,13 @@ export class UserResolver {
       user,
       upsertRecentlyStudiedExamsInput,
     );
+  }
+
+  @Role(['ANY'])
+  @Query(() => GetPresignedUrlOutput)
+  async getPresignedUrl(
+    @Args('input') getPresignedUrlInput: GetPresignedUrlInput,
+  ): Promise<GetPresignedUrlOutput> {
+    return this.userService.getPresignedUrl(getPresignedUrlInput);
   }
 }

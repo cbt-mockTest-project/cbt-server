@@ -114,6 +114,10 @@ import { RevenueRequestForm } from './revenue-request-form/entites/revenue-reque
 import { RevenueRequestFormModule } from './revenue-request-form/revenue-request-form.module';
 import { CategoryPointHistory } from './point/entities/category-point-history.entity';
 import { SettlementRequest } from './point/entities/settlement-request.entity';
+import { Item } from './item/entities/item.entity';
+import { ItemRevision } from './item/entities/item-revision.entity';
+import { ItemSalesHistory } from './item/entities/item-sales-history.entity';
+import { ItemModule } from './item/item.module';
 
 @Module({
   imports: [
@@ -141,7 +145,9 @@ import { SettlementRequest } from './point/entities/settlement-request.entity';
       autoSchemaFile: true,
       sortSchema: true, //default: false
       debug: process.env.NODE_ENV === 'dev',
-      playground: process.env.NODE_ENV === 'dev',
+      playground: {
+        cdnUrl: 'https://gcore.jsdelivr.net/npm',
+      },
       formatError(error) {
         logger.error(
           `GraphQL Validation Error: ${JSON.stringify(error, null, 2)}`,
@@ -247,6 +253,9 @@ import { SettlementRequest } from './point/entities/settlement-request.entity';
         RevenueRequestForm,
         CategoryPointHistory,
         SettlementRequest,
+        Item,
+        ItemRevision,
+        ItemSalesHistory,
       ],
     }),
     UserModule,
@@ -277,6 +286,7 @@ import { SettlementRequest } from './point/entities/settlement-request.entity';
     RootModule,
     VisitModule,
     RevenueRequestFormModule,
+    ItemModule,
     CategoryInvitationLinkModule,
     MailerModule.forRoot({
       transport: `smtps://${process.env.EMAIL_AUTH_EMAIL}:${process.env.EMAIL_AUTH_PASSWORD}@${process.env.EMAIL_HOST}`,

@@ -9,9 +9,7 @@ on:
       - release
 
 env:
-  LIGHTSAIL_SSH_KEY_TWO: ${{ secrets.LIGHTSAIL_SSH_KEY_TWO }}
-  LIGHTSAIL_HOST_TWO: ${{ secrets.LIGHTSAIL_HOST_TWO }}
-  LIGHTSAIL_USERNAME: ubuntu
+  LIGHTSAIL_USERNAME: bitnami
   AWS_REGION: ap-northeast-2
 
 jobs:

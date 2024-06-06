@@ -1340,11 +1340,6 @@ export class UserService {
       const { categoryId, questionIndex, examIds } =
         upsertRecentlyStudiedExamsInput;
       let recentlyStudiedExams = user.recentlyStudiedExams;
-      if (!questionIndex) {
-        recentlyStudiedExams = recentlyStudiedExams.filter(
-          (data) => data.categoryId !== categoryId,
-        );
-      }
       if (questionIndex) {
         const existed = recentlyStudiedExams.find(
           (data) => data.categoryId === categoryId,

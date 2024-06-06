@@ -9,15 +9,7 @@ import {
 } from './entities/mock-exam-category.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  FindManyOptions,
-  FindOptionsWhere,
-  In,
-  IsNull,
-  Like,
-  Not,
-  Repository,
-} from 'typeorm';
+import { FindOptionsWhere, In, IsNull, Not, Repository } from 'typeorm';
 import {
   DeleteMockExamCategoryInput,
   DeleteMockExamCategoryOutput,
@@ -214,8 +206,16 @@ export class MockExamCategoryService {
     getExamCategoriesInput: GetExamCategoriesInput,
     user?: User,
   ): Promise<GetExamCategoriesOutput> {
-    const { examSource, isBookmarked, limit, page, categoryMakerId, isPick } =
-      getExamCategoriesInput;
+    const {
+      examSource,
+      isBookmarked,
+      limit,
+      page,
+      categoryMakerId,
+      isPick,
+      keyword,
+      isPublicOnly,
+    } = getExamCategoriesInput;
     if (isBookmarked) {
       if (!user)
         return {
@@ -261,6 +261,21 @@ export class MockExamCategoryService {
             isPublic: true,
           });
         }
+      }
+      if (keyword) {
+        const formattedKeyword = `%${keyword
+          .replace(/\s+/g, '')
+          .toLowerCase()}%`;
+        categoryQuery.andWhere(
+          "(LOWER(REPLACE(category.name, ' ', '')) LIKE :formattedKeyword)",
+          { formattedKeyword },
+        );
+      }
+
+      if (isPublicOnly) {
+        categoryQuery.andWhere('category.isPublic = :isPublic', {
+          isPublic: true,
+        });
       }
 
       categoryQuery

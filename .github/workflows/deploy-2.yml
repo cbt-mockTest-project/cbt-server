@@ -66,6 +66,15 @@ jobs:
           source: 'package.json'
           target: '/home/bitnami/cbt-server'
 
+      - name: Copy package.json
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.LIGHTSAIL_HOST_TWO }}
+          username: ${{env.LIGHTSAIL_USERNAME}}
+          key: ${{ secrets.LIGHTSAIL_SSH_KEY_TWO }}
+          source: 'node_modules'
+          target: '/home/bitnami/cbt-server/node_modules'
+
       - name: Install Packages and Start/Restart PM2
         uses: appleboy/ssh-action@master
         with:

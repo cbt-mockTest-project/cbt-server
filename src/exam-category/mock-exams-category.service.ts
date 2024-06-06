@@ -267,7 +267,7 @@ export class MockExamCategoryService {
           .replace(/\s+/g, '')
           .toLowerCase()}%`;
         categoryQuery.andWhere(
-          "(LOWER(REPLACE(category.name, ' ', '')) LIKE :formattedKeyword)",
+          "(LOWER(REPLACE(category.name, ' ', '')) LIKE :formattedKeyword OR LOWER(REPLACE(category.description, ' ', '')) LIKE :formattedKeyword)",
           { formattedKeyword },
         );
       }

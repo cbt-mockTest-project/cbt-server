@@ -1340,20 +1340,18 @@ export class UserService {
       const { categoryId, questionIndex, examIds } =
         upsertRecentlyStudiedExamsInput;
       let recentlyStudiedExams = user.recentlyStudiedExams;
-      if (questionIndex) {
-        const existed = recentlyStudiedExams.find(
-          (data) => data.categoryId === categoryId,
+      const existed = recentlyStudiedExams.find(
+        (data) => data.categoryId === categoryId,
+      );
+      if (!existed) {
+        recentlyStudiedExams.push({ categoryId, questionIndex, examIds });
+      }
+      if (existed) {
+        recentlyStudiedExams = recentlyStudiedExams.map((data) =>
+          data.categoryId === categoryId
+            ? { ...data, questionIndex, examIds }
+            : data,
         );
-        if (!existed) {
-          recentlyStudiedExams.push({ categoryId, questionIndex, examIds });
-        }
-        if (existed) {
-          recentlyStudiedExams = recentlyStudiedExams.map((data) =>
-            data.categoryId === categoryId
-              ? { ...data, questionIndex, examIds }
-              : data,
-          );
-        }
       }
       await this.users.update(user.id, {
         recentlyStudiedExams,

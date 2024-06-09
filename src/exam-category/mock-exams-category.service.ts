@@ -68,6 +68,10 @@ import {
 import { RevalidateService } from 'src/revalidate/revalidate.service';
 import { MockExamQuestion } from 'src/exam/entities/mock-exam-question.entity';
 import { CategoryEvaluation } from 'src/category-evaluation/entities/category-evaluation.entity';
+import {
+  CheckIsAccessibleCategoryInput,
+  CheckIsAccessibleCategoryOutput,
+} from './dtos/checkIsAccessibleCategory.dto';
 
 @Injectable()
 export class MockExamCategoryService {
@@ -858,6 +862,55 @@ export class MockExamCategoryService {
       return {
         ok: false,
         error: '순서 변경에 실패했습니다.',
+      };
+    }
+  }
+
+  async checkIsAccessibleCategory(
+    user: User,
+    checkIsAccessibleCategory: CheckIsAccessibleCategoryInput,
+  ): Promise<CheckIsAccessibleCategoryOutput> {
+    try {
+      const { examId } = checkIsAccessibleCategory;
+      const categories = await this.mockExamCategories.find({
+        where: {
+          mockExam: {
+            id: examId,
+          },
+        },
+      });
+      const isPublicCategories = categories.some(
+        (category) => category.isPublic,
+      );
+      if (isPublicCategories) {
+        return {
+          ok: true,
+        };
+      }
+      if (!user)
+        return {
+          ok: false,
+        };
+      const categoryIds = categories.map((category) => category.id);
+      const isInvitedCategories = await this.examCategoryBookmarks.count({
+        where: {
+          category: {
+            id: In(categoryIds),
+          },
+          user: {
+            id: user.id,
+          },
+        },
+      });
+      if (isInvitedCategories) {
+        return {
+          ok: true,
+        };
+      }
+    } catch {
+      return {
+        ok: false,
+        error: '카테고리를 찾을 수 없습니다.',
       };
     }
   }

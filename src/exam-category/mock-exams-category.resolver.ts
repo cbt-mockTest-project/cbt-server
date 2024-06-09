@@ -56,6 +56,10 @@ import {
   MoveExamOrderInput,
   MoveExamOrderOutput,
 } from './dtos/moveExamOrder.dto';
+import {
+  CheckIsAccessibleCategoryInput,
+  CheckIsAccessibleCategoryOutput,
+} from './dtos/checkIsAccessibleCategory.dto';
 
 @Resolver(() => MockExamCategory)
 export class MockExamCategoryResolver {
@@ -225,5 +229,17 @@ export class MockExamCategoryResolver {
     moveExamOrderInput: MoveExamOrderInput,
   ): Promise<MoveExamOrderOutput> {
     return this.mockExamCategoryService.moveExamOrder(user, moveExamOrderInput);
+  }
+
+  @Mutation(() => CheckIsAccessibleCategoryOutput)
+  async checkIsAccessibleCategory(
+    @AuthUser() user: User,
+    @Args('input')
+    checkIsAccessibleCategoryInput: CheckIsAccessibleCategoryInput,
+  ): Promise<CheckIsAccessibleCategoryOutput> {
+    return this.mockExamCategoryService.checkIsAccessibleCategory(
+      user,
+      checkIsAccessibleCategoryInput,
+    );
   }
 }

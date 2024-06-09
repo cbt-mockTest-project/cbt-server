@@ -1009,6 +1009,7 @@ export class MockExamQuestionService {
           id: In(ids),
         },
         relations: {
+          user: true,
           mockExamQuestion: {
             user: true,
           },
@@ -1022,9 +1023,13 @@ export class MockExamQuestionService {
               mockExam: {
                 source: In([ExamSource.USER, ExamSource.MOUD_CBT]),
                 id: mockExam.id,
+                user: {
+                  id: mockExam.user.id,
+                },
               },
             },
           });
+          console.log(isPrivateCategory);
           if (isPrivateCategory) {
             mockExams = mockExams.map((mockExam) => ({
               ...mockExam,

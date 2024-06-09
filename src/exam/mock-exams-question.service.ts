@@ -1020,16 +1020,15 @@ export class MockExamQuestionService {
           const isPrivateCategory = await this.mockExamCategory.count({
             where: {
               isPublic: false,
+              user: {
+                id: mockExam.user.id,
+              },
+              source: ExamSource.USER,
               mockExam: {
-                source: In([ExamSource.USER, ExamSource.MOUD_CBT]),
                 id: mockExam.id,
-                user: {
-                  id: mockExam.user.id,
-                },
               },
             },
           });
-          console.log(isPrivateCategory);
           if (isPrivateCategory) {
             mockExams = mockExams.map((mockExam) => ({
               ...mockExam,

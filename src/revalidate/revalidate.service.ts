@@ -25,6 +25,7 @@ export class RevalidateService {
         ok: true,
       };
     } catch (e) {
+      console.log(e);
       console.log(`${path} revalidate failure`);
       return {
         ok: false,

@@ -1004,7 +1004,7 @@ export class MockExamQuestionService {
     try {
       const { order, states, ids, limit, bookmarked } =
         readQuestionsByExamIdsInput;
-      const mockExams = await this.mockExam.find({
+      let mockExams = await this.mockExam.find({
         where: {
           id: In(ids),
         },
@@ -1014,10 +1014,29 @@ export class MockExamQuestionService {
           },
         },
       });
+      await Promise.all(
+        mockExams.map(async (mockExam) => {
+          const isPrivateCategory = await this.mockExamCategory.count({
+            where: {
+              isPublic: false,
+              mockExam: {
+                source: In([ExamSource.USER, ExamSource.MOUD_CBT]),
+                id: mockExam.id,
+              },
+            },
+          });
+          if (isPrivateCategory) {
+            mockExams = mockExams.map((mockExam) => ({
+              ...mockExam,
+              isPrivate: true,
+            }));
+          }
+        }),
+      );
+      // console.log(mockExams[0]);
       let questions: MockExamQuestion[] = mockExams.flatMap(
         (mockExam) => mockExam.mockExamQuestion,
       );
-      console.log(1);
       let questionIds = questions.map((question) => question.id);
       if (bookmarked) {
         const questionBookmarks = await this.mockExamQuestionBookmark.find({

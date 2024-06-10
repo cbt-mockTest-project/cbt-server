@@ -60,6 +60,10 @@ import {
   CheckIsAccessibleCategoryInput,
   CheckIsAccessibleCategoryOutput,
 } from './dtos/checkIsAccessibleCategory.dto';
+import {
+  CheckHasCategoryAccessInput,
+  CheckHasCategoryAccessOutput,
+} from './dtos/checkHasCategoryAccess.dto';
 
 @Resolver(() => MockExamCategory)
 export class MockExamCategoryResolver {
@@ -240,6 +244,18 @@ export class MockExamCategoryResolver {
     return this.mockExamCategoryService.checkIsAccessibleCategory(
       user,
       checkIsAccessibleCategoryInput,
+    );
+  }
+
+  @Mutation(() => CheckHasCategoryAccessOutput)
+  async checkHasCategoryAccess(
+    @AuthUser() user: User,
+    @Args('input')
+    checkHasCategoryAccessInput: CheckHasCategoryAccessInput,
+  ): Promise<CheckHasCategoryAccessOutput> {
+    return this.mockExamCategoryService.checkHasCategoryAccess(
+      user,
+      checkHasCategoryAccessInput,
     );
   }
 }

@@ -72,6 +72,7 @@ import {
   CheckIsAccessibleCategoryInput,
   CheckIsAccessibleCategoryOutput,
 } from './dtos/checkIsAccessibleCategory.dto';
+import { CheckHasCategoryAccessInput } from './dtos/checkHasCategoryAccess.dto';
 
 @Injectable()
 export class MockExamCategoryService {
@@ -862,6 +863,33 @@ export class MockExamCategoryService {
       return {
         ok: false,
         error: '순서 변경에 실패했습니다.',
+      };
+    }
+  }
+
+  async checkHasCategoryAccess(
+    user: User,
+    checkHasCategoryAccessInput: CheckHasCategoryAccessInput,
+  ) {
+    try {
+      if (!user) return { ok: false };
+      const { categoryId } = checkHasCategoryAccessInput;
+      const isInvitedCategories = await this.examCategoryBookmarks.findOne({
+        where: {
+          category: {
+            id: categoryId,
+          },
+          user: {
+            id: user.id,
+          },
+        },
+      });
+      if (isInvitedCategories) return { ok: true };
+      return { ok: false };
+    } catch {
+      return {
+        ok: false,
+        error: '카테고리를 찾을 수 없습니다.',
       };
     }
   }

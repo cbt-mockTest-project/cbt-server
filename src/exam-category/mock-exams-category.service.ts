@@ -910,6 +910,11 @@ export class MockExamCategoryService {
           },
         },
       });
+      if (categories.length === 0) {
+        return {
+          ok: false,
+        };
+      }
       const isPublicCategories = categories.some(
         (category) => category.isPublic,
       );

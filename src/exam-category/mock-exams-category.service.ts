@@ -902,6 +902,9 @@ export class MockExamCategoryService {
       const { examId } = checkIsAccessibleCategory;
       const categories = await this.mockExamCategories.find({
         where: {
+          user: {
+            id: user.id,
+          },
           mockExam: {
             id: examId,
           },
@@ -935,6 +938,9 @@ export class MockExamCategoryService {
           ok: true,
         };
       }
+      return {
+        ok: false,
+      };
     } catch {
       return {
         ok: false,

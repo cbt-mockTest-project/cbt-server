@@ -1210,7 +1210,8 @@ export class MockExamQuestionService {
                 feedback.mockExamQuestion.id === question.id &&
                 (feedback.type !== QuestionFeedbackType.PRIVATE ||
                   (feedback.type === QuestionFeedbackType.PRIVATE &&
-                    feedback.user?.id === user?.id)),
+                    (feedback.user?.id === user?.id ||
+                      user?.role === UserRole.ADMIN))),
             )
             .map((feedback) => {
               const goodCount = feedback.recommendation.filter(

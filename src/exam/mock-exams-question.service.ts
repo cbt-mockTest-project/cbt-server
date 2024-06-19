@@ -948,18 +948,31 @@ export class MockExamQuestionService {
       let searchQuestionsByKeywordQuery = this.mockExamQuestion
         .createQueryBuilder('question')
         .leftJoinAndSelect('question.mockExam', 'mockExam')
-        .leftJoinAndSelect('question.user', 'user')
-        .where(
-          "(LOWER(REPLACE(question.question, ' ', '')) LIKE :formattedKeyword OR LOWER(REPLACE(question.solution, ' ', '')) LIKE :formattedKeyword) AND mockExam.approved = true",
-          { formattedKeyword },
-        )
-        .limit(30);
-      if (examIds.length > 0) {
-        searchQuestionsByKeywordQuery = searchQuestionsByKeywordQuery.andWhere(
-          'mockExam.id IN (:...examIds)',
-          { examIds },
-        );
+        .leftJoinAndSelect('question.user', 'user');
+
+      if (!user || user?.role !== UserRole.ADMIN) {
+        searchQuestionsByKeywordQuery
+          .where(
+            "(LOWER(REPLACE(question.question, ' ', '')) LIKE :formattedKeyword OR LOWER(REPLACE(question.solution, ' ', '')) LIKE :formattedKeyword) AND mockExam.approved = true",
+            { formattedKeyword },
+          )
+          .limit(30);
+        if (examIds.length > 0) {
+          searchQuestionsByKeywordQuery =
+            searchQuestionsByKeywordQuery.andWhere(
+              'mockExam.id IN (:...examIds)',
+              { examIds },
+            );
+        }
+      } else {
+        searchQuestionsByKeywordQuery
+          .where(
+            "(LOWER(REPLACE(question.question, ' ', '')) LIKE :formattedKeyword OR LOWER(REPLACE(question.solution, ' ', '')) LIKE :formattedKeyword)",
+            { formattedKeyword },
+          )
+          .limit(50);
       }
+
       let questions = await searchQuestionsByKeywordQuery.getMany();
       if (user) {
         const questionBookmarks = await this.mockExamQuestionBookmark.find({

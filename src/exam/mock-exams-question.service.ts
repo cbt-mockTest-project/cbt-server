@@ -1042,7 +1042,18 @@ export class MockExamQuestionService {
               },
             },
           });
-          if (isPrivateCategory) {
+          const category = await this.mockExamCategory.count({
+            where: {
+              mockExam: {
+                id: mockExam.id,
+              },
+            },
+          });
+          mockExams = mockExams.map((mockExam) => ({
+            ...mockExam,
+            isPrivate: mockExam.approved ? false : true,
+          }));
+          if (isPrivateCategory || category === 0) {
             mockExams = mockExams.map((mockExam) => ({
               ...mockExam,
               isPrivate: true,

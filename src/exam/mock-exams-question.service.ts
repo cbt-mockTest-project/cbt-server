@@ -1036,6 +1036,10 @@ export class MockExamQuestionService {
               },
             },
           });
+          mockExams = mockExams.map((mockExam) => ({
+            ...mockExam,
+            isPrivate: mockExam.approved ? false : true,
+          }));
           if (isPrivateCategory || category === 0) {
             mockExams = mockExams.map((mockExam) => ({
               ...mockExam,

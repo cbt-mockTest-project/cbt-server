@@ -1029,7 +1029,14 @@ export class MockExamQuestionService {
               },
             },
           });
-          if (isPrivateCategory) {
+          const category = await this.mockExamCategory.count({
+            where: {
+              mockExam: {
+                id: mockExam.id,
+              },
+            },
+          });
+          if (isPrivateCategory || category === 0) {
             mockExams = mockExams.map((mockExam) => ({
               ...mockExam,
               isPrivate: true,

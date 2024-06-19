@@ -774,7 +774,8 @@ export class MockExamService {
       });
       const exam = await this.mockExam.save({
         ...prevMockExam,
-        ...(!prevMockExam && { approved: true }), // 처음 저장할 때는 바로 승인
+        ...(prevCategory?.isPublic && { approved: true }),
+        ...(!prevCategory?.isPublic && { approved: false }),
         title,
         uuid,
         mockExamQuestion: newQuestions,

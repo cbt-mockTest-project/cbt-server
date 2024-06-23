@@ -788,21 +788,23 @@ export class MockExamService {
           .relation(MockExam, 'mockExamCategory')
           .of(exam.id)
           .loadMany();
+        if (!exitingRelation.find((relation) => relation.id === categoryId)) {
+          await this.mockExam
+            .createQueryBuilder()
+            .relation(MockExam, 'mockExamCategory')
+            .of(exam.id)
+            .add(categoryId);
+          await this.mockExamCategory.save({
+            ...prevCategory,
+            examOrderIds: [exam.id, ...prevCategory.examOrderIds],
+          });
+        }
         this.revalidateService.revalidate({
           path: `/exam/solution/${exam.id}`,
         });
+        //10초 지연
         this.revalidateService.revalidate({
           path: `/category/${prevCategory.name}`,
-        });
-        //10초 지연
-        await this.mockExam
-          .createQueryBuilder()
-          .relation(MockExam, 'mockExamCategory')
-          .of(exam.id)
-          .add(categoryId);
-        await this.mockExamCategory.save({
-          ...prevCategory,
-          examOrderIds: [exam.id, ...prevCategory.examOrderIds],
         });
         console.log('2');
         if (exitingRelation.find((relation) => relation.id === categoryId)) {

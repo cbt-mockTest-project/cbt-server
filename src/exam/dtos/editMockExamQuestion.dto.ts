@@ -11,7 +11,14 @@ import {
 @InputType()
 export class EditMockExamQuestionInput extends PickType(
   PartialType(MockExamQuestion),
-  ['question', 'question_img', 'solution', 'solution_img', 'label'],
+  [
+    'question',
+    'question_img',
+    'solution',
+    'solution_img',
+    'label',
+    'linkedQuestionIds',
+  ],
 ) {
   @Field(() => Number)
   id: number;

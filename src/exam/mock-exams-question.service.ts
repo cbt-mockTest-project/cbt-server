@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { MockExamQuestionBookmark } from 'src/exam/entities/mock-exam-question-bookmark.entity';
 import { User, UserRole } from 'src/users/entities/user.entity';
 import { shuffleArray } from 'src/utils/utils';
-import { FindOptionsWhere, In, LessThan, Not, Repository } from 'typeorm';
+import { FindOptionsWhere, In, Not, Repository } from 'typeorm';
 import {
   CreateMockExamQuestionInput,
   CreateMockExamQuestionOutput,
@@ -70,6 +70,10 @@ import { sortQuestions } from 'src/lib/utils/sortQuestions';
 import { MockExamCategory } from 'src/exam-category/entities/mock-exam-category.entity';
 import { ExamSource } from 'src/enums/enum';
 import * as moment from 'moment-timezone';
+import {
+  UpdateLinkedQuestionIdsInput,
+  UpdateLinkedQuestionIdsOutput,
+} from './dtos/updateLinkedQuestionIds.dto';
 
 @Injectable()
 export class MockExamQuestionService {
@@ -368,8 +372,15 @@ export class MockExamQuestionService {
     editMockExamQuestionInput: EditMockExamQuestionInput,
   ): Promise<EditMockExamQuestionOutput> {
     try {
-      const { id, question, question_img, solution, solution_img, label } =
-        editMockExamQuestionInput;
+      const {
+        id,
+        question,
+        question_img,
+        solution,
+        solution_img,
+        label,
+        linkedQuestionIds,
+      } = editMockExamQuestionInput;
       const prevMockExamQuestion = await this.mockExamQuestion.findOne({
         where: { id },
         relations: { user: true, mockExam: true },
@@ -396,15 +407,27 @@ export class MockExamQuestionService {
         question_img,
         solution,
         solution_img,
+        linkedQuestionIds,
       };
       if (label) {
         dataToUpdate['label'] = label;
       }
-      await this.mockExamQuestion.update(id, dataToUpdate);
+      if (linkedQuestionIds.length > 0) {
+        await this.mockExamQuestion.update(
+          Array.from(new Set([...linkedQuestionIds, id])),
+          {
+            ...dataToUpdate,
+          },
+        );
+      } else {
+        await this.mockExamQuestion.update(id, dataToUpdate);
+      }
+
       return {
         ok: true,
       };
-    } catch {
+    } catch (e) {
+      console.log(e);
       return {
         ok: false,
         error: '문제를 수정할 수 없습니다.',
@@ -1297,6 +1320,35 @@ export class MockExamQuestionService {
         error: '문제를 찾을 수 없습니다.',
       };
     }
+  }
+
+  async updateLinkedQuestionIds(
+    user: User,
+    updateLinkedQuestionIdsInput: UpdateLinkedQuestionIdsInput,
+  ): Promise<UpdateLinkedQuestionIdsOutput> {
+    const { questionId, linkedQuestionIds } = updateLinkedQuestionIdsInput;
+    const question = await this.mockExamQuestion.findOne({
+      where: { id: questionId },
+    });
+    if (!question) {
+      return {
+        ok: false,
+        error: '문제가 존재하지 않습니다.',
+      };
+    }
+    question.linkedQuestionIds = linkedQuestionIds;
+    const linkedQuestions = await this.mockExamQuestion.find({
+      where: { id: In(linkedQuestionIds) },
+    });
+    linkedQuestions.forEach((question) => {
+      question.linkedQuestionIds = Array.from(
+        new Set([...question.linkedQuestionIds, questionId]),
+      );
+    });
+    await this.mockExamQuestion.save([question, ...linkedQuestions]);
+    return {
+      ok: true,
+    };
   }
 
   async sync() {

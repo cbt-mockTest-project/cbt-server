@@ -51,7 +51,7 @@ import { ExamSource } from 'src/enums/enum';
 import { SaveExamInput, SaveExamOutput } from './dtos/saveExam.dto';
 import { MockExamQuestion } from './entities/mock-exam-question.entity';
 import { sortQuestions } from 'src/lib/utils/sortQuestions';
-import { pick } from 'lodash';
+import { pick, omit } from 'lodash';
 import { RevalidateService } from 'src/revalidate/revalidate.service';
 
 @Injectable()
@@ -745,6 +745,7 @@ export class MockExamService {
         const prevQuestion = prevQuestions.find(
           (prevQuestion) => prevQuestion.orderId === question.orderId,
         );
+
         if (prevQuestion) {
           return this.mockExamQuestion.merge(prevQuestion, {
             ...question,
@@ -782,6 +783,22 @@ export class MockExamService {
         questionOrderIds,
         user,
       });
+      await Promise.all(
+        questions.map(async (question) => {
+          if (question.linkedQuestionIds.length > 0) {
+            await this.mockExamQuestion.update(
+              question.linkedQuestionIds,
+              omit(question, [
+                'id',
+                'orderId',
+                'isBookmarked',
+                'commentCount',
+                'myQuestionState',
+              ]),
+            );
+          }
+        }),
+      );
       if (categoryId) {
         const exitingRelation = await this.mockExam
           .createQueryBuilder()

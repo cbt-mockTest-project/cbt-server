@@ -187,4 +187,8 @@ export class MockExamQuestion extends CoreEntity {
 
   @Field(() => Number, { nullable: true, defaultValue: 0 })
   commentCount?: number = 0;
+
+  @Column({ type: 'json', default: [] })
+  @Field(() => [Number], { nullable: true, defaultValue: [] })
+  linkedQuestionIds?: number[];
 }

@@ -943,14 +943,14 @@ export class MockExamQuestionService {
     searchQuestionsByKeywordInput: SearchQuestionsByKeywordInput,
   ): Promise<SearchQuestionsByKeywordOutput> {
     try {
-      const { keyword, examIds } = searchQuestionsByKeywordInput;
+      const { keyword, examIds, isAll } = searchQuestionsByKeywordInput;
       const formattedKeyword = `%${keyword.replace(/\s+/g, '').toLowerCase()}%`;
       let searchQuestionsByKeywordQuery = this.mockExamQuestion
         .createQueryBuilder('question')
         .leftJoinAndSelect('question.mockExam', 'mockExam')
         .leftJoinAndSelect('question.user', 'user');
 
-      if (!user || user?.role !== UserRole.ADMIN) {
+      if (!user || user?.role !== UserRole.ADMIN || !isAll) {
         searchQuestionsByKeywordQuery
           .where(
             "(LOWER(REPLACE(question.question, ' ', '')) LIKE :formattedKeyword OR LOWER(REPLACE(question.solution, ' ', '')) LIKE :formattedKeyword) AND mockExam.approved = true",

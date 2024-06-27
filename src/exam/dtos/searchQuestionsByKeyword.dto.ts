@@ -8,6 +8,8 @@ export class SearchQuestionsByKeywordInput {
   keyword: string;
   @Field(() => [Number], { defaultValue: [] })
   examIds: number[];
+  @Field(() => Boolean, { defaultValue: false })
+  isAll: boolean;
 }
 
 @ObjectType()

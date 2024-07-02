@@ -1,31 +1,37 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MockExamQuestion } from 'src/exam/entities/mock-exam-question.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { GetRandomQuestionOutput } from './dtos/getRandomQuestion.dto';
+import { MockExam } from 'src/exam/entities/mock-exam.entity';
 
 @Injectable()
 export class ZepService {
   constructor(
     @InjectRepository(MockExamQuestion)
     private readonly mockExamQuestion: Repository<MockExamQuestion>,
+    @InjectRepository(MockExam)
+    private readonly mockExam: Repository<MockExam>,
   ) {}
   async getRandomQuestion(
     categoryId: string,
   ): Promise<GetRandomQuestionOutput> {
     try {
+      const exams = await this.mockExam.find({
+        where: {
+          mockExamCategory: {
+            id: Number(categoryId),
+          },
+        },
+      });
+      const examIds = exams.map((exam) => exam.id);
       const questions = await this.mockExamQuestion.find({
         where: {
-          mockExam: {
-            mockExamCategory: {
-              id: Number(categoryId),
-            },
-          },
+          mockExam: In(examIds),
         },
       });
       const randomQuestion =
         questions[Math.floor(Math.random() * questions.length)];
-      console.log(randomQuestion);
       return {
         ok: true,
         question: {

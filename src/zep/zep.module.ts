@@ -18,11 +18,13 @@ import { ZepPostController } from './zepPost.controller';
 import { ZepPostService } from './zepPost.service';
 import { ZepCommentController } from './zepComment.controller';
 import { ZepCommentService } from './zepComment.service';
+import { MockExam } from 'src/exam/entities/mock-exam.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       MockExamQuestion,
+      MockExam,
       ZepUser,
       ZepStudyTime,
       ZepMapUserCount,

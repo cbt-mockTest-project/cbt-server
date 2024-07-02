@@ -73,6 +73,7 @@ import {
   CheckIsAccessibleCategoryOutput,
 } from './dtos/checkIsAccessibleCategory.dto';
 import { CheckHasCategoryAccessInput } from './dtos/checkHasCategoryAccess.dto';
+import { MockExam } from 'src/exam/entities/mock-exam.entity';
 
 @Injectable()
 export class MockExamCategoryService {
@@ -91,6 +92,8 @@ export class MockExamCategoryService {
     private readonly mockExamQuestions: Repository<MockExamQuestion>,
     @InjectRepository(CategoryEvaluation)
     private readonly categoryEvaluations: Repository<CategoryEvaluation>,
+    @InjectRepository(MockExam)
+    private readonly mockExams: Repository<MockExam>,
     private readonly examCategoryBookmarkService: ExamCategoryBookmarkService,
     private readonly revalidateService: RevalidateService,
   ) {}
@@ -456,7 +459,7 @@ export class MockExamCategoryService {
     user: User,
     editMockExamCategoryInput: EditMockExamCategoryInput,
   ): Promise<EditMockExamCategoryOutput> {
-    const { id } = editMockExamCategoryInput;
+    const { id, isPublic } = editMockExamCategoryInput;
     const prevCategory = await this.mockExamCategories.findOne({
       where: { id },
       relations: { user: true },
@@ -485,6 +488,25 @@ export class MockExamCategoryService {
         ok: false,
         error: '권한이 없습니다.',
       };
+    }
+    const exams = await this.mockExams.find({
+      where: {
+        mockExamCategory: {
+          id,
+        },
+        user: {
+          id: user.id,
+        },
+      },
+    });
+    const examIds = exams.map((exam) => exam.id);
+    if (examIds.length > 0) {
+      if (isPublic) {
+        await this.mockExams.update(examIds, { approved: true });
+      }
+      if (!isPublic) {
+        await this.mockExams.update(examIds, { approved: false });
+      }
     }
     await this.mockExamCategories.save({ ...editMockExamCategoryInput });
     this.revalidateService.revalidate({

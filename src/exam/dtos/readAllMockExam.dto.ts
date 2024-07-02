@@ -10,6 +10,8 @@ export class ReadAllMockExamsInput {
   category?: string;
   @Field(() => Boolean, { defaultValue: false })
   all?: boolean;
+  @Field(() => Boolean, { defaultValue: false })
+  approved?: boolean;
 }
 
 @ObjectType()

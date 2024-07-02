@@ -872,8 +872,19 @@ export class MockExamCategoryService {
     checkHasCategoryAccessInput: CheckHasCategoryAccessInput,
   ) {
     try {
-      if (!user) return { ok: false };
       const { categoryId } = checkHasCategoryAccessInput;
+      const category = await this.mockExamCategories.findOne({
+        where: {
+          id: categoryId,
+        },
+        relations: {
+          user: true,
+        },
+      });
+      if (!category) return { ok: false };
+      if (!user) return { ok: false };
+      if (category.isPublic) return { ok: true };
+      if (category.user.id === user.id) return { ok: true };
       const isInvitedCategories = await this.examCategoryBookmarks.findOne({
         where: {
           category: {

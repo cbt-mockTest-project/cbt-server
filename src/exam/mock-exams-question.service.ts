@@ -976,7 +976,7 @@ export class MockExamQuestionService {
       if (!user || user?.role !== UserRole.ADMIN || !isAll) {
         searchQuestionsByKeywordQuery
           .where(
-            "(LOWER(REPLACE(question.question, ' ', '')) LIKE :formattedKeyword OR LOWER(REPLACE(question.solution, ' ', '')) LIKE :formattedKeyword) AND mockExam.approved = true",
+            "(LOWER(REPLACE(question.question, ' ', '')) LIKE :formattedKeyword OR LOWER(REPLACE(question.solution, ' ', '')) LIKE :formattedKeyword)",
             { formattedKeyword },
           )
           .limit(30);

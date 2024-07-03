@@ -20,6 +20,7 @@ import { MockExamQuestionBookmark } from './mock-exam-question-bookmark.entity';
 import { MockExamQuestionMultipleChoice } from './mock-exam-question-multiple-choice.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Quiz } from 'src/quiz/entities/quiz.entity';
+import { MockExamQuestionHighlight } from './mock-exam-question-highlight.entity';
 
 @InputType('MockExamQuestionImageInputType', { isAbstract: true })
 @ObjectType()
@@ -129,6 +130,13 @@ export class MockExamQuestion extends CoreEntity {
   @Field(() => [MockExamQuestionState])
   state: MockExamQuestionState[];
 
+  @OneToMany(
+    () => MockExamQuestionHighlight,
+    (mockExamQuestionHighlight) => mockExamQuestionHighlight.question,
+  )
+  @Field(() => [MockExamQuestionHighlight])
+  highlight: MockExamQuestionHighlight[];
+
   @JoinColumn()
   @OneToOne(
     () => MockExamQuestionMultipleChoice,
@@ -181,6 +189,12 @@ export class MockExamQuestion extends CoreEntity {
     defaultValue: QuestionState.CORE,
   })
   myQuestionState?: QuestionState = QuestionState.CORE;
+
+  @Field(() => MockExamQuestionHighlight, {
+    nullable: true,
+    defaultValue: null,
+  })
+  myQuestionHighlight?: MockExamQuestionHighlight;
 
   @Field(() => Boolean, { nullable: true, defaultValue: false })
   isBookmarked?: boolean = false;

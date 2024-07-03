@@ -41,6 +41,9 @@ import {
   MockExamCategory,
 } from 'src/exam-category/entities/mock-exam-category.entity';
 import { RevalidateModule } from 'src/revalidate/revalidate.module';
+import { MockExamQuestionHighlight } from './entities/mock-exam-question-highlight.entity';
+import { MockExamQuestionHighlightService } from './mock-exam-question-highlight.service';
+import { MockExamQuestionHighlightResolver } from './mock-exam-question-highlight.resolver';
 
 @Module({
   imports: [
@@ -57,6 +60,7 @@ import { RevalidateModule } from 'src/revalidate/revalidate.module';
       MockExamQuestionMultipleChoice,
       ExamCategoryBookmark,
       MockExamQuestionFeedbackRecommendation,
+      MockExamQuestionHighlight,
       ExamCoAuthor,
       Role,
       ExamCategoryRole,
@@ -84,6 +88,8 @@ import { RevalidateModule } from 'src/revalidate/revalidate.module';
     MockExamQuestionMultipleChoiceService,
     MockExamQuestionFeedbackRecommendationResolver,
     MockExamQuestionFeedbackRecommendationService,
+    MockExamQuestionHighlightResolver,
+    MockExamQuestionHighlightService,
     MockExamHistoryResolver,
     MockExamHistoryService,
     RevalidateModule,

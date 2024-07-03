@@ -114,6 +114,7 @@ import { RevenueRequestForm } from './revenue-request-form/entites/revenue-reque
 import { RevenueRequestFormModule } from './revenue-request-form/revenue-request-form.module';
 import { CategoryPointHistory } from './point/entities/category-point-history.entity';
 import { SettlementRequest } from './point/entities/settlement-request.entity';
+import { MockExamQuestionHighlight } from './exam/entities/mock-exam-question-highlight.entity';
 
 @Module({
   imports: [
@@ -247,6 +248,7 @@ import { SettlementRequest } from './point/entities/settlement-request.entity';
         RevenueRequestForm,
         CategoryPointHistory,
         SettlementRequest,
+        MockExamQuestionHighlight,
       ],
     }),
     UserModule,

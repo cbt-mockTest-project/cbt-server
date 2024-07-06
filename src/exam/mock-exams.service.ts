@@ -202,7 +202,7 @@ export class MockExamService {
       if (categories.length > 0) {
         categories.forEach((category) => {
           this.revalidateService.revalidate({
-            path: `/category/${category.name}`,
+            path: `/category/${category.urlSlug}`,
           });
         });
       }
@@ -666,7 +666,7 @@ export class MockExamService {
         .of(examId)
         .loadMany();
       this.revalidateService.revalidate({
-        path: `/category/${category.name}`,
+        path: `/category/${category.urlSlug}`,
       });
       if (!exitingRelation.find((relation) => relation.id === categoryId)) {
         return {
@@ -822,7 +822,7 @@ export class MockExamService {
         });
         //10초 지연
         this.revalidateService.revalidate({
-          path: `/category/${prevCategory.name}`,
+          path: `/category/${prevCategory.urlSlug}`,
         });
         console.log('2');
         if (exitingRelation.find((relation) => relation.id === categoryId)) {

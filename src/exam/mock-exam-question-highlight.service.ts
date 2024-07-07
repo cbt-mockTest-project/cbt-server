@@ -28,7 +28,7 @@ export class MockExamQuestionHighlightService {
     insertQuestionHighlightInput: InsertQuestionHighlightInput,
   ): Promise<InsertQuestionHighlightOutput> {
     try {
-      const { questionHtml, solutionHtml, questionId } =
+      const { questionHighlights, solutionHighlights, questionId } =
         insertQuestionHighlightInput;
       const question = await this.mockExamQuestion.findOne({
         where: { id: questionId },
@@ -47,21 +47,21 @@ export class MockExamQuestionHighlightService {
         },
       });
       if (prevHighlight) {
-        if (!questionHtml && !solutionHtml) {
+        if (!questionHighlights && !solutionHighlights) {
           await this.mockExamQuestionHighlight.delete(prevHighlight.id);
           return { ok: true };
         }
         await this.mockExamQuestionHighlight.update(prevHighlight.id, {
-          questionHtml,
-          solutionHtml,
+          questionHighlights,
+          solutionHighlights,
         });
 
         return { ok: true };
       }
       await this.mockExamQuestionHighlight.save(
         this.mockExamQuestionHighlight.create({
-          questionHtml,
-          solutionHtml,
+          questionHighlights,
+          solutionHighlights,
           question: question,
           user: user,
         }),

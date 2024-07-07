@@ -876,7 +876,7 @@ export class MockExamCategoryService {
       category.examOrderIds = examOrderIds;
       await this.mockExamCategories.save(category);
       this.revalidateService.revalidate({
-        path: `/category/${category.name}`,
+        path: `/category/${category.urlSlug}`,
       });
       return {
         ok: true,

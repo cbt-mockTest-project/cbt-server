@@ -69,11 +69,14 @@ import {
 import { sortQuestions } from 'src/lib/utils/sortQuestions';
 import { MockExamCategory } from 'src/exam-category/entities/mock-exam-category.entity';
 import { ExamSource } from 'src/enums/enum';
-import * as moment from 'moment-timezone';
 import {
   UpdateLinkedQuestionIdsInput,
   UpdateLinkedQuestionIdsOutput,
 } from './dtos/updateLinkedQuestionIds.dto';
+import {
+  ReadBookmarkedQuestionsInput,
+  ReadBookmarkedQuestionsOutput,
+} from './dtos/readBookmarkedQuestions.dto';
 
 @Injectable()
 export class MockExamQuestionService {
@@ -1367,6 +1370,156 @@ export class MockExamQuestionService {
       console.log(e);
       return {
         ok: false,
+      };
+    }
+  }
+
+  async readBookmarkedQuestions(
+    user: User,
+    readBookmarkedQuestionsInput: ReadBookmarkedQuestionsInput,
+  ): Promise<ReadBookmarkedQuestionsOutput> {
+    try {
+      const { folderId } = readBookmarkedQuestionsInput;
+      const bookmarks = await this.mockExamQuestionBookmark.find({
+        relations: {
+          question: {
+            user: true,
+          },
+        },
+        where: {
+          bookmarkFolder: {
+            id: folderId,
+          },
+          user: {
+            id: user.id,
+          },
+        },
+      });
+      let questions = bookmarks.map((bookmark) => bookmark.question);
+      const questionIds = questions.map((question) => question.id);
+      const mockExams = await this.mockExam.find({
+        where: {
+          id: In(questionIds),
+        },
+      });
+      const [questionStates, questionBookmarks, questionFeedbacks] =
+        await Promise.all([
+          user
+            ? this.mockExamQuestionState.find({
+                relations: { question: true },
+                where: {
+                  question: In(questionIds),
+                  user: {
+                    id: user.id,
+                  },
+                },
+              })
+            : [],
+          user
+            ? this.mockExamQuestionBookmark.find({
+                relations: { question: true },
+                where: {
+                  question: In(questionIds),
+                  user: {
+                    id: user.id,
+                  },
+                },
+              })
+            : [],
+          this.mockExamQuestionFeedback.find({
+            relations: {
+              mockExamQuestion: true,
+              user: true,
+              recommendation: { user: true },
+            },
+            where: {
+              mockExamQuestion: In(questionIds),
+            },
+            order: {
+              type: 'ASC',
+            },
+          }),
+        ]);
+
+      questions = questions.map((question) => {
+        return {
+          ...question,
+          mockExam: mockExams.find((mockExam) =>
+            mockExam.mockExamQuestion.find((q) => q.id === question.id),
+          ),
+          myQuestionState: questionStates.find(
+            (state) => state.question.id === question.id,
+          )?.state,
+          isBookmarked: !!questionBookmarks.find(
+            (bookmark) => bookmark.question.id === question.id,
+          ),
+          mockExamQuestionFeedback: questionFeedbacks
+            .filter(
+              (feedback) =>
+                feedback.mockExamQuestion.id === question.id &&
+                (feedback.type !== QuestionFeedbackType.PRIVATE ||
+                  (feedback.type === QuestionFeedbackType.PRIVATE &&
+                    (feedback.user?.id === user?.id ||
+                      user?.role === UserRole.ADMIN))),
+            )
+            .map((feedback) => {
+              const goodCount = feedback.recommendation.filter(
+                (recommendation) =>
+                  recommendation.type ===
+                  QuestionFeedbackRecommendationType.GOOD,
+              ).length;
+              const badCount = feedback.recommendation.filter(
+                (recommendation) =>
+                  recommendation.type ===
+                  QuestionFeedbackRecommendationType.BAD,
+              ).length;
+              const myRecommedationStatus: MyRecommedationStatus = {
+                isGood: false,
+                isBad: false,
+              };
+              feedback.recommendation.forEach((recommendation) => {
+                if (recommendation.user?.id === user?.id) {
+                  if (
+                    recommendation.type ===
+                    QuestionFeedbackRecommendationType.GOOD
+                  ) {
+                    myRecommedationStatus.isGood = true;
+                  }
+                  if (
+                    recommendation.type ===
+                    QuestionFeedbackRecommendationType.BAD
+                  ) {
+                    myRecommedationStatus.isBad = true;
+                  }
+                }
+              });
+              const recommendationCount: RecommendationCount = {
+                good: goodCount,
+                bad: badCount,
+              };
+              return {
+                ...feedback,
+                recommendationCount,
+                myRecommedationStatus,
+              };
+            })
+            .sort((a, b) =>
+              a.type === QuestionFeedbackType.PRIVATE
+                ? -1
+                : b.recommendationCount.good - a.recommendationCount.good ||
+                  a.recommendationCount.bad - b.recommendationCount.bad,
+            ),
+        };
+      });
+      return {
+        ok: true,
+        questions,
+      };
+    } catch (e) {
+      console.log(e);
+      return {
+        ok: false,
+        error: '문제를 찾을 수 없습니다.',
       };
     }
   }

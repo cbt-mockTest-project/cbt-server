@@ -50,6 +50,10 @@ import {
   ReadQuestionsByExamIdsInput,
   ReadQuestionsByExamIdsOutput,
 } from './dtos/readQuestionsByExamIds.dto';
+import {
+  ReadBookmarkedQuestionsInput,
+  ReadBookmarkedQuestionsOutput,
+} from './dtos/readBookmarkedQuestions.dto';
 
 @Resolver(() => MockExamQuestion)
 export class MockExamQuestionResolver {
@@ -184,6 +188,18 @@ export class MockExamQuestionResolver {
     return this.mockExamQuestionService.readQuestionsByExamIds(
       user,
       readQuestionsByExamIdsInput,
+    );
+  }
+
+  @Role(['ANY'])
+  @Query(() => ReadBookmarkedQuestionsOutput)
+  async readBookmarkedQuestions(
+    @AuthUser() user: User,
+    @Args('input') readBookmarkedQuestionsInput: ReadBookmarkedQuestionsInput,
+  ): Promise<ReadBookmarkedQuestionsOutput> {
+    return this.mockExamQuestionService.readBookmarkedQuestions(
+      user,
+      readBookmarkedQuestionsInput,
     );
   }
 

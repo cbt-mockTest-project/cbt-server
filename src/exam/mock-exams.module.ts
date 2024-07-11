@@ -41,6 +41,7 @@ import {
   MockExamCategory,
 } from 'src/exam-category/entities/mock-exam-category.entity';
 import { RevalidateModule } from 'src/revalidate/revalidate.module';
+import { MockExamQuestionBookmarkFolder } from './entities/mock-exam-question-bookmark-folder.entity';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { RevalidateModule } from 'src/revalidate/revalidate.module';
       MockExamQuestionComment,
       MockExamQuestionCommentLike,
       MockExamQuestionBookmark,
+      MockExamQuestionBookmarkFolder,
       MockExamQuestionMultipleChoice,
       ExamCategoryBookmark,
       MockExamQuestionFeedbackRecommendation,

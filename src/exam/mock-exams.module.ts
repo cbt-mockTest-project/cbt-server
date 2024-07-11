@@ -42,6 +42,8 @@ import {
 } from 'src/exam-category/entities/mock-exam-category.entity';
 import { RevalidateModule } from 'src/revalidate/revalidate.module';
 import { MockExamQuestionBookmarkFolder } from './entities/mock-exam-question-bookmark-folder.entity';
+import { MockExamQuestionBookmarkFolderSerivce } from './mock-exams-question-bookmark-folder.service';
+import { MockExamQuestionBookmarkFolderResolver } from './mock-exams-question-bookmark-folder.resolver';
 
 @Module({
   imports: [
@@ -86,6 +88,8 @@ import { MockExamQuestionBookmarkFolder } from './entities/mock-exam-question-bo
     MockExamQuestionMultipleChoiceService,
     MockExamQuestionFeedbackRecommendationResolver,
     MockExamQuestionFeedbackRecommendationService,
+    MockExamQuestionBookmarkFolderResolver,
+    MockExamQuestionBookmarkFolderSerivce,
     MockExamHistoryResolver,
     MockExamHistoryService,
     RevalidateModule,

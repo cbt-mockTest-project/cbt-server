@@ -19,7 +19,7 @@ import {
 import { ReadQuestionBookmarkFoldersOutput } from './dtos/question-bookmark-folder/read-question-bookmark-folders.dto';
 
 @Resolver(() => MockExamQuestionBookmark)
-export class MockExamQuestionBookmarkResolver {
+export class MockExamQuestionBookmarkFolderResolver {
   constructor(
     private readonly mockExamQuestionBookmarkFolderSerivce: MockExamQuestionBookmarkFolderSerivce,
   ) {}

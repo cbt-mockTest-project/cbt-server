@@ -139,4 +139,8 @@ export class MockExam extends CoreEntity {
   @Column({ type: 'json', default: [] })
   @Field(() => [String], { defaultValue: [] })
   questionOrderIds: string[];
+
+  @Column({ type: 'json', default: [] })
+  @Field(() => [Number], { defaultValue: [] })
+  accesibleRoleIds: number[];
 }

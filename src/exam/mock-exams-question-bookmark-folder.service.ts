@@ -31,7 +31,12 @@ export class MockExamQuestionBookmarkFolderSerivce {
     try {
       const { name } = createQuestionBookmarkFolderInput;
       const existingFolder = await this.mockExamQuestionBookmarkFolder.findOne({
-        where: { name, user },
+        where: {
+          name,
+          user: {
+            id: user.id,
+          },
+        },
       });
       if (existingFolder) {
         return {

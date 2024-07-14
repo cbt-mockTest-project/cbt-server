@@ -81,7 +81,11 @@ export class MockExamQuestionBookmarkFolderSerivce {
   ): Promise<ReadQuestionBookmarkFoldersOutput> {
     try {
       const folders = await this.mockExamQuestionBookmarkFolder.find({
-        where: { user },
+        where: {
+          user: {
+            id: user.id,
+          },
+        },
       });
       return {
         ok: true,

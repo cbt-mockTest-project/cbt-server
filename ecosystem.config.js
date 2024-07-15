@@ -23,6 +23,7 @@ module.exports = {
       interpreter_args: '-r ts-node/register',
       listen_timeout: 8000,
       kill_timeout: 1600,
+      log: false,
     },
   ],
 };

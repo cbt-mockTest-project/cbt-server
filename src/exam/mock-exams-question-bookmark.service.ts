@@ -192,15 +192,7 @@ export class MockExamQuestionBookmarkSerivce {
       if (prevBookmark) {
         return { ok: false, error: '이미 저장된 문제입니다.' };
       }
-      const bookmarkFolder = await this.mockExamQuestionBookmarkFolder.findOne({
-        where: {
-          id: questionBookmarkFolderId,
-          user: { id: user.id },
-        },
-      });
-      if (!bookmarkFolder) {
-        return { ok: false, error: '폴더를 찾을 수 없습니다.' };
-      }
+
       const bookmark = this.mockExamQuestionBookmark.create({
         user: { id: user.id },
         question: { id: questionId },
@@ -211,7 +203,7 @@ export class MockExamQuestionBookmarkSerivce {
       const myBookmark = await this.mockExamQuestionBookmark.save(bookmark);
       return { ok: true, myBookmark };
     } catch {
-      return { ok: false, error: '북마크를 생성할 수 없습니다.' };
+      return { ok: false, error: '폴더를 찾을 수 없습니다.' };
     }
   }
 

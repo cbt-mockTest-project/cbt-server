@@ -8,7 +8,7 @@ import { MockExamQuestion } from './entities/mock-exam-question.entity';
 import { MockExamQuestionBookmark } from './entities/mock-exam-question-bookmark.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import {
   ReadMockExamQuestionBookmarkInput,
   ReadMockExamQuestionBookmarkOutput,
@@ -32,6 +32,10 @@ import {
   MoveQuestionBookmarkInput,
   moveQuestionBookmarkOutput,
 } from './dtos/question-bookmark/moveQuestionBookmark.dto';
+import {
+  ResetQuestionBookmarkInput,
+  ResetQuestionBookmarkOutput,
+} from './dtos/resetQuestionBookmark.dto';
 @Injectable()
 export class MockExamQuestionBookmarkSerivce {
   constructor(
@@ -256,6 +260,24 @@ export class MockExamQuestionBookmarkSerivce {
       return { ok: true };
     } catch {
       return { ok: false, error: '북마크를 이동할 수 없습니다.' };
+    }
+  }
+
+  async resetQuestionBookmark(
+    resetQuestionBookmarkInput: ResetQuestionBookmarkInput,
+    user: User,
+  ): Promise<ResetQuestionBookmarkOutput> {
+    try {
+      const { questionBookmarkFolderId } = resetQuestionBookmarkInput;
+      await this.mockExamQuestionBookmark.delete({
+        bookmarkFolder: questionBookmarkFolderId
+          ? { id: questionBookmarkFolderId }
+          : IsNull(),
+        user: { id: user.id },
+      });
+      return { ok: true };
+    } catch {
+      return { ok: false, error: '북마크를 초기화할 수 없습니다.' };
     }
   }
 }

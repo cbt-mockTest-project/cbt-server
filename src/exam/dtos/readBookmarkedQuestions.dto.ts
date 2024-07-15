@@ -6,6 +6,10 @@ import { MockExamQuestion } from '../entities/mock-exam-question.entity';
 export class ReadBookmarkedQuestionsInput {
   @Field(() => Number, { nullable: true })
   folderId?: number;
+  @Field(() => Number, { nullable: true })
+  limit?: number;
+  @Field(() => String, { defaultValue: 'normal' })
+  order?: 'random' | 'normal';
 }
 
 @ObjectType()

@@ -1002,7 +1002,7 @@ export class MockExamQuestionService {
       let questions = await searchQuestionsByKeywordQuery.getMany();
       if (user) {
         const questionBookmarks = await this.mockExamQuestionBookmark.find({
-          relations: { question: true },
+          relations: { question: true, bookmarkFolder: true },
           where: {
             question: In(questions.map((question) => question.id)),
             user: {
@@ -1011,13 +1011,14 @@ export class MockExamQuestionService {
           },
         });
         questions = questions.map((question) => {
-          const bookmarkedQuestion = questionBookmarks.find(
+          const myBookmark = questionBookmarks.find(
             (bookmark) => bookmark.question.id === question.id,
           );
-          if (bookmarkedQuestion) {
+          if (myBookmark) {
             return {
               ...question,
               isBookmarked: true,
+              myBookmark,
             };
           }
           return question;
@@ -1087,7 +1088,6 @@ export class MockExamQuestionService {
           }
         }),
       );
-      // console.log(mockExams[0]);
       let questions: MockExamQuestion[] = mockExams.flatMap(
         (mockExam) => mockExam.mockExamQuestion,
       );
@@ -1383,8 +1383,8 @@ export class MockExamQuestionService {
     readBookmarkedQuestionsInput: ReadBookmarkedQuestionsInput,
   ): Promise<ReadBookmarkedQuestionsOutput> {
     try {
-      const { folderId } = readBookmarkedQuestionsInput;
-      const bookmarks = await this.mockExamQuestionBookmark.find({
+      const { folderId, limit, order } = readBookmarkedQuestionsInput;
+      let bookmarks = await this.mockExamQuestionBookmark.find({
         relations: {
           question: {
             user: true,
@@ -1400,13 +1400,19 @@ export class MockExamQuestionService {
             id: user.id,
           },
         },
+        ...(limit && { limit }),
       });
+      if (order === 'random') {
+        bookmarks = shuffleArray(bookmarks);
+      }
 
       let questions = bookmarks.map((bookmark) => bookmark.question);
       const questionIds = questions.map((question) => question.id);
       const mockExams = await this.mockExam.find({
         where: {
-          id: In(questionIds),
+          mockExamQuestion: {
+            id: In(questionIds),
+          },
         },
         relations: {
           mockExamQuestion: true,

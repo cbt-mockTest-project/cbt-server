@@ -30,6 +30,10 @@ import {
   ResetMyQuestionBookmarksInput,
   ResetMyQuestionBookmarksOutput,
 } from './dtos/question-bookmark/resetMyQuestionBookmarks.dto';
+import {
+  ResetQuestionBookmarkInput,
+  ResetQuestionBookmarkOutput,
+} from './dtos/resetQuestionBookmark.dto';
 
 @Resolver(() => MockExamQuestionBookmark)
 export class MockExamQuestionBookmarkResolver {
@@ -129,6 +133,19 @@ export class MockExamQuestionBookmarkResolver {
   ): Promise<ResetMyQuestionBookmarksOutput> {
     return this.mockExamQuestionBookmarkSerivce.resetMyQuestionBookmarks(
       resetMyQuestionBookmarksInput,
+      user,
+    );
+  }
+
+  @Mutation(() => ResetQuestionBookmarkOutput)
+  @Role(['ANY'])
+  async resetQuestionBookmark(
+    @Args('input')
+    resetQuestionBookmarkInput: ResetQuestionBookmarkInput,
+    @AuthUser() user: User,
+  ): Promise<ResetQuestionBookmarkOutput> {
+    return this.mockExamQuestionBookmarkSerivce.resetQuestionBookmark(
+      resetQuestionBookmarkInput,
       user,
     );
   }

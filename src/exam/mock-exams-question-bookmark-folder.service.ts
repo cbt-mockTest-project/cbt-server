@@ -91,6 +91,9 @@ export class MockExamQuestionBookmarkFolderSerivce {
             id: user.id,
           },
         },
+        order: {
+          created_at: 'DESC',
+        },
       });
       return {
         ok: true,

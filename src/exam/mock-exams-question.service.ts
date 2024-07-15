@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { MockExamQuestionBookmark } from 'src/exam/entities/mock-exam-question-bookmark.entity';
 import { User, UserRole } from 'src/users/entities/user.entity';
 import { shuffleArray } from 'src/utils/utils';
-import { FindOptionsWhere, In, Not, Repository } from 'typeorm';
+import { FindOptionsWhere, In, IsNull, Not, Repository } from 'typeorm';
 import {
   CreateMockExamQuestionInput,
   CreateMockExamQuestionOutput,
@@ -69,11 +69,14 @@ import {
 import { sortQuestions } from 'src/lib/utils/sortQuestions';
 import { MockExamCategory } from 'src/exam-category/entities/mock-exam-category.entity';
 import { ExamSource } from 'src/enums/enum';
-import * as moment from 'moment-timezone';
 import {
   UpdateLinkedQuestionIdsInput,
   UpdateLinkedQuestionIdsOutput,
 } from './dtos/updateLinkedQuestionIds.dto';
+import {
+  ReadBookmarkedQuestionsInput,
+  ReadBookmarkedQuestionsOutput,
+} from './dtos/readBookmarkedQuestions.dto';
 
 @Injectable()
 export class MockExamQuestionService {
@@ -999,7 +1002,7 @@ export class MockExamQuestionService {
       let questions = await searchQuestionsByKeywordQuery.getMany();
       if (user) {
         const questionBookmarks = await this.mockExamQuestionBookmark.find({
-          relations: { question: true },
+          relations: { question: true, bookmarkFolder: true },
           where: {
             question: In(questions.map((question) => question.id)),
             user: {
@@ -1008,13 +1011,14 @@ export class MockExamQuestionService {
           },
         });
         questions = questions.map((question) => {
-          const bookmarkedQuestion = questionBookmarks.find(
+          const myBookmark = questionBookmarks.find(
             (bookmark) => bookmark.question.id === question.id,
           );
-          if (bookmarkedQuestion) {
+          if (myBookmark) {
             return {
               ...question,
               isBookmarked: true,
+              myBookmark,
             };
           }
           return question;
@@ -1084,7 +1088,6 @@ export class MockExamQuestionService {
           }
         }),
       );
-      // console.log(mockExams[0]);
       let questions: MockExamQuestion[] = mockExams.flatMap(
         (mockExam) => mockExam.mockExamQuestion,
       );
@@ -1092,6 +1095,7 @@ export class MockExamQuestionService {
       if (bookmarked) {
         const questionBookmarks = await this.mockExamQuestionBookmark.find({
           relations: {
+            bookmarkFolder: true,
             question: {
               user: true,
             },
@@ -1213,7 +1217,7 @@ export class MockExamQuestionService {
           user
             ? this.mockExamQuestionBookmark
                 .find({
-                  relations: { question: true },
+                  relations: { question: true, bookmarkFolder: true },
                   where: {
                     question: In(questionIds),
                     user: {
@@ -1249,6 +1253,9 @@ export class MockExamQuestionService {
             (state) => state.question.id === question.id,
           )?.state,
           isBookmarked: !!questionBookmarks.find(
+            (bookmark) => bookmark.question.id === question.id,
+          ),
+          myBookmark: questionBookmarks.find(
             (bookmark) => bookmark.question.id === question.id,
           ),
           mockExamQuestionFeedback: questionFeedbacks
@@ -1367,6 +1374,170 @@ export class MockExamQuestionService {
       console.log(e);
       return {
         ok: false,
+      };
+    }
+  }
+
+  async readBookmarkedQuestions(
+    user: User,
+    readBookmarkedQuestionsInput: ReadBookmarkedQuestionsInput,
+  ): Promise<ReadBookmarkedQuestionsOutput> {
+    try {
+      const { folderId, limit, order } = readBookmarkedQuestionsInput;
+      let bookmarks = await this.mockExamQuestionBookmark.find({
+        relations: {
+          question: {
+            user: true,
+          },
+        },
+        where: {
+          bookmarkFolder: folderId
+            ? {
+                id: folderId,
+              }
+            : IsNull(),
+          user: {
+            id: user.id,
+          },
+        },
+        ...(limit && { limit }),
+      });
+      if (order === 'random') {
+        bookmarks = shuffleArray(bookmarks);
+      }
+
+      let questions = bookmarks.map((bookmark) => bookmark.question);
+      const questionIds = questions.map((question) => question.id);
+      const mockExams = await this.mockExam.find({
+        where: {
+          mockExamQuestion: {
+            id: In(questionIds),
+          },
+        },
+        relations: {
+          mockExamQuestion: true,
+        },
+      });
+      const [questionStates, questionBookmarks, questionFeedbacks] =
+        await Promise.all([
+          user
+            ? this.mockExamQuestionState.find({
+                relations: { question: true },
+                where: {
+                  question: In(questionIds),
+                  user: {
+                    id: user.id,
+                  },
+                },
+              })
+            : [],
+          user
+            ? this.mockExamQuestionBookmark.find({
+                relations: { question: true, bookmarkFolder: true },
+                where: {
+                  question: In(questionIds),
+                  user: {
+                    id: user.id,
+                  },
+                },
+              })
+            : [],
+          this.mockExamQuestionFeedback.find({
+            relations: {
+              mockExamQuestion: true,
+              user: true,
+              recommendation: { user: true },
+            },
+            where: {
+              mockExamQuestion: In(questionIds),
+            },
+            order: {
+              type: 'ASC',
+            },
+          }),
+        ]);
+      questions = questions.map((question) => {
+        return {
+          ...question,
+          mockExam: mockExams.find((mockExam) =>
+            mockExam.mockExamQuestion.find((q) => q.id === question.id),
+          ),
+          myQuestionState: questionStates.find(
+            (state) => state.question.id === question.id,
+          )?.state,
+          isBookmarked: !!questionBookmarks.find(
+            (bookmark) => bookmark.question.id === question.id,
+          ),
+          myBookmark: questionBookmarks.find(
+            (bookmark) => bookmark.question.id === question.id,
+          ),
+          mockExamQuestionFeedback: questionFeedbacks
+            .filter(
+              (feedback) =>
+                feedback.mockExamQuestion.id === question.id &&
+                (feedback.type !== QuestionFeedbackType.PRIVATE ||
+                  (feedback.type === QuestionFeedbackType.PRIVATE &&
+                    (feedback.user?.id === user?.id ||
+                      user?.role === UserRole.ADMIN))),
+            )
+            .map((feedback) => {
+              const goodCount = feedback.recommendation.filter(
+                (recommendation) =>
+                  recommendation.type ===
+                  QuestionFeedbackRecommendationType.GOOD,
+              ).length;
+              const badCount = feedback.recommendation.filter(
+                (recommendation) =>
+                  recommendation.type ===
+                  QuestionFeedbackRecommendationType.BAD,
+              ).length;
+              const myRecommedationStatus: MyRecommedationStatus = {
+                isGood: false,
+                isBad: false,
+              };
+              feedback.recommendation.forEach((recommendation) => {
+                if (recommendation.user?.id === user?.id) {
+                  if (
+                    recommendation.type ===
+                    QuestionFeedbackRecommendationType.GOOD
+                  ) {
+                    myRecommedationStatus.isGood = true;
+                  }
+                  if (
+                    recommendation.type ===
+                    QuestionFeedbackRecommendationType.BAD
+                  ) {
+                    myRecommedationStatus.isBad = true;
+                  }
+                }
+              });
+              const recommendationCount: RecommendationCount = {
+                good: goodCount,
+                bad: badCount,
+              };
+              return {
+                ...feedback,
+                recommendationCount,
+                myRecommedationStatus,
+              };
+            })
+            .sort((a, b) =>
+              a.type === QuestionFeedbackType.PRIVATE
+                ? -1
+                : b.recommendationCount.good - a.recommendationCount.good ||
+                  a.recommendationCount.bad - b.recommendationCount.bad,
+            ),
+        };
+      });
+      return {
+        ok: true,
+        questions,
+      };
+    } catch (e) {
+      console.log(e);
+      return {
+        ok: false,
+        error: '문제를 찾을 수 없습니다.',
       };
     }
   }

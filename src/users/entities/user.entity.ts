@@ -57,6 +57,7 @@ import { PointTransaction } from 'src/point/entities/point-transaction.entity';
 import { PointBalance } from 'src/point/entities/point-balance.entity';
 import { CategoryPointHistory } from 'src/point/entities/category-point-history.entity';
 import { SettlementRequest } from 'src/point/entities/settlement-request.entity';
+import { MockExamQuestionBookmarkFolder } from 'src/exam/entities/mock-exam-question-bookmark-folder.entity';
 
 @InputType('RecentlyStudiedExamsInputType', { isAbstract: true })
 @ObjectType()
@@ -147,6 +148,13 @@ export class User extends CoreEntity {
   )
   @Field(() => [MockExamQuestionState])
   mockExamQuestionState: MockExamQuestionState[];
+
+  @OneToMany(
+    () => MockExamQuestionBookmarkFolder,
+    (mockExamQuestionBookmarkFolder) => mockExamQuestionBookmarkFolder.user,
+  )
+  @Field(() => [MockExamQuestionBookmarkFolder])
+  mockExamQuestionBookmarkFolder: MockExamQuestionBookmarkFolder[];
 
   @OneToMany(() => MockExam, (mockExam) => mockExam.user)
   @Field(() => [MockExam])

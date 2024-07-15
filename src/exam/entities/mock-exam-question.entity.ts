@@ -185,6 +185,9 @@ export class MockExamQuestion extends CoreEntity {
   @Field(() => Boolean, { nullable: true, defaultValue: false })
   isBookmarked?: boolean = false;
 
+  @Field(() => MockExamQuestionBookmark, { nullable: true, defaultValue: null })
+  myBookmark?: MockExamQuestionBookmark = null;
+
   @Field(() => Number, { nullable: true, defaultValue: 0 })
   commentCount?: number = 0;
 

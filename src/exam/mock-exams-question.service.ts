@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { MockExamQuestionBookmark } from 'src/exam/entities/mock-exam-question-bookmark.entity';
 import { User, UserRole } from 'src/users/entities/user.entity';
 import { shuffleArray } from 'src/utils/utils';
-import { FindOptionsWhere, In, Not, Repository } from 'typeorm';
+import { FindOptionsWhere, In, IsNull, Not, Repository } from 'typeorm';
 import {
   CreateMockExamQuestionInput,
   CreateMockExamQuestionOutput,
@@ -1095,6 +1095,7 @@ export class MockExamQuestionService {
       if (bookmarked) {
         const questionBookmarks = await this.mockExamQuestionBookmark.find({
           relations: {
+            bookmarkFolder: true,
             question: {
               user: true,
             },
@@ -1216,7 +1217,7 @@ export class MockExamQuestionService {
           user
             ? this.mockExamQuestionBookmark
                 .find({
-                  relations: { question: true },
+                  relations: { question: true, bookmarkFolder: true },
                   where: {
                     question: In(questionIds),
                     user: {
@@ -1252,6 +1253,9 @@ export class MockExamQuestionService {
             (state) => state.question.id === question.id,
           )?.state,
           isBookmarked: !!questionBookmarks.find(
+            (bookmark) => bookmark.question.id === question.id,
+          ),
+          myBookmark: questionBookmarks.find(
             (bookmark) => bookmark.question.id === question.id,
           ),
           mockExamQuestionFeedback: questionFeedbacks
@@ -1387,19 +1391,25 @@ export class MockExamQuestionService {
           },
         },
         where: {
-          bookmarkFolder: {
-            id: folderId,
-          },
+          bookmarkFolder: folderId
+            ? {
+                id: folderId,
+              }
+            : IsNull(),
           user: {
             id: user.id,
           },
         },
       });
+
       let questions = bookmarks.map((bookmark) => bookmark.question);
       const questionIds = questions.map((question) => question.id);
       const mockExams = await this.mockExam.find({
         where: {
           id: In(questionIds),
+        },
+        relations: {
+          mockExamQuestion: true,
         },
       });
       const [questionStates, questionBookmarks, questionFeedbacks] =
@@ -1417,7 +1427,7 @@ export class MockExamQuestionService {
             : [],
           user
             ? this.mockExamQuestionBookmark.find({
-                relations: { question: true },
+                relations: { question: true, bookmarkFolder: true },
                 where: {
                   question: In(questionIds),
                   user: {
@@ -1440,7 +1450,6 @@ export class MockExamQuestionService {
             },
           }),
         ]);
-
       questions = questions.map((question) => {
         return {
           ...question,
@@ -1451,6 +1460,9 @@ export class MockExamQuestionService {
             (state) => state.question.id === question.id,
           )?.state,
           isBookmarked: !!questionBookmarks.find(
+            (bookmark) => bookmark.question.id === question.id,
+          ),
+          myBookmark: questionBookmarks.find(
             (bookmark) => bookmark.question.id === question.id,
           ),
           mockExamQuestionFeedback: questionFeedbacks

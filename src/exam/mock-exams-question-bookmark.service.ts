@@ -191,10 +191,12 @@ export class MockExamQuestionBookmarkSerivce {
       const bookmark = this.mockExamQuestionBookmark.create({
         user: { id: user.id },
         question: { id: questionId },
-        bookmarkFolder: { id: questionBookmarkFolderId },
+        ...(questionBookmarkFolderId && {
+          bookmarkFolder: { id: questionBookmarkFolderId },
+        }),
       });
-      await this.mockExamQuestionBookmark.save(bookmark);
-      return { ok: true };
+      const myBookmark = await this.mockExamQuestionBookmark.save(bookmark);
+      return { ok: true, myBookmark };
     } catch {
       return { ok: false, error: '북마크를 생성할 수 없습니다.' };
     }
@@ -249,7 +251,7 @@ export class MockExamQuestionBookmarkSerivce {
       }
       await this.mockExamQuestionBookmark.update(
         { id: bookmarkId },
-        { bookmarkFolder: { id: bookmarkFolderId } },
+        { bookmarkFolder: { id: bookmarkFolderId || null } },
       );
       return { ok: true };
     } catch {

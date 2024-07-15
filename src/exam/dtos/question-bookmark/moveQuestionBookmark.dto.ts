@@ -6,8 +6,8 @@ export class MoveQuestionBookmarkInput {
   @Field(() => Number)
   bookmarkId: number;
 
-  @Field(() => Number)
-  bookmarkFolderId: number;
+  @Field(() => Number, { nullable: true })
+  bookmarkFolderId?: number;
 }
 
 @ObjectType()

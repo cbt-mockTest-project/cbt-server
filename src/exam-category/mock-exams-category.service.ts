@@ -986,4 +986,34 @@ export class MockExamCategoryService {
       };
     }
   }
+
+  async getExamCategoriesForAdmin(): Promise<GetExamCategoriesOutput> {
+    const categoryQuery = this.mockExamCategories
+      .createQueryBuilder('category')
+      .leftJoinAndSelect('category.user', 'user')
+      .leftJoinAndSelect('category.mockExam', 'mockExam')
+      .where('mockExam.id IS NOT NULL');
+
+    let categories = await categoryQuery.getMany();
+
+    const categoryEvaluations = await this.categoryEvaluations.find({
+      where: {
+        category: In(categories.map((category) => category.id)),
+      },
+      relations: {
+        category: true,
+      },
+    });
+    categories = categories.map((category) => {
+      const evaluation = categoryEvaluations.filter(
+        (evaluation) => evaluation.category.id === category.id,
+      );
+      if (evaluation) category.categoryEvaluations = evaluation;
+      return category;
+    });
+    return {
+      ok: true,
+      categories,
+    };
+  }
 }

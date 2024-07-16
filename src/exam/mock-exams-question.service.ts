@@ -1360,6 +1360,12 @@ export class MockExamQuestionService {
 
   async sync() {
     try {
+      const exams = await this.mockExam
+        .createQueryBuilder('mockExam')
+        .leftJoinAndSelect('mockExam.mockExamCategory', 'mockExamCategory')
+        .where('mockExamCategory.id IS NULL AND mockExam.approved = true')
+        .getMany();
+
       return {
         ok: true,
       };

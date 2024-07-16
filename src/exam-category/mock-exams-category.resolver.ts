@@ -258,4 +258,10 @@ export class MockExamCategoryResolver {
       checkHasCategoryAccessInput,
     );
   }
+
+  @Role(['ADMIN'])
+  @Query(() => GetExamCategoriesOutput)
+  async getExamCategoriesForAdmin(): Promise<GetExamCategoriesOutput> {
+    return this.mockExamCategoryService.getExamCategoriesForAdmin();
+  }
 }

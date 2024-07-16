@@ -19,10 +19,12 @@ import { RevalidateModule } from 'src/revalidate/revalidate.module';
 import { MockExamQuestionFeedbackSerivce } from 'src/exam/mock-exams-question-feedback.service';
 import { MockExamQuestionFeedback } from 'src/exam/entities/mock-exam-question-feedback.entity';
 import { MockExamCategory } from 'src/exam-category/entities/mock-exam-category.entity';
+import { MockExam } from 'src/exam/entities/mock-exam.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
+      MockExam,
       MockExamQuestion,
       Visit,
       VisitHistory,

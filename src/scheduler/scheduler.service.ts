@@ -10,12 +10,15 @@ import { UserService } from 'src/users/user.service';
 import { RevalidateService } from 'src/revalidate/revalidate.service';
 import { BlogManageService } from 'src/blogManage/blog-manage.service';
 import { MockExamQuestionFeedbackSerivce } from 'src/exam/mock-exams-question-feedback.service';
+import { MockExam } from 'src/exam/entities/mock-exam.entity';
 
 @Injectable()
 export class SchedulerService {
   constructor(
     @InjectRepository(MockExamQuestion)
     private readonly mockExamQuestions: Repository<MockExamQuestion>,
+    @InjectRepository(MockExam)
+    private readonly mockExams: Repository<MockExam>,
     private readonly configService: ConfigService,
     private readonly visitService: VisitService,
     private readonly telegramService: TelegramService,
@@ -102,6 +105,34 @@ export class SchedulerService {
     } catch {
       this.telegramService.sendMessageToTelegram({
         message: `cronjob: hideNegativeFeedbacks error`,
+        channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
+      });
+    }
+  }
+  // 새벽 3시
+  @Cron('0 0 3 * * *', { timeZone: 'Asia/Seoul' })
+  async manageExamApproval() {
+    try {
+      if (process.env.NODE_ENV === 'dev') {
+        return;
+      }
+      const exams = await this.mockExams
+        .createQueryBuilder('mockExam')
+        .leftJoinAndSelect('mockExam.mockExamCategory', 'mockExamCategory')
+        .where('mockExamCategory.id IS NULL AND mockExam.approved = true')
+        .getMany();
+
+      exams.forEach((exam) => {
+        this.mockExams.update({ id: exam.id }, { approved: false });
+      });
+
+      this.telegramService.sendMessageToTelegram({
+        message: `cronjob: manageExamApproval success`,
+        channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
+      });
+    } catch {
+      this.telegramService.sendMessageToTelegram({
+        message: `cronjob: manageExamApproval error`,
         channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
       });
     }

@@ -25,6 +25,9 @@ export class TextHighlightData {
 
   @Field(() => String)
   memo: string;
+
+  @Field(() => String)
+  type: 'question' | 'answer';
 }
 
 @InputType('TextHighlightInput')

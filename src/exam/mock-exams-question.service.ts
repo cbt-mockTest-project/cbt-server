@@ -77,10 +77,13 @@ import {
   ReadBookmarkedQuestionsInput,
   ReadBookmarkedQuestionsOutput,
 } from './dtos/readBookmarkedQuestions.dto';
+import { TextHighlight } from 'src/text-highlight/entites/text-highlight.entity';
 
 @Injectable()
 export class MockExamQuestionService {
   constructor(
+    @InjectRepository(TextHighlight)
+    private readonly textHighlights: Repository<TextHighlight>,
     @InjectRepository(MockExamQuestion)
     private readonly mockExamQuestion: Repository<MockExamQuestion>,
     @InjectRepository(MockExam)
@@ -534,7 +537,7 @@ export class MockExamQuestionService {
       };
     }
   }
-
+  /** deprecated */
   async readMockExamQuestionsByMockExamId(
     readMockExamQuestionsByMockExamIdInput: ReadMockExamQuestionsByMockExamIdInput,
     user: User,
@@ -888,7 +891,7 @@ export class MockExamQuestionService {
       };
     }
   }
-
+  /** deprecated */
   async readMockExamQuestionNumbers(
     readMockExamQuestionNumbersInput: ReadMockExamQuestionNumbersInput,
   ): Promise<ReadMockExamQuestionNumbersOutput> {
@@ -931,7 +934,7 @@ export class MockExamQuestionService {
       examStatus: mockExam[0].status,
     };
   }
-
+  /** deprecated */
   async readMockExamQuestionsByState(
     user: User,
     readMockExamQuestionsByStateInput: ReadMockExamQuestionsByStateInput,
@@ -962,6 +965,54 @@ export class MockExamQuestionService {
       ok: true,
       mockExamQusetions,
     };
+  }
+
+  async updateLinkedQuestionIds(
+    user: User,
+    updateLinkedQuestionIdsInput: UpdateLinkedQuestionIdsInput,
+  ): Promise<UpdateLinkedQuestionIdsOutput> {
+    const { questionId, linkedQuestionIds } = updateLinkedQuestionIdsInput;
+    const question = await this.mockExamQuestion.findOne({
+      where: { id: questionId },
+    });
+    if (!question) {
+      return {
+        ok: false,
+        error: '문제가 존재하지 않습니다.',
+      };
+    }
+    question.linkedQuestionIds = linkedQuestionIds;
+    const linkedQuestions = await this.mockExamQuestion.find({
+      where: { id: In(linkedQuestionIds) },
+    });
+    linkedQuestions.forEach((question) => {
+      question.linkedQuestionIds = Array.from(
+        new Set([...question.linkedQuestionIds, questionId]),
+      );
+    });
+    await this.mockExamQuestion.save([question, ...linkedQuestions]);
+    return {
+      ok: true,
+    };
+  }
+
+  async sync() {
+    try {
+      const exams = await this.mockExam
+        .createQueryBuilder('mockExam')
+        .leftJoinAndSelect('mockExam.mockExamCategory', 'mockExamCategory')
+        .where('mockExamCategory.id IS NULL AND mockExam.approved = true')
+        .getMany();
+
+      return {
+        ok: true,
+      };
+    } catch (e) {
+      console.log(e);
+      return {
+        ok: false,
+      };
+    }
   }
 
   async searchQuestionsByKeyword(
@@ -1199,55 +1250,76 @@ export class MockExamQuestionService {
         questions = questions.slice(0, limit);
       }
       questionIds = questions.map((question) => question.id);
-      const [questionStates, questionBookmarks, questionFeedbacks] =
-        await Promise.all([
-          user
-            ? this.mockExamQuestionState
-                .find({
-                  relations: { question: true },
-                  where: {
-                    question: In(questionIds),
-                    user: {
-                      id: user.id,
-                    },
+      const [
+        questionHighlights,
+        questionStates,
+        questionBookmarks,
+        questionFeedbacks,
+      ] = await Promise.all([
+        user
+          ? this.textHighlights
+              .find({
+                relations: { question: true },
+                where: {
+                  question: In(questionIds),
+                  user: {
+                    id: user.id,
                   },
-                })
-                .then((res) => res)
-            : [],
-          user
-            ? this.mockExamQuestionBookmark
-                .find({
-                  relations: { question: true, bookmarkFolder: true },
-                  where: {
-                    question: In(questionIds),
-                    user: {
-                      id: user.id,
-                    },
+                },
+              })
+              .then((res) => res)
+          : [],
+        user
+          ? this.mockExamQuestionState
+              .find({
+                relations: { question: true },
+                where: {
+                  question: In(questionIds),
+                  user: {
+                    id: user.id,
                   },
-                })
-                .then((res) => res)
-            : [],
-          this.mockExamQuestionFeedback
-            .find({
-              relations: {
-                mockExamQuestion: true,
-                user: true,
-                recommendation: { user: true },
-              },
-              where: {
-                mockExamQuestion: In(questionIds),
-              },
-              order: {
-                type: 'ASC',
-              },
-            })
-            .then((res) => res),
-        ]);
+                },
+              })
+              .then((res) => res)
+          : [],
+        user
+          ? this.mockExamQuestionBookmark
+              .find({
+                relations: { question: true, bookmarkFolder: true },
+                where: {
+                  question: In(questionIds),
+                  user: {
+                    id: user.id,
+                  },
+                },
+              })
+              .then((res) => res)
+          : [],
+        this.mockExamQuestionFeedback
+          .find({
+            relations: {
+              mockExamQuestion: true,
+              user: true,
+              recommendation: { user: true },
+            },
+            where: {
+              mockExamQuestion: In(questionIds),
+            },
+            order: {
+              type: 'ASC',
+            },
+          })
+          .then((res) => res),
+      ]);
+
       questions = questions.map((question) => {
         return {
           ...question,
           mockExam: mockExams.find((mockExam) =>
             mockExam.mockExamQuestion.find((q) => q.id === question.id),
+          ),
+          textHighlight: questionHighlights.filter(
+            (highlight) => highlight.question.id === question.id,
           ),
           myQuestionState: questionStates.find(
             (state) => state.question.id === question.id,
@@ -1329,54 +1401,6 @@ export class MockExamQuestionService {
     }
   }
 
-  async updateLinkedQuestionIds(
-    user: User,
-    updateLinkedQuestionIdsInput: UpdateLinkedQuestionIdsInput,
-  ): Promise<UpdateLinkedQuestionIdsOutput> {
-    const { questionId, linkedQuestionIds } = updateLinkedQuestionIdsInput;
-    const question = await this.mockExamQuestion.findOne({
-      where: { id: questionId },
-    });
-    if (!question) {
-      return {
-        ok: false,
-        error: '문제가 존재하지 않습니다.',
-      };
-    }
-    question.linkedQuestionIds = linkedQuestionIds;
-    const linkedQuestions = await this.mockExamQuestion.find({
-      where: { id: In(linkedQuestionIds) },
-    });
-    linkedQuestions.forEach((question) => {
-      question.linkedQuestionIds = Array.from(
-        new Set([...question.linkedQuestionIds, questionId]),
-      );
-    });
-    await this.mockExamQuestion.save([question, ...linkedQuestions]);
-    return {
-      ok: true,
-    };
-  }
-
-  async sync() {
-    try {
-      const exams = await this.mockExam
-        .createQueryBuilder('mockExam')
-        .leftJoinAndSelect('mockExam.mockExamCategory', 'mockExamCategory')
-        .where('mockExamCategory.id IS NULL AND mockExam.approved = true')
-        .getMany();
-
-      return {
-        ok: true,
-      };
-    } catch (e) {
-      console.log(e);
-      return {
-        ok: false,
-      };
-    }
-  }
-
   async readBookmarkedQuestions(
     user: User,
     readBookmarkedQuestionsInput: ReadBookmarkedQuestionsInput,
@@ -1417,47 +1441,65 @@ export class MockExamQuestionService {
           mockExamQuestion: true,
         },
       });
-      const [questionStates, questionBookmarks, questionFeedbacks] =
-        await Promise.all([
-          user
-            ? this.mockExamQuestionState.find({
-                relations: { question: true },
-                where: {
-                  question: In(questionIds),
-                  user: {
-                    id: user.id,
-                  },
+      const [
+        questionHighlights,
+        questionStates,
+        questionBookmarks,
+        questionFeedbacks,
+      ] = await Promise.all([
+        user
+          ? this.textHighlights.find({
+              relations: { question: true },
+              where: {
+                question: In(questionIds),
+                user: {
+                  id: user.id,
                 },
-              })
-            : [],
-          user
-            ? this.mockExamQuestionBookmark.find({
-                relations: { question: true, bookmarkFolder: true },
-                where: {
-                  question: In(questionIds),
-                  user: {
-                    id: user.id,
-                  },
+              },
+            })
+          : [],
+        user
+          ? this.mockExamQuestionState.find({
+              relations: { question: true },
+              where: {
+                question: In(questionIds),
+                user: {
+                  id: user.id,
                 },
-              })
-            : [],
-          this.mockExamQuestionFeedback.find({
-            relations: {
-              mockExamQuestion: true,
-              user: true,
-              recommendation: { user: true },
-            },
-            where: {
-              mockExamQuestion: In(questionIds),
-            },
-            order: {
-              type: 'ASC',
-            },
-          }),
-        ]);
+              },
+            })
+          : [],
+        user
+          ? this.mockExamQuestionBookmark.find({
+              relations: { question: true, bookmarkFolder: true },
+              where: {
+                question: In(questionIds),
+                user: {
+                  id: user.id,
+                },
+              },
+            })
+          : [],
+        this.mockExamQuestionFeedback.find({
+          relations: {
+            mockExamQuestion: true,
+            user: true,
+            recommendation: { user: true },
+          },
+          where: {
+            mockExamQuestion: In(questionIds),
+          },
+          order: {
+            type: 'ASC',
+          },
+        }),
+      ]);
       questions = questions.map((question) => {
         return {
           ...question,
+          textHighlight: questionHighlights.filter(
+            (highlight) => highlight.question.id === question.id,
+          ),
           mockExam: mockExams.find((mockExam) =>
             mockExam.mockExamQuestion.find((q) => q.id === question.id),
           ),

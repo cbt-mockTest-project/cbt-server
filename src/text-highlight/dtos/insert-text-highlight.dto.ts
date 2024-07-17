@@ -13,8 +13,8 @@ export class InsertTextHighlightInput {
   @Field(() => String)
   textHighlightId: string;
 
-  @Field(() => TextHighlightData)
-  data: TextHighlightData;
+  @Field(() => TextHighlightData, { nullable: true })
+  data?: TextHighlightData;
 }
 
 @ObjectType()

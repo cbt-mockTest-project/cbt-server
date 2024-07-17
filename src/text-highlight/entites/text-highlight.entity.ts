@@ -38,7 +38,7 @@ export class TextHighlight extends OmitType(CoreEntity, ['id']) {
 
   @Column({ type: 'json', nullable: true })
   @Field(() => TextHighlightData, { nullable: true, defaultValue: null })
-  Data?: TextHighlightData;
+  data?: TextHighlightData;
 
   @ManyToOne(() => User, (user) => user.textHighlight, { onDelete: 'CASCADE' })
   @Field(() => User)

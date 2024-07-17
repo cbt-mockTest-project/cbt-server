@@ -58,6 +58,7 @@ import { PointBalance } from 'src/point/entities/point-balance.entity';
 import { CategoryPointHistory } from 'src/point/entities/category-point-history.entity';
 import { SettlementRequest } from 'src/point/entities/settlement-request.entity';
 import { MockExamQuestionBookmarkFolder } from 'src/exam/entities/mock-exam-question-bookmark-folder.entity';
+import { TextHighlight } from 'src/text-highlight/entites/text-highlight.entity';
 
 @InputType('RecentlyStudiedExamsInputType', { isAbstract: true })
 @ObjectType()
@@ -348,6 +349,10 @@ export class User extends CoreEntity {
   @OneToMany(() => QuizCommentLike, (quizCommentLike) => quizCommentLike.user)
   @Field(() => [QuizCommentLike])
   quizCommentLike: QuizCommentLike[];
+
+  @OneToMany(() => TextHighlight, (highlight) => highlight.user)
+  @Field(() => [TextHighlight])
+  textHighlight: TextHighlight[];
 
   @Field(() => [UserAndRole])
   @OneToMany(() => UserAndRole, (userRole) => userRole.user)

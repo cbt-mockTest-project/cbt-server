@@ -115,6 +115,8 @@ import { RevenueRequestFormModule } from './revenue-request-form/revenue-request
 import { CategoryPointHistory } from './point/entities/category-point-history.entity';
 import { SettlementRequest } from './point/entities/settlement-request.entity';
 import { MockExamQuestionBookmarkFolder } from './exam/entities/mock-exam-question-bookmark-folder.entity';
+import { TextHighlightModule } from './text-highlight/text-highlight.module';
+import { TextHighlight } from './text-highlight/entites/text-highlight.entity';
 
 @Module({
   imports: [
@@ -249,6 +251,7 @@ import { MockExamQuestionBookmarkFolder } from './exam/entities/mock-exam-questi
         CategoryPointHistory,
         SettlementRequest,
         MockExamQuestionBookmarkFolder,
+        TextHighlight,
       ],
     }),
     UserModule,
@@ -322,6 +325,7 @@ import { MockExamQuestionBookmarkFolder } from './exam/entities/mock-exam-questi
     QuizModule,
     SecedersModule,
     PointModule,
+    TextHighlightModule,
   ],
   controllers: [],
   providers: [

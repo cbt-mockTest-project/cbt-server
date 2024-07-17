@@ -20,6 +20,7 @@ import { MockExamQuestionBookmark } from './mock-exam-question-bookmark.entity';
 import { MockExamQuestionMultipleChoice } from './mock-exam-question-multiple-choice.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Quiz } from 'src/quiz/entities/quiz.entity';
+import { TextHighlight } from 'src/text-highlight/entites/text-highlight.entity';
 
 @InputType('MockExamQuestionImageInputType', { isAbstract: true })
 @ObjectType()
@@ -169,6 +170,10 @@ export class MockExamQuestion extends CoreEntity {
   @Field(() => [Quiz])
   @OneToMany(() => Quiz, (quiz) => quiz.question)
   quiz: Quiz[];
+
+  @Field(() => [TextHighlight])
+  @OneToMany(() => TextHighlight, (textHighlight) => textHighlight.question)
+  textHighlight: TextHighlight[];
 
   @ManyToOne(() => User, (user) => user.mockExamQuestion, {
     onDelete: 'SET NULL', // user 삭제될시  mockExam's userId가 null

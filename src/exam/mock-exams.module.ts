@@ -44,6 +44,7 @@ import { RevalidateModule } from 'src/revalidate/revalidate.module';
 import { MockExamQuestionBookmarkFolder } from './entities/mock-exam-question-bookmark-folder.entity';
 import { MockExamQuestionBookmarkFolderSerivce } from './mock-exams-question-bookmark-folder.service';
 import { MockExamQuestionBookmarkFolderResolver } from './mock-exams-question-bookmark-folder.resolver';
+import { TextHighlight } from 'src/text-highlight/entites/text-highlight.entity';
 
 @Module({
   imports: [
@@ -67,6 +68,7 @@ import { MockExamQuestionBookmarkFolderResolver } from './mock-exams-question-bo
       MockExamBookmark,
       ExamLike,
       User,
+      TextHighlight,
     ]),
   ],
   providers: [

@@ -3,11 +3,11 @@ import { IsUUID } from 'class-validator';
 import { CoreEntity } from 'src/common/entities/core.entity';
 import { MockExamQuestion } from 'src/exam/entities/mock-exam-question.entity';
 import { User } from 'src/users/entities/user.entity';
-import { Column, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
 
-@InputType('TextHighlightOption')
+@InputType('TextHighlightDataInput')
 @ObjectType()
-export class TextHighlightOption {
+export class TextHighlightData {
   @Field(() => [Number])
   startContainer: number[];
 
@@ -27,6 +27,9 @@ export class TextHighlightOption {
   memo: string;
 }
 
+@InputType('TextHighlightInput')
+@ObjectType()
+@Entity()
 export class TextHighlight extends OmitType(CoreEntity, ['id']) {
   @PrimaryColumn('uuid')
   @Field(() => String)
@@ -34,8 +37,8 @@ export class TextHighlight extends OmitType(CoreEntity, ['id']) {
   id: string;
 
   @Column({ type: 'json', nullable: true })
-  @Field(() => TextHighlightOption, { nullable: true, defaultValue: null })
-  option?: TextHighlightOption;
+  @Field(() => TextHighlightData, { nullable: true, defaultValue: null })
+  Data?: TextHighlightData;
 
   @ManyToOne(() => User, (user) => user.textHighlight, { onDelete: 'CASCADE' })
   @Field(() => User)

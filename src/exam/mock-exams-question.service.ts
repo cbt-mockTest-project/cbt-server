@@ -1295,23 +1295,55 @@ export class MockExamQuestionService {
               })
               .then((res) => res)
           : [],
-        this.mockExamQuestionFeedback
-          .find({
-            relations: {
-              mockExamQuestion: true,
-              user: true,
-              recommendation: { user: true },
-            },
-            where: {
-              mockExamQuestion: In(questionIds),
-            },
-            order: {
-              type: 'ASC',
-            },
-          })
-          .then((res) => res),
+        user
+          ? this.mockExamQuestionFeedback
+              .find({
+                relations: {
+                  mockExamQuestion: true,
+                  user: true,
+                  recommendation: { user: true },
+                },
+                where: [
+                  {
+                    mockExamQuestion: In(questionIds),
+                    type: In([
+                      QuestionFeedbackType.PUBLIC,
+                      QuestionFeedbackType.REPORT,
+                    ]),
+                  },
+                  {
+                    mockExamQuestion: In(questionIds),
+                    type: QuestionFeedbackType.PRIVATE,
+                    user: {
+                      id: user.id,
+                    },
+                  },
+                ],
+                order: {
+                  type: 'ASC',
+                },
+              })
+              .then((res) => res)
+          : this.mockExamQuestionFeedback
+              .find({
+                relations: {
+                  mockExamQuestion: true,
+                  user: true,
+                  recommendation: { user: true },
+                },
+                where: {
+                  mockExamQuestion: In(questionIds),
+                  type: In([
+                    QuestionFeedbackType.PUBLIC,
+                    QuestionFeedbackType.REPORT,
+                  ]),
+                },
+                order: {
+                  type: 'ASC',
+                },
+              })
+              .then((res) => res),
       ]);
-
       questions = questions.map((question) => {
         return {
           ...question,
@@ -1480,19 +1512,50 @@ export class MockExamQuestionService {
               },
             })
           : [],
-        this.mockExamQuestionFeedback.find({
-          relations: {
-            mockExamQuestion: true,
-            user: true,
-            recommendation: { user: true },
-          },
-          where: {
-            mockExamQuestion: In(questionIds),
-          },
-          order: {
-            type: 'ASC',
-          },
-        }),
+        user
+          ? this.mockExamQuestionFeedback.find({
+              relations: {
+                mockExamQuestion: true,
+                user: true,
+                recommendation: { user: true },
+              },
+              where: [
+                {
+                  mockExamQuestion: In(questionIds),
+                  type: In([
+                    QuestionFeedbackType.PUBLIC,
+                    QuestionFeedbackType.REPORT,
+                  ]),
+                },
+                {
+                  mockExamQuestion: In(questionIds),
+                  type: QuestionFeedbackType.PRIVATE,
+                  user: {
+                    id: user.id,
+                  },
+                },
+              ],
+              order: {
+                type: 'ASC',
+              },
+            })
+          : this.mockExamQuestionFeedback.find({
+              relations: {
+                mockExamQuestion: true,
+                user: true,
+                recommendation: { user: true },
+              },
+              where: {
+                mockExamQuestion: In(questionIds),
+                type: In([
+                  QuestionFeedbackType.PUBLIC,
+                  QuestionFeedbackType.REPORT,
+                ]),
+              },
+              order: {
+                type: 'ASC',
+              },
+            }),
       ]);
       questions = questions.map((question) => {
         return {

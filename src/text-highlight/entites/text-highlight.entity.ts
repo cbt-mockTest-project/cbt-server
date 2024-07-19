@@ -28,6 +28,9 @@ export class TextHighlightData {
 
   @Field(() => String)
   type: 'question' | 'answer';
+
+  @Field(() => String, { nullable: true, defaultValue: '' })
+  color?: string;
 }
 
 @InputType('TextHighlightInput')

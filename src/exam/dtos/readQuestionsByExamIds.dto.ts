@@ -15,6 +15,8 @@ export class ReadQuestionsByExamIdsInput {
   limit?: number;
   @Field(() => Boolean, { nullable: true, defaultValue: false })
   bookmarked?: boolean;
+  @Field(() => Boolean, { nullable: true, defaultValue: false })
+  highlighted?: boolean;
 }
 
 @ObjectType()

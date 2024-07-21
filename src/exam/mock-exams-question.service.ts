@@ -1093,7 +1093,7 @@ export class MockExamQuestionService {
     readQuestionsByExamIdsInput: ReadQuestionsByExamIdsInput,
   ): Promise<ReadQuestionsByExamIdsOutput> {
     try {
-      const { order, states, ids, limit, bookmarked } =
+      const { order, states, ids, limit, bookmarked, highlighted } =
         readQuestionsByExamIdsInput;
       let mockExams = await this.mockExam.find({
         where: {
@@ -1163,6 +1163,23 @@ export class MockExamQuestionService {
           },
         });
         questions = questionBookmarks.map((bookmark) => bookmark.question);
+        questionIds = questions.map((question) => question.id);
+      }
+      if (highlighted && user) {
+        const questionHighlights = await this.textHighlights.find({
+          relations: {
+            question: {
+              user: true,
+            },
+          },
+          where: {
+            question: { id: In(questionIds) },
+            user: {
+              id: user.id,
+            },
+          },
+        });
+        questions = questionHighlights.map((highlight) => highlight.question);
         questionIds = questions.map((question) => question.id);
       }
       /**

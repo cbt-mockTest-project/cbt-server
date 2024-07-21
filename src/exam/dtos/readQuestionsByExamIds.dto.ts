@@ -17,6 +17,8 @@ export class ReadQuestionsByExamIdsInput {
   bookmarked?: boolean;
   @Field(() => Boolean, { nullable: true, defaultValue: false })
   highlighted?: boolean;
+  @Field(() => Boolean, { nullable: true, defaultValue: false })
+  feedbacked?: boolean;
 }
 
 @ObjectType()

@@ -1093,7 +1093,7 @@ export class MockExamQuestionService {
     readQuestionsByExamIdsInput: ReadQuestionsByExamIdsInput,
   ): Promise<ReadQuestionsByExamIdsOutput> {
     try {
-      const { order, states, ids, limit, bookmarked, highlighted } =
+      const { order, states, ids, limit, bookmarked, highlighted, feedbacked } =
         readQuestionsByExamIdsInput;
       let mockExams = await this.mockExam.find({
         where: {
@@ -1180,6 +1180,27 @@ export class MockExamQuestionService {
           },
         });
         questions = questionHighlights.map((highlight) => highlight.question);
+        questionIds = questions.map((question) => question.id);
+      }
+      if (feedbacked && user) {
+        const questionFeedbacks = await this.mockExamQuestionFeedback.find({
+          relations: {
+            mockExamQuestion: {
+              user: true,
+            },
+          },
+          where: {
+            mockExamQuestion: {
+              id: In(questionIds),
+            },
+            user: {
+              id: user.id,
+            },
+          },
+        });
+        questions = questionFeedbacks.map(
+          (feedback) => feedback.mockExamQuestion,
+        );
         questionIds = questions.map((question) => question.id);
       }
       /**

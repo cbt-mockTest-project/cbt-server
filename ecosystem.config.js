@@ -10,6 +10,7 @@ module.exports = {
       watch: false, // 파일 변경 감시 비활성화
       max_memory_restart: '1G', // 메모리 최대 사용량 초과시 재시작
       instance_var: 'moducbt',
+      cron_restart: '0 5 * * *',
       listen_timeout: 50000,
       kill_timeout: 5000,
       env: {

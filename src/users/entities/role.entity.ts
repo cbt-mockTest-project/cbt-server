@@ -30,4 +30,12 @@ export class Role extends CoreEntity {
   )
   @Field(() => [MockExamCategory])
   mockExamCategories: MockExamCategory[];
+
+  @Column({ default: 0 })
+  @Field(() => Number, { nullable: true, defaultValue: 0 })
+  period?: number;
+
+  @Column({ default: '' })
+  @Field(() => String, { nullable: true, defaultValue: '' })
+  endDate?: string;
 }

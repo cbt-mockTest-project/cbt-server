@@ -176,7 +176,7 @@ export class MockExamQuestion extends CoreEntity {
   textHighlight: TextHighlight[];
 
   @ManyToOne(() => User, (user) => user.mockExamQuestion, {
-    onDelete: 'SET NULL', // user 삭제될시  mockExam's userId가 null
+    onDelete: 'CASCADE',
   })
   @Field(() => User)
   user: User;

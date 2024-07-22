@@ -100,7 +100,7 @@ export class MockExam extends CoreEntity {
   examViewer: ExamViewer[];
 
   @ManyToOne(() => User, (user) => user.mockExam, {
-    onDelete: 'SET NULL',
+    onDelete: 'CASCADE',
   })
   @Field(() => User)
   user: User;

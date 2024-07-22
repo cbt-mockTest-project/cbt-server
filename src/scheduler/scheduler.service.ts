@@ -4,7 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Cron, Interval } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { VisitService } from 'src/visit/visit.service';
 import { UserService } from 'src/users/user.service';
 import { RevalidateService } from 'src/revalidate/revalidate.service';
@@ -118,14 +118,26 @@ export class SchedulerService {
       }
       const exams = await this.mockExams
         .createQueryBuilder('mockExam')
+        .leftJoinAndSelect('mockExam.user', 'user')
         .leftJoinAndSelect('mockExam.mockExamCategory', 'mockExamCategory')
         .where('mockExamCategory.id IS NULL AND mockExam.approved = true')
         .orWhere(
-          'mockExamCategory.isPublic = false AND mockExam.approved = true',
+          'mockExamCategory.isPublic = false AND mockExam.approved = true AND mockExam.user.id = mockExamCategory.user.id',
         )
         .getMany();
-
-      exams.forEach((exam) => {
+      const examIds = exams.map((exam) => exam.id);
+      const duplicated = await this.mockExams.find({
+        where: {
+          mockExamCategory: {
+            isPublic: true,
+          },
+          id: In(examIds),
+          approved: true,
+        },
+      });
+      const duplicatedIds = duplicated.map((exam) => exam.id);
+      const filtered = exams.filter((exam) => !duplicatedIds.includes(exam.id));
+      filtered.forEach((exam) => {
         this.mockExams.update({ id: exam.id }, { approved: false });
       });
 

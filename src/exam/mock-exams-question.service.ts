@@ -1000,9 +1000,29 @@ export class MockExamQuestionService {
     try {
       const exams = await this.mockExam
         .createQueryBuilder('mockExam')
+        .leftJoinAndSelect('mockExam.user', 'user')
         .leftJoinAndSelect('mockExam.mockExamCategory', 'mockExamCategory')
         .where('mockExamCategory.id IS NULL AND mockExam.approved = true')
+        .orWhere(
+          'mockExamCategory.isPublic = false AND mockExam.approved = true AND mockExam.user.id = mockExamCategory.user.id',
+        )
         .getMany();
+      const examIds = exams.map((exam) => exam.id);
+      const duplicated = await this.mockExam.find({
+        where: {
+          mockExamCategory: {
+            isPublic: true,
+          },
+          id: In(examIds),
+          approved: true,
+        },
+      });
+      const duplicatedIds = duplicated.map((exam) => exam.id);
+      const filtered = exams.filter((exam) => !duplicatedIds.includes(exam.id));
+      console.log(filtered.length);
+      filtered.forEach((exam) => {
+        this.mockExam.update({ id: exam.id }, { approved: false });
+      });
 
       return {
         ok: true,

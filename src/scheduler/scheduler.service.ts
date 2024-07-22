@@ -120,6 +120,9 @@ export class SchedulerService {
         .createQueryBuilder('mockExam')
         .leftJoinAndSelect('mockExam.mockExamCategory', 'mockExamCategory')
         .where('mockExamCategory.id IS NULL AND mockExam.approved = true')
+        .orWhere(
+          'mockExamCategory.isPublic = false AND mockExam.approved = true',
+        )
         .getMany();
 
       exams.forEach((exam) => {

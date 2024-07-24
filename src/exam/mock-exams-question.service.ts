@@ -998,32 +998,26 @@ export class MockExamQuestionService {
 
   async sync() {
     try {
-      const exams = await this.mockExam
-        .createQueryBuilder('mockExam')
-        .leftJoinAndSelect('mockExam.user', 'user')
-        .leftJoinAndSelect('mockExam.mockExamCategory', 'mockExamCategory')
-        .where('mockExamCategory.id IS NULL AND mockExam.approved = true')
-        .orWhere(
-          'mockExamCategory.isPublic = false AND mockExam.approved = true AND mockExam.user.id = mockExamCategory.user.id',
-        )
-        .getMany();
-      const examIds = exams.map((exam) => exam.id);
-      const duplicated = await this.mockExam.find({
-        where: {
-          mockExamCategory: {
-            isPublic: true,
-          },
-          id: In(examIds),
-          approved: true,
-        },
-      });
-      const duplicatedIds = duplicated.map((exam) => exam.id);
-      const filtered = exams.filter((exam) => !duplicatedIds.includes(exam.id));
-      console.log(filtered.length);
-      filtered.forEach((exam) => {
-        this.mockExam.update({ id: exam.id }, { approved: false });
-      });
-
+      const duplicateStates = await this.mockExamQuestionState
+        .createQueryBuilder('state')
+        .select('state.user.id', 'userId')
+        .addSelect('state.question.id', 'questionId')
+        .addSelect('COUNT(*)', 'count')
+        .groupBy('state.userId')
+        .addGroupBy('state.questionId')
+        .having('COUNT(*) > 1')
+        .getRawMany();
+      if (duplicateStates.length > 0) {
+        const detailedDuplicates = await this.mockExamQuestionState.find({
+          where: duplicateStates.map((dup) => ({
+            user: { id: dup.userId },
+            question: { id: dup.questionId },
+          })),
+          relations: ['user', 'question'],
+        });
+        console.log(detailedDuplicates.length);
+        console.log(duplicateStates[0]);
+      }
       return {
         ok: true,
       };
@@ -1337,6 +1331,9 @@ export class MockExamQuestionService {
                     id: user.id,
                   },
                 },
+                order: {
+                  updated_at: 'DESC',
+                },
               })
               .then((res) => res)
           : [],
@@ -1556,6 +1553,9 @@ export class MockExamQuestionService {
                 user: {
                   id: user.id,
                 },
+              },
+              order: {
+                updated_at: 'DESC',
               },
             })
           : [],

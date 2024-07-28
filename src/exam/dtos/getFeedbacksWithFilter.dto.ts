@@ -7,14 +7,16 @@ import {
 
 @InputType()
 export class GetFeedbacksWithFilterInput {
-  @Field(() => Number)
-  examId: number;
-  @Field(() => Number)
-  goodCount: number;
-  @Field(() => Number)
-  badCount: number;
-  @Field(() => [QuestionFeedbackType])
-  types: QuestionFeedbackType[];
+  @Field(() => Number, { nullable: true })
+  examId?: number;
+  @Field(() => Number, { nullable: true })
+  categoryId?: number;
+  @Field(() => Number, { nullable: true })
+  goodCount?: number;
+  @Field(() => Number, { nullable: true })
+  badCount?: number;
+  @Field(() => [QuestionFeedbackType], { nullable: true, defaultValue: [] })
+  types?: QuestionFeedbackType[];
 }
 
 @ObjectType()

@@ -250,7 +250,7 @@ export class MockExamQuestionFeedbackSerivce {
     user: User,
   ): Promise<GetFeedbacksWithFilterOutput> {
     try {
-      const { examId, goodCount, badCount, types } =
+      const { examId, goodCount, badCount, types, categoryId } =
         getFeedbacksWithFilterInput;
       let query = this.mockExamQuestionFeedback
         .createQueryBuilder('feedback')
@@ -274,6 +274,16 @@ export class MockExamQuestionFeedbackSerivce {
 
       if (examId) {
         query = query.andWhere('mockExam.id = :examId', { examId });
+      }
+      if (categoryId) {
+        const category = await this.mockExamCategory.findOne({
+          relations: {
+            mockExam: true,
+          },
+          where: { id: categoryId },
+        });
+        const examIds = category.mockExam.map((exam) => exam.id);
+        query = query.andWhere('mockExam.id IN (:...examIds)', { examIds });
       }
       if (types.length >= 1) {
         query = query.andWhere('feedback.type IN (:...types)', { types });

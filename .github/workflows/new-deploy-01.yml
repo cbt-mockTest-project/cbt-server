@@ -9,7 +9,7 @@ on:
       - release
 
 env:
-  LIGHTSAIL_USERNAME: bitnami
+  LIGHTSAIL_USERNAME: ubuntu
   AWS_REGION: ap-northeast-2
 
 jobs:

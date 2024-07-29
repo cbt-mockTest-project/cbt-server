@@ -46,7 +46,7 @@ jobs:
           key: ${{ secrets.LIGHTSAIL_SSH_KEY_TWO }}
           source: 'dist/*'
           strip_components: 1
-          target: '/home/bitnami/cbt-server/dist'
+          target: '/home/ubuntu/cbt-server/dist'
 
       - name: Copy pm2 config
         uses: appleboy/scp-action@master
@@ -55,7 +55,7 @@ jobs:
           username: ${{env.LIGHTSAIL_USERNAME}}
           key: ${{ secrets.LIGHTSAIL_SSH_KEY_TWO }}
           source: 'ecosystem.config.js'
-          target: '/home/bitnami/cbt-server'
+          target: '/home/ubuntu/cbt-server/dist'
 
       - name: Copy package.json
         uses: appleboy/scp-action@master
@@ -64,7 +64,7 @@ jobs:
           username: ${{env.LIGHTSAIL_USERNAME}}
           key: ${{ secrets.LIGHTSAIL_SSH_KEY_TWO }}
           source: 'package.json'
-          target: '/home/bitnami/cbt-server'
+          target: '/home/ubuntu/cbt-server/dist'
 
       - name: Copy package.json
         uses: appleboy/scp-action@master
@@ -73,7 +73,7 @@ jobs:
           username: ${{env.LIGHTSAIL_USERNAME}}
           key: ${{ secrets.LIGHTSAIL_SSH_KEY_TWO }}
           source: 'node_modules'
-          target: '/home/bitnami/cbt-server/node_modules'
+          target: '/home/ubuntu/cbt-server/node_modules'
 
       - name: Install Packages and Start/Restart PM2
         uses: appleboy/ssh-action@master
@@ -82,6 +82,6 @@ jobs:
           username: ${{env.LIGHTSAIL_USERNAME}}
           key: ${{ secrets.LIGHTSAIL_SSH_KEY_TWO }}
           script: |
-            cd /home/bitnami/cbt-server
+            cd /home/ubuntu/cbt-server
             npm install
             yarn run cross-env NODE_ENV=prod pm2 start ecosystem.config.js

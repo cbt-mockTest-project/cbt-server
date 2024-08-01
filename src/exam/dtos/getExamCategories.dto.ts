@@ -31,6 +31,9 @@ export class GetExamCategoriesInput {
 
   @Field(() => Boolean, { nullable: true })
   isPick?: boolean;
+
+  @Field(() => String, { nullable: true })
+  sort?: string;
 }
 
 @ObjectType()

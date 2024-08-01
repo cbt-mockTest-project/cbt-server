@@ -223,6 +223,7 @@ export class MockExamCategoryService {
       isPick,
       keyword,
       isPublicOnly,
+      sort,
     } = getExamCategoriesInput;
     if (isBookmarked) {
       if (!user)
@@ -338,6 +339,11 @@ export class MockExamCategoryService {
         if (evaluation) category.categoryEvaluations = evaluation;
         return category;
       });
+      if (sort === 'likeCount') {
+        categories = categories.sort(
+          (a, b) => b.categoryEvaluations.length - a.categoryEvaluations.length,
+        );
+      }
       return {
         ok: true,
         categories,

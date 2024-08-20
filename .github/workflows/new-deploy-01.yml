@@ -66,13 +66,21 @@ jobs:
           source: 'package.json'
           target: '/home/ubuntu/cbt-server'
 
-      - name: Install Packages and Start/Restart PM2
+      - name: Deploy to server
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.LIGHTSAIL_HOST_TWO }}
           username: ${{env.LIGHTSAIL_USERNAME}}
           key: ${{ secrets.LIGHTSAIL_SSH_KEY_TWO }}
           script: |
+            curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+            sudo apt-get install -y nodejs
+
+            sudo npm install -g yarn
+
+            echo 'export PATH=$PATH:/usr/bin:/usr/local/bin' >> ~/.bashrc
+            source ~/.bashrc
+
             cd /home/ubuntu/cbt-server
             npm install
             yarn run cross-env NODE_ENV=prod pm2 start ecosystem.config.js

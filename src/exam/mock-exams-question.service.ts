@@ -1007,17 +1007,28 @@ export class MockExamQuestionService {
         .addGroupBy('state.questionId')
         .having('COUNT(*) > 1')
         .getRawMany();
+
       if (duplicateStates.length > 0) {
-        const detailedDuplicates = await this.mockExamQuestionState.find({
-          where: duplicateStates.map((dup) => ({
-            user: { id: dup.userId },
-            question: { id: dup.questionId },
-          })),
-          relations: ['user', 'question'],
-        });
-        console.log(detailedDuplicates.length);
-        console.log(duplicateStates[0]);
+        for (const dup of duplicateStates) {
+          const detailedDuplicates = await this.mockExamQuestionState.find({
+            where: {
+              user: { id: dup.userId },
+              question: { id: dup.questionId },
+            },
+            relations: ['user', 'question'],
+            order: { created_at: 'DESC' },
+          });
+
+          // 가장 최근 항목을 제외한 나머지 삭제
+          const [latest, ...outdated] = detailedDuplicates;
+          if (outdated.length > 0) {
+            const ids = outdated.map((el) => el.id);
+            console.log(ids.length);
+            await this.mockExamQuestionState.delete(ids);
+          }
+        }
       }
+
       return {
         ok: true,
       };

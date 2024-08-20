@@ -6,7 +6,7 @@ import {
   ObjectType,
   registerEnumType,
 } from '@nestjs/graphql';
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Column, Entity, ManyToOne, Unique } from 'typeorm';
 import { IsEnum } from 'class-validator';
 import { User } from 'src/users/entities/user.entity';
 import { MockExam } from './mock-exam.entity';
@@ -23,6 +23,7 @@ registerEnumType(QuestionState, { name: 'QuestionState' });
 @InputType('MockExamQuestionStateInputType', { isAbstract: true })
 @ObjectType()
 @Entity()
+@Unique(['user', 'question'])
 export class MockExamQuestionState extends CoreEntity {
   @Field(() => QuestionState)
   @Column({ type: 'enum', enum: QuestionState, default: QuestionState.CORE })

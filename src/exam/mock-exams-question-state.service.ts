@@ -176,13 +176,8 @@ export class MockExamQuestionStateService {
           error: '체크된 성취도가 없습니다.',
         };
       }
-      const newStates = this.mockExamQuestionState.create(
-        states.map((el) => ({
-          ...el,
-          state: QuestionState.CORE,
-        })),
-      );
-      await this.mockExamQuestionState.save(newStates);
+      await this.mockExamQuestionState.delete(states.map((el) => el.id));
+
       return {
         ok: true,
       };

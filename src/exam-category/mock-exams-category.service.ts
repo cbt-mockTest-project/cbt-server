@@ -224,6 +224,7 @@ export class MockExamCategoryService {
       keyword,
       isPublicOnly,
       sort,
+      examType,
     } = getExamCategoriesInput;
     if (isBookmarked) {
       if (!user)
@@ -239,8 +240,10 @@ export class MockExamCategoryService {
       const categoryQuery = this.mockExamCategories
         .createQueryBuilder('category')
         .leftJoinAndSelect('category.user', 'user')
-        .leftJoinAndSelect('category.mockExam', 'mockExam');
-      // examSource가 있는 경우, 공개된 시험 카테고리를 검색
+        .leftJoinAndSelect('category.mockExam', 'mockExam')
+        .andWhere('category.examType = :examType', {
+          examType,
+        });
       if (examSource) {
         categoryQuery.andWhere(
           'category.source = :source AND category.isPublic = :isPublic',

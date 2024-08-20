@@ -37,7 +37,8 @@ export class MockExamQuestionStateService {
     user: User,
     createOrUpdateMockExamQuestionStateInput: CreateOrUpdateMockExamQuestionStateInput,
   ): Promise<CreateOrUpdateMockExamQuestionStateOutput> {
-    const { questionId, state } = createOrUpdateMockExamQuestionStateInput;
+    const { questionId, state, answer } =
+      createOrUpdateMockExamQuestionStateInput;
     const prevState = await this.mockExamQuestionState.findOne({
       where: {
         user: {
@@ -49,19 +50,7 @@ export class MockExamQuestionStateService {
       },
     });
     if (prevState) {
-      if (prevState.state === state) {
-        return {
-          ok: false,
-          error: '이전과 값이 동일합니다.',
-        };
-      }
-      if (prevState.state === QuestionState.CORE) {
-        this.user.update(user.id, {
-          solvedProblemCount: user.solvedProblemCount + 1,
-          solveLimit: user.solveLimit - 1,
-        });
-      }
-      await this.mockExamQuestionState.update(prevState.id, { state });
+      await this.mockExamQuestionState.update(prevState.id, { state, answer });
       return {
         ok: true,
         message: 'update success',
@@ -86,12 +75,10 @@ export class MockExamQuestionStateService {
       question,
       exam: question.mockExam,
       state,
+      answer,
       user,
     });
-    this.user.update(user.id, {
-      solvedProblemCount: user.solvedProblemCount + 1,
-      solveLimit: user.solveLimit - 1,
-    });
+
     await this.mockExamQuestionState.save(newState);
     return {
       ok: true,

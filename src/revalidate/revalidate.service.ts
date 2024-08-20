@@ -17,7 +17,7 @@ export class RevalidateService {
     try {
       console.log(`${path} revalidate start`);
       await axios.post(
-        `https://www.moducbt.com/api/revalidate?secret=${this.options.revalidateKey}`,
+        `http://localhost:3000/api/revalidate?secret=${this.options.revalidateKey}`,
         { path },
       );
       console.log(`${path} revalidate success`);

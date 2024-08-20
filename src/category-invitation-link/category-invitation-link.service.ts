@@ -110,6 +110,7 @@ export class CategoryInvitationLinkService {
         ok: true,
         categoryName: invitationLink.category.name,
         urlSlug: invitationLink.category.urlSlug,
+        examType: invitationLink.category.examType,
       };
     } catch (e) {
       console.log(e);

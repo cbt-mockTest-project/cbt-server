@@ -611,12 +611,14 @@ export class MockExamCategoryService {
     readMockExamCategoryByCategoryIdInput: ReadMockExamCategoryByCategoryIdInput,
   ): Promise<ReadMockExamCategoryByCategoryIdOutput> {
     try {
-      const { id, name, urlSlug } = readMockExamCategoryByCategoryIdInput;
+      const { id, name, urlSlug, examType } =
+        readMockExamCategoryByCategoryIdInput;
       const category = await this.mockExamCategories.findOne({
         where: {
           ...(id ? { id } : {}),
           ...(name ? { name } : {}),
           ...(urlSlug ? { urlSlug } : {}),
+          ...(examType ? { examType } : {}),
         },
         relations: {
           user: true,

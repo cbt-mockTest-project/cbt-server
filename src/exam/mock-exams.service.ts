@@ -502,7 +502,7 @@ export class MockExamService {
     getMyExams: GetMyExamsInput,
   ): Promise<GetMyExamsOutput> {
     try {
-      const { isBookmarked } = getMyExams;
+      const { isBookmarked, examType } = getMyExams;
       let exams: MockExam[] = [];
       if (isBookmarked) {
         const bookmarks = await this.mockExamBookmark.find({
@@ -510,6 +510,7 @@ export class MockExamService {
             user: {
               id: user.id,
             },
+            ...(examType ? { exam: { examType } } : {}),
           },
           relations: {
             exam: {
@@ -538,6 +539,7 @@ export class MockExamService {
           user: {
             id: user.id,
           },
+          ...(examType ? { examType } : {}),
         },
         relations: {
           user: true,
@@ -714,7 +716,7 @@ export class MockExamService {
     saveExamInput: SaveExamInput,
   ): Promise<SaveExamOutput> {
     try {
-      const { title, questionOrderIds, questions, uuid, categoryId } =
+      const { title, questionOrderIds, questions, uuid, categoryId, examType } =
         saveExamInput;
       const [prevMockExam, prevQuestions, prevCategory] = await Promise.all([
         this.mockExam.findOne({
@@ -787,6 +789,7 @@ export class MockExamService {
         ...prevMockExam,
         ...(prevCategory?.isPublic && { approved: true }),
         ...(!prevCategory?.isPublic && { approved: false }),
+        examType,
         title,
         uuid,
         mockExamQuestion: newQuestions,

@@ -187,6 +187,12 @@ export class MockExamQuestion extends CoreEntity {
   })
   myQuestionState?: QuestionState = QuestionState.CORE;
 
+  @Field(() => Number, {
+    nullable: true,
+    defaultValue: 0,
+  })
+  myObjectiveAnswer?: number = 0;
+
   @Field(() => Boolean, { nullable: true, defaultValue: false })
   isBookmarked?: boolean = false;
 

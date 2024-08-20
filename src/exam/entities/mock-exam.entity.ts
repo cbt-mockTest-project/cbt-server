@@ -15,7 +15,10 @@ import { MockExamHistory } from './mock-exam-history';
 import { ExamViewer } from 'src/exam-viewer/entities/exam-viewer.entity';
 import { MockExamBookmark } from 'src/exam-bookmark/entities/mock-exam-bookmark.entity';
 import { ExamLike } from 'src/exam-like/entities/exam-like.entity';
-import { MockExamCategory } from 'src/exam-category/entities/mock-exam-category.entity';
+import {
+  ExamType,
+  MockExamCategory,
+} from 'src/exam-category/entities/mock-exam-category.entity';
 import { ExamSource, ExamStatus } from 'src/enums/enum';
 import { Quiz } from 'src/quiz/entities/quiz.entity';
 
@@ -135,6 +138,15 @@ export class MockExam extends CoreEntity {
 
   @Field(() => Boolean, { nullable: true, defaultValue: false })
   isPrivate?: boolean = false;
+
+  @Column({
+    type: 'enum',
+    enum: ExamType,
+    default: ExamType.SUBJECTIVE,
+  })
+  @Field(() => ExamType)
+  @IsEnum(ExamType)
+  examType: ExamType;
 
   @Column({ type: 'json', default: [] })
   @Field(() => [String], { defaultValue: [] })

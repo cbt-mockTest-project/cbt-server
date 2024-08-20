@@ -1,6 +1,9 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { CoreOutput } from 'src/common/dtos/output.dto';
-import { MockExamCategory } from '../entities/mock-exam-category.entity';
+import {
+  ExamType,
+  MockExamCategory,
+} from '../entities/mock-exam-category.entity';
 
 @InputType()
 export class ReadMockExamCategoryByCategoryIdInput {
@@ -10,6 +13,8 @@ export class ReadMockExamCategoryByCategoryIdInput {
   name?: string;
   @Field(() => String, { nullable: true })
   urlSlug?: string;
+  @Field(() => ExamType, { nullable: true, defaultValue: ExamType.SUBJECTIVE })
+  examType?: ExamType;
 }
 
 @ObjectType()

@@ -74,6 +74,10 @@ import {
 } from './dtos/checkIsAccessibleCategory.dto';
 import { CheckHasCategoryAccessInput } from './dtos/checkHasCategoryAccess.dto';
 import { MockExam } from 'src/exam/entities/mock-exam.entity';
+import {
+  GetCategoryNamesAndSlugsInput,
+  GetCategoryNamesAndSlugsOutput,
+} from './dtos/getCategoryNamesAndSlugs.dto';
 
 @Injectable()
 export class MockExamCategoryService {
@@ -240,10 +244,8 @@ export class MockExamCategoryService {
       const categoryQuery = this.mockExamCategories
         .createQueryBuilder('category')
         .leftJoinAndSelect('category.user', 'user')
-        .leftJoinAndSelect('category.mockExam', 'mockExam')
-        .andWhere('category.examType = :examType', {
-          examType,
-        });
+        .leftJoinAndSelect('category.mockExam', 'mockExam');
+
       if (examSource) {
         categoryQuery.andWhere(
           'category.source = :source AND category.isPublic = :isPublic',
@@ -252,6 +254,11 @@ export class MockExamCategoryService {
             isPublic: true,
           },
         );
+      }
+      if (examType) {
+        categoryQuery.andWhere('category.examType = :examType', {
+          examType,
+        });
       }
       if (isPick) {
         categoryQuery.andWhere('category.isPick = :isPick', {
@@ -388,7 +395,8 @@ export class MockExamCategoryService {
     createMockExamCategoryInput: CreateMockExamCategoryInput,
   ): Promise<CreateMockExamCategoryOutput> {
     try {
-      const { name, isPublic, description } = createMockExamCategoryInput;
+      const { name, isPublic, description, examType } =
+        createMockExamCategoryInput;
       const exists = await this.mockExamCategories.findOne({
         where: [{ name }, { urlSlug: name }],
       });
@@ -408,6 +416,7 @@ export class MockExamCategoryService {
         description,
         source:
           user.role === UserRole.ADMIN ? ExamSource.MOUD_CBT : ExamSource.USER,
+        examType,
       });
       const category = await this.mockExamCategories.save(newCategory);
       return {
@@ -519,7 +528,10 @@ export class MockExamCategoryService {
     }
     await this.mockExamCategories.save({ ...editMockExamCategoryInput });
     this.revalidateService.revalidate({
-      path: `/category/${prevCategory.urlSlug}`,
+      path:
+        prevCategory.examType === ExamType.SUBJECTIVE
+          ? `/category/${prevCategory.urlSlug}`
+          : `/mcq/category/${prevCategory.urlSlug}`,
     });
     return {
       ok: true,
@@ -797,6 +809,7 @@ export class MockExamCategoryService {
     }
   }
 
+  // deprecated
   async readMockExamCategoryNames(): Promise<ReadMockExamCategoryNamesOutput> {
     try {
       const categories = await this.mockExamCategories.find({
@@ -809,6 +822,32 @@ export class MockExamCategoryService {
         .filter((category) => category.isPublic)
         .map((category) => category.urlSlug);
 
+      return {
+        ok: true,
+        names,
+        urlSlugs,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: '카테고리를 찾을 수 없습니다.',
+      };
+    }
+  }
+
+  async getCategoryNamesAndSlugs(
+    getCategoryNamesAndSlugsInput: GetCategoryNamesAndSlugsInput,
+  ): Promise<GetCategoryNamesAndSlugsOutput> {
+    try {
+      const { examType } = getCategoryNamesAndSlugsInput;
+      const categories = await this.mockExamCategories.find({
+        where: {
+          examType,
+          isPublic: true,
+        },
+      });
+      const names = categories.map((category) => category.name);
+      const urlSlugs = categories.map((category) => category.urlSlug);
       return {
         ok: true,
         names,
@@ -885,7 +924,10 @@ export class MockExamCategoryService {
       category.examOrderIds = examOrderIds;
       await this.mockExamCategories.save(category);
       this.revalidateService.revalidate({
-        path: `/category/${category.urlSlug}`,
+        path:
+          category.examType === ExamType.SUBJECTIVE
+            ? `/category/${category.urlSlug}`
+            : `/mcq/category/${category.urlSlug}`,
       });
       return {
         ok: true,

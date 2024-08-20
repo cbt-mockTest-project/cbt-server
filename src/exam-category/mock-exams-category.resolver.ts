@@ -64,6 +64,10 @@ import {
   CheckHasCategoryAccessInput,
   CheckHasCategoryAccessOutput,
 } from './dtos/checkHasCategoryAccess.dto';
+import {
+  GetCategoryNamesAndSlugsInput,
+  GetCategoryNamesAndSlugsOutput,
+} from './dtos/getCategoryNamesAndSlugs.dto';
 
 @Resolver(() => MockExamCategory)
 export class MockExamCategoryResolver {
@@ -223,6 +227,15 @@ export class MockExamCategoryResolver {
   @Query(() => ReadMockExamCategoryNamesOutput)
   async readMockExamCategoryNames(): Promise<ReadMockExamCategoryNamesOutput> {
     return this.mockExamCategoryService.readMockExamCategoryNames();
+  }
+
+  @Query(() => GetCategoryNamesAndSlugsOutput)
+  async getCategoryNamesAndSlugs(
+    @Args('input') getCategoryNamesAndSlugsInput: GetCategoryNamesAndSlugsInput,
+  ): Promise<GetCategoryNamesAndSlugsOutput> {
+    return this.mockExamCategoryService.getCategoryNamesAndSlugs(
+      getCategoryNamesAndSlugsInput,
+    );
   }
 
   @Mutation(() => MoveExamOrderOutput)

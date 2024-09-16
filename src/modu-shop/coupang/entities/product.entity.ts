@@ -38,19 +38,27 @@ export class Product {
   @Column()
   productUrl: string;
 
-  @Column()
+  @Column({
+    default: '',
+  })
   categoryName: string;
 
   @Column()
   keyword: string;
 
-  @Column()
+  @Column({
+    default: 0,
+  })
   rank: number;
 
-  @Column()
+  @Column({
+    default: false,
+  })
   isRocket: boolean;
 
-  @Column()
+  @Column({
+    default: false,
+  })
   isFreeShipping: boolean;
 
   @Column({

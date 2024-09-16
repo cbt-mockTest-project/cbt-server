@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { CoupangDetailData } from './interface/coupang-detail';
 import { JSDOM } from 'jsdom';
+import { load } from 'cheerio';
 
 const COUPANG_REQUEST_HEADERS = {
   Accept: '*/*',
@@ -25,6 +26,12 @@ function extractImageUrls(detailData: any): string[] {
   const imgRegex = /<img\s+src="([^"]+)"/g;
   const matches = content.matchAll(imgRegex);
   return Array.from(matches, (match) => match[1]);
+}
+
+function extractOgImageUrl(html: string): string {
+  const $ = load(html);
+  const ogImage = $('meta[property="og:image"]').attr('content');
+  return ogImage;
 }
 
 function extractJsonLd(html: string): any {
@@ -167,11 +174,13 @@ export class CoupangService {
       );
       const jsonLdData = extractJsonLd(detailData) as CoupangDetailData;
       const discountRate = extractDiscountRate(detailData);
+      const ogImage = extractOgImageUrl(detailData);
       const data = {
         ratingValue: jsonLdData.aggregateRating?.ratingValue || 0,
         ratingCount: jsonLdData.aggregateRating?.ratingCount || 0,
         discountRate: discountRate,
         description: jsonLdData.description,
+        productImage: 'https:' + ogImage,
         imageUrls: [],
       };
       if (vendorItemId && itemId) {
@@ -215,6 +224,100 @@ export class CoupangService {
         ok: false,
         error: error.message,
       };
+    }
+  }
+
+  async crawlProductListFromCoupang(keyword: string, isMobile?: boolean) {
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    try {
+      const { data } = await axios.get(
+        `https://www.coupang.com/np/search?component=&q=${encodeURIComponent(
+          keyword,
+        )}&channel=user`,
+        {
+          headers: COUPANG_REQUEST_HEADERS,
+        },
+      );
+      const $ = load(data);
+      const $productList = $('.search-product-list');
+      const productPromises: Promise<Product>[] = [];
+
+      $productList.children('li').each((i, li) => {
+        const rankedProduct = $(li).find('.number');
+        if (!rankedProduct.text()) return;
+
+        const productPromise = (async () => {
+          const rawUrls = $(li).find('a').attr('href');
+          const queryString = rawUrls.split('?')[1]; // URL에서 쿼리 문자열 부분만 추출
+          const searchParams = new URLSearchParams(queryString);
+
+          const itemId = searchParams.get('itemId');
+          const vendorItemId = searchParams.get('vendorItemId');
+          const productId = $(li).attr('data-product-id');
+          const productUrl = `https://link.coupang.com/re/AFFSDP?lptag=AF8104485&subid=${
+            isMobile ? 'android' : 'webpage00'
+          }&pageKey=${productId}&vendorItemId=${vendorItemId}`;
+
+          const productName = $(li).find('.name').text();
+          const productPrice = Number(
+            $(li).find('.price-value').text().replace(',', ''),
+          );
+          const isRocket = $(li).find('.rocket').length > 0;
+          const { data } = await this.crawlProductDetailFromCoupang({
+            productId,
+            itemId,
+            vendorItemId,
+          });
+
+          return this.products.create({
+            keyword,
+            productId,
+            productUrl,
+            productName,
+            productPrice,
+            isRocket,
+            itemId,
+            vendorItemId,
+            productImage: data.productImage,
+            ratingValue: data.ratingValue,
+            ratingCount: Number(data.ratingCount),
+            discountRate: data.discountRate,
+            description: data.description,
+            imageUrls: data.imageUrls,
+          });
+        })();
+
+        productPromises.push(productPromise);
+      });
+
+      const products = await Promise.all(productPromises);
+
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+      await queryRunner.manager.delete(Product, { keyword });
+      await queryRunner.manager.save(
+        Product,
+        products.filter(
+          (product, index, self) =>
+            index === self.findIndex((p) => p.productId === product.productId),
+        ),
+      );
+      await queryRunner.commitTransaction();
+
+      return {
+        ok: true,
+        products,
+      };
+    } catch (error) {
+      console.log(error);
+      await queryRunner.rollbackTransaction();
+      return {
+        ok: false,
+        error: error.message,
+      };
+    } finally {
+      await queryRunner.release();
     }
   }
 }

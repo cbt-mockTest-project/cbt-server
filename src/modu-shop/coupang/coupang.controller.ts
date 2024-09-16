@@ -31,4 +31,10 @@ export class CoupangController {
       vendorItemId,
     });
   }
+
+  @Get('/search/crawl/:keyword')
+  async crawlProductListFromCoupang(@Param('keyword') keyword: string) {
+    console.log('keyword', keyword);
+    return this.coupangService.crawlProductListFromCoupang(keyword);
+  }
 }

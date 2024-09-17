@@ -25,7 +25,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v1
         with:
-          node-version: 16
+          node-version: 18
 
       - name: Install Dependencies
         run: npm install
@@ -76,5 +76,5 @@ jobs:
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
           script: |
             cd /home/ubuntu/cbt-server
-            npm install
+            yarn
             yarn run cross-env NODE_ENV=prod pm2 start ecosystem.config.js

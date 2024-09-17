@@ -25,6 +25,7 @@ import { RedisService } from 'src/redis/redis.service';
       'https://www.moducbt.com/',
       'https://www.moducbt.com',
       'https://moducbt.com/',
+      'https://shop.moducbt.com/',
     ], // 클라이언트의 주소를 명시적으로 지정
     methods: ['GET', 'POST'], // 허용할 HTTP 메소드 지정
     allowedHeaders: [], // 허용할 헤더들

@@ -227,6 +227,36 @@ export class CoupangService {
     }
   }
 
+  async searchProductList(keyword: string, isMobile: boolean) {
+    try {
+      let products = await this.products.find({
+        where: { keyword },
+      });
+      // 업데이트된지 하루가 지났으면
+      const now = new Date();
+      const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+      if (
+        (products.length > 0 && products[0].updated_at < oneDayAgo) ||
+        products.length === 0
+      ) {
+        await this.crawlProductListFromCoupang(keyword, isMobile);
+        products = await this.products.find({
+          where: { keyword },
+        });
+      }
+
+      return {
+        ok: true,
+        products,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: error.message,
+      };
+    }
+  }
+
   async crawlProductListFromCoupang(keyword: string, isMobile?: boolean) {
     const queryRunner = this.dataSource.createQueryRunner();
 
@@ -261,7 +291,7 @@ export class CoupangService {
 
           const productName = $(li).find('.name').text();
           const productPrice = Number(
-            $(li).find('.price-value').text().replace(',', ''),
+            $(li).find('.price-value').text().replace(/,/g, ''),
           );
           const isRocket = $(li).find('.rocket').length > 0;
           const { data } = await this.crawlProductDetailFromCoupang({
@@ -275,7 +305,7 @@ export class CoupangService {
             productId,
             productUrl,
             productName,
-            productPrice,
+            productPrice: isNaN(productPrice) ? 0 : productPrice,
             isRocket,
             itemId,
             vendorItemId,
@@ -290,7 +320,6 @@ export class CoupangService {
 
         productPromises.push(productPromise);
       });
-
       const products = await Promise.all(productPromises);
 
       await queryRunner.connect();
@@ -304,7 +333,6 @@ export class CoupangService {
         ),
       );
       await queryRunner.commitTransaction();
-
       return {
         ok: true,
         products,

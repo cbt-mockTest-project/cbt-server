@@ -1,7 +1,8 @@
+import { TimeStampedEntity } from 'src/common/entities/core.entity';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity()
-export class Product {
+export class Product extends TimeStampedEntity {
   @PrimaryColumn()
   productId: string;
 

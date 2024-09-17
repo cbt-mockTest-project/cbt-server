@@ -15,7 +15,6 @@ export class CoupangController {
 
   @Get('/product')
   async getProductList(@Query() getProductListInput: GetProductListInput) {
-    console.log('getProductListInput', getProductListInput);
     return this.coupangService.getProductList(getProductListInput);
   }
 
@@ -34,7 +33,17 @@ export class CoupangController {
 
   @Get('/search/crawl/:keyword')
   async crawlProductListFromCoupang(@Param('keyword') keyword: string) {
-    console.log('keyword', keyword);
     return this.coupangService.crawlProductListFromCoupang(keyword);
+  }
+
+  @Get('/search/list')
+  async getProductListFromCoupang(
+    @Query('keyword') keyword: string,
+    @Query('type') type: string,
+  ) {
+    return this.coupangService.searchProductList(
+      keyword,
+      type === 'm' ? true : false,
+    );
   }
 }

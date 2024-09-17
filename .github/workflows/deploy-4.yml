@@ -23,12 +23,15 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Set up Node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3 # v1에서 v3로 업데이트
         with:
-          node-version: 16
+          node-version: '18' # 따옴표 추가
 
       - name: Install Dependencies
-        run: npm install
+        run: |
+          node -v
+          npm -v
+          npm install
 
       - name: Build Project
         run: npm run build
@@ -76,5 +79,7 @@ jobs:
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
           script: |
             cd /home/ubuntu/cbt-server
-            yarn
-            yarn run cross-env NODE_ENV=prod pm2 start ecosystem.config.js
+            node -v
+            npm -v
+            npm install
+            npm run cross-env NODE_ENV=prod pm2 start ecosystem.config.js

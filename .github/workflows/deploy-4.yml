@@ -86,4 +86,5 @@ jobs:
             node -v
             npm -v
             npm install
-            npm run cross-env NODE_ENV=prod pm2 start ecosystem.config.js
+            npm install cross-env
+            npx cross-env NODE_ENV=prod pm2 start ecosystem.config.js

@@ -8,6 +8,7 @@ import { Repository, DataSource } from 'typeorm';
 import { CoupangDetailData } from './interface/coupang-detail';
 import { JSDOM } from 'jsdom';
 import { load } from 'cheerio';
+import { CoupangSearchLog } from './entities/coupang-search-log';
 
 const COUPANG_REQUEST_HEADERS = {
   Accept: '*/*',
@@ -71,6 +72,8 @@ export class CoupangService {
   constructor(
     @InjectRepository(Product)
     private readonly products: Repository<Product>,
+    @InjectRepository(CoupangSearchLog)
+    private readonly coupangSearchLogs: Repository<CoupangSearchLog>,
     private dataSource: DataSource,
   ) {}
 
@@ -229,6 +232,19 @@ export class CoupangService {
 
   async searchProductList(keyword: string, isMobile: boolean) {
     try {
+      const searchLog = await this.coupangSearchLogs.findOne({
+        where: { keyword },
+      });
+      if (searchLog) {
+        await this.coupangSearchLogs.update(
+          { keyword },
+          { count: searchLog.count + 1 },
+        );
+      } else {
+        await this.coupangSearchLogs.save(
+          this.coupangSearchLogs.create({ keyword, count: 1 }),
+        );
+      }
       let products = await this.products.find({
         where: { keyword },
       });

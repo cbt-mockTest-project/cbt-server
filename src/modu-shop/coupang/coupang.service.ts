@@ -371,12 +371,15 @@ export class CoupangService {
 
   async crawlProductListFromCoupangV2(keyword: string) {
     try {
+      console.log('크롤링 시작');
       const { data } = await axios.get(
         `https://m.coupang.com/nm/search?q=${encodeURIComponent(keyword)}`,
         {
           headers: COUPANG_REQUEST_HEADERS,
+          timeout: 10000,
         },
       );
+      console.log('응답 받음: ', data.substring(0, 100));
       const $ = load(data);
       const $productList = $('#productList');
       const products: Product[] = [];

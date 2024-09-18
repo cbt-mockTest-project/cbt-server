@@ -16,7 +16,7 @@ const COUPANG_REQUEST_HEADERS = {
   'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
   Host: 'www.coupang.com',
   Connection: 'keep-alive',
-  Cookie: '',
+  Cookie: 'x-coupang-accept-language=ko-KR; x-coupang-target-market=KR',
   'User-Agent':
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
 };
@@ -372,15 +372,13 @@ export class CoupangService {
 
   async crawlProductListFromCoupangV2(keyword: string) {
     try {
-      console.log('크롤링 시작');
       const { data } = await axios.get(
         `https://m.coupang.com/nm/search?q=${encodeURIComponent(keyword)}`,
         {
-          headers: COUPANG_REQUEST_HEADERS,
+          headers: { ...COUPANG_REQUEST_HEADERS, Host: 'm.coupang.com' },
           timeout: 10000,
         },
       );
-      console.log('응답 받음: ', data.substring(0, 100));
       const $ = load(data);
       const $productList = $('#productList');
       const products: Product[] = [];

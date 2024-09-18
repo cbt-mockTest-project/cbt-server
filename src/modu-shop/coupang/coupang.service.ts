@@ -9,6 +9,8 @@ import { CoupangDetailData } from './interface/coupang-detail';
 import { JSDOM } from 'jsdom';
 import { load } from 'cheerio';
 import { CoupangSearchLog } from './entities/coupang-search-log';
+import https from 'https';
+import http from 'http';
 
 const COUPANG_REQUEST_HEADERS = {
   Accept: '*/*',
@@ -375,7 +377,13 @@ export class CoupangService {
       const { data } = await axios.get(
         `https://m.coupang.com/nm/search?q=${encodeURIComponent(keyword)}`,
         {
-          headers: { ...COUPANG_REQUEST_HEADERS, Host: 'm.coupang.com' },
+          headers: {
+            ...COUPANG_REQUEST_HEADERS,
+            Host: 'm.coupang.com',
+            'User-Agent':
+              'Mozilla/5.0 (Linux; Android 10; SM-G9750) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Mobile Safari/537.36',
+          },
+          maxRedirects: 0,
           timeout: 10000,
         },
       );

@@ -31,19 +31,18 @@ export class CoupangController {
     });
   }
 
+  @Get('/search/crawl/v2')
+  async crawlProductListFromCoupangV2(@Query('keyword') keyword: string) {
+    return this.coupangService.crawlProductListFromCoupangV2(keyword);
+  }
+
   @Get('/search/crawl/:keyword')
   async crawlProductListFromCoupang(@Param('keyword') keyword: string) {
     return this.coupangService.crawlProductListFromCoupang(keyword);
   }
 
   @Get('/search/list')
-  async getProductListFromCoupang(
-    @Query('keyword') keyword: string,
-    @Query('type') type: string,
-  ) {
-    return this.coupangService.searchProductList(
-      keyword,
-      type === 'm' ? true : false,
-    );
+  async getProductListFromCoupang(@Query('keyword') keyword: string) {
+    return this.coupangService.searchProductList(keyword);
   }
 }

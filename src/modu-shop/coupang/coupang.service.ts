@@ -4,7 +4,7 @@ import { GetProductListInput } from './dtos/get-product-list.dto';
 import { generateHmac } from './utils';
 import { Product } from './entities/product.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
+import { Repository, DataSource, In } from 'typeorm';
 import { CoupangDetailData } from './interface/coupang-detail';
 import { JSDOM } from 'jsdom';
 import { load } from 'cheerio';
@@ -230,7 +230,7 @@ export class CoupangService {
     }
   }
 
-  async searchProductList(keyword: string, isMobile: boolean) {
+  async searchProductList(keyword: string) {
     try {
       const searchLog = await this.coupangSearchLogs.findOne({
         where: { keyword },
@@ -251,11 +251,15 @@ export class CoupangService {
       // 업데이트된지 하루가 지났으면
       const now = new Date();
       const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+      await this.crawlProductListFromCoupangV2(keyword);
+      products = await this.products.find({
+        where: { keyword },
+      });
       if (
         (products.length > 0 && products[0].updated_at < oneDayAgo) ||
         products.length === 0
       ) {
-        await this.crawlProductListFromCoupang(keyword, isMobile);
+        await this.crawlProductListFromCoupangV2(keyword);
         products = await this.products.find({
           where: { keyword },
         });
@@ -362,6 +366,78 @@ export class CoupangService {
       };
     } finally {
       await queryRunner.release();
+    }
+  }
+
+  async crawlProductListFromCoupangV2(keyword: string) {
+    try {
+      const { data } = await axios.get(
+        `https://m.coupang.com/nm/search?q=${encodeURIComponent(keyword)}`,
+        {
+          headers: COUPANG_REQUEST_HEADERS,
+        },
+      );
+      const $ = load(data);
+      const $productList = $('#productList');
+      const products: Product[] = [];
+      $productList.children('li').each((i, li) => {
+        const productId = $(li).attr('data-product-id');
+        const itemId = $(li).attr('data-item-id');
+        const vendorItemId = $(li).attr('data-vendor-item-id');
+        const productUrl = `https://link.coupang.com/re/AFFSDP?lptag=AF8104485&pageKey=${productId}&vendorItemId=${vendorItemId}`;
+        const productName = $(li).find('.title').text();
+        const productPrice = $(li)
+          .find('.discount-price')
+          .find('strong')
+          .text();
+        const discountRate = $(li)
+          .find('.base-discount-rate .percentage')
+          .text();
+        const productImage =
+          'https:' + $(li).find('.thumbnail img').attr('src');
+        const ratingValue = Number($(li).find('.rating').text()) || 0;
+        const ratingCount =
+          Number(
+            $(li)
+              .find('.rating-total-count')
+              .text()
+              .replace('(', '')
+              .replace(')', ''),
+          ) || 0;
+        const product = {
+          keyword,
+          productId,
+          productUrl,
+          productName,
+          productPrice: Number(productPrice.replace(/,/g, '')),
+          discountRate: Number(discountRate.replace('%', '')) / 100,
+          itemId,
+          vendorItemId,
+          ratingValue,
+          ratingCount,
+          productImage,
+        };
+        products.push(this.products.create(product));
+      });
+      await this.products.delete({
+        productId: In(products.map((product) => product.productId)),
+      });
+      await this.products.save(
+        products.filter(
+          (product, index, self) =>
+            index === self.findIndex((p) => p.productId === product.productId),
+        ),
+      );
+      return {
+        ok: true,
+        data,
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        ok: false,
+        error: error.message,
+      };
     }
   }
 }

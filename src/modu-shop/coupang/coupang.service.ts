@@ -385,6 +385,7 @@ export class CoupangService {
           },
           maxRedirects: 0,
           timeout: 10000,
+          validateStatus: (status) => status >= 200 && status < 300,
         },
       );
       const $ = load(data);

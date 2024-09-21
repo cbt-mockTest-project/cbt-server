@@ -20,6 +20,9 @@ import { MockExamQuestionFeedbackSerivce } from 'src/exam/mock-exams-question-fe
 import { MockExamQuestionFeedback } from 'src/exam/entities/mock-exam-question-feedback.entity';
 import { MockExamCategory } from 'src/exam-category/entities/mock-exam-category.entity';
 import { MockExam } from 'src/exam/entities/mock-exam.entity';
+import { CoupangService } from 'src/modu-shop/coupang/coupang.service';
+import { Product } from 'src/modu-shop/coupang/entities/product.entity';
+import { CoupangSearchLog } from 'src/modu-shop/coupang/entities/coupang-search-log';
 
 @Module({
   imports: [
@@ -37,9 +40,12 @@ import { MockExam } from 'src/exam/entities/mock-exam.entity';
       Payment,
       MockExamQuestionFeedback,
       MockExamCategory,
+      Product,
+      CoupangSearchLog,
     ]),
   ],
   providers: [
+    CoupangService,
     SchedulerService,
     VisitService,
     UserService,

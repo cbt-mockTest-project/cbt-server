@@ -117,6 +117,9 @@ import { SettlementRequest } from './point/entities/settlement-request.entity';
 import { MockExamQuestionBookmarkFolder } from './exam/entities/mock-exam-question-bookmark-folder.entity';
 import { TextHighlightModule } from './text-highlight/text-highlight.module';
 import { TextHighlight } from './text-highlight/entites/text-highlight.entity';
+import { CoupangModule } from './modu-shop/coupang/coupang.module';
+import { Product } from './modu-shop/coupang/entities/product.entity';
+import { CoupangSearchLog } from './modu-shop/coupang/entities/coupang-search-log';
 
 @Module({
   imports: [
@@ -189,6 +192,8 @@ import { TextHighlight } from './text-highlight/entites/text-highlight.entity';
       synchronize: process.env.NODE_ENV !== 'prod',
       logging: false,
       entities: [
+        CoupangSearchLog,
+        Product,
         NaverBlog,
         ExamCoAuthor,
         QuestionCard,
@@ -326,6 +331,7 @@ import { TextHighlight } from './text-highlight/entites/text-highlight.entity';
     SecedersModule,
     PointModule,
     TextHighlightModule,
+    CoupangModule,
   ],
   controllers: [],
   providers: [

@@ -9,6 +9,7 @@ import { UserService } from 'src/users/user.service';
 import { MockExamQuestionFeedbackSerivce } from 'src/exam/mock-exams-question-feedback.service';
 import { MockExam } from 'src/exam/entities/mock-exam.entity';
 import { CoupangService } from 'src/modu-shop/coupang/coupang.service';
+import { MockExamCategory } from 'src/exam-category/entities/mock-exam-category.entity';
 
 @Injectable()
 export class SchedulerService {
@@ -17,6 +18,8 @@ export class SchedulerService {
     private readonly mockExamQuestions: Repository<MockExamQuestion>,
     @InjectRepository(MockExam)
     private readonly mockExams: Repository<MockExam>,
+    @InjectRepository(MockExamCategory)
+    private readonly mockExamCategories: Repository<MockExamCategory>,
     private readonly visitService: VisitService,
     private readonly telegramService: TelegramService,
     private readonly userService: UserService,
@@ -122,7 +125,30 @@ export class SchedulerService {
       });
     }
   }
+  // 새벽 2시
+  @Cron('0 0 2 * * *', { timeZone: 'Asia/Seoul' })
+  async syncEvaluationCount() {
+    try {
+      const mockExamCategories = await this.mockExamCategories.find({
+        relations: {
+          categoryEvaluations: true,
+        },
+      });
 
+      for (const mockExamCategory of mockExamCategories) {
+        if (mockExamCategory.categoryEvaluations.length > 0) {
+          await this.mockExamCategories.update(mockExamCategory.id, {
+            evaluationCount: mockExamCategory.categoryEvaluations.length,
+          });
+        }
+      }
+    } catch {
+      this.telegramService.sendMessageToTelegram({
+        message: `cronjob: syncEvaluationCount error`,
+        channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
+      });
+    }
+  }
   // 새벽 6시
   @Cron('0 0 6 * * *', { timeZone: 'Asia/Seoul' })
   async updateProductList() {

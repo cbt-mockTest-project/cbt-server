@@ -10,8 +10,10 @@ export class SearchMockExamCategoriesInput {
   limit: number;
   @Field(() => Number)
   page: number;
-  @Field(() => Boolean)
-  isPublic: boolean;
+  @Field(() => Boolean, { defaultValue: true })
+  isPublic?: boolean;
+  @Field(() => Boolean, { defaultValue: false })
+  hasExamCount?: boolean;
 }
 
 @ObjectType()

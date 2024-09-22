@@ -826,21 +826,41 @@ export class MockExamCategoryService {
     searchMockExamCategoriesInput: SearchMockExamCategoriesInput,
   ): Promise<SearchMockExamCategoriesOutput> {
     try {
-      const { keyword, limit, page, isPublic } = searchMockExamCategoriesInput;
+      const { keyword, limit, page, isPublic, hasExamCount } =
+        searchMockExamCategoriesInput;
       const skip = (Number(page) - 1) * Number(limit);
       const formattedKeyword = `%${keyword.replace(/\s+/g, '').toLowerCase()}%`;
       const query = this.mockExamCategories
         .createQueryBuilder('category')
         .leftJoinAndSelect('category.user', 'user')
         .where(
-          "(LOWER(REPLACE(category.name, ' ', '')) LIKE :formattedKeyword OR LOWER(REPLACE(user.nickname, ' ', '')) LIKE :formattedKeyword) AND category.isPublic = :isPublic",
+          "(LOWER(REPLACE(category.name, ' ', '')) LIKE :formattedKeyword OR LOWER(REPLACE(user.nickname, ' ', '')) LIKE :formattedKeyword OR LOWER(REPLACE(category.description, ' ', '')) LIKE :formattedKeyword) AND category.isPublic = :isPublic",
           { formattedKeyword, isPublic: isPublic },
-        );
+        )
+        .orderBy({
+          'category.evaluationCount': 'DESC',
+          'category.created_at': 'DESC',
+        });
+
+      // .orderBy('category.created_at', 'DESC');
 
       const totalCount = await query.getCount();
 
-      const categories = await query.skip(skip).take(limit).getMany();
-
+      let categories = await query.skip(skip).take(limit).getMany();
+      if (hasExamCount) {
+        categories = await Promise.all(
+          categories.map(async (category) => {
+            const examsCount = await this.mockExams.count({
+              where: {
+                mockExamCategory: { id: category.id },
+              },
+            });
+            console.log(examsCount);
+            category.examCount = examsCount;
+            return category;
+          }),
+        );
+      }
       return {
         totalCount,
         categories,

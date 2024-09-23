@@ -14,6 +14,8 @@ export class SearchMockExamCategoriesInput {
   isPublic?: boolean;
   @Field(() => Boolean, { defaultValue: false })
   hasExamCount?: boolean;
+  @Field(() => String, { nullable: true, defaultValue: 'popular' })
+  sort?: string;
 }
 
 @ObjectType()

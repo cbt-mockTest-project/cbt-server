@@ -106,8 +106,8 @@ export class SchedulerService {
       });
     }
   }
-  // 새벽 5시
-  @Cron('0 0 5 * * *', { timeZone: 'Asia/Seoul' })
+  // 새벽 7시
+  @Cron('0 0 7 * * *', { timeZone: 'Asia/Seoul' })
   async clearBasicPlan() {
     try {
       if (process.env.NODE_ENV === 'dev') {

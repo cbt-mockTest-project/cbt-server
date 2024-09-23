@@ -188,6 +188,16 @@ export class MockExamCategoryResolver {
       user,
     );
   }
+  @Query(() => GetExamCategoriesOutput)
+  async getExamCategoriesV2(
+    @AuthUser() user: User,
+    @Args('input') getExamCategoriesInput: GetExamCategoriesInput,
+  ): Promise<GetExamCategoriesOutput> {
+    return this.mockExamCategoryService.getExamCategoriesV2(
+      getExamCategoriesInput,
+      user,
+    );
+  }
 
   @Role(['ANY'])
   @Query(() => GetMyExamCategoriesOutput)

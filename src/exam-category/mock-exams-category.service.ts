@@ -356,7 +356,7 @@ export class MockExamCategoryService {
   }
 
   async getExamCategoriesV2(
-    getExamCategoriesInput: GetExamCategoriesInputV2,
+    getExamCategoriesInputV2: GetExamCategoriesInputV2,
     user?: User,
   ): Promise<GetExamCategoriesOutput> {
     const {
@@ -369,7 +369,7 @@ export class MockExamCategoryService {
       keyword,
       isPublicOnly,
       examType,
-    } = getExamCategoriesInput;
+    } = getExamCategoriesInputV2;
     if (isBookmarked) {
       if (!user)
         return {

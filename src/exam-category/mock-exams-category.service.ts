@@ -42,6 +42,7 @@ import {
 } from '../exam/dtos/searchMockExamCategories.dto';
 import {
   GetExamCategoriesInput,
+  GetExamCategoriesInputV2,
   GetExamCategoriesOutput,
 } from '../exam/dtos/getExamCategories.dto';
 import { MockExamBookmark } from 'src/exam-bookmark/entities/mock-exam-bookmark.entity';
@@ -354,6 +355,139 @@ export class MockExamCategoryService {
           (a, b) => b.categoryEvaluations.length - a.categoryEvaluations.length,
         );
       }
+      return {
+        ok: true,
+        categories,
+      };
+    }
+  }
+
+  async getExamCategoriesV2(
+    getExamCategoriesInputV2: GetExamCategoriesInputV2,
+    user?: User,
+  ): Promise<GetExamCategoriesOutput> {
+    const {
+      examSources,
+      isBookmarked,
+      limit,
+      page,
+      categoryMakerId,
+      isPick,
+      keyword,
+      isPublicOnly,
+      examType,
+    } = getExamCategoriesInputV2;
+    if (isBookmarked) {
+      if (!user)
+        return {
+          ok: false,
+          error: '로그인이 필요합니다.',
+        };
+      return this.examCategoryBookmarkService.getMyBookmarkedExamCategories(
+        user,
+      );
+    }
+    if (!isBookmarked) {
+      const categoryQuery = this.mockExamCategories
+        .createQueryBuilder('category')
+        .leftJoinAndSelect('category.user', 'user')
+        .andWhere('category.examType = :examType', {
+          examType,
+        })
+        .orderBy({
+          'category.evaluationCount': 'DESC',
+          'category.created_at': 'DESC',
+        });
+      if (examSources.length > 0) {
+        categoryQuery.andWhere(
+          'category.source IN (:...sources) AND category.isPublic = :isPublic',
+          {
+            sources: examSources,
+            isPublic: true,
+          },
+        );
+      }
+      if (isPick) {
+        categoryQuery.andWhere('category.isPick = :isPick', {
+          isPick: true,
+        });
+      }
+      if (isPick === false) {
+        categoryQuery.andWhere('category.isPick = :isPick', {
+          isPick: false,
+        });
+      }
+      // categoryMakerId가 있는 경우, 해당 유저가 만든 카테고리를 검색
+      if (categoryMakerId) {
+        categoryQuery.andWhere('user.id = :categoryMakerId', {
+          categoryMakerId,
+        });
+        if (!user || user.id !== categoryMakerId) {
+          categoryQuery.andWhere('category.isPublic = :isPublic', {
+            isPublic: true,
+          });
+        }
+      }
+
+      if (keyword) {
+        const formattedKeyword = `%${keyword
+          .replace(/\s+/g, '')
+          .toLowerCase()}%`;
+        categoryQuery.andWhere(
+          "(LOWER(REPLACE(category.name, ' ', '')) LIKE :formattedKeyword OR LOWER(REPLACE(category.description, ' ', '')) LIKE :formattedKeyword)",
+          { formattedKeyword },
+        );
+      }
+
+      if (isPublicOnly) {
+        categoryQuery.andWhere('category.isPublic = :isPublic', {
+          isPublic: true,
+        });
+      }
+
+      if (limit) {
+        categoryQuery.take(limit);
+      }
+      if (page) {
+        categoryQuery.skip((Number(page) - 1) * Number(limit));
+      }
+
+      let categories = await categoryQuery.getMany();
+      categories = await Promise.all(
+        categories.map(async (category) => {
+          const examCount = await this.mockExams.count({
+            where: {
+              mockExamCategory: {
+                id: category.id,
+              },
+            },
+          });
+          category.examCount = examCount;
+          return category;
+        }),
+      );
+      if (user) {
+        const categoryIds = categories.map((category) => category.id);
+        const categoryBookmarks = await this.examCategoryBookmarks.find({
+          relations: {
+            category: true,
+          },
+          where: {
+            user: {
+              id: user.id,
+            },
+            category: In(categoryIds),
+          },
+        });
+        categories = categories.map((category) => {
+          const isBookmarked = categoryBookmarks.find(
+            (bookmark) => bookmark.category.id === category.id,
+          );
+          if (isBookmarked) category.isBookmarked = true;
+          return category;
+        });
+      }
+
       return {
         ok: true,
         categories,
@@ -867,21 +1001,46 @@ export class MockExamCategoryService {
     searchMockExamCategoriesInput: SearchMockExamCategoriesInput,
   ): Promise<SearchMockExamCategoriesOutput> {
     try {
-      const { keyword, limit, page, isPublic } = searchMockExamCategoriesInput;
+      const { keyword, limit, page, isPublic, hasExamCount, sort } =
+        searchMockExamCategoriesInput;
       const skip = (Number(page) - 1) * Number(limit);
       const formattedKeyword = `%${keyword.replace(/\s+/g, '').toLowerCase()}%`;
       const query = this.mockExamCategories
         .createQueryBuilder('category')
         .leftJoinAndSelect('category.user', 'user')
         .where(
-          "(LOWER(REPLACE(category.name, ' ', '')) LIKE :formattedKeyword OR LOWER(REPLACE(user.nickname, ' ', '')) LIKE :formattedKeyword) AND category.isPublic = :isPublic",
+          "(LOWER(REPLACE(category.name, ' ', '')) LIKE :formattedKeyword OR LOWER(REPLACE(user.nickname, ' ', '')) LIKE :formattedKeyword OR LOWER(REPLACE(category.description, ' ', '')) LIKE :formattedKeyword) AND category.isPublic = :isPublic",
           { formattedKeyword, isPublic: isPublic },
         );
 
+      if (sort === 'popular') {
+        query.orderBy({
+          'category.evaluationCount': 'DESC',
+          'category.created_at': 'DESC',
+        });
+      }
+
+      if (sort === 'recent') {
+        query.orderBy('category.created_at', 'DESC');
+      }
+
       const totalCount = await query.getCount();
 
-      const categories = await query.skip(skip).take(limit).getMany();
-
+      let categories = await query.skip(skip).take(limit).getMany();
+      if (hasExamCount) {
+        categories = await Promise.all(
+          categories.map(async (category) => {
+            const examsCount = await this.mockExams.count({
+              where: {
+                mockExamCategory: { id: category.id },
+              },
+            });
+            console.log(examsCount);
+            category.examCount = examsCount;
+            return category;
+          }),
+        );
+      }
       return {
         totalCount,
         categories,

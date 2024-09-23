@@ -1001,36 +1001,24 @@ export class MockExamQuestionService {
 
   async sync() {
     try {
-      const duplicateStates = await this.mockExamQuestionState
-        .createQueryBuilder('state')
-        .select('state.user.id', 'userId')
-        .addSelect('state.question.id', 'questionId')
-        .addSelect('COUNT(*)', 'count')
-        .groupBy('state.userId')
-        .addGroupBy('state.questionId')
-        .having('COUNT(*) > 1')
-        .getRawMany();
-
-      if (duplicateStates.length > 0) {
-        for (const dup of duplicateStates) {
-          const detailedDuplicates = await this.mockExamQuestionState.find({
-            where: {
-              user: { id: dup.userId },
-              question: { id: dup.questionId },
+      const feedbacks = await this.mockExamQuestionFeedback.find({
+        where: {
+          type: In([QuestionFeedbackType.REPORT, QuestionFeedbackType.PUBLIC]),
+          mockExamQuestion: {
+            mockExam: {
+              isPremium: true,
             },
-            relations: ['user', 'question'],
-            order: { created_at: 'DESC' },
-          });
+          },
+        },
+      });
 
-          // 가장 최근 항목을 제외한 나머지 삭제
-          const [latest, ...outdated] = detailedDuplicates;
-          if (outdated.length > 0) {
-            const ids = outdated.map((el) => el.id);
-            console.log(ids.length);
-            await this.mockExamQuestionState.delete(ids);
-          }
-        }
-      }
+      await Promise.all(
+        feedbacks.map(async (feedback) => {
+          await this.mockExamQuestionFeedback.update(feedback.id, {
+            type: QuestionFeedbackType.PRIVATE,
+          });
+        }),
+      );
 
       return {
         ok: true,

@@ -209,6 +209,13 @@ export class MockExamCategory extends CoreEntity {
   @Field(() => Boolean, { nullable: true, defaultValue: false })
   @Column({ default: false })
   isPick?: boolean;
+
+  @Field(() => Number, { nullable: true })
+  @Column({ default: 0 })
+  evaluationCount?: number;
+
+  @Field(() => Number, { nullable: true, defaultValue: 0 })
+  examCount?: number;
 }
 
 @Entity()

@@ -43,6 +43,7 @@ import {
 } from '../exam/dtos/searchMockExamCategories.dto';
 import {
   GetExamCategoriesInput,
+  GetExamCategoriesInputV2,
   GetExamCategoriesOutput,
 } from '../exam/dtos/getExamCategories.dto';
 import { GetMyExamCategoriesOutput } from '../exam/dtos/getMyExamCategories.dto';
@@ -189,6 +190,16 @@ export class MockExamCategoryResolver {
   ): Promise<GetExamCategoriesOutput> {
     return this.mockExamCategoryService.getExamCategories(
       getExamCategoriesInput,
+      user,
+    );
+  }
+  @Query(() => GetExamCategoriesOutput)
+  async getExamCategoriesV2(
+    @AuthUser() user: User,
+    @Args('input') getExamCategoriesInputV2: GetExamCategoriesInputV2,
+  ): Promise<GetExamCategoriesOutput> {
+    return this.mockExamCategoryService.getExamCategoriesV2(
+      getExamCategoriesInputV2,
       user,
     );
   }

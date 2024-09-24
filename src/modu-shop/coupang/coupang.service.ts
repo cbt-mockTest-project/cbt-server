@@ -308,9 +308,7 @@ export class CoupangService {
           const itemId = searchParams.get('itemId');
           const vendorItemId = searchParams.get('vendorItemId');
           const productId = $(li).attr('data-product-id');
-          const productUrl = `https://link.coupang.com/re/AFFSDP?lptag=AF8104485&subid=${
-            isMobile ? 'android' : 'webpage00'
-          }&pageKey=${productId}&vendorItemId=${vendorItemId}`;
+          const productUrl = `https://link.coupang.com/re/AFFSDP?lptag=AF8104485&pageKey=${productId}&vendorItemId=${vendorItemId}`;
 
           const productName = $(li).find('.name').text();
           const productPrice = Number(

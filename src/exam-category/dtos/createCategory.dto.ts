@@ -1,5 +1,8 @@
 import { CoreOutput } from '../../common/dtos/output.dto';
-import { MockExamCategory } from './../entities/mock-exam-category.entity';
+import {
+  ExamType,
+  MockExamCategory,
+} from './../entities/mock-exam-category.entity';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 
 @InputType()
@@ -12,6 +15,9 @@ export class CreateMockExamCategoryInput {
 
   @Field(() => Boolean, { nullable: true, defaultValue: false })
   isPublic?: boolean;
+
+  @Field(() => ExamType, { nullable: true })
+  examType?: ExamType;
 }
 
 @ObjectType()

@@ -12,6 +12,9 @@ export class CreateOrUpdateMockExamQuestionStateInput extends PickType(
 ) {
   @Field(() => Number)
   questionId: number;
+
+  @Field(() => Number, { nullable: true, defaultValue: 0 })
+  answer?: number;
 }
 
 @ObjectType()

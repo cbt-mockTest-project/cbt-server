@@ -1,6 +1,7 @@
 import { Field, InputType, ObjectType, PartialType } from '@nestjs/graphql';
 import { CoreOutput } from 'src/common/dtos/output.dto';
 import { MockExamQuestion } from '../entities/mock-exam-question.entity';
+import { ExamType } from 'src/exam-category/entities/mock-exam-category.entity';
 
 @InputType()
 export class PartialMockExamQuestionInput extends PartialType(
@@ -30,6 +31,9 @@ export class SaveExamInput {
     defaultValue: [],
   })
   questions?: PartialMockExamQuestionInput[];
+
+  @Field(() => ExamType, { nullable: true, defaultValue: ExamType.SUBJECTIVE })
+  examType?: ExamType;
 }
 
 @ObjectType()

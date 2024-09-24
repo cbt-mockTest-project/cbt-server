@@ -46,7 +46,10 @@ import {
   RemoveExamFromCategoryOutput,
 } from './dtos/removeExamFromCategory.dto';
 import { MockExamBookmark } from 'src/exam-bookmark/entities/mock-exam-bookmark.entity';
-import { MockExamCategory } from 'src/exam-category/entities/mock-exam-category.entity';
+import {
+  ExamType,
+  MockExamCategory,
+} from 'src/exam-category/entities/mock-exam-category.entity';
 import { ExamSource } from 'src/enums/enum';
 import { SaveExamInput, SaveExamOutput } from './dtos/saveExam.dto';
 import { MockExamQuestion } from './entities/mock-exam-question.entity';
@@ -202,7 +205,10 @@ export class MockExamService {
       if (categories.length > 0) {
         categories.forEach((category) => {
           this.revalidateService.revalidate({
-            path: `/category/${category.urlSlug}`,
+            path:
+              category.examType === ExamType.SUBJECTIVE
+                ? `/category/${category.urlSlug}`
+                : `/mcq/category/${category.urlSlug}`,
           });
         });
       }
@@ -496,7 +502,7 @@ export class MockExamService {
     getMyExams: GetMyExamsInput,
   ): Promise<GetMyExamsOutput> {
     try {
-      const { isBookmarked } = getMyExams;
+      const { isBookmarked, examType } = getMyExams;
       let exams: MockExam[] = [];
       if (isBookmarked) {
         const bookmarks = await this.mockExamBookmark.find({
@@ -504,6 +510,7 @@ export class MockExamService {
             user: {
               id: user.id,
             },
+            ...(examType ? { exam: { examType } } : {}),
           },
           relations: {
             exam: {
@@ -532,6 +539,7 @@ export class MockExamService {
           user: {
             id: user.id,
           },
+          ...(examType ? { examType } : {}),
         },
         relations: {
           user: true,
@@ -666,7 +674,10 @@ export class MockExamService {
         .of(examId)
         .loadMany();
       this.revalidateService.revalidate({
-        path: `/category/${category.urlSlug}`,
+        path:
+          category.examType === ExamType.SUBJECTIVE
+            ? `/category/${category.urlSlug}`
+            : `/mcq/category/${category.urlSlug}`,
       });
       if (!exitingRelation.find((relation) => relation.id === categoryId)) {
         return {
@@ -705,7 +716,7 @@ export class MockExamService {
     saveExamInput: SaveExamInput,
   ): Promise<SaveExamOutput> {
     try {
-      const { title, questionOrderIds, questions, uuid, categoryId } =
+      const { title, questionOrderIds, questions, uuid, categoryId, examType } =
         saveExamInput;
       const [prevMockExam, prevQuestions, prevCategory] = await Promise.all([
         this.mockExam.findOne({
@@ -778,6 +789,7 @@ export class MockExamService {
         ...prevMockExam,
         ...(prevCategory?.isPublic && { approved: true }),
         ...(!prevCategory?.isPublic && { approved: false }),
+        examType,
         title,
         uuid,
         mockExamQuestion: newQuestions,
@@ -822,7 +834,10 @@ export class MockExamService {
         });
         //10초 지연
         this.revalidateService.revalidate({
-          path: `/category/${prevCategory.urlSlug}`,
+          path:
+            prevCategory.examType === ExamType.SUBJECTIVE
+              ? `/category/${prevCategory.urlSlug}`
+              : `/mcq/category/${prevCategory.urlSlug}`,
         });
         console.log('2');
         if (exitingRelation.find((relation) => relation.id === categoryId)) {

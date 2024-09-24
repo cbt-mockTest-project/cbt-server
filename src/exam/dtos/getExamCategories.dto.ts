@@ -38,7 +38,7 @@ export class GetExamCategoriesInput {
   @Field(() => String, { nullable: true })
   sort?: string;
 
-  @Field(() => ExamType, { nullable: true, defaultValue: ExamType.SUBJECTIVE })
+  @Field(() => ExamType, { nullable: true })
   examType?: ExamType;
 }
 

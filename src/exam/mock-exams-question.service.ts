@@ -281,6 +281,9 @@ export class MockExamQuestionService {
           myQuestionState: questionStates.find(
             (state) => state.question.id === question.id,
           )?.state,
+          myObjectiveAnswer: questionStates.find(
+            (state) => state.question.id === question.id,
+          )?.answer,
           isBookmarked: !!questionBookmarks.find(
             (bookmark) => bookmark.question.id === question.id,
           ),
@@ -682,7 +685,7 @@ export class MockExamQuestionService {
             created_at: new Date(),
             updated_at: new Date(),
             id: 0,
-            answer: '',
+            answer: 0,
           });
           return {
             ...question,
@@ -1410,6 +1413,9 @@ export class MockExamQuestionService {
           myQuestionState: questionStates.find(
             (state) => state.question.id === question.id,
           )?.state,
+          myObjectiveAnswer: questionStates.find(
+            (state) => state.question.id === question.id,
+          )?.answer,
           isBookmarked: !!questionBookmarks.find(
             (bookmark) => bookmark.question.id === question.id,
           ),
@@ -1626,6 +1632,9 @@ export class MockExamQuestionService {
           myQuestionState: questionStates.find(
             (state) => state.question.id === question.id,
           )?.state,
+          myObjectiveAnswer: questionStates.find(
+            (state) => state.question.id === question.id,
+          )?.answer,
           isBookmarked: !!questionBookmarks.find(
             (bookmark) => bookmark.question.id === question.id,
           ),

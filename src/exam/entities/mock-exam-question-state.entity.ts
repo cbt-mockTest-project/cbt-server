@@ -30,9 +30,9 @@ export class MockExamQuestionState extends CoreEntity {
   @IsEnum(QuestionState)
   state: QuestionState;
 
-  @Column({ default: '' })
-  @Field(() => String)
-  answer: string;
+  @Column({ default: 0 })
+  @Field(() => Number)
+  answer: number;
 
   @ManyToOne(
     () => MockExamQuestion,

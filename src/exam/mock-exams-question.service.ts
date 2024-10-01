@@ -494,11 +494,17 @@ export class MockExamQuestionService {
   ): Promise<ReadAllQuestionsOutput> {
     const { page, limit } = readAllQuestionsInput;
     try {
-      const questions = await this.mockExamQuestion.find({
+      let questions = await this.mockExamQuestion.find({
         ...(page ? { skip: (page - 1) * limit } : {}),
         ...(limit ? { take: limit } : {}),
         order: { id: 'ASC' },
       });
+      const removeHtmlTag = (String: string) => String.replace(/<[^>]*>?/g, '');
+      questions = questions.filter(
+        (question) =>
+          removeHtmlTag(question.question).trim().length > 0 &&
+          removeHtmlTag(question.solution).trim().length > 0,
+      );
       return {
         questions,
         ok: true,

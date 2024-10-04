@@ -16,6 +16,7 @@ export enum QuestionState {
   MIDDLE = 'MIDDLE',
   HIGH = 'HIGH',
   CORE = 'CORE',
+  EXCLUDE = 'EXCLUDE',
 }
 
 registerEnumType(QuestionState, { name: 'QuestionState' });

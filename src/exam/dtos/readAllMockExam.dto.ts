@@ -1,6 +1,7 @@
 import { MockExam } from '../entities/mock-exam.entity';
 import { ObjectType, Field, InputType } from '@nestjs/graphql';
 import { CoreOutput } from 'src/common/dtos/output.dto';
+import { ExamType } from 'src/exam-category/entities/mock-exam-category.entity';
 
 @InputType()
 export class ReadAllMockExamsInput {
@@ -12,6 +13,8 @@ export class ReadAllMockExamsInput {
   all?: boolean;
   @Field(() => Boolean, { defaultValue: false })
   approved?: boolean;
+  @Field(() => ExamType, { defaultValue: ExamType.SUBJECTIVE })
+  examType?: ExamType;
 }
 
 @ObjectType()

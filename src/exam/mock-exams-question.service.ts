@@ -67,7 +67,10 @@ import {
   ReadQuestionsByExamIdsOutput,
 } from './dtos/readQuestionsByExamIds.dto';
 import { sortQuestions } from 'src/lib/utils/sortQuestions';
-import { MockExamCategory } from 'src/exam-category/entities/mock-exam-category.entity';
+import {
+  ExamType,
+  MockExamCategory,
+} from 'src/exam-category/entities/mock-exam-category.entity';
 import { ExamSource } from 'src/enums/enum';
 import {
   UpdateLinkedQuestionIdsInput,
@@ -78,6 +81,9 @@ import {
   ReadBookmarkedQuestionsOutput,
 } from './dtos/readBookmarkedQuestions.dto';
 import { TextHighlight } from 'src/text-highlight/entites/text-highlight.entity';
+import axios from 'axios';
+import { MockExamService } from './mock-exams.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class MockExamQuestionService {
@@ -88,6 +94,7 @@ export class MockExamQuestionService {
     private readonly mockExamQuestion: Repository<MockExamQuestion>,
     @InjectRepository(MockExam)
     private readonly mockExam: Repository<MockExam>,
+    private readonly mockExamService: MockExamService,
     @InjectRepository(MockExamQuestionState)
     private readonly mockExamQuestionState: Repository<MockExamQuestionState>,
     @InjectRepository(MockExamQuestionBookmark)
@@ -100,6 +107,8 @@ export class MockExamQuestionService {
     private readonly mockExamCategory: Repository<MockExamCategory>,
     @InjectRepository(ExamCoAuthor)
     private readonly examCoAuthor: Repository<ExamCoAuthor>,
+    @InjectRepository(User)
+    private readonly user: Repository<User>,
   ) {}
 
   async createMockExamQuestion(
@@ -364,9 +373,20 @@ export class MockExamQuestionService {
         },
       });
       question = await makeQuestionJoins(question);
+      const category = await this.mockExamCategory.findOne({
+        where: {
+          mockExam: {
+            id: question.mockExam.id,
+            user: {
+              id: question.user.id,
+            },
+          },
+        },
+      });
       return {
         ok: true,
         mockExamQusetion: question,
+        categorySlug: category?.urlSlug,
       };
     } catch (e) {
       return {
@@ -1004,37 +1024,199 @@ export class MockExamQuestionService {
       ok: true,
     };
   }
+  mock = [
+    {
+      pastExamId: 788,
+      subjectName: '산업위생관리기사',
+      round: '2회차',
+      year: 22,
+      totalAmount: 100,
+    },
+    {
+      pastExamId: 789,
+      subjectName: '산업위생관리기사',
+      round: '1회차',
+      year: 22,
+      totalAmount: 100,
+    },
+    {
+      pastExamId: 790,
+      subjectName: '산업위생관리기사',
+      round: '3회차',
+      year: 21,
+      totalAmount: 100,
+    },
+    {
+      pastExamId: 791,
+      subjectName: '산업위생관리기사',
+      round: '2회차',
+      year: 21,
+      totalAmount: 100,
+    },
+    {
+      pastExamId: 792,
+      subjectName: '산업위생관리기사',
+      round: '1회차',
+      year: 21,
+      totalAmount: 100,
+    },
+    {
+      pastExamId: 793,
+      subjectName: '산업위생관리기사',
+      round: '4회차',
+      year: 20,
+      totalAmount: 100,
+    },
+    {
+      pastExamId: 794,
+      subjectName: '산업위생관리기사',
+      round: '3회차',
+      year: 20,
+      totalAmount: 100,
+    },
+    {
+      pastExamId: 795,
+      subjectName: '산업위생관리기사',
+      round: '1, 2회차',
+      year: 20,
+      totalAmount: 100,
+    },
+    {
+      pastExamId: 796,
+      subjectName: '산업위생관리기사',
+      round: '3회차',
+      year: 19,
+      totalAmount: 100,
+    },
+    {
+      pastExamId: 797,
+      subjectName: '산업위생관리기사',
+      round: '2회차',
+      year: 19,
+      totalAmount: 100,
+    },
+    {
+      pastExamId: 798,
+      subjectName: '산업위생관리기사',
+      round: '1회차',
+      year: 19,
+      totalAmount: 100,
+    },
+    {
+      pastExamId: 799,
+      subjectName: '산업위생관리기사',
+      round: '3회차',
+      year: 18,
+      totalAmount: 100,
+    },
+    {
+      pastExamId: 800,
+      subjectName: '산업위생관리기사',
+      round: '2회차',
+      year: 18,
+      totalAmount: 100,
+    },
+    {
+      pastExamId: 801,
+      subjectName: '산업위생관리기사',
+      round: '1회차',
+      year: 18,
+      totalAmount: 100,
+    },
+    {
+      pastExamId: 802,
+      subjectName: '산업위생관리기사',
+      round: '3회차',
+      year: 17,
+      totalAmount: 100,
+    },
+    {
+      pastExamId: 803,
+      subjectName: '산업위생관리기사',
+      round: '2회차',
+      year: 17,
+      totalAmount: 100,
+    },
+    {
+      pastExamId: 804,
+      subjectName: '산업위생관리기사',
+      round: '1회차',
+      year: 17,
+      totalAmount: 100,
+    },
+    {
+      pastExamId: 805,
+      subjectName: '산업위생관리기사',
+      round: '3회차',
+      year: 16,
+      totalAmount: 100,
+    },
+    {
+      pastExamId: 806,
+      subjectName: '산업위생관리기사',
+      round: '2회차',
+      year: 16,
+      totalAmount: 100,
+    },
+    {
+      pastExamId: 807,
+      subjectName: '산업위생관리기사',
+      round: '1회차',
+      year: 16,
+      totalAmount: 100,
+    },
+  ];
 
   async sync() {
-    try {
-      const feedbacks = await this.mockExamQuestionFeedback.find({
-        where: {
-          type: In([QuestionFeedbackType.REPORT, QuestionFeedbackType.PUBLIC]),
-          mockExamQuestion: {
-            mockExam: {
-              isPremium: true,
-            },
+    const user = await this.user.findOne({
+      where: {
+        id: 1,
+      },
+    });
+    for await (const mock of this.mock) {
+      const { data } = await axios.get<{
+        response: {
+          body: string;
+          solution: string;
+          answer: number;
+          optionList: string[];
+        }[];
+      }>(
+        `https://api.machuda.kr/pastProblem/list?pastExamId=${mock.pastExamId}`,
+      );
+      const questionOrderIds = Array.from(
+        { length: data.response.length },
+        () => uuidv4(),
+      );
+      const questions = data.response.map((problem, index) =>
+        this.mockExamQuestion.create({
+          orderId: questionOrderIds[index],
+          question: problem.body,
+          solution: problem.solution,
+          objectiveData: {
+            answer: problem.answer,
+            content: problem.optionList.map((option) => ({
+              content: option,
+              url: '',
+            })),
           },
-        },
-      });
-
-      await Promise.all(
-        feedbacks.map(async (feedback) => {
-          await this.mockExamQuestionFeedback.update(feedback.id, {
-            type: QuestionFeedbackType.PRIVATE,
-          });
+          user,
         }),
       );
 
-      return {
-        ok: true,
-      };
-    } catch (e) {
-      console.log(e);
-      return {
-        ok: false,
-      };
+      await this.mockExamService.saveExam(user, {
+        questionOrderIds,
+        title: `${mock.year}년-${mock.round}-${mock.subjectName}-필기`,
+        uuid: uuidv4(),
+        categoryId: 1598,
+        examType: ExamType.OBJECTIVE,
+        questions,
+      });
     }
+
+    return {
+      ok: true,
+    };
   }
 
   async searchQuestionsByKeyword(

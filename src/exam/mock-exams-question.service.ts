@@ -518,7 +518,8 @@ export class MockExamQuestionService {
         ...(limit ? { take: limit } : {}),
         order: { id: 'ASC' },
       });
-      const removeHtmlTag = (String: string) => String.replace(/<[^>]*>?/g, '');
+      const removeHtmlTag = (String?: string) =>
+        String ? String.replace(/<[^>]*>?/g, '') : '';
       questions = questions.filter(
         (question) =>
           removeHtmlTag(question.question).trim().length > 0 &&
@@ -528,7 +529,8 @@ export class MockExamQuestionService {
         questions,
         ok: true,
       };
-    } catch {
+    } catch (e) {
+      console.log(e);
       return {
         ok: false,
         error: '문제를 불러오지 못했습니다.',

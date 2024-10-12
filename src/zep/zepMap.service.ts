@@ -23,7 +23,6 @@ export class ZepMapService {
         ok: true,
       };
     } catch (e) {
-      console.log(e);
       return {
         ok: false,
         error: '유저 카운드 정보를 가져오는데 실패했습니다.',

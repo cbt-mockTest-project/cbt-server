@@ -128,7 +128,6 @@ export class MockExamCategoryResolver {
     @Args('input', { nullable: true })
     readMyMockExamCategoriesInput?: ReadMyMockExamCategoriesInput,
   ): Promise<ReadMyMockExamCategoriesOutput> {
-    console.log(readMyMockExamCategoriesInput);
     return this.mockExamCategoryService.readMyMockExamCategories(
       user,
       readMyMockExamCategoriesInput || {

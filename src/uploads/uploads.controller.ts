@@ -51,7 +51,10 @@ export class UploadsController {
         : `${this.configService.get('CLOUD_FRONT_DOMAIN')}/${objectName}`;
       return { url };
     } catch (e) {
-      console.log(e);
+      return {
+        ok: false,
+        error: 'upload failed',
+      };
     }
   }
 

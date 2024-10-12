@@ -86,7 +86,6 @@ export class MockExamQuestionFeedbackRecommendationService {
         error: 'Something went wrong',
       };
     } catch (e) {
-      console.log(e);
       return {
         ok: false,
       };
@@ -117,7 +116,10 @@ export class MockExamQuestionFeedbackRecommendationService {
         feedbacks,
       };
     } catch (e) {
-      console.log(e);
+      return {
+        ok: false,
+        error: 'Something went wrong',
+      };
     }
   }
 }

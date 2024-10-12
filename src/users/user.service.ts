@@ -170,7 +170,6 @@ export class UserService {
         ok: true,
       };
     } catch (e) {
-      console.log(e);
       return {
         ok: false,
         error: '회원가입에 실패했습니다.',

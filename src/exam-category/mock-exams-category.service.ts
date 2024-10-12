@@ -893,7 +893,6 @@ export class MockExamCategoryService {
         categories,
       };
     } catch (e) {
-      console.log(e);
       return {
         ok: false,
         error: '카테고리를 찾을 수 없습니다.',
@@ -1035,7 +1034,6 @@ export class MockExamCategoryService {
                 mockExamCategory: { id: category.id },
               },
             });
-            console.log(examsCount);
             category.examCount = examsCount;
             return category;
           }),

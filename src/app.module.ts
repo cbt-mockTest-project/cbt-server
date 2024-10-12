@@ -66,7 +66,6 @@ import { PartnersModule } from './partners/partners.module';
 import { Partner } from './partners/entities/partners.entity';
 import { ZepComment } from './zep/entities/zepComment.entity';
 import { ZepPost } from './zep/entities/zepPost.entity';
-import { Chat } from './chat/entities/chat.entity';
 import { TodoModule } from './todo/todo.module';
 import { Todo } from './todo/entities/Todo.entity';
 import { PostFile } from './post/entities/postFile.entity';
@@ -232,7 +231,6 @@ import { CoupangSearchLog } from './modu-shop/coupang/entities/coupang-search-lo
         Partner,
         ZepPost,
         ZepComment,
-        Chat,
         Todo,
         PostFile,
         PostData,

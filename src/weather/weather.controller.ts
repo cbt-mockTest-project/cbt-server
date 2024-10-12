@@ -22,7 +22,6 @@ export class WeatherController {
           locationName + ' ' + LOCATION_DETAIL_MAP[locationDetailName] ||
           locationDetailName;
       }
-      console.log(locationName || keyword);
       const res = await axios.get(
         `https://ac.search.naver.com/nx/ac?q=${
           locationName || keyword
@@ -55,7 +54,7 @@ export class WeatherController {
         data: result,
       };
     } catch (e) {
-      console.log(e);
+      e;
       return {
         ok: false,
         error: '날씨를 가져올 수 없습니다.',

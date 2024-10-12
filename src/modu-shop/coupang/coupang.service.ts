@@ -205,7 +205,6 @@ export class CoupangService {
         data,
       };
     } catch (error) {
-      console.log(error);
       return {
         ok: false,
         error: error.message,
@@ -359,7 +358,6 @@ export class CoupangService {
         products,
       };
     } catch (error) {
-      console.log(error);
       await queryRunner.rollbackTransaction();
       return {
         ok: false,
@@ -442,7 +440,6 @@ export class CoupangService {
         data,
       };
     } catch (error) {
-      console.log(error);
       return {
         ok: false,
         error: error.message,

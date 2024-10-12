@@ -141,7 +141,6 @@ export class BlogManageService {
         postInfo,
       };
     } catch (e) {
-      console.log(e);
       return {
         ok: false,
       };
@@ -223,7 +222,6 @@ export class BlogManageService {
       };
     } catch (e) {
       await driver.quit();
-      console.log(e);
       this.telegramService.sendMessageToTelegram({
         message: '블로그 매크로 실패',
         channelId: Number(process.env.TELEGRAM_ALRAM_CHANNEL),
@@ -254,9 +252,7 @@ export class BlogManageService {
         },
       });
       return data;
-    } catch (e) {
-      console.log(e);
-    }
+    } catch (e) {}
   }
 
   async getKeywordSearchCount(
@@ -284,7 +280,6 @@ export class BlogManageService {
         })),
       };
     } catch (e) {
-      console.log(e);
       return {
         ok: false,
       };
@@ -488,7 +483,6 @@ export class BlogManageService {
         ok: true,
       };
     } catch (e) {
-      console.log(e);
       return {
         ok: false,
         error: '서버 에러',
@@ -523,7 +517,6 @@ export class BlogManageService {
         postCnt: data.result.mylogPostCount,
       };
     } catch (e) {
-      console.log(e);
       return {
         ok: false,
         error: '서버 에러',
@@ -633,7 +626,6 @@ export class BlogManageService {
         postLink,
       };
     } catch (e) {
-      console.log(e);
       return {
         ok: false,
       };
@@ -699,7 +691,6 @@ export class BlogManageService {
       );
       return JSON.parse(parsedData).result as NaverBlogInfo;
     } catch (e) {
-      console.log(e);
       return null;
     }
   }

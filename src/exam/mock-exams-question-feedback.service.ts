@@ -93,7 +93,6 @@ export class MockExamQuestionFeedbackSerivce {
         feedback,
       };
     } catch (e) {
-      console.log(e);
       return {
         ok: false,
         error: '피드백을 보낼 수 없습니다.',
@@ -323,7 +322,6 @@ export class MockExamQuestionFeedbackSerivce {
         feedbacks,
       };
     } catch (e) {
-      console.log(e);
       return {
         ok: false,
         error: '피드백을 불러올 수 없습니다.',
@@ -367,7 +365,6 @@ export class MockExamQuestionFeedbackSerivce {
         ok: true,
       };
     } catch (e) {
-      console.log(e);
       return {
         ok: false,
         error: '피드백을 숨길 수 없습니다.',

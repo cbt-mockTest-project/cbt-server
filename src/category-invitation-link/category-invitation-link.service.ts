@@ -59,7 +59,6 @@ export class CategoryInvitationLinkService {
         code,
       };
     } catch (e) {
-      console.log(e);
       return {
         ok: false,
         error: '초대링크를 생성 할 수 없습니다.',
@@ -113,7 +112,6 @@ export class CategoryInvitationLinkService {
         examType: invitationLink.category.examType,
       };
     } catch (e) {
-      console.log(e);
       return {
         ok: false,
         error: '알수 없는 오류가 발생했습니다.',

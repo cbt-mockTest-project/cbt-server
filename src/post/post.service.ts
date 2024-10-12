@@ -167,7 +167,6 @@ export class PostService {
       });
       return { ok: true, title: savedPost.title, content: savedPost.content };
     } catch (e) {
-      console.log(e);
       return {
         ok: false,
         error: '게시글 수정에 실패했습니다.',
@@ -247,7 +246,6 @@ export class PostService {
         post,
       };
     } catch (e) {
-      console.log(e);
       return {
         ok: false,
         error: '게시글을 불러오지 못했습니다.',
@@ -301,7 +299,6 @@ export class PostService {
         ok: true,
       };
     } catch (e) {
-      console.log(e);
       return {
         ok: false,
         error: '게시글들을 불러오지 못했습니다.',

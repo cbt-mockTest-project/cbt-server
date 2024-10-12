@@ -841,7 +841,6 @@ export class MockExamService {
               ? `/category/${prevCategory.urlSlug}`
               : `/mcq/category/${prevCategory.urlSlug}`,
         });
-        console.log('2');
         if (exitingRelation.find((relation) => relation.id === categoryId)) {
           return {
             examId: exam.id,

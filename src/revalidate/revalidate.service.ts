@@ -15,18 +15,14 @@ export class RevalidateService {
   ): Promise<RevalidateOutput> {
     const { path } = revalidateInput;
     try {
-      console.log(`${path} revalidate start`);
       await axios.post(
         `http://localhost:3000/api/revalidate?secret=${this.options.revalidateKey}`,
         { path },
       );
-      console.log(`${path} revalidate success`);
       return {
         ok: true,
       };
     } catch (e) {
-      console.log(e);
-      console.log(`${path} revalidate failure`);
       return {
         ok: false,
         error: 'revalidate failed',

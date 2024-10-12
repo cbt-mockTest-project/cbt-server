@@ -64,7 +64,6 @@ export class SettlementRequestService {
       });
       return { ok: true };
     } catch (e) {
-      console.log(e);
       return { ok: false, error: 'Cannot create settlement request' };
     }
   }

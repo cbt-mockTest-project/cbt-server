@@ -456,7 +456,6 @@ export class MockExamQuestionService {
         ok: true,
       };
     } catch (e) {
-      console.log(e);
       return {
         ok: false,
         error: '문제를 수정할 수 없습니다.',
@@ -913,7 +912,6 @@ export class MockExamQuestionService {
         count,
       };
     } catch (e) {
-      console.log(e);
       return {
         ok: false,
         error: '문제를 찾을 수 없습니다.',
@@ -1673,7 +1671,6 @@ export class MockExamQuestionService {
         questions,
       };
     } catch (e) {
-      console.log(e);
       return {
         ok: false,
         error: '문제를 찾을 수 없습니다.',
@@ -1892,7 +1889,6 @@ export class MockExamQuestionService {
         questions,
       };
     } catch (e) {
-      console.log(e);
       return {
         ok: false,
         error: '문제를 찾을 수 없습니다.',

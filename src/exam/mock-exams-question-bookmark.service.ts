@@ -156,7 +156,6 @@ export class MockExamQuestionBookmarkSerivce {
       );
       return { ok: true, titleAndId };
     } catch (e) {
-      console.log(e);
       return { ok: false, error: '시험 리스트를 불러올 수 없습니다.' };
     }
   }

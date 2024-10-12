@@ -18,11 +18,7 @@ export class MailService {
           link,
         },
       })
-      .then((success) => {
-        console.log(success);
-      })
       .catch((err) => {
-        console.log(err);
         return {
           ok: false,
           error: '메일을 보낼 수 없습니다.',
@@ -45,11 +41,7 @@ export class MailService {
           link,
         },
       })
-      .then((success) => {
-        console.log(success);
-      })
       .catch((err) => {
-        console.log(err);
         return {
           ok: false,
           error: '메일을 보낼 수 없습니다.',
@@ -78,11 +70,7 @@ export class MailService {
           title,
         },
       })
-      .then((success) => {
-        console.log(success);
-      })
       .catch((err) => {
-        console.log(err);
         return {
           ok: false,
           error: '메일을 보낼 수 없습니다.',

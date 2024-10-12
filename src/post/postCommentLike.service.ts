@@ -62,7 +62,6 @@ export class PostCommentLikeService {
         currentState: true,
       };
     } catch (e) {
-      console.log(e);
       return {
         ok: false,
         error: '좋아요 요청에 실패했습니다.',

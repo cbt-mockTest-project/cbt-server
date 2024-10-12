@@ -40,7 +40,6 @@ export class ZepUserService {
         ok: true,
       };
     } catch (e) {
-      console.log(e);
       return {
         ok: false,
         error: '업데이트에 실패했습니다.',

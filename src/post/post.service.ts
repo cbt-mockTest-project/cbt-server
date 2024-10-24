@@ -15,8 +15,7 @@ import {
   ReadPostsOutput,
 } from './dtos/readPosts.dto';
 import { ViewPostInput, ViewPostOutput } from './dtos/viewPost.dto';
-import { Post, PostCategory } from './entities/post.entity';
-import { PostData } from './entities/postData.entity';
+import { Post } from './entities/post.entity';
 import { PostFile } from './entities/postFile.entity';
 
 @Injectable()
@@ -24,8 +23,6 @@ export class PostService {
   constructor(
     @InjectRepository(Post)
     private readonly post: Repository<Post>,
-    @InjectRepository(PostData)
-    private readonly postData: Repository<PostData>,
     @InjectRepository(PostFile)
     private readonly postFile: Repository<PostFile>,
     private readonly revalidateService: RevalidateService,
@@ -37,54 +34,31 @@ export class PostService {
   ): Promise<CreatePostOutput> {
     const queryRunner = this.post.manager.connection.createQueryRunner();
     try {
-      const { content, title, category, data } = createPostInput;
+      const { content, title, file } = createPostInput;
       await queryRunner.connect();
       await queryRunner.startTransaction();
 
-      if (data) {
-        const postData = await queryRunner.manager.save(
-          this.postData.create({
-            user,
-            price: data.price,
-          }),
-        );
-        await queryRunner.manager.save(
-          this.postFile.create({
-            name: data.fileName,
-            url: data.fileUrl,
-            page: data.filePage,
-            postData,
-            user,
-          }),
-        );
-        const post = await queryRunner.manager.save(
-          this.post.create({
-            content,
-            title,
-            user,
-            category,
-            data: postData,
-          }),
-        );
-        await queryRunner.commitTransaction();
-        await this.revalidateService.revalidate({
-          path: `/post/${post.id}`,
-        });
-        return {
-          ok: true,
-          postId: post.id,
-        };
-      }
+      await queryRunner.manager.save(
+        this.postFile.create({
+          name: file.name,
+          url: file.url,
+          format: file.format,
+          user,
+        }),
+      );
 
-      const post = this.post.create({ content, title, user, category });
-      await queryRunner.manager.save(post);
-      await this.revalidateService.revalidate({
-        path: `/post/${post.id}`,
-      });
+      const post = await queryRunner.manager.save(
+        this.post.create({
+          content,
+          title,
+          user,
+        }),
+      );
       await queryRunner.commitTransaction();
+
       return {
-        postId: post.id,
         ok: true,
+        post,
       };
     } catch {
       await queryRunner.rollbackTransaction();
@@ -103,17 +77,12 @@ export class PostService {
   ): Promise<EditPostOutput> {
     const queryRunner = this.post.manager.connection.createQueryRunner();
     try {
-      const { title, content, id, data } = editPostInput;
+      const { title, content, id } = editPostInput;
       await queryRunner.connect();
       await queryRunner.startTransaction();
 
       const prevPost = await this.post.findOne({
         where: { id, user: { id: user.id } },
-        relations: {
-          data: {
-            postFile: true,
-          },
-        },
       });
       if (!prevPost) {
         return {
@@ -121,41 +90,7 @@ export class PostService {
           error: '존재하지 않는 게시글입니다.',
         };
       }
-      if (data) {
-        await queryRunner.manager.update(
-          PostData,
-          { id: prevPost.data.id },
-          {
-            price: data.price,
-          },
-        );
-        await queryRunner.manager.update(
-          PostFile,
-          {
-            id: prevPost.data.postFile[0].id,
-          },
-          {
-            name: data.fileName,
-            url: data.fileUrl,
-            page: data.filePage,
-            user,
-          },
-        );
-        await queryRunner.manager.update(
-          Post,
-          { id },
-          {
-            content,
-            title,
-            user,
-          },
-        );
-        await queryRunner.commitTransaction();
-        this.revalidateService.revalidate({
-          path: `/post/${id}`,
-        });
-        return { ok: true };
-      }
+
       const savedPost = await this.post.save({
         title: title,
         content: content,
@@ -213,9 +148,8 @@ export class PostService {
         where: { id },
         relations: {
           user: true,
-          like: { user: true },
-          comment: { user: true, commentLike: { user: true } },
-          data: { postFile: true },
+          likes: { user: true },
+          comments: { user: true, likes: { user: true } },
         },
       });
       if (!post) {
@@ -224,21 +158,21 @@ export class PostService {
           error: '존재하지 않는 게시글 입니다.',
         };
       }
-      post.commentsCount = post.comment.length;
-      post.likesCount = post.like.length;
-      post.comment = post.comment.map((el) => {
+      post.commentsCount = post.comments.length;
+      post.likesCount = post.likes.length;
+      post.comments = post.comments.map((el) => {
         const newComment: PostComment = {
           ...el,
-          likesCount: el.commentLike.length,
+          likesCount: el.likes.length,
         };
 
         return newComment;
       });
       if (user) {
         post.likeState =
-          post.like.filter((el) => el.user.id === user.id).length >= 1;
+          post.likes.filter((el) => el.user.id === user.id).length >= 1;
       }
-      post.comment = post.comment.sort(
+      post.comments = post.comments.sort(
         (a, b) => Number(b.created_at) - Number(a.created_at),
       );
       return {
@@ -255,29 +189,26 @@ export class PostService {
 
   async readPosts(readPostsInput: ReadPostsInput): Promise<ReadPostsOutput> {
     try {
-      const { page, limit, category, all, search, order } = readPostsInput;
+      const { page, limit, all, search, order } = readPostsInput;
       const skip = (page - 1) * limit;
       let options: FindManyOptions<Post> = {
-        relations: { user: true, like: true, comment: true },
+        relations: { user: true, likes: true, comments: true },
       };
       if (!all) {
-        const orderOption: FindOptionsOrder<Post> = { priority: 'DESC' };
+        const orderOption: FindOptionsOrder<Post> = { created_at: 'DESC' };
         if (order === PostOrderType.like) {
           orderOption.likesCount = 'DESC';
         }
-        orderOption.created_at = 'DESC';
         options = {
           skip,
           take: limit,
           order: orderOption,
           relations: {
             user: true,
-            like: true,
-            comment: true,
-            data: category === PostCategory.DATA ? { postFile: true } : false,
+            likes: true,
+            comments: true,
           },
           where: {
-            category,
             title: search ? Like(`%${search}%`) : undefined,
             isHidden: false,
           },
@@ -288,8 +219,8 @@ export class PostService {
         posts = posts.map((post) => {
           return {
             ...post,
-            likesCount: post.like.length,
-            commentsCount: post.comment.length,
+            likesCount: post.likes.length,
+            commentsCount: post.comments.length,
           };
         });
       }

@@ -8,7 +8,7 @@ import { Post } from './post.entity';
 @ObjectType()
 @Entity()
 export class PostLike extends CoreEntity {
-  @ManyToOne(() => Post, (post) => post.like, {
+  @ManyToOne(() => Post, (post) => post.likes, {
     onDelete: 'CASCADE',
   })
   @Field(() => Post)

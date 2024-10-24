@@ -14,7 +14,6 @@ import { PostResolver } from './post.resolver';
 import { PostCommentLike } from './entities/postCommentLike.entity';
 import { PostCommentLikeResolver } from './postCommentLike.resolver';
 import { Notice } from 'src/users/entities/notice.entity';
-import { PostData } from './entities/postData.entity';
 import { PostFile } from './entities/postFile.entity';
 
 @Module({
@@ -23,7 +22,6 @@ import { PostFile } from './entities/postFile.entity';
       Post,
       PostComment,
       PostCommentLike,
-      PostData,
       PostFile,
       PostLike,
       Notice,

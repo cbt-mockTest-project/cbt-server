@@ -69,7 +69,6 @@ import { ZepPost } from './zep/entities/zepPost.entity';
 import { TodoModule } from './todo/todo.module';
 import { Todo } from './todo/entities/Todo.entity';
 import { PostFile } from './post/entities/postFile.entity';
-import { PostData } from './post/entities/postData.entity';
 import { ExamViewer } from './exam-viewer/entities/exam-viewer.entity';
 import { ExamViewerModule } from './exam-viewer/exam-viewer.module';
 import { StockModule } from './stock/stock.module';
@@ -233,7 +232,6 @@ import { CoupangSearchLog } from './modu-shop/coupang/entities/coupang-search-lo
         ZepComment,
         Todo,
         PostFile,
-        PostData,
         ExamViewer,
         Stock,
         ChatbotKey,

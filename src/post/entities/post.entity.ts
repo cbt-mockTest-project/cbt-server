@@ -1,28 +1,25 @@
 import { PostComment } from './postComment.entity';
 import { User } from './../../users/entities/user.entity';
-import {
-  Field,
-  InputType,
-  ObjectType,
-  registerEnumType,
-} from '@nestjs/graphql';
+import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { CoreEntity } from 'src/common/entities/core.entity';
-import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
-import { IsEnum } from 'class-validator';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+} from 'typeorm';
 import { PostLike } from './postLike.entity';
-import { PostData } from './postData.entity';
+import { PostFile } from './postFile.entity';
 
-export enum PostCategory {
-  FREE = 'FREE', // 자유
-  REVIEW = 'REVIEW', // 시험후기
-  RECOVERY = 'RECOVERY', // 복원
-  NOTICE = 'NOTICE', //공지
-  CHECKIN = 'CHECKIN', //출석체크
-  SUGGENSTION = 'SUGGENSTION', //건의사항
-  DATA = 'DATA', //자료실
+export enum PostStatusEnum {
+  DRAFT = 'DRAFT',
+  PENDING = 'PENDING',
+  PUBLISHED = 'PUBLISHED',
+  REJECTED = 'REJECTED',
 }
 
-registerEnumType(PostCategory, { name: 'PostCategory' });
 @InputType('PostInputType', { isAbstract: true })
 @ObjectType()
 @Entity()
@@ -35,29 +32,34 @@ export class Post extends CoreEntity {
   @Field(() => String)
   content: string;
 
-  @Column({
-    type: 'enum',
-    enum: PostCategory,
-    default: PostCategory.FREE,
-  })
-  @Field(() => PostCategory)
-  @IsEnum(PostCategory)
-  category: PostCategory;
+  @Column({ default: '' })
+  @Field(() => String, { defaultValue: '' })
+  keyword?: string;
+
+  @Column({ nullable: true })
+  @Field(() => String, { nullable: true })
+  thumbnail?: string;
+
+  @Column({ type: 'json', default: [] })
+  @Field(() => [String], { defaultValue: [] })
+  imageUrls?: string[];
+
+  @Column({ default: 0 })
+  @Field(() => Number, { defaultValue: 0 })
+  price?: number;
 
   @OneToMany(() => PostComment, (postComment) => postComment.post)
   @Field(() => [PostComment])
-  comment: PostComment[];
+  comments: PostComment[];
 
   @OneToMany(() => PostLike, (postLike) => postLike.post)
   @Field(() => [PostLike])
-  like: PostLike[];
+  likes: PostLike[];
 
-  @ManyToOne(() => PostData, (postData) => postData.post, {
-    nullable: true,
-    onDelete: 'SET NULL',
-  })
-  @Field(() => PostData, { nullable: true })
-  data: PostData;
+  @JoinColumn()
+  @OneToOne(() => PostFile, (postFile) => postFile.post)
+  @Field(() => PostFile)
+  file: PostFile;
 
   @ManyToOne(() => User, (user) => user.post, {
     onDelete: 'CASCADE',
@@ -68,13 +70,6 @@ export class Post extends CoreEntity {
   @Column({ default: 0 })
   @Field(() => Number, { defaultValue: 0 })
   view: number;
-
-  @Field(() => Boolean, { defaultValue: false })
-  likeState: boolean;
-
-  @Column({ default: 0 })
-  @Field(() => Number, { defaultValue: 0 })
-  priority: number;
 
   @Column({ default: false })
   @Field(() => Boolean, { defaultValue: false })
@@ -92,4 +87,7 @@ export class Post extends CoreEntity {
 
   @Field(() => Number, { defaultValue: 0 })
   commentLikesCount?: number;
+
+  @Field(() => Boolean, { defaultValue: false })
+  likeState: boolean;
 }

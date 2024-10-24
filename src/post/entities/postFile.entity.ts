@@ -1,8 +1,8 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { CoreEntity } from 'src/common/entities/core.entity';
-import { Column, Entity, ManyToOne } from 'typeorm';
-import { PostData } from './postData.entity';
+import { Column, Entity, ManyToOne, OneToOne } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
+import { Post } from './post.entity';
 
 @InputType('PostFileInputType', { isAbstract: true })
 @ObjectType()
@@ -17,16 +17,14 @@ export class PostFile extends CoreEntity {
   url: string;
 
   @Column()
-  @Field(() => Number, { defaultValue: 0 })
-  page: number;
-
-  @ManyToOne(() => PostData, (postData) => postData.postFile, {
-    onDelete: 'CASCADE',
-  })
-  @Field(() => PostData)
-  postData: PostData;
+  @Field(() => String, { defaultValue: '' })
+  format: string;
 
   @ManyToOne(() => User, (user) => user.postFile, { onDelete: 'CASCADE' })
   @Field(() => User)
   user: User;
+
+  @OneToOne(() => Post, (post) => post.file, { onDelete: 'CASCADE' })
+  @Field(() => Post, { nullable: true })
+  post?: Post;
 }

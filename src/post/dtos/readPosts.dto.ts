@@ -1,5 +1,5 @@
 import { CoreOutput } from './../../common/dtos/output.dto';
-import { Post, PostCategory } from './../entities/post.entity';
+import { Post } from './../entities/post.entity';
 import {
   Field,
   InputType,
@@ -23,8 +23,6 @@ export class ReadPostsInput {
   page: number;
   @Field(() => Number, { nullable: true })
   limit: number;
-  @Field(() => PostCategory, { nullable: true })
-  category: PostCategory;
   @Field(() => Boolean, { defaultValue: false })
   all: boolean;
   @Field(() => String, { nullable: true })

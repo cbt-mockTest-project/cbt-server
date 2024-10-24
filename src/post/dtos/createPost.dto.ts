@@ -1,29 +1,30 @@
+import { PostFile } from '../entities/postFile.entity';
 import { CoreOutput } from './../../common/dtos/output.dto';
-import { Post, PostCategory } from './../entities/post.entity';
+import { Post } from './../entities/post.entity';
 import { Field, InputType, ObjectType, PickType } from '@nestjs/graphql';
 
 @InputType()
-export class PostDataInput {
-  @Field(() => Number, { defaultValue: 0 })
-  price: number;
-  @Field(() => String, { defaultValue: '' })
-  fileName: string;
-  @Field(() => String, { defaultValue: '' })
-  fileUrl: string;
-  @Field(() => Number, { defaultValue: 0 })
-  filePage: number;
-}
+export class PostFileInput extends PickType(PostFile, [
+  'name',
+  'url',
+  'format',
+]) {}
 
 @InputType()
-export class CreatePostInput extends PickType(Post, ['content', 'title']) {
-  @Field(() => PostCategory, { nullable: true })
-  category?: PostCategory;
-  @Field(() => PostDataInput, { nullable: true })
-  data?: PostDataInput;
+export class CreatePostInput extends PickType(Post, [
+  'content',
+  'title',
+  'keyword',
+  'price',
+  'imageUrls',
+  'thumbnail',
+]) {
+  @Field(() => PostFileInput)
+  file: PostFileInput;
 }
 
 @ObjectType()
 export class CreatePostOutput extends CoreOutput {
-  @Field(() => Number, { nullable: true })
-  postId?: number;
+  @Field(() => Post, { nullable: true })
+  post?: Post;
 }

@@ -8,7 +8,7 @@ import { User } from 'src/users/entities/user.entity';
 @ObjectType()
 @Entity()
 export class PostCommentLike extends CoreEntity {
-  @ManyToOne(() => PostComment, (postComment) => postComment.commentLike, {
+  @ManyToOne(() => PostComment, (postComment) => postComment.likes, {
     onDelete: 'CASCADE',
   })
   @Field(() => PostComment)

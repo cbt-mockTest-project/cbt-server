@@ -13,7 +13,7 @@ export class PostComment extends CoreEntity {
   @Field(() => String)
   content: string;
 
-  @ManyToOne(() => Post, (post) => post.comment, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Post, (post) => post.comments, { onDelete: 'CASCADE' })
   @Field(() => Post)
   post: Post;
 
@@ -28,7 +28,7 @@ export class PostComment extends CoreEntity {
     (postCommentLike) => postCommentLike.comment,
   )
   @Field(() => [PostCommentLike])
-  commentLike: PostCommentLike[];
+  likes: PostCommentLike[];
 
   @Field(() => Boolean, { defaultValue: false })
   likeState: boolean;

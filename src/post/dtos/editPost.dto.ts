@@ -1,7 +1,7 @@
 import { CoreOutput } from '../../common/dtos/output.dto';
 import { Post } from '../entities/post.entity';
 import { Field, InputType, ObjectType, PickType } from '@nestjs/graphql';
-import { PostDataInput } from './createPost.dto';
+import { PostFileInput } from './createPost.dto';
 
 @InputType()
 export class EditPostInput extends PickType(Post, ['id']) {
@@ -9,8 +9,8 @@ export class EditPostInput extends PickType(Post, ['id']) {
   content?: string;
   @Field(() => String, { nullable: true })
   title?: string;
-  @Field(() => PostDataInput, { nullable: true })
-  data?: PostDataInput;
+  @Field(() => PostFileInput, { nullable: true })
+  file?: PostFileInput;
 }
 
 @ObjectType()
